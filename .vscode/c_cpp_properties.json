@@ -1,0 +1,37 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "",
+        "limitSymbolsToIncludedHeaders": true
+      },
+      "includePath": [
+        "/home/gsarthou/Robots/Pr2/Semantic/catkin_ws/devel/include/**",
+        "/opt/ros/melodic/include/**",
+        "/home/gsarthou/Robots/Pr2/Semantic/catkin_ws/src/GBA_generator/include/**",
+        "/home/gsarthou/Robots/Pr2/Semantic/catkin_ws/src/ar_track_alvar/ar_track_alvar/include/**",
+        "/home/gsarthou/Robots/Pr2/Semantic/catkin_ws/src/dialoGUI/include/**",
+        "/home/gsarthou/Robots/Pr2/Semantic/catkin_ws/src/exp_director_task/dt_actions_emulation/include/**",
+        "/home/gsarthou/Robots/Pr2/Semantic/catkin_ws/src/htn_to_owl/include/**",
+        "/home/gsarthou/Robots/Pr2/Semantic/catkin_ws/src/intruder/include/**",
+        "/home/gsarthou/Robots/Pr2/Semantic/catkin_ws/src/knowledge_sharing_planner/include/**",
+        "/home/gsarthou/Robots/Pr2/Semantic/catkin_ws/src/mementar/include/**",
+        "/home/gsarthou/Robots/Pr2/Semantic/catkin_ws/src/ontologenius/include/**",
+        "/home/gsarthou/Robots/Pr2/Semantic/catkin_ws/src/ontologenius_query/include/**",
+        "/home/gsarthou/Robots/Pr2/Semantic/catkin_ws/src/overworld/include/**",
+        "/home/gsarthou/Robots/Pr2/Semantic/catkin_ws/src/pir_ressources/include/**",
+        "/home/gsarthou/Robots/Pr2/Semantic/catkin_ws/src/resource_management/resource_management/include/**",
+        "/home/gsarthou/Robots/Pr2/Semantic/catkin_ws/src/resource_management/resource_synchronizer/include/**",
+        "/home/gsarthou/Robots/Pr2/Semantic/catkin_ws/src/route_verbalization/include/**",
+        "/home/gsarthou/Robots/Pr2/Semantic/catkin_ws/src/route_verbalization_fi/include/**",
+        "/home/gsarthou/Robots/Pr2/Semantic/catkin_ws/src/semantic_actions_description/include/**",
+        "/home/gsarthou/Robots/Pr2/Semantic/catkin_ws/src/semantic_route_description/include/**",
+        "/home/gsarthou/Robots/Pr2/Semantic/catkin_ws/src/sls/include/**",
+        "/home/gsarthou/Robots/Pr2/Semantic/catkin_ws/src/tempo/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS"
+    }
+  ],
+  "version": 4
+}
