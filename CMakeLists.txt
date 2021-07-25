@@ -6,8 +6,6 @@ add_compile_options(-std=c++14)
 
 if(DEFINED ENV{BULLET_INSTALL_PATH})
   set(CMAKE_PREFIX_PATH $ENV{BULLET_INSTALL_PATH} ${CMAKE_PREFIX_PATH})
-  message("${CMAKE_PREFIX_PATH}")
-  message("${BULLET_ROOT_DIR}/${BULLET_INCLUDE_DIR}")
 endif()
 
 find_package(catkin REQUIRED COMPONENTS
@@ -18,19 +16,6 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 find_package(Bullet REQUIRED)
-
-message("BULLET_FOUND ${BULLET_FOUND}")
-message("BULLET_USE_FILE ${BULLET_USE_FILE}")
-message("BULLET_DEFINITIONS ${BULLET_DEFINITIONS}")
-message("BULLET_INCLUDE_DIR ${BULLET_INCLUDE_DIR}")
-message("BULLET_INCLUDE_DIRS ${BULLET_INCLUDE_DIRS}")
-message("BULLET_LIBRARIES ${BULLET_LIBRARIES}")
-message("BULLET_LIBRARY_DIRS ${BULLET_LIBRARY_DIRS}")
-message("BULLET_ROOT_DIR ${BULLET_ROOT_DIR}")
-message("BULLET_VERSION_STRING ${BULLET_VERSION_STRING}")
-
-## System dependencies are found with CMake's conventions
-# find_package(Boost REQUIRED COMPONENTS system)
 
 ################################################
 ## Declare ROS messages, services and actions ##
@@ -91,6 +76,12 @@ include_directories(
 link_directories(
   ${BULLET_LIBRARY_DIRS}
 )
+
+add_library(${PROJECT_NAME}_bullet_lib
+  src/Bullet/PhysicsServers.cpp
+)
+target_include_directories(${PROJECT_NAME}_bullet_lib PRIVATE ${BULLET_INCLUDE_DIR})
+target_link_libraries(${PROJECT_NAME}_bullet_lib PRIVATE ${BULLET_LIBRARIES})
 
 add_executable(${PROJECT_NAME}_test src/main.cpp)
 target_include_directories(${PROJECT_NAME}_test PRIVATE ${BULLET_INCLUDE_DIR})
