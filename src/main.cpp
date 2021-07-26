@@ -1,4 +1,5 @@
 #include "overworld/Bullet/PhysicsServers.h"
+#include "overworld/geometry/Pose.h"
 
 #include <iostream>
 #include <csignal>
@@ -22,6 +23,11 @@ int main(int argc, char** argv)
 
 	int server_id = servers.connectPhysicsServer(owds::CONNECT_GUI);
 	std::cout << "server_id " << server_id << std::endl;
+
+	Pose p1;
+	Pose p2({{1.0, 1.0, 1.0}}, {{0.0, 0.0, 0.0, 1.0}});
+
+	std::cout << "Distance is: " << p1.distanceTo(p2) << std::endl;
 
 	while(flag == false)
 	{
