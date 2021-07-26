@@ -18,9 +18,8 @@ void sigHandler(int signal)
 int main(int argc, char** argv)
 {
 	flag = false;
-	owds::PhysicsServers servers;
 
-	int server_id = servers.connectPhysicsServer(owds::CONNECT_GUI);
+	int server_id = owds::PhysicsServers::connectPhysicsServer(owds::CONNECT_GUI);
 	std::cout << "server_id " << server_id << std::endl;
 
 	while(flag == false)

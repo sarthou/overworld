@@ -4,12 +4,9 @@
 
 namespace owds {
 
-PhysicsServers::PhysicsServers() : nb_used_clients_(0),
-   								   clients_handles{0},
-    							   clients_method{0}
-{
-
-}
+int PhysicsServers::nb_used_clients_ = 0;
+b3PhysicsClientHandle PhysicsServers::clients_handles[MAX_PHYSICS_CLIENTS] = {0};
+int PhysicsServers::clients_method[MAX_PHYSICS_CLIENTS] = {0};
 
 int PhysicsServers::connectPhysicsServer(BulletConnectionMothod_e method, size_t port, size_t key)
 {

@@ -28,17 +28,17 @@ enum BulletConnectionMothod_e
 class PhysicsServers
 {
 public:
-    PhysicsServers();
-
-    int connectPhysicsServer(BulletConnectionMothod_e methode, size_t port = 1234, size_t key = 12347);
-    bool disconnectPhysicsServer(size_t physics_client_id);
+    static int connectPhysicsServer(BulletConnectionMothod_e methode, size_t port = 1234, size_t key = 12347);
+    static bool disconnectPhysicsServer(size_t physics_client_id);
 
 private:
-    int nb_used_clients_;
-    b3PhysicsClientHandle clients_handles[MAX_PHYSICS_CLIENTS];
-    int clients_method[MAX_PHYSICS_CLIENTS];
+    PhysicsServers() {}
 
-    b3PhysicsClientHandle getPhysicsClient(int physics_client_id);
+    static int nb_used_clients_;
+    static b3PhysicsClientHandle clients_handles[MAX_PHYSICS_CLIENTS];
+    static int clients_method[MAX_PHYSICS_CLIENTS];
+
+    static b3PhysicsClientHandle getPhysicsClient(int physics_client_id);
 };
 
 } // namespace owds
