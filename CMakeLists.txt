@@ -5,7 +5,7 @@ project(overworld)
 add_compile_options(-std=c++14)
 
 if(DEFINED ENV{BULLET_INSTALL_PATH})
-  set(CMAKE_PREFIX_PATH $ENV{BULLET_INSTALL_PATH} ${CMAKE_PREFIX_PATH})
+  set(BULLET_ROOT $ENV{BULLET_INSTALL_PATH})
 endif()
 
 find_package(catkin REQUIRED COMPONENTS
@@ -14,8 +14,32 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   tf
 )
+find_package(Threads REQUIRED)
 
-find_package(Bullet REQUIRED)
+list(APPEND BULLET_LIB_NAMES BulletRoboticsGUI
+                             BulletExampleBrowserLib
+                             BulletRobotics
+                             BulletFileLoader
+                             BulletWorldImporter
+                             BulletSoftBody
+                             BulletDynamics
+                             BulletCollision
+                             BulletInverseDynamicsUtils
+                             BulletInverseDynamics
+                             LinearMath
+                             OpenGLWindow
+                             gwen
+                             BussIK
+                             Bullet3Common)
+
+
+find_package(Bullet MODULE REQUIRED)
+
+foreach(lib_name ${BULLET_LIB_NAMES})
+  find_library(LIB_PATH ${lib_name} ${BULLET_ROOT}/lib NO_DEFAULT_PATH)
+  list(APPEND BULLET_LIBS ${LIB_PATH})
+  unset(LIB_PATH CACHE)
+endforeach()
 
 ################################################
 ## Declare ROS messages, services and actions ##
@@ -73,16 +97,14 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-link_directories(
-  ${BULLET_LIBRARY_DIRS}
-)
+add_library(Bullet3 INTERFACE)
+target_include_directories(Bullet3 INTERFACE ${BULLET_INCLUDE_DIRS})
+target_link_libraries(Bullet3 INTERFACE ${BULLET_LIBS} ${CMAKE_DL_LIBS} Threads::Threads)
 
-add_library(${PROJECT_NAME}_bullet_lib
+add_library(${PROJECT_NAME}_bullet_lib STATIC
   src/Bullet/PhysicsServers.cpp
 )
-target_include_directories(${PROJECT_NAME}_bullet_lib PRIVATE ${BULLET_INCLUDE_DIR})
-target_link_libraries(${PROJECT_NAME}_bullet_lib PRIVATE ${BULLET_LIBRARIES})
+target_link_libraries(${PROJECT_NAME}_bullet_lib PUBLIC Bullet3)
 
 add_executable(${PROJECT_NAME}_test src/main.cpp)
-target_include_directories(${PROJECT_NAME}_test PRIVATE ${BULLET_INCLUDE_DIR})
-target_link_libraries(${PROJECT_NAME}_test PRIVATE ${BULLET_LIBRARIES})
+target_link_libraries(${PROJECT_NAME}_test PRIVATE ${PROJECT_NAME}_bullet_lib)
