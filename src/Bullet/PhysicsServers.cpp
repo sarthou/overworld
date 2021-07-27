@@ -1,5 +1,7 @@
 #include "overworld/Bullet/PhysicsServers.h"
 
+#include "overworld/Utility/ShellDisplay.h"
+
 #include <iostream>
 
 namespace owds {
@@ -15,7 +17,7 @@ BulletClient* PhysicsServers::connectPhysicsServer(BulletConnectionMothod_e meth
 
 	if(nb_used_clients_ >= MAX_PHYSICS_CLIENTS)
 	{
-		std::cout << "Exceeding maximum number of physics connections." << std::endl;
+		ShellDisplay::error("Exceeding maximum number of physics connections.");
 		return nullptr;
 	}
 
@@ -26,7 +28,7 @@ BulletClient* PhysicsServers::connectPhysicsServer(BulletConnectionMothod_e meth
 		{
 			if ((clients_method[i] == CONNECT_GUI) || (clients_method[i] == CONNECT_GUI_SERVER))
 			{
-				std::cout << "Only one local in-process GUI/GUI_SERVER connection allowed. Use DIRECT connection mode or start a separate GUI physics server (ExampleBrowser, App_SharedMemoryPhysics_GUI, App_SharedMemoryPhysics_VR) and connect over SHARED_MEMORY, UDP or TCP instead." << std::endl;
+				ShellDisplay::error("Only one local in-process GUI/GUI_SERVER connection allowed. Use DIRECT connection mode or start a separate GUI physics server (ExampleBrowser, App_SharedMemoryPhysics_GUI, App_SharedMemoryPhysics_VR) and connect over SHARED_MEMORY, UDP or TCP instead.");
 				return nullptr;
 			}
 		}
@@ -84,7 +86,7 @@ BulletClient* PhysicsServers::connectPhysicsServer(BulletConnectionMothod_e meth
 		}
 		default:
 		{
-			std::cout << "connectPhysicsServer unexpected argument" << std::endl;
+			ShellDisplay::error("connectPhysicsServer unexpected argument");
 			return nullptr;
 		}
 	};
@@ -120,7 +122,7 @@ BulletClient* PhysicsServers::connectPhysicsServer(BulletConnectionMothod_e meth
 
 					if (status_type != CMD_SYNC_BODY_INFO_COMPLETED)
 					{
-						std::cout << "Connection terminated, couldn't get body info" << std::endl;
+						ShellDisplay::error("Connection terminated, couldn't get body info");
 						b3DisconnectSharedMemory(sm);
 						sm = 0;
 						clients_handles[free_index] = 0;
@@ -135,7 +137,7 @@ BulletClient* PhysicsServers::connectPhysicsServer(BulletConnectionMothod_e meth
 
 					if (status_type != CMD_SYNC_USER_DATA_COMPLETED)
 					{
-						std::cout << "Connection terminated, couldn't get user data" << std::endl;
+						ShellDisplay::error("Connection terminated, couldn't get user data");
 						b3DisconnectSharedMemory(sm);
 						sm = 0;
 						clients_handles[free_index] = 0;
@@ -159,7 +161,7 @@ bool PhysicsServers::disconnectPhysicsServer(size_t physics_client_id)
 	b3PhysicsClientHandle sm = getPhysicsClient(physics_client_id);
 	if (sm == 0)
 	{
-		std::cout << "Not connected to physics server." << std::endl;
+		ShellDisplay::error("Not connected to physics server.");
 		return false;
 	}
 
