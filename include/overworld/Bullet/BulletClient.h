@@ -28,6 +28,8 @@ public:
 
     size_t getId() { return client_id_; }
 
+    void setAdditionalSearchPath(const std::string& path);
+
     int createVisualShapeBox(const std::array<double, 3>& half_extents, const std::array<double, 4>& rgba_color = {1});
     int createVisualShapeSphere(float radius, const std::array<double, 4>& rgba_color = {1});
     int createVisualShapeCylinder(float radius, float height, const std::array<double, 4>& rgba_color = {1});
@@ -46,6 +48,12 @@ public:
                         const std::array<double, 3>& base_position,
                         const std::array<double, 4>& base_orientation,
                         int flags = 0);
+
+    int loadURDF(const std::string& file_name,
+                const std::array<double, 3>& base_position,
+                const std::array<double, 4>& base_orientation,
+                bool use_fixed_base = false,
+                int flags = 0);
     
 private:
     b3PhysicsClientHandle* client_handle_;

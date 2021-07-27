@@ -16,6 +16,15 @@ BulletClient::~BulletClient()
     PhysicsServers::disconnectPhysicsServer(client_id_);
 }
 
+void BulletClient::setAdditionalSearchPath(const std::string& path)
+{
+	if (path != "")
+	{
+		b3SharedMemoryCommandHandle command_handle = b3SetAdditionalSearchPath(*client_handle_, path.c_str());
+		b3SharedMemoryStatusHandle status_handle = b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+	}
+}
+
 int BulletClient::createVisualShapeBox(const std::array<double, 3>& half_extents, const std::array<double, 4>& rgba_color)
 {
     return createVisualShape(GEOM_BOX, 0, half_extents, 0, "", {0}, rgba_color);
@@ -222,6 +231,40 @@ int BulletClient::createMultiBody(float base_mass,
 
 	ShellDisplay::error("createMultiBody failed.");
 	return -1;
+}
+
+int BulletClient::loadURDF(const std::string& file_name,
+                           const std::array<double, 3>& base_position,
+                           const std::array<double, 4>& base_orientation,
+                           bool use_fixed_base,
+                           int flags)
+{
+	if (file_name != "")
+	{
+		b3SharedMemoryCommandHandle command = b3LoadUrdfCommandInit(*client_handle_, file_name.c_str());
+		b3LoadUrdfCommandSetFlags(command, flags);
+
+		b3LoadUrdfCommandSetStartPosition(command, base_position.at(0), base_position.at(1), base_position.at(2));
+		b3LoadUrdfCommandSetStartOrientation(command, base_orientation.at(0), base_orientation.at(1),
+											 base_orientation.at(2), base_orientation.at(3));
+
+		if (use_fixed_base)
+			b3LoadUrdfCommandSetUseFixedBase(command, 1);
+
+		b3SharedMemoryStatusHandle status_handle = b3SubmitClientCommandAndWaitStatus(*client_handle_, command);
+		int status_type = b3GetStatusType(status_handle);
+		if (status_type != CMD_URDF_LOADING_COMPLETED)
+		{
+			ShellDisplay::error("Cannot load URDF file.");
+			return -1;
+		}
+		return b3GetStatusBodyIndex(status_handle);
+	}
+	else
+	{
+		ShellDisplay::error("Empty filename, method expects 1, 4 or 8 arguments.");
+		return -1;
+	}
 }
 
 } // namespace owds
