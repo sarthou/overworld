@@ -24,4 +24,14 @@ double Pose::distanceTo(const Pose& pose) const{
     return (t_.translation() - pose.t_.translation()).norm();
 }
 
+const std::pair<std::array<double, 3>, std::array<double, 4>> Pose::arrays() const{
+    Eigen::Vector3d translation(t_.translation());
+    Eigen::Quaternion<double> rot(t_.rotation());
+    std::pair<std::array<double, 3>, std::array<double, 4>> p;
+    std::array<double, 3> t();
+    p.first = {translation.x(), translation.y(), translation.z()};
+    p.second = {rot.x(), rot.y(), rot.z(), rot.w()};
+    return p;
+}
+
 }

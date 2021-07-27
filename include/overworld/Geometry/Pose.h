@@ -19,6 +19,8 @@ class Pose{
     double distanceSqTo(const Pose& pose) const;
     double distanceTo(const Pose& pose) const;
 
+    const std::pair<std::array<double, 3>, std::array<double, 4>> arrays() const;
+
     protected:
     Eigen::Affine3d t_;
 };
