@@ -1,6 +1,6 @@
 #include "overworld/Geometry/Pose.h"
 
-using namespace owds;
+namespace owds{
 
 Pose::Pose(): t_(Eigen::Affine3d::Identity()){
 
@@ -22,4 +22,6 @@ double Pose::distanceSqTo(const Pose& pose) const{
 
 double Pose::distanceTo(const Pose& pose) const{
     return (t_.translation() - pose.t_.translation()).norm();
+}
+
 }
