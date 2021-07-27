@@ -1,4 +1,4 @@
-#include "overworld/geometry/Pose.h"
+#include "overworld/Geometry/Pose.h"
 
 Pose::Pose(): t_(Eigen::Affine3d::Identity()){
 

@@ -1,5 +1,5 @@
 #include "overworld/Bullet/PhysicsServers.h"
-#include "overworld/geometry/Pose.h"
+#include "overworld/Geometry/Pose.h"
 
 #include <iostream>
 #include <csignal>
