@@ -2,6 +2,7 @@
 #define POSE_H
 #include <eigen3/Eigen/Geometry>
 
+namespace owds{
 class Pose{
     public:
     Pose();
@@ -21,4 +22,5 @@ class Pose{
     protected:
     Eigen::Affine3d t_;
 };
+}
 #endif /* POSE_H */

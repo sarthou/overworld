@@ -1,5 +1,7 @@
 #include "overworld/Geometry/Pose.h"
 
+using namespace owds;
+
 Pose::Pose(): t_(Eigen::Affine3d::Identity()){
 
 }
