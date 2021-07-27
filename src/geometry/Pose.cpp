@@ -9,7 +9,7 @@ Pose::Pose(const Pose& pose): t_(pose.t_){
 }
 
 Pose::Pose(const std::array<double, 3>& translation, const std::array<double, 4>& rotation): t_(Eigen::Translation3d(
-                translation[0], translation[1], translation[2]) * Eigen::Quaternion<double>(rotation[0], rotation[1], rotation[2], rotation[3])
+                translation[0], translation[1], translation[2]) * Eigen::Quaternion<double>(rotation[3], rotation[0], rotation[1], rotation[2])
                 ){
 
 }
