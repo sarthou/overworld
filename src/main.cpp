@@ -22,6 +22,10 @@ int main(int argc, char** argv)
 	owds::BulletClient* client = owds::PhysicsServers::connectPhysicsServer(owds::CONNECT_GUI);
 	std::cout << "server_id " << client->getId() << std::endl;
 
+	int visual_id = client->createVisualShapeBox({1,2,1}, {1,0,0,1});
+	int collision_id = client->createCollisionShapeBox({1,2,1});
+	int obj_id = client->createMultiBody(0, collision_id, visual_id, {0,0,0}, {0,0,0,1});
+
 	while(flag == false)
 	{
 		std::this_thread::sleep_for(100ms);
