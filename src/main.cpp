@@ -1,5 +1,6 @@
 #include "overworld/Bullet/PhysicsServers.h"
 #include "overworld/Geometry/Pose.h"
+#include "overworld/BasicTypes/Object.h"
 
 #include <iostream>
 #include <csignal>
@@ -26,8 +27,12 @@ int main(int argc, char** argv)
 
 	owds::Pose p1;
 	owds::Pose p2({{1.0, 1.0, 1.0}}, {{0.0, 0.0, 0.0, 1.0}});
-
 	std::cout << "Distance is: " << p1.distanceTo(p2) << std::endl;
+
+	owds::Object obj1("obj_1"), obj2("table");
+	obj1.updatePose({{0.0, 0.0, 0.0}}, {{0.0, 0.0, 0.0, 1.0}}, ros::Time(1.0));
+	obj2.updatePose({{3.0, 0.0, 0.0}}, {{0.0, 0.0, 0.0, 1.0}}, ros::Time(3.0));
+	std::cout << "The distance between " << obj1.id() << " and " << obj2.id() << " is: " << obj1.pose().distanceTo(obj2.pose()) << "m." << std::endl;
 
 	while(flag == false)
 	{
