@@ -103,6 +103,7 @@ target_link_libraries(Bullet3 INTERFACE ${BULLET_LIBS} ${CMAKE_DL_LIBS} Threads:
 
 add_library(${PROJECT_NAME}_bullet_lib STATIC
   src/Bullet/PhysicsServers.cpp
+  src/Bullet/BulletClient.cpp
 )
 target_link_libraries(${PROJECT_NAME}_bullet_lib PUBLIC Bullet3)
 
