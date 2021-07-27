@@ -7,6 +7,8 @@
 #include "SharedMemory/PhysicsDirectC_API.h"
 #include "SharedMemory/SharedMemoryInProcessPhysicsC_API.h"
 
+#include "overworld/Bullet/BulletClient.h"
+
 #define MAX_PHYSICS_CLIENTS 1024
 
 namespace owds {
@@ -28,7 +30,7 @@ enum BulletConnectionMothod_e
 class PhysicsServers
 {
 public:
-    static int connectPhysicsServer(BulletConnectionMothod_e methode, size_t port = 1234, size_t key = 12347);
+    static BulletClient* connectPhysicsServer(BulletConnectionMothod_e methode, size_t port = 1234, size_t key = 12347);
     static bool disconnectPhysicsServer(size_t physics_client_id);
 
 private:

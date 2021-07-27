@@ -19,13 +19,15 @@ int main(int argc, char** argv)
 {
 	flag = false;
 
-	int server_id = owds::PhysicsServers::connectPhysicsServer(owds::CONNECT_GUI);
-	std::cout << "server_id " << server_id << std::endl;
+	owds::BulletClient* client = owds::PhysicsServers::connectPhysicsServer(owds::CONNECT_GUI);
+	std::cout << "server_id " << client->getId() << std::endl;
 
 	while(flag == false)
 	{
 		std::this_thread::sleep_for(100ms);
 	}
+
+	delete client;
 
 	return 0;
 }

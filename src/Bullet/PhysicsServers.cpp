@@ -8,7 +8,7 @@ int PhysicsServers::nb_used_clients_ = 0;
 b3PhysicsClientHandle PhysicsServers::clients_handles[MAX_PHYSICS_CLIENTS] = {0};
 int PhysicsServers::clients_method[MAX_PHYSICS_CLIENTS] = {0};
 
-int PhysicsServers::connectPhysicsServer(BulletConnectionMothod_e method, size_t port, size_t key)
+BulletClient* PhysicsServers::connectPhysicsServer(BulletConnectionMothod_e method, size_t port, size_t key)
 {
 	int free_index = -1;
 	b3PhysicsClientHandle sm = 0;
@@ -16,7 +16,7 @@ int PhysicsServers::connectPhysicsServer(BulletConnectionMothod_e method, size_t
 	if(nb_used_clients_ >= MAX_PHYSICS_CLIENTS)
 	{
 		std::cout << "Exceeding maximum number of physics connections." << std::endl;
-		return -1;
+		return nullptr;
 	}
 
 	//Only one local in-process GUI connection allowed.
@@ -27,7 +27,7 @@ int PhysicsServers::connectPhysicsServer(BulletConnectionMothod_e method, size_t
 			if ((clients_method[i] == CONNECT_GUI) || (clients_method[i] == CONNECT_GUI_SERVER))
 			{
 				std::cout << "Only one local in-process GUI/GUI_SERVER connection allowed. Use DIRECT connection mode or start a separate GUI physics server (ExampleBrowser, App_SharedMemoryPhysics_GUI, App_SharedMemoryPhysics_VR) and connect over SHARED_MEMORY, UDP or TCP instead." << std::endl;
-				return -1;
+				return nullptr;
 			}
 		}
 	}
@@ -85,7 +85,7 @@ int PhysicsServers::connectPhysicsServer(BulletConnectionMothod_e method, size_t
 		default:
 		{
 			std::cout << "connectPhysicsServer unexpected argument" << std::endl;
-			return -1;
+			return nullptr;
 		}
 	};
 
@@ -126,7 +126,7 @@ int PhysicsServers::connectPhysicsServer(BulletConnectionMothod_e method, size_t
 						clients_handles[free_index] = 0;
 						clients_method[free_index] = 0;
 						nb_used_clients_++;
-						return -1;
+						return nullptr;
 					}
 
 					command = b3InitSyncUserDataCommand(sm);
@@ -141,7 +141,7 @@ int PhysicsServers::connectPhysicsServer(BulletConnectionMothod_e method, size_t
 						clients_handles[free_index] = 0;
 						clients_method[free_index] = 0;
 						nb_used_clients_++;
-						return -1;
+						return nullptr;
 					}
 				}
 			}
@@ -151,7 +151,7 @@ int PhysicsServers::connectPhysicsServer(BulletConnectionMothod_e method, size_t
 			b3DisconnectSharedMemory(sm);
 		}
 	}
-	return free_index;
+	return new BulletClient(&clients_handles[free_index], free_index);
 }
 
 bool PhysicsServers::disconnectPhysicsServer(size_t physics_client_id)
