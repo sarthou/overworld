@@ -106,5 +106,5 @@ add_library(${PROJECT_NAME}_bullet_lib STATIC
 )
 target_link_libraries(${PROJECT_NAME}_bullet_lib PUBLIC Bullet3)
 
-add_executable(${PROJECT_NAME}_test src/main.cpp src/Geometry/Pose.cpp)
-target_link_libraries(${PROJECT_NAME}_test PRIVATE ${PROJECT_NAME}_bullet_lib)
+add_executable(${PROJECT_NAME}_test src/main.cpp src/Geometry/Pose.cpp src/BasicTypes/Entity.cpp src/BasicTypes/BodyPart.cpp src/BasicTypes/Object.cpp)
+target_link_libraries(${PROJECT_NAME}_test PRIVATE ${PROJECT_NAME}_bullet_lib ${catkin_LIBRARIES})
