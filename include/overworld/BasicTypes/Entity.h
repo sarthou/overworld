@@ -21,11 +21,15 @@ class Entity{
     void setId(const std::string& id);
     const std::string& id() const;
 
+    void setBulletId(int bodyId);
+    int bulletId() const;
+
     protected:
     std::string id_;
     Pose pose_;
     ros::Time lastPose_;
     bool isLocated_;
+    int bulletId_;
 };
 
 class UnlocatedEntityError: public std::runtime_error{

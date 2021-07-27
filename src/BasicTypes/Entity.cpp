@@ -4,10 +4,10 @@
 
 namespace owds{
     
-Entity::Entity(): id_(""), isLocated_(false){
+Entity::Entity(): id_(""), isLocated_(false), bulletId_(-1){
 
 }
-Entity::Entity(const std::string& id): id_(id), isLocated_(false){
+Entity::Entity(const std::string& id): id_(id), isLocated_(false), bulletId_(-1){
 
 }
 
@@ -41,5 +41,13 @@ void Entity::setId(const std::string& id){
 
 const std::string& Entity::id() const{
     return id_;
+}
+
+void Entity::setBulletId(int bulletId){
+    bulletId_ = bulletId;
+}
+
+int Entity::bulletId() const{
+    return bulletId_;
 }
 }
