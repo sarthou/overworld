@@ -138,7 +138,9 @@ public:
     struct b3RaycastInformation rayTestBatch(const std::vector<std::array<double, 3>>& from_poses,
                                              const std::vector<std::array<double,3>>& to_poses,
                                              int nb_thread = 1,
-                                             bool report_hit_number = -1);
+                                             bool report_hit_number = false);
+    
+    void performCollisionDetection();
     
 private:
     b3PhysicsClientHandle* client_handle_;

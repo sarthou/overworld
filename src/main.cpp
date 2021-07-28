@@ -48,6 +48,7 @@ int main(int argc, char** argv)
 
 	std::cout << images.m_pixelWidth << "x" << images.m_pixelHeight << std::endl;
 
+	client->performCollisionDetection();
 	auto raycast_info = client->rayTestBatch({{0,0,1}}, {{3,3,1}});
 	client->addUserDebugLine({0,0,1}, {3,3,1}, {0,0,1});
 	if(raycast_info.m_numRayHits)

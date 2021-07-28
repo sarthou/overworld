@@ -627,7 +627,7 @@ struct b3RaycastInformation BulletClient::rayTestBatch(const std::vector<std::ar
             b3RaycastBatchAddRays(*client_handle_, command_handle, &from_poses[i][0], &to_poses[i][0], 1);
     }
 
-	if (report_hit_number >= 0)
+	if (report_hit_number)
 		b3RaycastBatchSetReportHitNumber(command_handle, report_hit_number);
 
 	b3SharedMemoryStatusHandle status_handle = b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
@@ -641,5 +641,15 @@ struct b3RaycastInformation BulletClient::rayTestBatch(const std::vector<std::ar
 
 	return raycast_info_empty;
 }
+
+// perform collision detection: update aabbs, compute overlapping pairs and contact points
+void BulletClient::performCollisionDetection()
+{
+    if (b3CanSubmitCommand(*client_handle_))
+        b3SubmitClientCommandAndWaitStatus(*client_handle_, b3InitPerformCollisionDetectionCommand(*client_handle_));
+    else
+        ShellDisplay::warning("Collisions not updated");
+}
+
 
 } // namespace owds
