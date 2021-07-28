@@ -572,4 +572,74 @@ struct b3JointInfo BulletClient::getJointInfo(int body_id, int joint_index)
     }
 }
 
+long BulletClient::addUserDebugLine(const std::array<double, 3>& xyz_from,
+                                    const std::array<double, 3>& xyz_to,
+                                    const std::array<double, 3>& color_rgb,
+                                    double line_width,
+                                    double life_time,
+                                    int replace_id)
+{
+	b3SharedMemoryCommandHandle command_handle = b3InitUserDebugDrawAddLine3D(*client_handle_, 
+                                                                              &xyz_from[0],
+                                                                              &xyz_to[0],
+                                                                              &color_rgb[0],
+                                                                              line_width, life_time);
+
+	if (replace_id >= 0)
+		b3UserDebugItemSetReplaceItemUniqueId(command_handle, replace_id);
+
+	b3SharedMemoryStatusHandle status_handle = b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+	int status_type = b3GetStatusType(status_handle);
+	if (status_type == CMD_USER_DEBUG_DRAW_COMPLETED)
+		return b3GetDebugItemUniqueId(status_handle);
+    else
+    {
+        ShellDisplay::error("failed to draw debug line");
+        return -1;
+    }
+}
+
+struct b3RaycastInformation BulletClient::rayTestBatch(const std::vector<std::array<double, 3>>& from_poses,
+                                                       const std::vector<std::array<double,3>>& to_poses,
+                                                       int nb_thread,
+                                                       bool report_hit_number)
+{
+    struct b3RaycastInformation raycast_info_empty;
+    raycast_info_empty.m_numRayHits = 0;
+
+	b3SharedMemoryCommandHandle command_handle = b3CreateRaycastBatchCommandInit(*client_handle_);
+	b3RaycastBatchSetNumThreads(command_handle, nb_thread);
+
+    if (from_poses.size() != to_poses.size())
+    {
+        ShellDisplay::error("Size of from_positions need to be equal to size of to_positions.");
+        return raycast_info_empty;
+    }
+    else
+    {
+        if (from_poses.size() > MAX_RAY_INTERSECTION_BATCH_SIZE_STREAMING)
+        {
+            ShellDisplay::error("Number of rays exceed the maximum batch size.");
+            return raycast_info_empty;
+        }
+
+        for (int i = 0; i < from_poses.size(); i++)
+            b3RaycastBatchAddRays(*client_handle_, command_handle, &from_poses[i][0], &to_poses[i][0], 1);
+    }
+
+	if (report_hit_number >= 0)
+		b3RaycastBatchSetReportHitNumber(command_handle, report_hit_number);
+
+	b3SharedMemoryStatusHandle status_handle = b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+	int status_type = b3GetStatusType(status_handle);
+	if (status_type == CMD_REQUEST_RAY_CAST_INTERSECTIONS_COMPLETED)
+	{
+		struct b3RaycastInformation raycast_info;
+		b3GetRaycastInformation(*client_handle_, &raycast_info);
+		return raycast_info;
+	}
+
+	return raycast_info_empty;
+}
+
 } // namespace owds

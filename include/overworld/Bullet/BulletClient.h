@@ -5,6 +5,7 @@
 
 #include <string>
 #include <array>
+#include <vector>
 
 namespace owds {
 
@@ -126,6 +127,18 @@ public:
                                             std::array<float, 16>& projection_matrix,
                                             Renderer_e renderer,
                                             int flags = -1);
+
+    long addUserDebugLine(const std::array<double, 3>& xyz_from,
+                      const std::array<double, 3>& xyz_to,
+                      const std::array<double, 3>& color_rgb,
+                      double line_width = 1,
+                      double life_time = 0,
+                      int replace_id = -1);
+
+    struct b3RaycastInformation rayTestBatch(const std::vector<std::array<double, 3>>& from_poses,
+                                             const std::vector<std::array<double,3>>& to_poses,
+                                             int nb_thread = 1,
+                                             bool report_hit_number = -1);
     
 private:
     b3PhysicsClientHandle* client_handle_;

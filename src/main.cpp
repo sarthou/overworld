@@ -26,7 +26,7 @@ int main(int argc, char** argv)
 	owds::BulletClient* client = owds::PhysicsServers::connectPhysicsServer(owds::CONNECT_GUI);
 	std::cout << "server_id " << client->getId() << std::endl;
 
-	int visual_id = client->createVisualShapeBox({1,2,1}, {1,0,0,1});
+	int visual_id = client->createVisualShapeBox({1,1.5,1.5}, {1,0,0,1});
 	int collision_id = client->createCollisionShapeBox({1,0.5,1});
 	int obj_id = client->createMultiBody(0, collision_id, visual_id, {3,3,0}, {0,0,0,1});
 
@@ -47,6 +47,15 @@ int main(int argc, char** argv)
 	auto images = client->getCameraImage(400, 400, view_matrix, proj_matrix, owds::BULLET_HARDWARE_OPENGL);
 
 	std::cout << images.m_pixelWidth << "x" << images.m_pixelHeight << std::endl;
+
+	auto raycast_info = client->rayTestBatch({{0,0,1}}, {{3,3,1}});
+	client->addUserDebugLine({0,0,1}, {3,3,1}, {0,0,1});
+	if(raycast_info.m_numRayHits)
+	{
+		owds::ShellDisplay::info("hit " + std::to_string(raycast_info.m_numRayHits));
+		for(size_t i = 0; i < raycast_info.m_numRayHits; i++)
+			std::cout << "- " << raycast_info.m_rayHits[i].m_hitObjectUniqueId << " : " << raycast_info.m_rayHits[i].m_hitObjectLinkIndex << std::endl;
+	}
 
 	while(flag == false)
 	{
