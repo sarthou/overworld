@@ -276,4 +276,69 @@ int BulletClient::loadURDF(const std::string& file_name,
 	}
 }
 
+// Return the number of joints in an object based on
+// body index; body index is based on order of sequence
+// the object is loaded into simulation
+int BulletClient::getNumJoints(int body_id)
+{
+	return b3GetNumJoints(*client_handle_, body_id);
+}
+
+// Initalize all joint positions given a list of values
+bool BulletClient::resetJointState(int body_id, int joint_index, double target_value, double target_velocity)
+{
+    int nb_joints = b3GetNumJoints(*client_handle_, body_id);
+    if ((joint_index >= nb_joints) || (joint_index < 0))
+    {
+        ShellDisplay::error("Joint index out-of-range.");
+        return false;
+    }
+
+    b3SharedMemoryCommandHandle command_handle = b3CreatePoseCommandInit(*client_handle_, body_id);
+
+    b3CreatePoseCommandSetJointPosition(*client_handle_, command_handle, joint_index,
+                                        target_value);
+
+    b3CreatePoseCommandSetJointVelocity(*client_handle_, command_handle, joint_index,
+                                        target_velocity);
+
+    b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+    return true;
+}
+
+// Reset the position and orientation of the base/root link, position [x,y,z]
+// and orientation quaternion [x,y,z,w]
+void BulletClient::resetBasePositionAndOrientation(int body_id, const std::array<double, 3>& position, const std::array<double, 4>& orientation)
+{
+	b3SharedMemoryCommandHandle command_handle = b3CreatePoseCommandInit(*client_handle_, body_id);
+
+    b3CreatePoseCommandSetBasePosition(command_handle, position[0], position[1], position[2]);
+    b3CreatePoseCommandSetBaseOrientation(command_handle, orientation[0], orientation[1],
+                                          orientation[2], orientation[3]);
+
+    b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+}
+
+void BulletClient::removeUserConstraint(int user_constraint_id)
+{
+	b3SharedMemoryCommandHandle command_handle = b3InitRemoveUserConstraintCommand(*client_handle_, user_constraint_id);
+	b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+};
+
+void BulletClient::changeUserConstraint(int user_constraint_id,
+                         const std::array<double, 3>& joint_child_pivot,
+                         const std::array<double, 4>& joint_child_frame_orientation,
+                         double max_force)
+{
+	b3SharedMemoryCommandHandle command_handle = b3InitChangeUserConstraintCommand(*client_handle_, user_constraint_id);
+
+    b3InitChangeUserConstraintSetPivotInB(command_handle, &joint_child_pivot[0]);
+    b3InitChangeUserConstraintSetFrameInB(command_handle, &joint_child_frame_orientation[0]);
+
+	if (max_force >= 0)
+		b3InitChangeUserConstraintSetMaxForce(command_handle, max_force);
+	
+	b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+};
+
 } // namespace owds

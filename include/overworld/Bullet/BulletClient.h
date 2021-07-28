@@ -54,6 +54,15 @@ public:
                 const std::array<double, 4>& base_orientation,
                 bool use_fixed_base = false,
                 int flags = 0);
+
+    int getNumJoints(int body_id);
+    bool resetJointState(int body_id, int joint_index, double target_value, double target_velocity = 0);
+    void resetBasePositionAndOrientation(int body_id, const std::array<double, 3>& position, const std::array<double, 4>& orientation);
+    void removeUserConstraint(int user_constraint_id);
+    void changeUserConstraint(int user_constraint_id,
+                             const std::array<double, 3>& joint_child_pivot,
+                             const std::array<double, 4>& joint_child_frame_orientation,
+                             double max_force = -1);
     
 private:
     b3PhysicsClientHandle* client_handle_;
