@@ -39,6 +39,8 @@ int main(int argc, char** argv)
 	client->setAdditionalSearchPath(path_overworld + "/models");
 	client->loadURDF("pr2.urdf", {-2,-2,0}, {0,0,0,1});
 
+	client->configureDebugVisualizer(COV_ENABLE_DEPTH_BUFFER_PREVIEW, false);
+	client->configureDebugVisualizer(COV_ENABLE_SHADOWS, false);
 
 	auto proj_matrix = client->computeProjectionMatrix(60, 1, 0.1, 10);
 	auto view_matrix = client->computeViewMatrix({0,0,1}, {-1,-1,1}, {0,0,1});

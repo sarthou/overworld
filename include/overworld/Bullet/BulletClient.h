@@ -41,6 +41,7 @@ public:
     size_t getId() { return client_id_; }
 
     void setAdditionalSearchPath(const std::string& path);
+    void configureDebugVisualizer(b3ConfigureDebugVisualizerEnum flag, bool enable);
 
     int createVisualShapeBox(const std::array<double, 3>& half_extents, const std::array<double, 4>& rgba_color = {1});
     int createVisualShapeSphere(float radius, const std::array<double, 4>& rgba_color = {1});

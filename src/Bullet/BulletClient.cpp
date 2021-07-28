@@ -437,4 +437,11 @@ struct b3CameraImageData BulletClient::getCameraImage(int width, int height,
 	return image_data_empty;
 }
 
+void BulletClient::configureDebugVisualizer(b3ConfigureDebugVisualizerEnum flag, bool enable)
+{
+    b3SharedMemoryCommandHandle command_handle = b3InitConfigureOpenGLVisualizer(*client_handle_);
+    b3ConfigureOpenGLVisualizerSetVisualizationFlags(command_handle, flag, enable);
+    b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+}
+
 } // namespace owds

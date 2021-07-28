@@ -5,9 +5,6 @@ constraint_id = p.createConstraint(base_link_sim_id, -1, -1, -1, p.JOINT_FIXED, 
 p.changeDynamics(base_link_sim_id, -1, activationState=p.ACTIVATION_STATE_DISABLE_SLEEPING)
 p.changeDynamics(base_link_sim_id, info[0], frictionAnchor=1)
 
-p.configureDebugVisualizer(p.COV_ENABLE_RGB_BUFFER_PREVIEW, 0, physicsClientId = self.simulator.client_id)
-p.configureDebugVisualizer(p.COV_ENABLE_DEPTH_BUFFER_PREVIEW, 0, physicsClientId = self.simulator.client_id)
-p.configureDebugVisualizer(p.COV_ENABLE_SEGMENTATION_MARK_PREVIEW, 0, physicsClientId = self.simulator.client_id)
 p.addUserDebugLine(map2kinect, [poi_in_map.point.x, poi_in_map.point.y, poi_in_map.point.z], (1,0,0), physicsClientId = self.simulator.client_id, lifeTime=2.0)
 ray_cast_results += p.rayTestBatch([map2kinect], [[poi_in_map.point.x, poi_in_map.point.y, poi_in_map.point.z]], reportHitNumber = nb_hit, physicsClientId = self.simulator.client_id)
 for i in range(0, p.getNumJoints(base_link_sim_id, physicsClientId=self.client_id)):
