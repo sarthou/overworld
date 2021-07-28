@@ -37,7 +37,14 @@ int main(int argc, char** argv)
 	std::string path_overworld = ros::package::getPath("overworld");
 	
 	client->setAdditionalSearchPath(path_overworld + "/models");
-	client->loadURDF("pr2.urdf", {0,0,0}, {0,0,0,1});
+	client->loadURDF("pr2.urdf", {-2,-2,0}, {0,0,0,1});
+
+
+	auto proj_matrix = client->computeProjectionMatrix(60, 1, 0.1, 10);
+	auto view_matrix = client->computeViewMatrix({0,0,1}, {-1,-1,1}, {0,0,1});
+	auto images = client->getCameraImage(400, 400, view_matrix, proj_matrix, owds::BULLET_HARDWARE_OPENGL);
+
+	std::cout << images.m_pixelWidth << "x" << images.m_pixelHeight << std::endl;
 
 	while(flag == false)
 	{

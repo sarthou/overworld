@@ -16,21 +16,3 @@ visual_shapes = p.getVisualShapeData(sim_id, physicsClientId=self.client_id)
 link_state = p.getLinkState(sim_id, link_id, physicsClientId=self.client_id)
 aabb = p.getAABB(sim_id, physicsClientId=self.client_id)
 sim_ids_overlapping = p.getOverlappingObjects(aabb[0], aabb[1], physicsClientId=self.client_id)
-view_matrix = p.computeViewMatrix(camera_pose.position().to_array(), target, [0, 0, 1], physicsClientId=self.client_id)
-projection_matrix = p.computeProjectionMatrixFOV(camera.fov(),
-                                                float(rendered_width)/rendered_height,
-                                                camera.clipnear,
-                                                camera.clipfar, physicsClientId=self.client_id)
-
-camera_image = p.getCameraImage(rendered_width,
-                                rendered_height,
-                                viewMatrix=view_matrix,
-                                renderer=p.ER_BULLET_HARDWARE_OPENGL,
-                                flags=p.ER_NO_SEGMENTATION_MASK,
-                                projectionMatrix=projection_matrix, physicsClientId=self.client_id)
-camera_image = p.getCameraImage(rendered_width,
-                                rendered_height,
-                                viewMatrix=view_matrix,
-                                renderer=p.ER_TINY_RENDERER,
-                                flags=p.ER_NO_SEGMENTATION_MASK,
-                                projectionMatrix=projection_matrix, physicsClientId=self.client_id)

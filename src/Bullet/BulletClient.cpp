@@ -323,7 +323,7 @@ void BulletClient::removeUserConstraint(int user_constraint_id)
 {
 	b3SharedMemoryCommandHandle command_handle = b3InitRemoveUserConstraintCommand(*client_handle_, user_constraint_id);
 	b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
-};
+}
 
 void BulletClient::changeUserConstraint(int user_constraint_id,
                          const std::array<double, 3>& joint_child_pivot,
@@ -339,6 +339,102 @@ void BulletClient::changeUserConstraint(int user_constraint_id,
 		b3InitChangeUserConstraintSetMaxForce(command_handle, max_force);
 	
 	b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
-};
+}
+
+std::array<float, 16> BulletClient::computeProjectionMatrix(float fov,
+                                                            float aspect,
+                                                            float near_value,
+                                                            float far_value)
+{
+	std::array<float, 16> projection_matrix;
+	b3ComputeProjectionMatrixFOV(fov, aspect, near_value, far_value, &projection_matrix[0]);
+	return projection_matrix;
+}
+
+std::array<float, 16> BulletClient::computeProjectionMatrix(float left,
+                                                            float right,
+                                                            float bottom,
+                                                            float top,
+                                                            float near_value,
+                                                            float far_value)
+{
+	std::array<float, 16> projection_matrix;
+	b3ComputeProjectionMatrix(left, right, bottom, top, near_value, far_value, &projection_matrix[0]);
+	return projection_matrix;
+}
+
+std::array<float, 16> BulletClient::computeProjectionMatrix(const std::array<float, 3>& camera_position,
+                                                            float distance,
+                                                            float yaw,
+                                                            float pitch,
+                                                            float roll,
+                                                            int up_axis_index)
+{
+	std::array<float, 16> projection_matrix;
+	b3ComputeViewMatrixFromYawPitchRoll(&camera_position[0], distance, yaw, pitch, roll, up_axis_index, &projection_matrix[0]);
+	return projection_matrix;
+}
+
+std::array<float, 16> BulletClient::computeViewMatrix(const std::array<float, 3>& camera_eye_position,
+                                                      const std::array<float, 3>& camera_target_position,
+                                                      const std::array<float, 3>& camera_up_vector)
+{
+    std::array<float, 16> view_matrix;
+	b3ComputeViewMatrixFromPositions(&camera_eye_position[0], &camera_target_position[0], &camera_up_vector[0], &view_matrix[0]);
+    return view_matrix;
+}
+
+std::array<float, 16> BulletClient::computeViewMatrix(const std::array<float, 3>& camera_target_position,
+                                                      float distance,
+                                                      float yaw,
+                                                      float pitch,
+                                                      float roll,
+                                                      int up_axis_index)
+{
+    std::array<float, 16> view_matrix;
+	b3ComputeViewMatrixFromYawPitchRoll(&camera_target_position[0], distance, yaw, pitch, roll, up_axis_index, &view_matrix[0]);
+    return view_matrix;
+}
+
+struct b3CameraImageData BulletClient::getCameraImage(int width, int height,
+                                                      std::array<float, 16>& view_matrix, 
+                                                      std::array<float, 16>& projection_matrix,
+                                                      Renderer_e renderer,
+                                                      int flags)
+{
+	b3SharedMemoryCommandHandle command = b3InitRequestCameraImage(*client_handle_);
+	b3RequestCameraImageSetPixelResolution(command, width, height);
+
+	b3RequestCameraImageSetCameraMatrices(command, &view_matrix[0], &projection_matrix[0]);
+	if (flags >= 0)
+		b3RequestCameraImageSetFlags(command, flags);
+
+	b3RequestCameraImageSelectRenderer(command, renderer);
+
+	if (b3CanSubmitCommand(*client_handle_))
+	{
+		b3SharedMemoryStatusHandle status_handle = b3SubmitClientCommandAndWaitStatus(*client_handle_, command);
+		int status_type = b3GetStatusType(status_handle);
+		if (status_type == CMD_CAMERA_IMAGE_COMPLETED)
+		{
+
+            struct b3CameraImageData image_data;
+			b3GetCameraImageData(*client_handle_, &image_data);
+            return image_data;
+		}
+        else
+            ShellDisplay::error("getCameraImage failed");
+	}
+    else
+        ShellDisplay::error("getCameraImage can not submit the command");
+
+	struct b3CameraImageData image_data_empty;
+    image_data_empty.m_pixelHeight = 0;
+    image_data_empty.m_pixelWidth = 0;
+    image_data_empty.m_depthValues = nullptr;
+    image_data_empty.m_rgbColorData = nullptr;
+    image_data_empty.m_segmentationMaskValues = nullptr;
+	return image_data_empty;
+}
 
 } // namespace owds
