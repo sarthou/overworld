@@ -49,6 +49,8 @@ public:
     int createVisualShapeCapsule(float radius, float height, const std::array<double, 4>& rgba_color = {1});
     int createVisualShapeMesh(const std::string& file_name, const std::array<double, 3>& scale, const std::array<double, 4>& rgba_color = {1});
 
+    struct b3VisualShapeInformation getVisualShapeData(int object_id, int flags = 0);
+
     int createCollisionShapeBox(const std::array<double, 3>& half_extents, int flags = 0);
     int createCollisionShapeSphere(float radius, int flags = 0);
     int createCollisionShapeCylinder(float radius, float height, int flags = 0);
@@ -71,11 +73,23 @@ public:
     int getNumJoints(int body_id);
     bool resetJointState(int body_id, int joint_index, double target_value, double target_velocity = 0);
     void resetBasePositionAndOrientation(int body_id, const std::array<double, 3>& position, const std::array<double, 4>& orientation);
+    long createUserConstraint(int parent_body_id, int parent_link_index,
+                              int child_body_id, int child_link_index,
+                              JointType joint_type,
+                              const std::array<double, 3>& joint_axis,
+                              const std::array<double, 3>& parent_frame_pose,
+                              const std::array<double, 3>& child_frame_pose,
+                              const std::array<double, 4>& parent_frame_orientation,
+                              const std::array<double, 4>& child_frame_orientation);
     void removeUserConstraint(int user_constraint_id);
     void changeUserConstraint(int user_constraint_id,
                              const std::array<double, 3>& joint_child_pivot,
                              const std::array<double, 4>& joint_child_frame_orientation,
                              double max_force = -1);
+
+    struct b3LinkState getLinkState(int body_id, int link_index, bool compute_link_velocity = false, bool compute_forward_kinematics = false);
+    struct b3JointInfo getJointInfo(int body_id, int joint_index);
+    void changeDynamicsInfo(int body_id, int link_index, int friction_anchor, int activation_state);
 
     std::array<float, 16> computeProjectionMatrix(float fov,
                                                   float aspect,

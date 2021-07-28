@@ -319,6 +319,47 @@ void BulletClient::resetBasePositionAndOrientation(int body_id, const std::array
     b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
 }
 
+long BulletClient::createUserConstraint(int parent_body_id, int parent_link_index,
+                                        int child_body_id, int child_link_index,
+                                        JointType joint_type,
+                                        const std::array<double, 3>& joint_axis,
+                                        const std::array<double, 3>& parent_frame_pose,
+                                        const std::array<double, 3>& child_frame_pose,
+                                        const std::array<double, 4>& parent_frame_orientation,
+                                        const std::array<double, 4>& child_frame_orientation)
+{
+    struct b3JointInfo joint_info;
+	joint_info.m_jointType = joint_type;
+	joint_info.m_parentFrame[0] = parent_frame_pose[0];
+	joint_info.m_parentFrame[1] = parent_frame_pose[1];
+	joint_info.m_parentFrame[2] = parent_frame_pose[2];
+	joint_info.m_parentFrame[3] = parent_frame_orientation[0];
+	joint_info.m_parentFrame[4] = parent_frame_orientation[1];
+	joint_info.m_parentFrame[5] = parent_frame_orientation[2];
+	joint_info.m_parentFrame[6] = parent_frame_orientation[3];
+
+	joint_info.m_childFrame[0] = child_frame_pose[0];
+	joint_info.m_childFrame[1] = child_frame_pose[1];
+	joint_info.m_childFrame[2] = child_frame_pose[2];
+	joint_info.m_childFrame[3] = child_frame_orientation[0];
+	joint_info.m_childFrame[4] = child_frame_orientation[1];
+	joint_info.m_childFrame[5] = child_frame_orientation[2];
+	joint_info.m_childFrame[6] = child_frame_orientation[3];
+
+	joint_info.m_jointAxis[0] = joint_axis[0];
+	joint_info.m_jointAxis[1] = joint_axis[1];
+	joint_info.m_jointAxis[2] = joint_axis[2];
+
+	b3SharedMemoryCommandHandle command_handle = b3InitCreateUserConstraintCommand(*client_handle_, parent_body_id, parent_link_index, child_body_id, child_link_index, &joint_info);
+	b3SharedMemoryStatusHandle status_handle = b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+	int status_type = b3GetStatusType(status_handle);
+	if (status_type == CMD_USER_CONSTRAINT_COMPLETED)
+		return b3GetStatusUserConstraintUniqueId(status_handle);
+
+	ShellDisplay::error("createConstraint failed.");
+	return -1;
+}
+
 void BulletClient::removeUserConstraint(int user_constraint_id)
 {
 	b3SharedMemoryCommandHandle command_handle = b3InitRemoveUserConstraintCommand(*client_handle_, user_constraint_id);
@@ -339,6 +380,20 @@ void BulletClient::changeUserConstraint(int user_constraint_id,
 		b3InitChangeUserConstraintSetMaxForce(command_handle, max_force);
 	
 	b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+}
+
+// use the enum DynamicsActivationState for the activation_state
+void BulletClient::changeDynamicsInfo(int body_id, int link_index, int friction_anchor, int activation_state)
+{
+    b3SharedMemoryCommandHandle command_handle = b3InitChangeDynamicsInfo(*client_handle_);
+
+    if (friction_anchor >= 0)
+        b3ChangeDynamicsInfoSetFrictionAnchor(command_handle, body_id, link_index, friction_anchor);
+
+    if (activation_state >= 0)
+        b3ChangeDynamicsInfoSetActivationState(command_handle, body_id, activation_state);        
+            
+    b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
 }
 
 std::array<float, 16> BulletClient::computeProjectionMatrix(float fov,
@@ -442,6 +497,79 @@ void BulletClient::configureDebugVisualizer(b3ConfigureDebugVisualizerEnum flag,
     b3SharedMemoryCommandHandle command_handle = b3InitConfigureOpenGLVisualizer(*client_handle_);
     b3ConfigureOpenGLVisualizerSetVisualizationFlags(command_handle, flag, enable);
     b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+}
+
+struct b3VisualShapeInformation BulletClient::getVisualShapeData(int object_id, int flags)
+{
+    b3SharedMemoryCommandHandle command_handle = b3InitRequestVisualShapeInformation(*client_handle_, object_id);
+    b3SharedMemoryStatusHandle status_handle = b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+    int status_type = b3GetStatusType(status_handle);
+    if (status_type == CMD_VISUAL_SHAPE_INFO_COMPLETED)
+    {
+        struct b3VisualShapeInformation visual_shape_info;
+        b3GetVisualShapeInformation(*client_handle_, &visual_shape_info);
+        return visual_shape_info;
+    }
+    else
+    {
+        ShellDisplay::error("Error receiving visual shape info");
+        struct b3VisualShapeInformation visual_shape_info_empty;
+        visual_shape_info_empty.m_numVisualShapes = 0;
+        visual_shape_info_empty.m_visualShapeData = nullptr;
+        return visual_shape_info_empty;
+    }
+}
+
+struct b3LinkState BulletClient::getLinkState(int body_id, int link_index, bool compute_link_velocity, bool compute_forward_kinematics)
+{
+    struct b3LinkState link_state_empty;
+
+    if (body_id < 0)
+    {
+        ShellDisplay::error("getLinkState failed; invalid bodyUniqueId");
+        return link_state_empty;
+    }
+    else if (link_index < 0)
+    {
+        ShellDisplay::error("getLinkState failed; invalid linkIndex");
+        return link_state_empty;
+    }
+
+    b3SharedMemoryCommandHandle command_handle = b3RequestActualStateCommandInit(*client_handle_, body_id);
+
+    if (compute_link_velocity)
+        b3RequestActualStateCommandComputeLinkVelocity(command_handle, compute_link_velocity);
+
+    if (compute_forward_kinematics)
+        b3RequestActualStateCommandComputeForwardKinematics(command_handle, compute_forward_kinematics);
+
+    b3SharedMemoryStatusHandle status_handle = b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+
+    int status_type = b3GetStatusType(status_handle);
+    if (status_type != CMD_ACTUAL_STATE_UPDATE_COMPLETED)
+    {
+        ShellDisplay::error("getLinkState failed.");
+        return link_state_empty;
+    }
+
+    struct b3LinkState link_state;
+    if (b3GetLinkState(*client_handle_, status_handle, link_index, &link_state))
+        return link_state;
+
+	return link_state_empty;
+}
+
+struct b3JointInfo BulletClient::getJointInfo(int body_id, int joint_index)
+{
+	struct b3JointInfo info;
+
+    if (b3GetJointInfo(*client_handle_, body_id, joint_index, &info))
+        return info;
+    else
+    {
+        ShellDisplay::error("GetJointInfo failed.");
+        return info;
+    }
 }
 
 } // namespace owds
