@@ -59,6 +59,8 @@ private:
     b3PhysicsClientHandle* client_handle_;
     size_t client_id_;
 
+    std::string additional_path_;
+
     int createVisualShape(ShapeType_e shape_type, 
                             float radius,
                             const std::array<double, 3>& half_extents,

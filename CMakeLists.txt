@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
   tf
+  roslib
 )
 find_package(Threads REQUIRED)
 
@@ -84,7 +85,7 @@ endforeach()
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES overworld
-#  CATKIN_DEPENDS ontologenius roscpp std_msgs tf
+   CATKIN_DEPENDS ontologenius roscpp std_msgs tf roslib
 #  DEPENDS system_lib
 )
 
@@ -108,4 +109,4 @@ add_library(${PROJECT_NAME}_bullet_lib STATIC
 target_link_libraries(${PROJECT_NAME}_bullet_lib PUBLIC Bullet3)
 
 add_executable(${PROJECT_NAME}_test src/main.cpp)
-target_link_libraries(${PROJECT_NAME}_test PRIVATE ${PROJECT_NAME}_bullet_lib)
+target_link_libraries(${PROJECT_NAME}_test PRIVATE ${PROJECT_NAME}_bullet_lib ${catkin_LIBRARIES})

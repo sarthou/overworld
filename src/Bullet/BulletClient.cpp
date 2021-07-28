@@ -1,6 +1,7 @@
 #include "overworld/Bullet/BulletClient.h"
 
 #include "overworld/Bullet/PhysicsServers.h"
+#include "overworld/Bullet/UrdfHelper.h"
 #include "overworld/Utility/ShellDisplay.h"
 
 namespace owds {
@@ -22,6 +23,10 @@ void BulletClient::setAdditionalSearchPath(const std::string& path)
 	{
 		b3SharedMemoryCommandHandle command_handle = b3SetAdditionalSearchPath(*client_handle_, path.c_str());
 		b3SharedMemoryStatusHandle status_handle = b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+
+        if(additional_path_ != "")
+            ShellDisplay::warning("The previous additional path has been overwritten");
+        additional_path_ = path;
 	}
 }
 
@@ -241,7 +246,11 @@ int BulletClient::loadURDF(const std::string& file_name,
 {
 	if (file_name != "")
 	{
-		b3SharedMemoryCommandHandle command = b3LoadUrdfCommandInit(*client_handle_, file_name.c_str());
+        std::string full_path = file_name;
+        if(additional_path_ != "")
+            full_path = createLocalUrdf(file_name, additional_path_);
+        
+		b3SharedMemoryCommandHandle command = b3LoadUrdfCommandInit(*client_handle_, full_path.c_str());
 		b3LoadUrdfCommandSetFlags(command, flags);
 
 		b3LoadUrdfCommandSetStartPosition(command, base_position.at(0), base_position.at(1), base_position.at(2));
