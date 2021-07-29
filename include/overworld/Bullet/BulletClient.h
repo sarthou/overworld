@@ -32,6 +32,15 @@ enum RendererFlags_e {
 	ER_NO_SEGMENTATION_MASK = 4,
 };
 
+struct aabb_t
+{
+    std::array<double, 3> min;
+    std::array<double, 3> max;
+    bool is_valid;
+
+    aabb_t() : min{0}, max{0}, is_valid{false}
+    {}
+};
 
 class BulletClient
 {
@@ -129,11 +138,11 @@ public:
                                             int flags = -1);
 
     long addUserDebugLine(const std::array<double, 3>& xyz_from,
-                      const std::array<double, 3>& xyz_to,
-                      const std::array<double, 3>& color_rgb,
-                      double line_width = 1,
-                      double life_time = 0,
-                      int replace_id = -1);
+                          const std::array<double, 3>& xyz_to,
+                          const std::array<double, 3>& color_rgb,
+                          double line_width = 1,
+                          double life_time = 0,
+                          int replace_id = -1);
 
     struct b3RaycastInformation rayTestBatch(const std::vector<std::array<double, 3>>& from_poses,
                                              const std::vector<std::array<double,3>>& to_poses,
@@ -141,6 +150,9 @@ public:
                                              bool report_hit_number = false);
     
     void performCollisionDetection();
+
+    struct aabb_t getAABB(int body_id, int link_index);
+    struct b3AABBOverlapData getOverlappingObjects(const struct aabb_t& aabb);
     
 private:
     b3PhysicsClientHandle* client_handle_;

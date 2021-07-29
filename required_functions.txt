@@ -1,5 +1,0 @@
-flags = p.URDF_ENABLE_SLEEPING or p.URDF_ENABLE_CACHED_GRAPHICS_SHAPES or p.URDF_MERGE_FIXED_LINKS
-
-aabb = p.getAABB(sim_id, physicsClientId=self.client_id)
-[xmin,ymin,zmin],[xmax,ymax,zmax] = p.getAABB(end_id)
-sim_ids_overlapping = p.getOverlappingObjects(aabb[0], aabb[1], physicsClientId=self.client_id)

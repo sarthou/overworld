@@ -651,5 +651,50 @@ void BulletClient::performCollisionDetection()
         ShellDisplay::warning("Collisions not updated");
 }
 
+struct aabb_t BulletClient::getAABB(int body_id, int link_index)
+{
+    struct aabb_t aabb;
+    aabb.is_valid = false;
+
+    if (body_id < 0)
+    {
+        ShellDisplay::error("getAABB failed; invalid body_id");
+        return aabb;
+    }
+
+    if (link_index < -1)
+    {
+        ShellDisplay::error("getAABB failed; invalid link_index");
+        return aabb;
+    }
+
+    b3SharedMemoryCommandHandle command_handle = b3RequestCollisionInfoCommandInit(*client_handle_, body_id);
+    b3SharedMemoryStatusHandle status_handle = b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+
+    int status_type = b3GetStatusType(status_handle);
+    if (status_type != CMD_REQUEST_COLLISION_INFO_COMPLETED)
+    {
+        ShellDisplay::error("getAABB failed.");
+        return aabb;
+    }
+
+    if (b3GetStatusAABB(status_handle, link_index, &aabb.min[0], &aabb.max[0]))
+    {
+        aabb.is_valid = true;
+        return aabb;
+    }
+    else
+        return aabb;  
+}
+
+struct b3AABBOverlapData BulletClient::getOverlappingObjects(const struct aabb_t& aabb)
+{
+	struct b3AABBOverlapData overlap_data;
+
+	b3SharedMemoryCommandHandle command_handle = b3InitAABBOverlapQuery(*client_handle_, &aabb.min[0], &aabb.max[0]);
+	b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+	b3GetAABBOverlapResults(*client_handle_, &overlap_data);
+    return overlap_data;
+}
 
 } // namespace owds
