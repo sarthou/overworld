@@ -18,12 +18,14 @@
   <build_depend>tf</build_depend>
   <build_depend>bullet</build_depend>
   <build_depend>roslib</build_depend>
+  <build_depend>eigen</build_depend>
 
   <build_export_depend>ontologenius</build_export_depend>
   <build_export_depend>roscpp</build_export_depend>
   <build_export_depend>std_msgs</build_export_depend>
   <build_export_depend>tf</build_export_depend>
   <build_export_depend>bullet</build_export_depend>
+  <build_export_depend>eigen</build_export_depend>
 
   <exec_depend>ontologenius</exec_depend>
   <exec_depend>roscpp</exec_depend>
@@ -31,6 +33,7 @@
   <exec_depend>tf</exec_depend>
   <exec_depend>bullet</exec_depend>
   <exec_depend>roslib</exec_depend>
+  <exec_depend>eigen</exec_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>

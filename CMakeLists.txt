@@ -15,6 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
   tf
   roslib
 )
+find_package (Eigen3 REQUIRED NO_MODULE)
 find_package(Threads REQUIRED)
 
 list(APPEND BULLET_LIB_NAMES BulletRoboticsGUI
@@ -95,8 +96,10 @@ catkin_package(
 
 include_directories(
   include
+  ${EIGEN3_INCLUDE_DIRS}
   ${catkin_INCLUDE_DIRS}
 )
+add_definitions( ${EIGEN3_DEFINITIONS} )
 
 add_library(Bullet3 INTERFACE)
 target_include_directories(Bullet3 INTERFACE ${BULLET_INCLUDE_DIRS})
@@ -108,9 +111,16 @@ add_library(${PROJECT_NAME}_bullet_lib STATIC
 )
 target_link_libraries(${PROJECT_NAME}_bullet_lib PUBLIC Bullet3)
 
-<<<<<<< HEAD
-add_executable(${PROJECT_NAME}_test src/main.cpp src/Geometry/Pose.cpp src/BasicTypes/Entity.cpp src/BasicTypes/BodyPart.cpp src/BasicTypes/Object.cpp)
-=======
-add_executable(${PROJECT_NAME}_test src/main.cpp)
->>>>>>> add_pybullet_functions
-target_link_libraries(${PROJECT_NAME}_test PRIVATE ${PROJECT_NAME}_bullet_lib ${catkin_LIBRARIES})
+add_library(${PROJECT_NAME}_types_lib STATIC
+  src/Geometry/Pose.cpp
+  src/BasicTypes/Entity.cpp
+  src/BasicTypes/BodyPart.cpp
+  src/BasicTypes/Object.cpp
+)
+target_link_libraries(${PROJECT_NAME}_types_lib PUBLIC ${catkin_LIBRARIES})
+
+add_executable(${PROJECT_NAME}_test src/main.cpp )
+target_link_libraries(${PROJECT_NAME}_test PRIVATE
+                      ${PROJECT_NAME}_bullet_lib
+                      ${PROJECT_NAME}_types_lib
+                      ${catkin_LIBRARIES})
