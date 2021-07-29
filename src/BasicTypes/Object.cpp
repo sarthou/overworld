@@ -1,27 +1,27 @@
 #include "overworld/BasicTypes/Object.h"
 
-namespace owds{
+namespace owds {
 
-Object::Object(): Entity(){
+Object::Object(const std::string& id): Entity(id) {}
 
-}
-Object::Object(const std::string& id): Entity(id){
-
-}
-
-void Object::setPointsOfInterest(const std::vector<Pose>& pointsOfInterest){
-    pointsOfInterest_ = pointsOfInterest;
+void Object::setPointsOfInterest(const std::vector<Pose>& points_of_interest)
+{
+    points_of_interest_ = points_of_interest;
 }
 
-void Object::addPointOfInterest(const Pose& pointOfInterest){
-    pointsOfInterest_.push_back(pointOfInterest);
+void Object::addPointOfInterest(const Pose& point_of_interest)
+{
+    points_of_interest_.push_back(point_of_interest);
 }
 
-void Object::emptyPointsOfInterest(){
-    pointsOfInterest_.empty();
+void Object::emptyPointsOfInterest()
+{
+    points_of_interest_.empty();
 }
 
-const std::vector<Pose>& Object::getPointsOfInterest() const{
-    return pointsOfInterest_;
+const std::vector<Pose>& Object::getPointsOfInterest() const
+{
+    return points_of_interest_;
 }
-}
+
+} // namespace owds

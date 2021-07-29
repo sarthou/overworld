@@ -1,13 +1,7 @@
 #include "overworld/BasicTypes/BodyPart.h"
 
-namespace owds{
+namespace owds {
 
-BodyPart::BodyPart(): Entity(){
+BodyPart::BodyPart(const std::string& id): Entity(id){}
 
-}
-
-BodyPart::BodyPart(const std::string& id): Entity(id){
-
-}
-
-}
+} // namespace owds

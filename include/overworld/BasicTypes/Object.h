@@ -1,23 +1,23 @@
-#ifndef OBJECT_H
-#define OBJECT_H
+#ifndef OWDS_OBJECT_H
+#define OWDS_OBJECT_H
 #include "overworld/BasicTypes/Entity.h"
 
-namespace owds{
+namespace owds {
 
-class Object: public Entity{
-    public:
-    Object();
+class Object: public Entity
+{
+public:
     Object(const std::string& id);
 
-    void setPointsOfInterest(const std::vector<Pose>& pointsOfInterest);
-    void addPointOfInterest(const Pose& pointOfInterest);
+    void setPointsOfInterest(const std::vector<Pose>& points_of_interest);
+    void addPointOfInterest(const Pose& point_of_interest);
     void emptyPointsOfInterest();
     const std::vector<Pose>& getPointsOfInterest() const;
 
-    protected:
-    std::vector<Pose> pointsOfInterest_;
-    
+protected:
+    std::vector<Pose> points_of_interest_;
 };
-}
 
-#endif /* OBJECT_H */
+} // namespace owds
+
+#endif // OWDS_OBJECT_H

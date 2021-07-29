@@ -1,10 +1,15 @@
-#ifndef POSE_H
-#define POSE_H
+#ifndef OWDS_POSE_H
+#define OWDS_POSE_H
+
+#include <array>
+
 #include <eigen3/Eigen/Geometry>
 
 namespace owds{
-class Pose{
-    public:
+
+class Pose
+{
+public:
     Pose();
     Pose(const Pose& pose);
 
@@ -21,8 +26,10 @@ class Pose{
 
     const std::pair<std::array<double, 3>, std::array<double, 4>> arrays() const;
 
-    protected:
+protected:
     Eigen::Affine3d t_;
 };
-}
-#endif /* POSE_H */
+
+} // namespace owds
+
+#endif // OWDS_POSE_H

@@ -1,45 +1,47 @@
-#ifndef ENTITY_H
-#define ENTITY_H
+#ifndef OWDS_ENTITY_H
+#define OWDS_ENTITY_H
 
 #include <ros/ros.h>
 #include <exception>
+#include <string>
+
 #include "overworld/Geometry/Pose.h"
 
-namespace owds{
+namespace owds {
 
-class Entity{
-    public:
-    Entity();
+class Entity
+{
+public:
     Entity(const std::string& id);
 
     void updatePose(const std::array<double, 3>& translation, const std::array<double, 4>& rotation);
     void updatePose(const std::array<double, 3>& translation, const std::array<double, 4>& rotation, ros::Time stamp);
-    void unsetPose();
-    bool isLocated() const;
-    const owds::Pose& pose() const;
+    void unsetPose() { is_located_ = false; }
+    bool isLocated() const { return is_located_; }
+    const Pose& pose() const;
 
-    void setId(const std::string& id);
-    const std::string& id() const;
+    void setId(const std::string& id) { id_ = id; }
+    const std::string& id() const { return id_; }
 
-    void setBulletId(int bodyId);
-    int bulletId() const;
+    void setBulletId(int bullet_id) { bullet_id_ = bullet_id; }
+    int bulletId() const { return bullet_id_; }
 
-    protected:
+protected:
     std::string id_;
     Pose pose_;
-    ros::Time lastPose_;
-    bool isLocated_;
-    int bulletId_;
+    ros::Time last_pose_;
+    bool is_located_;
+    int bullet_id_;
 };
 
-class UnlocatedEntityError: public std::runtime_error{
-    public:
-    inline UnlocatedEntityError(const std::string& entityName): 
-        std::runtime_error("Entity '" + entityName + "' is not located, but its pose has been asked."){
-
-    }
+class UnlocatedEntityError: public std::runtime_error
+{
+public:
+    inline UnlocatedEntityError(const std::string& entity_name): 
+        std::runtime_error("Entity '" + entity_name + "' is not located, but its pose has been asked.")
+    {}
 };
-}
 
+} // namespace owds
 
-#endif /* ENTITY_H */
+#endif // OWDS_ENTITY_H
