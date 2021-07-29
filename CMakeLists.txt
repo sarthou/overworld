@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
   tf
+  roslib
 )
 find_package(Threads REQUIRED)
 
@@ -84,7 +85,7 @@ endforeach()
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES overworld
-#  CATKIN_DEPENDS ontologenius roscpp std_msgs tf
+   CATKIN_DEPENDS ontologenius roscpp std_msgs tf roslib
 #  DEPENDS system_lib
 )
 
@@ -103,8 +104,13 @@ target_link_libraries(Bullet3 INTERFACE ${BULLET_LIBS} ${CMAKE_DL_LIBS} Threads:
 
 add_library(${PROJECT_NAME}_bullet_lib STATIC
   src/Bullet/PhysicsServers.cpp
+  src/Bullet/BulletClient.cpp
 )
 target_link_libraries(${PROJECT_NAME}_bullet_lib PUBLIC Bullet3)
 
+<<<<<<< HEAD
 add_executable(${PROJECT_NAME}_test src/main.cpp src/Geometry/Pose.cpp src/BasicTypes/Entity.cpp src/BasicTypes/BodyPart.cpp src/BasicTypes/Object.cpp)
+=======
+add_executable(${PROJECT_NAME}_test src/main.cpp)
+>>>>>>> add_pybullet_functions
 target_link_libraries(${PROJECT_NAME}_test PRIVATE ${PROJECT_NAME}_bullet_lib ${catkin_LIBRARIES})
