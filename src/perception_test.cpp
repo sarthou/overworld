@@ -15,12 +15,13 @@ public:
   virtual ~PerceptionTest() = default;
 
 private:
-  void perceptionCallback(const std::vector<int>& msg)
+  bool perceptionCallback(const std::vector<int>& msg)
   {
     std::cout << "PerceptionTest: ";
     for(auto i : msg)
       std::cout << i << " ";
     std::cout << std::endl;
+    return true;
   }
 };
 
@@ -31,9 +32,10 @@ public:
   virtual ~RosPerceptionTest() = default;
 
 private:
-  void perceptionCallback(const std_msgs::String& msg)
+  bool perceptionCallback(const std_msgs::String& msg)
   {
     std::cout << "RosPerceptionTest: " << msg.data << std::endl;
+    return true;
   }
 };
 
@@ -44,9 +46,10 @@ public:
   virtual ~RosPerceptionSyncTest() = default;
 
 private:
-  void perceptionCallback(const overworld::StampedStringTest& msg_1, const overworld::StampedStringTest& msg_2)
+  bool perceptionCallback(const overworld::StampedStringTest& msg_1, const overworld::StampedStringTest& msg_2)
   {
     std::cout << "RosPerceptionSyncTest: " << msg_1.data << " : " << msg_2.data << std::endl;
+    return true;
   }
 };
 
@@ -59,20 +62,20 @@ int main(int argc, char** argv)
   RosPerceptionTest test_ros_perception(&n);
   RosPerceptionSyncTest test_ros_perception_sync(&n);
 
-  owds::EntitiesPerceptionManager<owds::Entity> entitiesManager;
-  entitiesManager.addPerceptionModule("No_ros", &test_perception);
-  entitiesManager.addPerceptionModule("Ros", &test_ros_perception);
-  entitiesManager.addPerceptionModule("Ros_sync", &test_ros_perception_sync);
+  owds::EntitiesPerceptionManager<owds::Entity> entities_manager;
+  entities_manager.addPerceptionModule("No_ros", &test_perception);
+  entities_manager.addPerceptionModule("Ros", &test_ros_perception);
+  entities_manager.addPerceptionModule("Ros_sync", &test_ros_perception_sync);
   test_ros_perception_sync.activate(false);
-  std::cout << "All modules: " << entitiesManager.getModulesListStr() << std::endl;
-  std::cout << "Activated modules: " << entitiesManager.getActivatedModulesListStr() << std::endl;
+  std::cout << "All modules: " << entities_manager.getModulesListStr() << std::endl;
+  std::cout << "Activated modules: " << entities_manager.getActivatedModulesListStr() << std::endl;
 
-  bool has_run = entitiesManager.update();
+  bool has_run = entities_manager.update();
   std::cout << "has run = " << has_run << std::endl;
 
   test_perception.sendPerception({1,2,3});
 
-  has_run = entitiesManager.update();
+  has_run = entities_manager.update();
   std::cout << "has run = " << has_run << std::endl;
 
   ros::spin();

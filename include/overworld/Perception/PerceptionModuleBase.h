@@ -53,7 +53,7 @@ public:
   void sendPerception(const M& msg) { privatePerceptionCallback(msg); }
 
 protected:
-  virtual void perceptionCallback(const M& msg) = 0;
+  virtual bool perceptionCallback(const M& msg) = 0;
 
 private:
   void privatePerceptionCallback(const M& msg)
@@ -62,8 +62,8 @@ private:
       return;
 
     this->mutex_.lock();
-    perceptionCallback(msg);
-    this->updated_ = true;
+    if(perceptionCallback(msg))
+      this->updated_ = true;
     this->mutex_.unlock();
   }
 };
@@ -91,7 +91,7 @@ public:
   virtual ~PerceptionModuleRosBase() = default;
 
 protected:
-  virtual void perceptionCallback(const M& msg) = 0;
+  virtual bool perceptionCallback(const M& msg) = 0;
 
 private:
   ros::Subscriber sub_;
@@ -102,8 +102,8 @@ private:
       return;
 
     this->mutex_.lock();
-    perceptionCallback(msg);
-    this->updated_ = true;
+    if(perceptionCallback(msg))
+      this->updated_ = true;
     this->mutex_.unlock();
   }
 };
@@ -125,7 +125,7 @@ public:
   virtual ~PerceptionModuleRosSyncBase() = default;
 
 protected:
-  virtual void perceptionCallback(const M0& first_msg, const M1& second_msg) = 0;
+  virtual bool perceptionCallback(const M0& first_msg, const M1& second_msg) = 0;
 
 private:
   message_filters::Subscriber<M0> sub_0_;
@@ -140,8 +140,8 @@ private:
       return;
 
     this->mutex_.lock();
-    perceptionCallback(first_msg, second_msg);
-    this->updated_ = true;
+    if(perceptionCallback(first_msg, second_msg))
+      this->updated_ = true;
     this->mutex_.unlock();
   }
 };
