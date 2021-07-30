@@ -46,7 +46,7 @@ protected:
 };
 
 template<typename T, class M>
-class PerceptionModuleBase : protected PerceptionModuleBase_<T>
+class PerceptionModuleBase : public PerceptionModuleBase_<T>
 {
 public:
   virtual ~PerceptionModuleBase() = default;
@@ -69,7 +69,7 @@ private:
 };
 
 template<typename T>
-class PerceptionModuleRosBase_ : protected PerceptionModuleBase_<T>
+class PerceptionModuleRosBase_ : public PerceptionModuleBase_<T>
 {
 public:
   PerceptionModuleRosBase_(ros::NodeHandle* n) { n_ = n; }
@@ -80,7 +80,7 @@ protected:
 
 
 template<typename T, class M>
-class PerceptionModuleRosBase : protected PerceptionModuleRosBase_<T>
+class PerceptionModuleRosBase : public PerceptionModuleRosBase_<T>
 {
 public:
   PerceptionModuleRosBase(ros::NodeHandle* n, const std::string& topic_name) : PerceptionModuleRosBase_<T>(n)
@@ -109,7 +109,7 @@ private:
 };
 
 template<typename T, class M0, class M1>
-class PerceptionModuleRosSyncBase : protected PerceptionModuleRosBase_<T>
+class PerceptionModuleRosSyncBase : public PerceptionModuleRosBase_<T>
 {
 public:
   PerceptionModuleRosSyncBase(ros::NodeHandle* n,
