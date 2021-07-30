@@ -12,8 +12,11 @@ find_package(catkin REQUIRED COMPONENTS
   ontologenius
   roscpp
   std_msgs
+  genmsg
+  message_generation
   tf
   roslib
+  message_filters
 )
 find_package (Eigen3 REQUIRED NO_MODULE)
 find_package(Threads REQUIRED)
@@ -47,32 +50,21 @@ endforeach()
 ## Declare ROS messages, services and actions ##
 ################################################
 
-## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
-#   Message1.msg
-#   Message2.msg
-# )
+add_message_files(
+  FILES
+  StampedStringTest.msg
+)
 
-## Generate services in the 'srv' folder
 # add_service_files(
 #   FILES
 #   Service1.srv
 #   Service2.srv
 # )
 
-## Generate actions in the 'action' folder
-# add_action_files(
-#   FILES
-#   Action1.action
-#   Action2.action
-# )
-
-## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs
-# )
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+)
 
 ###################################
 ## catkin specific configuration ##
@@ -119,8 +111,14 @@ add_library(${PROJECT_NAME}_types_lib STATIC
 )
 target_link_libraries(${PROJECT_NAME}_types_lib PUBLIC ${catkin_LIBRARIES})
 
-add_executable(${PROJECT_NAME}_test src/main.cpp )
-target_link_libraries(${PROJECT_NAME}_test PRIVATE
+add_executable(${PROJECT_NAME}_bullet_test src/bullet_test.cpp )
+target_link_libraries(${PROJECT_NAME}_bullet_test PRIVATE
                       ${PROJECT_NAME}_bullet_lib
                       ${PROJECT_NAME}_types_lib
                       ${catkin_LIBRARIES})
+
+add_executable(${PROJECT_NAME}_perception_test src/perception_test.cpp )
+target_link_libraries(${PROJECT_NAME}_perception_test PRIVATE
+                      ${PROJECT_NAME}_types_lib
+                      ${catkin_LIBRARIES})
+add_dependencies(${PROJECT_NAME}_perception_test overworld_gencpp)
