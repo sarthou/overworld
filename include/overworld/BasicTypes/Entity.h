@@ -15,11 +15,13 @@ class Entity
 public:
     Entity(const std::string& id, bool is_true_id = true);
 
+    void updatePose(const Pose& pose, ros::Time stamp = ros::Time::now());
     void updatePose(const std::array<double, 3>& translation, const std::array<double, 4>& rotation);
     void updatePose(const std::array<double, 3>& translation, const std::array<double, 4>& rotation, ros::Time stamp);
     void unsetPose() { is_located_ = false; }
     bool isLocated() const { return is_located_; }
     const Pose& pose() const;
+    ros::Time lastStamp() const { return last_pose_; }
 
     void setId(const std::string& id, bool is_true_id = true);
     const std::string& id() const { return id_; }

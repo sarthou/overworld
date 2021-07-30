@@ -10,6 +10,13 @@ Entity::Entity(const std::string& id, bool is_true_id): id_(id),
                                                         bullet_id_(-1)
 {}
 
+void Entity::updatePose(const Pose& pose, ros::Time stamp)
+{
+    pose_ = pose;
+    is_located_ = true;
+    last_pose_ = stamp;
+}
+
 void Entity::updatePose(const std::array<double, 3>& translation, const std::array<double, 4>& rotation)
 {
     updatePose(translation, rotation, ros::Time::now());
