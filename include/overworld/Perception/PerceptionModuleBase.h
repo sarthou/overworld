@@ -26,8 +26,8 @@ public:
   }
   virtual ~PerceptionModuleBase_() = default;
 
-  void activate(bool is_activated) { is_activated_ = is_activated_; }
-  bool isActiavted() { return is_activated_; }
+  void activate(bool is_activated) { is_activated_ = is_activated; }
+  bool isActivated() { return is_activated_; }
   bool hasBeenUpdated() { return updated_; }
 
   void accessPercepts(const std::function<void(const std::map<std::string, T>&)>& accessor)
