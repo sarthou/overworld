@@ -19,22 +19,29 @@ class PerceptionModuleBase_
 {
   static_assert(std::is_base_of<Entity,T>::value, "T must be derived from Entity");
 public:
-  PerceptionModuleBase_() { is_activated_ = true; }
+  PerceptionModuleBase_()
+  {
+    is_activated_ = true;
+    updated_ = false;
+  }
   virtual ~PerceptionModuleBase_() = default;
 
   void activate(bool is_activated) { is_activated_ = is_activated_; }
   bool isActiavted() { return is_activated_; }
+  bool hasBeenUpdated() { return updated_; }
 
   void accessPercepts(const std::function<void(const std::map<std::string, T>&)>& accessor)
   {
     mutex_.lock();
     accessor(percepts_);
+    updated_ = false;
     mutex_.unlock();
   }
 
 protected:
   std::map<std::string, T> percepts_;
   bool is_activated_;
+  bool updated_;
   std::mutex mutex_;
 };
 
@@ -56,6 +63,7 @@ private:
 
     this->mutex_.lock();
     perceptionCallback(msg);
+    this->updated_ = true;
     this->mutex_.unlock();
   }
 };
@@ -95,6 +103,7 @@ private:
 
     this->mutex_.lock();
     perceptionCallback(msg);
+    this->updated_ = true;
     this->mutex_.unlock();
   }
 };
@@ -132,6 +141,7 @@ private:
 
     this->mutex_.lock();
     perceptionCallback(first_msg, second_msg);
+    this->updated_ = true;
     this->mutex_.unlock();
   }
 };
