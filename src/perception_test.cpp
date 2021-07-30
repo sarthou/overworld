@@ -63,10 +63,17 @@ int main(int argc, char** argv)
   entitiesManager.addPerceptionModule("No_ros", &test_perception);
   entitiesManager.addPerceptionModule("Ros", &test_ros_perception);
   entitiesManager.addPerceptionModule("Ros_sync", &test_ros_perception_sync);
-  std::cout << entitiesManager.getModulesListStr() << std::endl;
+  test_ros_perception_sync.activate(false);
+  std::cout << "All modules: " << entitiesManager.getModulesListStr() << std::endl;
+  std::cout << "Activated modules: " << entitiesManager.getActivatedModulesListStr() << std::endl;
 
+  bool has_run = entitiesManager.update();
+  std::cout << "has run = " << has_run << std::endl;
 
   test_perception.sendPerception({1,2,3});
+
+  has_run = entitiesManager.update();
+  std::cout << "has run = " << has_run << std::endl;
 
   ros::spin();
 
