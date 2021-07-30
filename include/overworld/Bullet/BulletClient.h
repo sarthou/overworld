@@ -9,7 +9,7 @@
 
 namespace owds {
 
-enum ShapeType_e {
+enum BulletShapeType_e {
     GEOM_SPHERE = 2,
 	GEOM_BOX,
 	GEOM_CYLINDER,
@@ -160,7 +160,7 @@ private:
 
     std::string additional_path_;
 
-    int createVisualShape(ShapeType_e shape_type, 
+    int createVisualShape(BulletShapeType_e shape_type, 
                             float radius,
                             const std::array<double, 3>& half_extents,
                             float height,
@@ -168,7 +168,7 @@ private:
                             const std::array<double, 3>& mesh_scale,
                             const std::array<double, 4>& rgba_color);
 
-    int createCollisionShape(ShapeType_e shape_type, 
+    int createCollisionShape(BulletShapeType_e shape_type, 
                             float radius,
                             const std::array<double, 3>& half_extents,
                             float height,

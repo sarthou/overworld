@@ -55,7 +55,7 @@ int BulletClient::createVisualShapeMesh(const std::string& file_name, const std:
     return createVisualShape(GEOM_MESH, 0, {0}, 0, file_name, scale, rgba_color);
 }
 
-int BulletClient::createVisualShape(ShapeType_e shape_type, 
+int BulletClient::createVisualShape(BulletShapeType_e shape_type, 
                                     float radius,
                                     const std::array<double, 3>& half_extents,
                                     float height,
@@ -145,7 +145,7 @@ int BulletClient::createCollisionShapeMesh(const std::string& file_name, const s
     return createCollisionShape(GEOM_MESH, 0, {0}, 0, file_name, scale, flags);
 }
 
-int BulletClient::createCollisionShape(ShapeType_e shape_type, 
+int BulletClient::createCollisionShape(BulletShapeType_e shape_type, 
                                         float radius,
                                         const std::array<double, 3>& half_extents,
                                         float height,
