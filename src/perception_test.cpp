@@ -1,4 +1,6 @@
-#include "overworld/PerceptionModules/PerceptionModuleBase.h"
+#include "overworld/Perception/PerceptionModuleBase.h"
+#include "overworld/Perception/EntitiesPerceptionManager.h"
+
 #include "overworld/StampedStringTest.h"
 
 #include "ros/ros.h"
@@ -56,6 +58,13 @@ int main(int argc, char** argv)
   PerceptionTest test_perception;
   RosPerceptionTest test_ros_perception(&n);
   RosPerceptionSyncTest test_ros_perception_sync(&n);
+
+  owds::EntitiesPerceptionManager<owds::Entity> entitiesManager;
+  entitiesManager.addPerceptionModule("No_ros", &test_perception);
+  entitiesManager.addPerceptionModule("Ros", &test_ros_perception);
+  entitiesManager.addPerceptionModule("Ros_sync", &test_ros_perception_sync);
+  std::cout << entitiesManager.getModulesListStr() << std::endl;
+
 
   test_perception.sendPerception({1,2,3});
 
