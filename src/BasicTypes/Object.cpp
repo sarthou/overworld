@@ -2,7 +2,7 @@
 
 namespace owds {
 
-Object::Object(const std::string& id): Entity(id) {}
+Object::Object(const std::string& id, bool is_true_id): Entity(id, is_true_id) {}
 
 void Object::setPointsOfInterest(const std::vector<Pose>& points_of_interest)
 {

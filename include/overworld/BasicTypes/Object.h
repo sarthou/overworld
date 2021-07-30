@@ -7,7 +7,7 @@ namespace owds {
 class Object: public Entity
 {
 public:
-    Object(const std::string& id);
+    Object(const std::string& id, bool is_true_id = true);
 
     void setPointsOfInterest(const std::vector<Pose>& points_of_interest);
     void addPointOfInterest(const Pose& point_of_interest);
