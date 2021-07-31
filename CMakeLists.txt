@@ -111,13 +111,18 @@ add_library(${PROJECT_NAME}_types_lib STATIC
 )
 target_link_libraries(${PROJECT_NAME}_types_lib PUBLIC ${catkin_LIBRARIES})
 
-add_executable(${PROJECT_NAME}_bullet_test src/bullet_test.cpp )
+add_executable(${PROJECT_NAME}_bullet_test src/TestFiles/bullet_test.cpp )
 target_link_libraries(${PROJECT_NAME}_bullet_test PRIVATE
                       ${PROJECT_NAME}_bullet_lib
                       ${PROJECT_NAME}_types_lib
                       ${catkin_LIBRARIES})
 
-add_executable(${PROJECT_NAME}_perception_test src/perception_test.cpp )
+add_executable(${PROJECT_NAME}_multi_server_test src/TestFiles/multi_server_test.cpp )
+target_link_libraries(${PROJECT_NAME}_multi_server_test PRIVATE
+                      ${PROJECT_NAME}_bullet_lib
+                      ${catkin_LIBRARIES})
+
+add_executable(${PROJECT_NAME}_perception_test src/TestFiles/perception_test.cpp )
 target_link_libraries(${PROJECT_NAME}_perception_test PRIVATE
                       ${PROJECT_NAME}_types_lib
                       ${catkin_LIBRARIES})
