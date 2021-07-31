@@ -18,6 +18,7 @@ find_package(catkin REQUIRED COMPONENTS
   roslib
   message_filters
   ar_track_alvar_msgs
+  sensor_msgs
 )
 find_package (Eigen3 REQUIRED NO_MODULE)
 find_package(Threads REQUIRED)
@@ -112,10 +113,16 @@ add_library(${PROJECT_NAME}_types_lib STATIC
 )
 target_link_libraries(${PROJECT_NAME}_types_lib PUBLIC ${catkin_LIBRARIES})
 
+add_library(${PROJECT_NAME}_perception_lib STATIC
+  src/Perception/PR2JointsPerception.cpp
+)
+target_link_libraries(${PROJECT_NAME}_perception_lib PUBLIC ${catkin_LIBRARIES} ${PROJECT_NAME}_bullet_lib)
+
 add_executable(${PROJECT_NAME}_bullet_test src/TestFiles/bullet_test.cpp )
 target_link_libraries(${PROJECT_NAME}_bullet_test PRIVATE
                       ${PROJECT_NAME}_bullet_lib
                       ${PROJECT_NAME}_types_lib
+                      ${PROJECT_NAME}_perception_lib
                       ${catkin_LIBRARIES})
 
 add_executable(${PROJECT_NAME}_multi_server_test src/TestFiles/multi_server_test.cpp )

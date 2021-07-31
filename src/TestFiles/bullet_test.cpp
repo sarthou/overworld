@@ -11,6 +11,9 @@
 
 #include "overworld/Utility/ShellDisplay.h"
 
+#include "overworld/Perception/PR2JointsPerception.h"
+#include "overworld/Perception/EntitiesPerceptionManager.h"
+
 using namespace std::chrono_literals;
 
 static volatile std::sig_atomic_t flag;
@@ -23,9 +26,11 @@ void sigHandler(int signal)
 
 int main(int argc, char** argv)
 {
+	ros::init(argc, argv, "listener");
+    ros::NodeHandle n;
 	flag = false;
 
-	owds::BulletClient* client = owds::PhysicsServers::connectPhysicsServer(owds::CONNECT_GUI);
+	owds::BulletClient* client = owds::PhysicsServers::connectPhysicsServer(owds::CONNECT_GUI_SERVER);
 	std::cout << "server_id " << client->getId() << std::endl;
 
 	int visual_id = client->createVisualShapeBox({1,1.5,1.5}, {1,0,0,1});
@@ -39,7 +44,10 @@ int main(int argc, char** argv)
 	std::string path_overworld = ros::package::getPath("overworld");
 	
 	client->setAdditionalSearchPath(path_overworld + "/models");
-	client->loadURDF("pr2.urdf", {-2,-2,0}, {0,0,0,1});
+	int robot_id = client->loadURDF("pr2.urdf", {-2,-2,0}, {0,0,0,1});
+
+	std::cout << "Robot id : " << robot_id << std::endl;
+	std::cout << "Nombre de joints: " << client->getNumJoints(robot_id) << std::endl;
 
 	client->configureDebugVisualizer(COV_ENABLE_DEPTH_BUFFER_PREVIEW, false);
 	client->configureDebugVisualizer(COV_ENABLE_SHADOWS, false);
@@ -69,9 +77,14 @@ int main(int argc, char** argv)
 	obj2.updatePose({{3.0, 0.0, 0.0}}, {{0.0, 0.0, 0.0, 1.0}}, ros::Time(3.0));
 	std::cout << "The distance between " << obj1.id() << " and " << obj2.id() << " is: " << obj1.pose().distanceTo(obj2.pose()) << "m." << std::endl;
 
-	while(flag == false)
+	owds::PR2JointsPerception joint_perception(&n, robot_id);
+	owds::EntitiesPerceptionManager<owds::Entity> entities_manager;
+	entities_manager.addPerceptionModule("PR2_joints", &joint_perception);
+
+	while(flag == false && ros::ok())
 	{
 		std::this_thread::sleep_for(100ms);
+		ros::spinOnce();
 	}
 
 	delete client;

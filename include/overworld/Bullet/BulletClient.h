@@ -6,6 +6,7 @@
 #include <string>
 #include <array>
 #include <vector>
+#include <unordered_map>
 
 namespace owds {
 
@@ -99,6 +100,7 @@ public:
 
     struct b3LinkState getLinkState(int body_id, int link_index, bool compute_link_velocity = false, bool compute_forward_kinematics = false);
     struct b3JointInfo getJointInfo(int body_id, int joint_index);
+    std::unordered_map<std::string, int> findJointIndices(int body_id);
     void changeDynamicsInfo(int body_id, int link_index, int friction_anchor, int activation_state);
 
     std::array<float, 16> computeProjectionMatrix(float fov,
