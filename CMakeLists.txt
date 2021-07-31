@@ -17,6 +17,7 @@ find_package(catkin REQUIRED COMPONENTS
   tf
   roslib
   message_filters
+  ar_track_alvar_msgs
 )
 find_package (Eigen3 REQUIRED NO_MODULE)
 find_package(Threads REQUIRED)
