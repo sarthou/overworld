@@ -24,4 +24,10 @@ const std::vector<PointOfInterest>& Object::getPointsOfInterest() const
     return points_of_interest_;
 }
 
+void Object::setAllPoiUnseen()
+{
+    for(auto& poi : points_of_interest_)
+        poi.setUnseen();
+}
+
 } // namespace owds

@@ -21,11 +21,16 @@ private:
   Agent* agent_;
   Pose last_head_pose_;
 
+  std::map<size_t, std::string> ids_map_;
+
   bool perceptionCallback(const ar_track_alvar_msgs::AlvarMarkers& markers,
                           const ar_track_alvar_msgs::AlvarVisibleMarkers& visible_markers);
 
   bool headHasMoved();
   bool isInValidArea(const Pose& tag_pose);
+
+  void setPointOfInterest(const ar_track_alvar_msgs::AlvarVisibleMarker& visible_marker);
+  void setAllPoiUnseen();
 };
 
 } // namespace owds
