@@ -12,6 +12,7 @@ class Pose
 public:
     Pose();
     Pose(const Pose& pose);
+    Pose(const Eigen::Affine3d& pose) { t_ = pose; }
 
     /**
      * @brief Construct a new Pose object
@@ -27,6 +28,12 @@ public:
     double angleTo(const Pose& pose) const;
 
     const std::pair<std::array<double, 3>, std::array<double, 4>> arrays() const;
+
+    Pose transform(const Pose& new_frame) const;
+
+    double getX();
+    double getY();
+    double getZ();
 
 protected:
     Eigen::Affine3d t_;

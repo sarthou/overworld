@@ -22,6 +22,12 @@ double Pose::distanceTo(const Pose& pose) const
     return (t_.translation() - pose.t_.translation()).norm();
 }
 
+double Pose::angleTo(const Pose& pose) const
+{
+    Eigen::Quaternion<double> rot(t_.rotation());
+    return rot.angularDistance(Eigen::Quaternion<double>(pose.t_.rotation()));
+}
+
 const std::pair<std::array<double, 3>, std::array<double, 4>> Pose::arrays() const
 {
     Eigen::Vector3d translation(t_.translation());
@@ -32,5 +38,14 @@ const std::pair<std::array<double, 3>, std::array<double, 4>> Pose::arrays() con
     p.second = {rot.x(), rot.y(), rot.z(), rot.w()};
     return p;
 }
+
+Pose Pose::transform(const Pose& new_frame) const 
+{
+    return new_frame.t_.inverse() * t_;
+}
+
+double getX();
+    double getY();
+    double getZ();
 
 } // namespace owds
