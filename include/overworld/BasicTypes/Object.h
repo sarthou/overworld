@@ -15,6 +15,7 @@ public:
     void addPointOfInterest(const PointOfInterest& point_of_interest);
     void emptyPointsOfInterest();
     const std::vector<PointOfInterest>& getPointsOfInterest() const;
+    void setAllPoiUnseen();
 
     void setStatic() { is_static_ = true; }
     bool isStatic() { return is_static_; }
