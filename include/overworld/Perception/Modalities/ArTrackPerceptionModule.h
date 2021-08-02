@@ -8,6 +8,13 @@
 #include "ar_track_alvar_msgs/AlvarMarkers.h"
 #include "ar_track_alvar_msgs/AlvarVisibleMarkers.h"
 
+#include "ontologenius/OntologiesManipulator.h"
+
+#include <map>
+#include <unordered_set>
+
+#include <tf2_ros/transform_listener.h>
+
 namespace owds {
 
 class ArTrackPerceptionModule : public PerceptionModuleRosSyncBase<Object, ar_track_alvar_msgs::AlvarMarkers, ar_track_alvar_msgs::AlvarVisibleMarkers>
@@ -22,6 +29,13 @@ private:
   Pose last_head_pose_;
 
   std::map<size_t, std::string> ids_map_;
+  std::unordered_set<size_t> blacklist_ids_;
+
+  OntologiesManipulator ontologies_manipulator_;
+  OntologyManipulator* onto_;
+
+  tf2_ros::Buffer tf_buffer_;
+  tf2_ros::TransformListener tf2_listener_;
 
   bool perceptionCallback(const ar_track_alvar_msgs::AlvarMarkers& markers,
                           const ar_track_alvar_msgs::AlvarVisibleMarkers& visible_markers);
@@ -31,6 +45,9 @@ private:
 
   void setPointOfInterest(const ar_track_alvar_msgs::AlvarVisibleMarker& visible_marker);
   void setAllPoiUnseen();
+  void updateEntities(const ar_track_alvar_msgs::AlvarMarkers& main_markers,
+                      const std::unordered_set<size_t>& invalid_main_markers_ids);
+  bool createNewEntity(const ar_track_alvar_msgs::AlvarMarker& marker);
 };
 
 } // namespace owds
