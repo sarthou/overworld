@@ -79,23 +79,40 @@ bool ArTrackPerceptionModule::isInValidArea(const Pose& tag_pose)
 
 void ArTrackPerceptionModule::setPointOfInterest(const ar_track_alvar_msgs::AlvarVisibleMarker& visible_marker)
 {
-  auto id_it = ids_map_.find(visible_marker.main_id);
-  if(id_it == ids_map_.end())
-  {
-    ShellDisplay::warning("[ArTrackPerceptionModule] tag " + std::to_string(visible_marker.main_id) + " is unknown.");
-    return;
-  }
+    auto id_it = ids_map_.find(visible_marker.main_id);
+    if (id_it == ids_map_.end())
+    {
+        ShellDisplay::warning("[ArTrackPerceptionModule] tag " + std::to_string(visible_marker.main_id) + " is unknown.");
+        return;
+    }
 
-  std::string poi_id = "ar_" + std::to_string(visible_marker.id);
-  auto obj_it = percepts_.find(id_it->second);
+    std::string poi_id = "ar_" + std::to_string(visible_marker.id);
+    auto obj_it = percepts_.find(id_it->second);
 
-  for(const auto& poi : obj_it->second.getPointsOfInterest())
-    if(poi.getId() == poi_id)
-      return;
+    for (const auto& poi : obj_it->second.getPointsOfInterest())
+        if (poi.getId() == poi_id)
+            return;
 
-  double half_size = visible_marker.size / 100. / 2.; // we also put it in meters
+    double half_size = visible_marker.size / 100. / 2.; // we also put it in meters
 
-  // TODO
+    PointOfInterest p(poi_id);
+    Pose sub_pois[5] = {Pose({{0.0, 0.0, 0.0}}, {{0.0, 0.0, 0.0, 1.0}}), 
+                        Pose({{-half_size, -half_size, 0.0}}, {{0.0, 0.0, 0.0, 1.0}}),
+                        Pose({{half_size, -half_size, 0.0}}, {{0.0, 0.0, 0.0, 1.0}}), 
+                        Pose({{half_size, half_size, 0.0}}, {{0.0, 0.0, 0.0, 1.0}}),
+                        Pose({{-half_size, half_size, 0.0}}, {{0.0, 0.0, 0.0, 1.0}})};
+    geometry_msgs::TransformStamped map_to_visible_marker_g;
+    tf_buffer_.transform(visible_marker.pose, map_to_visible_marker_g, "map", ros::Duration(1.0));
+    Pose map_to_visible_marker(map_to_visible_marker_g);
+    Pose map_to_marked_object = obj_it->second.pose();
+
+    Pose marker_in_marked_obj = map_to_visible_marker.transformIn(map_to_marked_object);
+    for (const auto& sub_poi : sub_pois)
+    {
+      Pose marked_obj_to_poi = marker_in_marked_obj * sub_poi;
+      p.addPoint(marker_in_marked_obj);
+    }
+    obj_it->second.addPointOfInterest(p);
 }
 
 void ArTrackPerceptionModule::setAllPoiUnseen()

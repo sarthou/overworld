@@ -12,6 +12,13 @@ Pose::Pose(const std::array<double, 3>& translation, const std::array<double, 4>
                 )
 {}
 
+Pose::Pose(const geometry_msgs::TransformStamped& transform)
+{
+    Eigen::Translation3d tra(transform.transform.translation.x, transform.transform.translation.y, transform.transform.translation.z);
+    Eigen::Quaternion<double> qua(transform.transform.rotation.w, transform.transform.rotation.x, transform.transform.rotation.y, transform.transform.rotation.z);
+    t_ = Eigen::Affine3d(tra * qua);
+}
+
 double Pose::distanceSqTo(const Pose& pose) const
 {
     return (t_.translation() - pose.t_.translation()).squaredNorm();
@@ -54,6 +61,12 @@ double Pose::getOriginPan() const
 Pose Pose::transformIn(const Pose& new_frame) const 
 {
     return new_frame.t_.inverse() * t_;
+}
+
+Pose& Pose::operator*=(const Pose& b)
+{
+    t_ * b.t_;
+    return *this;
 }
 
 double Pose::getX() const

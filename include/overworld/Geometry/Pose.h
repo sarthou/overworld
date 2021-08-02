@@ -4,6 +4,7 @@
 #include <array>
 
 #include <eigen3/Eigen/Geometry>
+#include <geometry_msgs/TransformStamped.h>
 
 namespace owds{
 
@@ -21,6 +22,8 @@ public:
      * @param rotation rotation part of the pose. Quaternion (x, y, z, w)
      */
     Pose(const std::array<double,3>& translation, const std::array<double, 4>& rotation);
+
+    Pose(const geometry_msgs::TransformStamped& transform);
 
     double distanceSqTo(const Pose& pose) const;
     double distanceTo(const Pose& pose) const;
@@ -44,6 +47,7 @@ public:
      * @return Pose 
      */
     Pose transformIn(const Pose& new_frame) const;
+    Pose& operator*= (const Pose& b);
 
     double getX() const;
     double getY() const;
@@ -56,6 +60,11 @@ public:
 protected:
     Eigen::Affine3d t_;
 };
+
+inline Pose operator*(Pose a, const Pose& b){
+    a *= b;
+    return a;
+}
 
 } // namespace owds
 
