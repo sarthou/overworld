@@ -15,12 +15,12 @@ public:
                                    clip_far_(clip_far)
     {}
 
-    double getHeight() { return height_; }
-    double getWidth() { return width_; }
-    double getClipNear() { return clip_near_; }
-    double getClipFar() { return clip_far_; }
+    double getHeight() const { return height_; }
+    double getWidth() const { return width_; }
+    double getClipNear() const { return clip_near_; }
+    double getClipFar() const { return clip_far_; }
 
-    double getRatio() { return width_ / height_; }
+    double getRatio() const { return width_ / height_; }
 
 private:
     double height_; // degrees 
