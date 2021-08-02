@@ -20,13 +20,13 @@ struct Shape_t
   ShapeType_e type;
   std::string mesh_resource;
   std::array<double, 3> color;
-  double scale;
+  std::array<double, 3> scale;
 
   Shape_t()
   {
     type = SHAPE_NONE;
     color.fill(0.);
-    scale = 1.;
+    scale = {1.,1.,1.};
   }
 };
 
