@@ -10,7 +10,7 @@ namespace owds {
 class PR2JointsPerception : public owds::PerceptionModuleRosBase<owds::Entity, sensor_msgs::JointState>
 {
   public:
-    PR2JointsPerception(ros::NodeHandle* n, int robotBodyId);
+    PR2JointsPerception(ros::NodeHandle* n, int robotBodyId, BulletClient* robotWorldClient);
     virtual ~PR2JointsPerception() = default;
 
   protected:
