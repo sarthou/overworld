@@ -25,11 +25,25 @@ public:
     double distanceSqTo(const Pose& pose) const;
     double distanceTo(const Pose& pose) const;
 
-    double angleTo(const Pose& pose) const;
+    /**
+     * @brief Returns the difference in angle between two poses. It does NOT return the angle from one pose to the origin of the other one.
+     * 
+     * @param pose 
+     * @return double 
+     */
+    double angularDistance(const Pose& pose) const;
 
     const std::pair<std::array<double, 3>, std::array<double, 4>> arrays() const;
+    double getOriginTilt() const;
+    double getOriginPan() const;
 
-    Pose transform(const Pose& new_frame) const;
+    /**
+     * @brief Compute the transform of this pose in "new_frame"
+     * 
+     * @param new_frame 
+     * @return Pose 
+     */
+    Pose transformIn(const Pose& new_frame) const;
 
     double getX() const;
     double getY() const;

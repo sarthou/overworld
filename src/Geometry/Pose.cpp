@@ -22,7 +22,7 @@ double Pose::distanceTo(const Pose& pose) const
     return (t_.translation() - pose.t_.translation()).norm();
 }
 
-double Pose::angleTo(const Pose& pose) const
+double Pose::angularDistance(const Pose& pose) const
 {
     Eigen::Quaternion<double> rot(t_.rotation());
     return rot.angularDistance(Eigen::Quaternion<double>(pose.t_.rotation()));
@@ -39,7 +39,19 @@ const std::pair<std::array<double, 3>, std::array<double, 4>> Pose::arrays() con
     return p;
 }
 
-Pose Pose::transform(const Pose& new_frame) const 
+double Pose::getOriginTilt() const
+{
+    Eigen::Vector3d origin = t_.translation();
+    return std::acos(origin.z() / std::hypot(origin.y(), origin.z()));
+}
+
+double Pose::getOriginPan() const
+{
+    Eigen::Vector3d origin = t_.translation();
+    return std::acos(origin.z() / std::hypot(origin.x(), origin.z()));
+}
+
+Pose Pose::transformIn(const Pose& new_frame) const 
 {
     return new_frame.t_.inverse() * t_;
 }

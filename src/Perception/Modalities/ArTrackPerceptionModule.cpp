@@ -59,7 +59,7 @@ bool ArTrackPerceptionModule::headHasMoved()
     res = true;
   else if(agent_->getHead()->pose().distanceTo(last_head_pose_) > 0.001)
     res = true;
-  else if(agent_->getHead()->pose().angleTo(last_head_pose_) > 0.001)
+  else if(agent_->getHead()->pose().angularDistance(last_head_pose_) > 0.001)
     res = true;
   
   last_head_pose_ = agent_->getHead()->pose();
@@ -68,10 +68,10 @@ bool ArTrackPerceptionModule::headHasMoved()
 
 bool ArTrackPerceptionModule::isInValidArea(const Pose& tag_pose)
 {
-  auto tag_in_head = tag_pose.transform(agent_->getHead()->pose());
+  auto tag_in_head = tag_pose.transformIn(agent_->getHead()->pose());
   if((tag_in_head.getZ() <= agent_->getFieldOfView().getClipFar()) &&
-      (std::abs(tag_in_head.getPitch()) <= agent_->getFieldOfView().getHeight() * TO_HALF_RAD) &&
-      (std::abs(tag_in_head.getYaw()) < agent_->getFieldOfView().getWidth() * TO_HALF_RAD))
+      (std::abs(tag_in_head.getOriginTilt()) <= agent_->getFieldOfView().getHeight() * TO_HALF_RAD) &&
+      (std::abs(tag_in_head.getOriginPan()) < agent_->getFieldOfView().getWidth() * TO_HALF_RAD))
     return true;
   else
     return false;
