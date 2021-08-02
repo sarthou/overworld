@@ -33,6 +33,7 @@ protected:
 
     bool shouldRun();
     virtual void getPercepts(const std::map<std::string, T>& percepts);
+    virtual void reasoningOnUpdate() {}
 };
 
 template<typename T>
@@ -107,7 +108,7 @@ template<typename T>
 bool EntitiesPerceptionManager<T>::shouldRun()
 {
     for(const auto& module : perception_modules_)
-        if(module.second->hasBeenUpdated())
+        if(module.second->isActivated() && module.second->hasBeenUpdated())
             return true;
     return false;
 }
@@ -133,7 +134,10 @@ bool EntitiesPerceptionManager<T>::update()
         return false;
 
     for(const auto& module : perception_modules_)
-        module.second->accessPercepts([this](const std::map<std::string, T>& percepts){ this->getPercepts(percepts); });
+        if(module.second->isActivated() && module.second->hasBeenUpdated())
+            module.second->accessPercepts([this](const std::map<std::string, T>& percepts){ this->getPercepts(percepts); });
+
+    reasoningOnUpdate();
 
     return true;
 }
