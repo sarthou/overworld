@@ -44,8 +44,34 @@ Pose Pose::transform(const Pose& new_frame) const
     return new_frame.t_.inverse() * t_;
 }
 
-double getX();
-    double getY();
-    double getZ();
+double Pose::getX() const
+{
+    return t_.translation().x();
+}
+
+double Pose::getY() const
+{
+    return t_.translation().y();
+}
+
+double Pose::getZ() const
+{
+    return t_.translation().z();
+}
+
+double Pose::getRoll() const
+{
+    return t_.rotation().eulerAngles(0,1,2)[0];
+}
+
+double Pose::getPitch() const
+{
+    return t_.rotation().eulerAngles(0,1,2)[1];
+}
+
+double Pose::getYaw() const
+{
+    return t_.rotation().eulerAngles(0,1,2)[2];
+}
 
 } // namespace owds

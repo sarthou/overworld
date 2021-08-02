@@ -31,9 +31,13 @@ public:
 
     Pose transform(const Pose& new_frame) const;
 
-    double getX();
-    double getY();
-    double getZ();
+    double getX() const;
+    double getY() const;
+    double getZ() const;
+
+    double getRoll() const;
+    double getPitch() const;
+    double getYaw() const;
 
 protected:
     Eigen::Affine3d t_;
