@@ -40,13 +40,13 @@ bool ArTrackPerceptionModule::perceptionCallback(const ar_track_alvar_msgs::Alva
         valid_visible_markers.push_back(visible_marker);
       else
         invalid_main_markers_ids.insert(visible_marker.main_id);
-
-    updateEntities(markers, invalid_main_markers_ids);
-    setAllPoiUnseen();
-
-    for(auto& visible_marker : valid_visible_markers)
-      setPointOfInterest(visible_marker);
   }
+
+  updateEntities(markers, invalid_main_markers_ids);
+  setAllPoiUnseen();
+
+  for(auto& visible_marker : valid_visible_markers)
+    setPointOfInterest(visible_marker);
 
   return true;
 }
