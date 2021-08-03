@@ -10,8 +10,6 @@ namespace owds {
 class RobotsPerceptionManager : public EntitiesPerceptionManager<BodyPart>
 {
 public:
-  RobotsPerceptionManager(BulletClient* bullet_client);
-
   Agent* getAgent(const std::string& agent_name);
 
 private:

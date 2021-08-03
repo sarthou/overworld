@@ -19,7 +19,7 @@ class EntitiesPerceptionManager
 {
     static_assert(std::is_base_of<Entity,T>::value, "T must be derived from Entity");
 public:
-    EntitiesPerceptionManager(BulletClient* bullet_client = nullptr) : bullet_client_(bullet_client) {}
+    void setBulletClient(BulletClient* client) { bullet_client_ = client; }
 
     void addPerceptionModule(const std::string& module_name, PerceptionModuleBase_<T>* perception_module);
     PerceptionModuleBase_<T>* getPerceptionModule(const std::string module_name);
@@ -27,6 +27,7 @@ public:
     std::vector<std::string> getActivatedModulesList();
     std::string getModulesListStr();
     std::string getActivatedModulesListStr();
+    void deleteModules();
 
     bool update();
 
@@ -112,6 +113,17 @@ std::string EntitiesPerceptionManager<T>::getActivatedModulesListStr()
         }
     }
     return modules_name;
+}
+
+template<typename T>
+void EntitiesPerceptionManager<T>::deleteModules()
+{
+    for(const auto& module : perception_modules_)
+    {
+        module.second->activate(false);
+        delete module.second;
+    }
+    perception_modules_.clear();
 }
 
 template<typename T>
