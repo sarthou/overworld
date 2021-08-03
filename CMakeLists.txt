@@ -118,6 +118,7 @@ add_library(${PROJECT_NAME}_types_lib STATIC
 target_link_libraries(${PROJECT_NAME}_types_lib PUBLIC ${catkin_LIBRARIES})
 
 add_library(${PROJECT_NAME}_perception_lib STATIC
+  src/Perception/RobotsPerceptionManager.cpp
   src/Perception/Modalities/PR2JointsPerception.cpp
   src/Perception/Modalities/ArTrackPerceptionModule.cpp
 )
