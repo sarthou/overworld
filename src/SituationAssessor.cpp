@@ -24,8 +24,8 @@ SituationAssessor::SituationAssessor(const std::string& agent_name, bool is_robo
   if(is_robot_)
   {
     auto pr2_joint_perception =  new PR2JointsPerception(&n_, agent_name, 
-                                                         {{"r_gripper_tool_frame", owds::BODY_PART_RIGHT_HAND}, {"l_gripper_tool_frame", owds::BODY_PART_LEFT_HAND}},
-                                                         bullet_client_, 2.0);
+                                                         {{"r_gripper_tool_frame", owds::BODY_PART_RIGHT_HAND}, {"l_gripper_tool_frame", owds::BODY_PART_LEFT_HAND}, {"head_mount_kinect2_rgb_optical_frame", owds::BODY_PART_HEAD}},
+                                                         bullet_client_, 0.09);
     robots_manager_.addPerceptionModule("pr2_joints", pr2_joint_perception);
     myself_agent_ = robots_manager_.getAgent(agent_name);
   }
@@ -81,6 +81,7 @@ void SituationAssessor::assessmentLoop()
 void SituationAssessor::assess()
 {
   robots_manager_.update();
+  auto entities = robots_manager_.getEntities();
 }
 
 }
