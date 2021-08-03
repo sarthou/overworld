@@ -6,6 +6,8 @@
 
 namespace owds {
 
+class BodyPart;
+
 class Object: public Entity
 {
 public:
@@ -18,11 +20,17 @@ public:
     void setAllPoiUnseen();
 
     void setStatic() { is_static_ = true; }
-    bool isStatic() { return is_static_; }
+    bool isStatic() const { return is_static_; }
+
+    void setInHand(BodyPart* hand) { hand_in_ = hand; }
+    void removeFromHand() { hand_in_ = nullptr; }
+    bool isInHand() const { return (hand_in_ != nullptr); }
+    BodyPart* getHandIn() const { return hand_in_; }
 
 protected:
     std::vector<PointOfInterest> points_of_interest_;
     bool is_static_;
+    BodyPart* hand_in_;
 };
 
 } // namespace owds
