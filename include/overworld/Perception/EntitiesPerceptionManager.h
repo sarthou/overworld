@@ -22,13 +22,13 @@ public:
     void setBulletClient(BulletClient* client) { bullet_client_ = client; }
 
     void addPerceptionModule(const std::string& module_name, PerceptionModuleBase_<T>* perception_module);
-    PerceptionModuleBase_<T>* getPerceptionModule(const std::string module_name);
+    PerceptionModuleBase_<T>* getPerceptionModule(const std::string& module_name);
     std::vector<std::string> getModulesList();
     std::vector<std::string> getActivatedModulesList();
     std::string getModulesListStr();
     std::string getActivatedModulesListStr();
     void deleteModules();
-    inline std::map<std::string, T> getEntities() { return entities_; }
+    std::map<std::string, T> getEntities() { return entities_; }
 
     bool update();
 
@@ -58,7 +58,7 @@ void EntitiesPerceptionManager<T>::addPerceptionModule(const std::string& module
 }
 
 template<typename T>
-PerceptionModuleBase_<T>* EntitiesPerceptionManager<T>::getPerceptionModule(const std::string module_name)
+PerceptionModuleBase_<T>* EntitiesPerceptionManager<T>::getPerceptionModule(const std::string& module_name)
 {
     if(perception_modules_.find(module_name) == perception_modules_.end())
         return perception_modules_[module_name];
@@ -159,6 +159,9 @@ bool EntitiesPerceptionManager<T>::update()
     if(!shouldRun())
         return false;
 
+    for(auto& entity : entities_)
+        entity.second.setUnseen();
+
     for(const auto& module : perception_modules_)
         if(module.second->isActivated() && module.second->hasBeenUpdated())
             module.second->accessPercepts([this](const std::map<std::string, T>& percepts){ this->getPercepts(percepts); });
@@ -173,6 +176,7 @@ void EntitiesPerceptionManager<T>::updateEntityPose(T& entity, const Pose& pose,
 {
     entity.updatePose(pose, stamp);
     updateToBullet(entity);
+    entity.setSeen();
 }
 
 template<typename T>

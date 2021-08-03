@@ -7,4 +7,6 @@ int main(int argc, char** argv)
   owds::SituationAssessor robot_situation_assessor("pr2_robot", true);
 
   robot_situation_assessor.run();
+
+  return 0;
 }

@@ -14,7 +14,10 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   genmsg
   message_generation
-  tf
+  tf2
+  tf2_ros
+  tf2_eigen
+  tf2_geometry_msgs
   roslib
   message_filters
   ar_track_alvar_msgs
@@ -80,7 +83,7 @@ generate_messages(
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES overworld
-   CATKIN_DEPENDS ontologenius roscpp std_msgs tf roslib
+   CATKIN_DEPENDS ontologenius roscpp std_msgs tf2 tf2_ros roslib
 #  DEPENDS system_lib
 )
 
@@ -119,6 +122,7 @@ target_link_libraries(${PROJECT_NAME}_types_lib PUBLIC ${catkin_LIBRARIES})
 
 add_library(${PROJECT_NAME}_perception_lib STATIC
   src/Perception/RobotsPerceptionManager.cpp
+  src/Perception/ObjectsPerceptionManager.cpp
   src/Perception/Modalities/PR2JointsPerception.cpp
   src/Perception/Modalities/ArTrackPerceptionModule.cpp
   src/SituationAssessor.cpp
