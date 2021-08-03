@@ -43,6 +43,12 @@ protected:
   bool is_activated_;
   bool updated_;
   std::mutex mutex_;
+
+  void setAllPerceptsUnseen()
+  {
+    for(auto& percept : percepts_)
+      percept.second.setUnseen();
+  }
 };
 
 template<typename T, class M>

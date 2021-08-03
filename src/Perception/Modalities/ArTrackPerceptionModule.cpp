@@ -30,13 +30,7 @@ bool ArTrackPerceptionModule::perceptionCallback(const ar_track_alvar_msgs::Alva
   std::unordered_set<size_t> invalid_main_markers_ids;
   for(const auto& visible_marker : visible_markers.markers)
   {
-    if(isInValidArea(Pose({visible_marker.pose.pose.position.x,
-                           visible_marker.pose.pose.position.y,
-                           visible_marker.pose.pose.position.z},
-                          {visible_marker.pose.pose.orientation.x,
-                           visible_marker.pose.pose.orientation.y,
-                           visible_marker.pose.pose.orientation.z,
-                           visible_marker.pose.pose.orientation.w})))
+    if(isInValidArea(Pose(visible_marker.pose)))
         valid_visible_markers.push_back(visible_marker);
       else
         invalid_main_markers_ids.insert(visible_marker.main_id);
@@ -46,7 +40,10 @@ bool ArTrackPerceptionModule::perceptionCallback(const ar_track_alvar_msgs::Alva
   setAllPoiUnseen();
 
   for(auto& visible_marker : valid_visible_markers)
+  {
     setPointOfInterest(visible_marker);
+    percepts_.at(ids_map_[visible_marker.main_id]).setSeen();
+  }
 
   return true;
 }
@@ -101,7 +98,7 @@ void ArTrackPerceptionModule::setPointOfInterest(const ar_track_alvar_msgs::Alva
                         Pose({{half_size, -half_size, 0.0}}, {{0.0, 0.0, 0.0, 1.0}}), 
                         Pose({{half_size, half_size, 0.0}}, {{0.0, 0.0, 0.0, 1.0}}),
                         Pose({{-half_size, half_size, 0.0}}, {{0.0, 0.0, 0.0, 1.0}})};
-    geometry_msgs::TransformStamped map_to_visible_marker_g;
+    geometry_msgs::PoseStamped map_to_visible_marker_g;
     tf_buffer_.transform(visible_marker.pose, map_to_visible_marker_g, "map", ros::Duration(1.0));
     Pose map_to_visible_marker(map_to_visible_marker_g);
     Pose map_to_marked_object = obj_it->second.pose();
@@ -118,7 +115,10 @@ void ArTrackPerceptionModule::setPointOfInterest(const ar_track_alvar_msgs::Alva
 void ArTrackPerceptionModule::setAllPoiUnseen()
 {
   for(auto& percept : percepts_)
+  {
     percept.second.setAllPoiUnseen();
+    percept.second.setUnseen();
+  }
 }
 
 void ArTrackPerceptionModule::updateEntities(const ar_track_alvar_msgs::AlvarMarkers& main_markers,
