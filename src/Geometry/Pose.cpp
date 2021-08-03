@@ -19,6 +19,13 @@ Pose::Pose(const geometry_msgs::TransformStamped& transform)
     t_ = Eigen::Affine3d(tra * qua);
 }
 
+Pose::Pose(const geometry_msgs::PoseStamped& pose)
+{
+    Eigen::Translation3d tra(pose.pose.position.x, pose.pose.position.y, pose.pose.position.z);
+    Eigen::Quaternion<double> qua(pose.pose.orientation.w, pose.pose.orientation.x, pose.pose.orientation.y, pose.pose.orientation.z);
+    t_ = Eigen::Affine3d(tra * qua);
+}
+
 double Pose::distanceSqTo(const Pose& pose) const
 {
     return (t_.translation() - pose.t_.translation()).squaredNorm();
