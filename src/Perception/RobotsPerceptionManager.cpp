@@ -4,11 +4,6 @@
 
 namespace owds {
 
-RobotsPerceptionManager::RobotsPerceptionManager(BulletClient* bullet_client) : EntitiesPerceptionManager<BodyPart>(bullet_client)
-{
-
-}
-
 Agent* RobotsPerceptionManager::getAgent(const std::string& agent_name)
 {
   auto it = agents_.find(agent_name);

@@ -121,6 +121,7 @@ add_library(${PROJECT_NAME}_perception_lib STATIC
   src/Perception/RobotsPerceptionManager.cpp
   src/Perception/Modalities/PR2JointsPerception.cpp
   src/Perception/Modalities/ArTrackPerceptionModule.cpp
+  src/SituationAssessor.cpp
 )
 target_link_libraries(${PROJECT_NAME}_perception_lib PUBLIC
                       ${catkin_LIBRARIES}
@@ -145,3 +146,9 @@ target_link_libraries(${PROJECT_NAME}_perception_test PRIVATE
                       ${PROJECT_NAME}_perception_lib
                       ${catkin_LIBRARIES})
 add_dependencies(${PROJECT_NAME}_perception_test overworld_gencpp)
+
+add_executable(${PROJECT_NAME}_node src/Nodes/overworld.cpp src/SituationAssessor.cpp)
+target_link_libraries(${PROJECT_NAME}_node PRIVATE
+                      ${PROJECT_NAME}_perception_lib
+                      ${catkin_LIBRARIES})
+add_dependencies(${PROJECT_NAME}_node overworld_gencpp)
