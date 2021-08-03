@@ -5,6 +5,16 @@
 
 namespace owds {
 
+enum BodyPartType_e
+{
+    BODY_PART_UNKNOW,
+    BODY_PART_HEAD,
+    BODY_PART_LEFT_HAND,
+    BODY_PART_RIGHT_HAND,
+    BODY_PART_TORSO,
+    BODY_PART_Base
+};
+
 class BodyPart: public Entity
 {
 public:
@@ -17,9 +27,13 @@ public:
     void setAgentName(const std::string& name) { agent_name_ = name; }
     bool isAgentKnown() const { return (agent_name_ != ""); }
 
+    BodyPartType_e getType() const { return type_; }
+    void setType(BodyPartType_e type) { type_ = type; }
+
 private:
     std::string frame_name_;
     std::string agent_name_;
+    BodyPartType_e type_;
 };
 
 } // namespace owds
