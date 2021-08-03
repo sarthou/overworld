@@ -117,7 +117,7 @@ add_library(${PROJECT_NAME}_perception_lib STATIC
   src/Perception/PR2JointsPerception.cpp
   src/Perception/Modalities/ArTrackPerceptionModule.cpp
 )
-target_link_libraries(${PROJECT_NAME}_perception_lib PUBLIC ${catkin_LIBRARIES} ${PROJECT_NAME}_bullet_lib)
+target_link_libraries(${PROJECT_NAME}_perception_lib PUBLIC ${catkin_LIBRARIES} ${PROJECT_NAME}_bullet_lib ${PROJECT_NAME}_types_lib)
 
 add_executable(${PROJECT_NAME}_bullet_test src/TestFiles/bullet_test.cpp )
 target_link_libraries(${PROJECT_NAME}_bullet_test PRIVATE
