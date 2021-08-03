@@ -28,6 +28,7 @@ public:
     std::string getModulesListStr();
     std::string getActivatedModulesListStr();
     void deleteModules();
+    inline std::map<std::string, T> getEntities() { return entities_; }
 
     bool update();
 
