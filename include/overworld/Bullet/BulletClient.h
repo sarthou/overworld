@@ -81,6 +81,12 @@ public:
                 bool use_fixed_base = false,
                 int flags = 0);
 
+    int loadURDFRaw(const std::string& raw_urdf, const std::string& temp_file_name,
+                           const std::array<double, 3>& base_position,
+                           const std::array<double, 4>& base_orientation,
+                           bool use_fixed_base = false,
+                           int flags = 0);
+
     int getNumJoints(int body_id);
     bool resetJointState(int body_id, int joint_index, double target_value, double target_velocity = 0);
     void resetBasePositionAndOrientation(int body_id, const std::array<double, 3>& position, const std::array<double, 4>& orientation);

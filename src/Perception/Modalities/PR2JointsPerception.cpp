@@ -56,7 +56,7 @@ bool PR2JointsPerception::perceptionCallback(const sensor_msgs::JointState& msg)
         std::string name = msg.name[i];
         if (joint_name_id_.count(name) != 1)
         {
-            std::cout << "Joint name not found in Bullet: " << name << std::endl;
+            //std::cout << "Joint name not found in Bullet: " << name << std::endl;
             continue;
         }
         bullet_->resetJointState(robot_body_id_, joint_name_id_[name], msg.position[i]);
@@ -79,7 +79,14 @@ void PR2JointsPerception::loadPr2Model()
 	std::string path_overworld = ros::package::getPath("overworld");
 	
 	bullet_->setAdditionalSearchPath(path_overworld + "/models");
-	robot_body_id_ = bullet_->loadURDF("pr2.urdf", {-2,-2,0}, {0,0,0,1});
+
+    std::string urdf = n_->param<std::string>("/robot_description", "");
+    if (urdf == "")
+    {
+	    robot_body_id_ = bullet_->loadURDF("pr2.urdf", {0,0,0}, {0,0,0,1});
+    }else{
+        robot_body_id_ = bullet_->loadURDFRaw(urdf, "pr2_tmp.urdf", {0,0,0}, {0,0,0,1});
+    }
 }
 
 } // namespace owds

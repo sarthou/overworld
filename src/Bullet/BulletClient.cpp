@@ -276,6 +276,21 @@ int BulletClient::loadURDF(const std::string& file_name,
 	}
 }
 
+int BulletClient::loadURDFRaw(const std::string& raw_urdf, const std::string& temp_file_name,
+                           const std::array<double, 3>& base_position,
+                           const std::array<double, 4>& base_orientation,
+                           bool use_fixed_base,
+                           int flags)
+{
+    std::ofstream out_file;
+    out_file.open(additional_path_ + "/" + temp_file_name + ".owds");
+    out_file << raw_urdf;
+    out_file.close();
+    return loadURDF(temp_file_name + ".owds", base_position, base_orientation, use_fixed_base, flags);
+
+}
+
+
 // Return the number of joints in an object based on
 // body index; body index is based on order of sequence
 // the object is loaded into simulation
