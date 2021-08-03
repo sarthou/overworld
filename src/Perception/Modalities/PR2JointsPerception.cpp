@@ -13,7 +13,7 @@ PR2JointsPerception::PR2JointsPerception(ros::NodeHandle* n, int robot_body_id, 
     for (const auto& name : link_to_entity_names_)
     {
         percepts_.emplace(name, name);
-        //percepts_.at(name).setAgentName("pr2_robot");
+        percepts_.at(name).setAgentName("pr2_robot");
         if (link_name_id_.count(name) == 0)
         {
             std::cout << "Error: link name '" << name
@@ -22,7 +22,7 @@ PR2JointsPerception::PR2JointsPerception(ros::NodeHandle* n, int robot_body_id, 
         }
     }
     percepts_.emplace("base_footprint", BodyPart("base_footprint"));
-    //percepts_.at("base_footprint").setAgentName("pr2_robot");
+    percepts_.at("base_footprint").setAgentName("pr2_robot");
 }
 
 bool PR2JointsPerception::perceptionCallback(const sensor_msgs::JointState& msg)
