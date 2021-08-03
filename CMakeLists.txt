@@ -97,7 +97,11 @@ add_definitions( ${EIGEN3_DEFINITIONS} )
 
 add_library(Bullet3 INTERFACE)
 target_include_directories(Bullet3 INTERFACE ${BULLET_INCLUDE_DIRS})
-target_link_libraries(Bullet3 INTERFACE ${BULLET_LIBS} ${CMAKE_DL_LIBS} Threads::Threads)
+target_link_libraries(Bullet3 INTERFACE
+                      ${BULLET_LIBS}
+                      ${CMAKE_DL_LIBS}
+                      ${catkin_LIBRARIES}
+                      Threads::Threads)
 
 add_library(${PROJECT_NAME}_bullet_lib STATIC
   src/Bullet/PhysicsServers.cpp
@@ -134,5 +138,6 @@ target_link_libraries(${PROJECT_NAME}_multi_server_test PRIVATE
 add_executable(${PROJECT_NAME}_perception_test src/TestFiles/perception_test.cpp )
 target_link_libraries(${PROJECT_NAME}_perception_test PRIVATE
                       ${PROJECT_NAME}_types_lib
+                      ${PROJECT_NAME}_perception_lib
                       ${catkin_LIBRARIES})
 add_dependencies(${PROJECT_NAME}_perception_test overworld_gencpp)

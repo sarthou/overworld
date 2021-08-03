@@ -35,7 +35,7 @@ double Pose::angularDistance(const Pose& pose) const
     return rot.angularDistance(Eigen::Quaternion<double>(pose.t_.rotation()));
 }
 
-const std::pair<std::array<double, 3>, std::array<double, 4>> Pose::arrays() const
+std::pair<std::array<double, 3>, std::array<double, 4>> Pose::arrays() const
 {
     Eigen::Vector3d translation(t_.translation());
     Eigen::Quaternion<double> rot(t_.rotation());

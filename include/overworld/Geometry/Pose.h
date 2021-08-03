@@ -36,7 +36,7 @@ public:
      */
     double angularDistance(const Pose& pose) const;
 
-    const std::pair<std::array<double, 3>, std::array<double, 4>> arrays() const;
+    std::pair<std::array<double, 3>, std::array<double, 4>> arrays() const;
     double getOriginTilt() const;
     double getOriginPan() const;
 
