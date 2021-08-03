@@ -12,7 +12,7 @@ enum BodyPartType_e
     BODY_PART_LEFT_HAND,
     BODY_PART_RIGHT_HAND,
     BODY_PART_TORSO,
-    BODY_PART_Base
+    BODY_PART_BASE
 };
 
 class BodyPart: public Entity

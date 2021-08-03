@@ -77,7 +77,7 @@ int main(int argc, char** argv)
 	obj2.updatePose({{3.0, 0.0, 0.0}}, {{0.0, 0.0, 0.0, 1.0}}, ros::Time(3.0));
 	std::cout << "The distance between " << obj1.id() << " and " << obj2.id() << " is: " << obj1.pose().distanceTo(obj2.pose()) << "m." << std::endl;
 
-	owds::PR2JointsPerception joint_perception(&n, robot_id, {"r_gripper_tool_frame", "l_gripper_tool_frame"}, client, 2.0);
+	owds::PR2JointsPerception joint_perception(&n, robot_id, {{"r_gripper_tool_frame", owds::BODY_PART_RIGHT_HAND}, {"l_gripper_tool_frame", owds::BODY_PART_LEFT_HAND}}, client, 2.0);
 	owds::EntitiesPerceptionManager<owds::BodyPart> entities_manager;
 	entities_manager.addPerceptionModule("PR2_joints", &joint_perception);
 
