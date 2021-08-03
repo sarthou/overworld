@@ -22,12 +22,18 @@ class PR2JointsPerception : public owds::PerceptionModuleRosBase<owds::BodyPart,
      * @param robotWorldClient
      * @param min_period
      */
-    PR2JointsPerception(ros::NodeHandle* n, int robotBodyId, const std::vector<std::pair<std::string, BodyPartType_e>>& links_to_entity, BulletClient* robot_world_client, double min_period);
+    PR2JointsPerception(ros::NodeHandle* n,
+                        int robotBodyId,
+                        const std::string& robot_name_,
+                        const std::vector<std::pair<std::string, BodyPartType_e>>& links_to_entity,
+                        BulletClient* robot_world_client,
+                        double min_period);
     virtual ~PR2JointsPerception() = default;
 
   protected:
     bool perceptionCallback(const sensor_msgs::JointState& msg) override;
     int robot_body_id_;
+    std::string robot_name_;
     std::unordered_map<std::string, int> joint_name_id_;
     std::unordered_map<std::string, int> link_name_id_;
     std::vector<std::pair<std::string, BodyPartType_e>> links_to_entity_;

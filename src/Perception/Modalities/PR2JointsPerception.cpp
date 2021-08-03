@@ -2,11 +2,19 @@
 
 namespace owds {
 
-PR2JointsPerception::PR2JointsPerception(ros::NodeHandle* n, int robot_body_id,
+PR2JointsPerception::PR2JointsPerception(ros::NodeHandle* n,
+                                         int robot_body_id,
+                                         const std::string& robot_name,
                                          const std::vector<std::pair<std::string, BodyPartType_e>>& links_to_entity,
-                                         BulletClient* robot_world_client, double min_period)
-    : PerceptionModuleRosBase(n, "/joint_states"), robot_body_id_(robot_body_id), links_to_entity_(links_to_entity),
-      tf2_listener_(tf_buffer_), bullet_(robot_world_client), min_period_(min_period)
+                                         BulletClient* robot_world_client,
+                                         double min_period)
+                                                            : PerceptionModuleRosBase(n, "/joint_states"),
+                                                            robot_body_id_(robot_body_id),
+                                                            robot_name_(robot_name),
+                                                            links_to_entity_(links_to_entity),
+                                                            tf2_listener_(tf_buffer_),
+                                                            bullet_(robot_world_client),
+                                                            min_period_(min_period)
 {
     auto p = bullet_->findJointAndLinkIndices(robot_body_id_);
     joint_name_id_ = p.first;
@@ -14,7 +22,7 @@ PR2JointsPerception::PR2JointsPerception(ros::NodeHandle* n, int robot_body_id,
     for (const auto& link_pair : links_to_entity_)
     {
         percepts_.emplace(link_pair.first, link_pair.first);
-        percepts_.at(link_pair.first).setAgentName("pr2_robot");
+        percepts_.at(link_pair.first).setAgentName(robot_name_);
         percepts_.at(link_pair.first).setType(link_pair.second);
         if (link_name_id_.count(link_pair.first) == 0)
         {
@@ -24,7 +32,7 @@ PR2JointsPerception::PR2JointsPerception(ros::NodeHandle* n, int robot_body_id,
         }
     }
     percepts_.emplace("base_footprint", BodyPart("base_footprint"));
-    percepts_.at("base_footprint").setAgentName("pr2_robot");
+    percepts_.at("base_footprint").setAgentName(robot_name_);
     percepts_.at("base_footprint").setType(BODY_PART_BASE);
 }
 
