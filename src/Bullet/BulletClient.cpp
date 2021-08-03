@@ -572,23 +572,25 @@ struct b3JointInfo BulletClient::getJointInfo(int body_id, int joint_index)
     }
 }
 
-std::unordered_map<std::string, int> BulletClient::findJointIndices(int body_id)
+std::pair<std::unordered_map<std::string, int>, std::unordered_map<std::string, int>> BulletClient::findJointAndLinkIndices(int body_id)
 {
     std::unordered_map<std::string, int> joint_name_index;
+    std::unordered_map<std::string, int> link_name_index;
     int numJoints = getNumJoints(body_id);
     std::cout << "Robot id: " << body_id << " Num_Joints : " << getNumJoints(body_id) << std::endl;
     if (numJoints == 0)
     {
         std::cout << "Warning: No joints found for Bullet body id: " << body_id << std::endl;
-        return joint_name_index;
+        return {joint_name_index, link_name_index};
     }
     for (size_t i = 0; i < getNumJoints(body_id) - 1; i++)
     {
         b3JointInfo joint = getJointInfo(body_id, i);
         std::cout << joint.m_jointName << std::endl;
         joint_name_index[joint.m_jointName] = i;
+        link_name_index[joint.m_linkName] = i;
     }
-    return joint_name_index;
+    return {joint_name_index, link_name_index};
 }
 
 long BulletClient::addUserDebugLine(const std::array<double, 3>& xyz_from,
