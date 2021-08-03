@@ -23,7 +23,6 @@ class PR2JointsPerception : public owds::PerceptionModuleRosBase<owds::BodyPart,
      * @param min_period
      */
     PR2JointsPerception(ros::NodeHandle* n,
-                        int robotBodyId,
                         const std::string& robot_name_,
                         const std::vector<std::pair<std::string, BodyPartType_e>>& links_to_entity,
                         BulletClient* robot_world_client,
@@ -46,6 +45,8 @@ class PR2JointsPerception : public owds::PerceptionModuleRosBase<owds::BodyPart,
     tf2_ros::TransformListener tf2_listener_;
 
     BulletClient* bullet_;
+
+    void loadPr2Model();
 };
 
 } // namespace owds

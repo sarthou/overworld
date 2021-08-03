@@ -1,21 +1,23 @@
 #include "overworld/Perception/Modalities/PR2JointsPerception.h"
 
+#include <ros/package.h>
+
 namespace owds {
 
 PR2JointsPerception::PR2JointsPerception(ros::NodeHandle* n,
-                                         int robot_body_id,
                                          const std::string& robot_name,
                                          const std::vector<std::pair<std::string, BodyPartType_e>>& links_to_entity,
                                          BulletClient* robot_world_client,
                                          double min_period)
                                                             : PerceptionModuleRosBase(n, "/joint_states"),
-                                                            robot_body_id_(robot_body_id),
                                                             robot_name_(robot_name),
                                                             links_to_entity_(links_to_entity),
                                                             tf2_listener_(tf_buffer_),
                                                             bullet_(robot_world_client),
                                                             min_period_(min_period)
 {
+    loadPr2Model();
+
     auto p = bullet_->findJointAndLinkIndices(robot_body_id_);
     joint_name_id_ = p.first;
     link_name_id_ = p.second;
@@ -69,4 +71,15 @@ bool PR2JointsPerception::perceptionCallback(const sensor_msgs::JointState& msg)
     last_update_ = ros::Time::now();
     return true;
 }
+
+void PR2JointsPerception::loadPr2Model()
+{
+    std::string path_pr2_description = ros::package::getPath("pr2_description");
+	path_pr2_description = path_pr2_description.substr(0, path_pr2_description.size() - std::string("/pr2_description").size());
+	std::string path_overworld = ros::package::getPath("overworld");
+	
+	bullet_->setAdditionalSearchPath(path_overworld + "/models");
+	robot_body_id_ = bullet_->loadURDF("pr2.urdf", {-2,-2,0}, {0,0,0,1});
+}
+
 } // namespace owds
