@@ -24,7 +24,7 @@ public:
     ros::Time lastStamp() const { return last_pose_; }
 
     void setId(const std::string& id, bool is_true_id = true);
-    const std::string& id() const { return id_; }
+    std::string id() const { return id_; }
     bool isTrueId() { return is_true_id_; }
 
     void setBulletId(int bullet_id) { bullet_id_ = bullet_id; }
@@ -32,6 +32,11 @@ public:
 
     void setShape(const Shape_t& shape) { shape_ = shape; }
     const Shape_t& getShape() { return shape_; }
+
+    void setSeen() { nb_frame_unseen_ = 0; }
+    void setUnseen() { if(nb_frame_unseen_ < 100) nb_frame_unseen_++; }
+    bool hasBeenSeen() const { return (nb_frame_unseen_ == 0); }
+    size_t getNbFrameUnseen() const { return nb_frame_unseen_; }
 
 protected:
     std::string id_;
@@ -41,6 +46,7 @@ protected:
     bool is_located_;
     int bullet_id_;
     Shape_t shape_;
+    size_t nb_frame_unseen_;
 };
 
 class UnlocatedEntityError: public std::runtime_error
