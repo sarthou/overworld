@@ -11,7 +11,7 @@ Agent* RobotsPerceptionManager::getAgent(const std::string& agent_name)
   {
     it = agents_.insert(std::pair<std::string, Agent>(agent_name, 
                                                       Agent(agent_name,
-                                                            FieldOfView(35,54.7,0.1,5)))).first;
+                                                            FieldOfView(54.8, 84.1,0.1,5)))).first;
   }
 
   return &it->second;
@@ -41,7 +41,7 @@ void RobotsPerceptionManager::UpdateAgent(BodyPart* body_part)
     if(it_agent == agents_.end())
       it_agent = agents_.insert(std::pair<std::string, Agent>(body_part->getAgentName(), 
                                                               Agent(body_part->getAgentName(),
-                                                                    FieldOfView(35,54.7,0.1,5)))).first;
+                                                                    FieldOfView(54.8, 84.1,0.1,5)))).first;
 
     switch (body_part->getType())
     {    
