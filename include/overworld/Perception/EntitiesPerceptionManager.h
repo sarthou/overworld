@@ -254,12 +254,16 @@ void EntitiesPerceptionManager<T>::updateToBullet(T& entity)
 {
     if(entity.bulletId() != -1)
     {
-        auto entity_pose = entity.pose().arrays();
-        if(entity.isLocated() == false)
-            entity_pose.first[2] -= 100;
-        bullet_client_->resetBasePositionAndOrientation(entity.bulletId(),
-                                                        entity_pose.first,
-                                                        entity_pose.second);
+        if(entity.isLocated() == true){
+            auto entity_pose = entity.pose().arrays();
+            bullet_client_->resetBasePositionAndOrientation(entity.bulletId(),
+                                                            entity_pose.first,
+                                                            entity_pose.second);
+        }
+        else
+            bullet_client_->resetBasePositionAndOrientation(entity.bulletId(),
+                                                            {0.0, 0.0, -100.0},
+                                                            {0.0, 0.0, 0.0, 1.0});
     }
 }
 

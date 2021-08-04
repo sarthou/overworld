@@ -31,6 +31,7 @@ SituationAssessor::SituationAssessor(const std::string& agent_name, bool is_robo
     robots_manager_.addPerceptionModule("pr2_joints", pr2_joint_perception);
     myself_agent_ = robots_manager_.getAgent(agent_name);
 
+    objects_manager_.setOwnerAgent(myself_agent_);
     auto ar_track_perception = new ArTrackPerceptionModule(&n_, myself_agent_);
     objects_manager_.addPerceptionModule("ar_track", ar_track_perception);
   }

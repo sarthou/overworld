@@ -37,11 +37,14 @@ void ObjectsPerceptionManager::getPercepts(const std::map<std::string, Object>& 
 void ObjectsPerceptionManager::reasoningOnUpdate()
 {
   std::vector<Object*> no_data_objects;
-
+  bullet_client_->performCollisionDetection();
   for(auto& object : entities_)
   {
     if(object.second.isStatic() == true)
       continue;
+    else if (object.second.isLocated() == false)
+      continue;
+    
 
     if(object.second.isInHand() == false)
     {
@@ -57,7 +60,9 @@ void ObjectsPerceptionManager::reasoningOnUpdate()
               it_unseen = lost_objects_nb_frames_.insert(std::make_pair<std::string, size_t>(object.second.id(), size_t(0))).first;
             it_unseen->second++;
             if(it_unseen->second > 5)
+            {
               removeEntityPose(object.second);
+            }
           }
         }
       }
@@ -73,7 +78,11 @@ std::vector<PointOfInterest> ObjectsPerceptionManager::getPoisInFov(const Object
     return object.getPointsOfInterest();
   }
   if(myself_agent_->getHead() == nullptr)
+  {
+    ShellDisplay::error("[ObjectsPerceptionManager] defined agent has no head");
     return object.getPointsOfInterest();
+  }
+    
 
   std::vector<PointOfInterest> pois_in_fov;
 
@@ -82,7 +91,7 @@ std::vector<PointOfInterest> ObjectsPerceptionManager::getPoisInFov(const Object
     bool poi_is_valid = true;
     for(const auto& point : poi.getPoints())
     {
-      auto poi_in_map = point.transformIn(object.pose());
+      auto poi_in_map = object.pose() * point;
       auto poi_in_head = poi_in_map.transformIn(myself_agent_->getHead()->pose());
       if (myself_agent_->getFieldOfView().hasIn(poi_in_head))
         continue;
@@ -110,8 +119,10 @@ bool ObjectsPerceptionManager::shouldBeSeen(const Object& object, const std::vec
     std::vector<std::array<double, 3>> from_poses(poi.getPoints().size(), myself_agent_->getHead()->pose().arrays().first);
     std::vector<std::array<double, 3>> to_poses;
 
-    for(const auto& point : poi.getPoints())
-      to_poses.push_back(point.arrays().first);
+    for(const auto& point : poi.getPoints()){
+      Pose map_to_point = object.pose() * point;
+      to_poses.push_back(map_to_point.arrays().first);
+    }
     auto ray_cast_info = bullet_client_->rayTestBatch(from_poses, to_poses, poi.getPoints().size(), true);
 
     if(ray_cast_info.size() == 0)
@@ -120,11 +131,11 @@ bool ObjectsPerceptionManager::shouldBeSeen(const Object& object, const std::vec
     {
       for(auto& info : ray_cast_info)
       {
-        bullet_client_->addUserDebugLine({info.m_hitPositionWorld[0],
+        /*bullet_client_->addUserDebugLine({info.m_hitPositionWorld[0],
                                           info.m_hitPositionWorld[1],
                                           info.m_hitPositionWorld[2]},
                                          myself_agent_->getHead()->pose().arrays().first,
-                                         {1,0,0}, 1, 2.0);
+                                         {1,0,0}, 1, 2.0);*/
         
       }
     }
