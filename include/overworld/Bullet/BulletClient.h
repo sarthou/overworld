@@ -58,7 +58,7 @@ public:
     int createVisualShapeSphere(float radius, const std::array<double, 4>& rgba_color = {1});
     int createVisualShapeCylinder(float radius, float height, const std::array<double, 4>& rgba_color = {1});
     int createVisualShapeCapsule(float radius, float height, const std::array<double, 4>& rgba_color = {1});
-    int createVisualShapeMesh(const std::string& file_name, const std::array<double, 3>& scale, const std::array<double, 4>& rgba_color = {1});
+    int createVisualShapeMesh(const std::string& file_name, const std::array<double, 3>& scale, const std::array<double, 4>& rgba_color = {1,1,1,1});
 
     struct b3VisualShapeInformation getVisualShapeData(int object_id, int flags = 0);
 

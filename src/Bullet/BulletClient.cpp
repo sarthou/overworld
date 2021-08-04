@@ -52,7 +52,7 @@ int BulletClient::createVisualShapeCapsule(float radius, float height, const std
 
 int BulletClient::createVisualShapeMesh(const std::string& file_name, const std::array<double, 3>& scale, const std::array<double, 4>& rgba_color)
 {
-    return createVisualShape(GEOM_MESH, 0, {0}, 0, file_name, scale, rgba_color);
+    return createVisualShape(GEOM_MESH, 0, {0,0,0}, 0, getFullPath(file_name), scale, rgba_color);
 }
 
 int BulletClient::createVisualShape(BulletShapeType_e shape_type, 
@@ -142,7 +142,7 @@ int BulletClient::createCollisionShapeCapsule(float radius, float height, int fl
 
 int BulletClient::createCollisionShapeMesh(const std::string& file_name, const std::array<double, 3>& scale, int flags)
 {
-    return createCollisionShape(GEOM_MESH, 0, {0}, 0, file_name, scale, flags);
+    return createCollisionShape(GEOM_MESH, 0, {0}, 0, getFullPath(file_name), scale, flags);
 }
 
 int BulletClient::createCollisionShape(BulletShapeType_e shape_type, 
@@ -232,7 +232,7 @@ int BulletClient::createMultiBody(float base_mass,
     b3SharedMemoryStatusHandle status_handle = b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
     int status_type = b3GetStatusType(status_handle);
     if (status_type == CMD_CREATE_MULTI_BODY_COMPLETED)
-            return b3GetStatusBodyIndex(status_handle);
+        return b3GetStatusBodyIndex(status_handle);
 
 	ShellDisplay::error("createMultiBody failed.");
 	return -1;
@@ -289,7 +289,6 @@ int BulletClient::loadURDFRaw(const std::string& raw_urdf, const std::string& te
     return loadURDF(temp_file_name + ".owds", base_position, base_orientation, use_fixed_base, flags);
 
 }
-
 
 // Return the number of joints in an object based on
 // body index; body index is based on order of sequence
@@ -369,7 +368,7 @@ long BulletClient::createUserConstraint(int parent_body_id, int parent_link_inde
 	b3SharedMemoryStatusHandle status_handle = b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
 	int status_type = b3GetStatusType(status_handle);
 	if (status_type == CMD_USER_CONSTRAINT_COMPLETED)
-		return b3GetStatusUserConstraintUniqueId(status_handle);
+        return b3GetStatusUserConstraintUniqueId(status_handle);
 
 	ShellDisplay::error("createConstraint failed.");
 	return -1;
@@ -592,13 +591,13 @@ std::pair<std::unordered_map<std::string, int>, std::unordered_map<std::string, 
     std::unordered_map<std::string, int> joint_name_index;
     std::unordered_map<std::string, int> link_name_index;
     int numJoints = getNumJoints(body_id);
-    std::cout << "Robot id: " << body_id << " Num_Joints : " << getNumJoints(body_id) << std::endl;
+    std::cout << "Robot id: " << body_id << " Num_Joints : " << numJoints << std::endl;
     if (numJoints == 0)
     {
         std::cout << "Warning: No joints found for Bullet body id: " << body_id << std::endl;
         return {joint_name_index, link_name_index};
     }
-    for (size_t i = 0; i < getNumJoints(body_id) - 1; i++)
+    for (size_t i = 0; i < numJoints - 1; i++)
     {
         b3JointInfo joint = getJointInfo(body_id, i);
         std::cout << joint.m_jointName << std::endl;
@@ -627,7 +626,7 @@ long BulletClient::addUserDebugLine(const std::array<double, 3>& xyz_from,
 	b3SharedMemoryStatusHandle status_handle = b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
 	int status_type = b3GetStatusType(status_handle);
 	if (status_type == CMD_USER_DEBUG_DRAW_COMPLETED)
-		return b3GetDebugItemUniqueId(status_handle);
+        return b3GetDebugItemUniqueId(status_handle);
     else
     {
         ShellDisplay::error("failed to draw debug line");
@@ -719,8 +718,8 @@ struct aabb_t BulletClient::getAABB(int body_id, int link_index)
         aabb.is_valid = true;
         return aabb;
     }
-    else
-        return aabb;  
+
+    return aabb;  
 }
 
 struct b3AABBOverlapData BulletClient::getOverlappingObjects(const struct aabb_t& aabb)

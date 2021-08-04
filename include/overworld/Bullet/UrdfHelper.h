@@ -49,4 +49,24 @@ std::string createLocalUrdf(std::string urdf_path, const std::string& urdf_folde
     return urdf_folder + "/" + urdf_name + ".owds";
 }
 
+std::string getFullPath(const std::string& file_name)
+{
+    std::string package_pattern = "package://";
+
+    if(file_name.find(package_pattern) != std::string::npos)
+    {
+        size_t pose = file_name.find(package_pattern);
+        size_t pose_end_of_name = file_name.find("/", pose + package_pattern.size());
+        std::string full_package = file_name.substr(pose, pose_end_of_name - pose);
+        std::string package_name = file_name.substr(pose + package_pattern.size(), pose_end_of_name - pose - package_pattern.size());
+        std::string package_path = ros::package::getPath(package_name);
+
+        std::string full_file_name = file_name;
+        full_file_name.replace(pose, full_package.size(), package_path);
+        return full_file_name;
+    }
+    else
+        return file_name;
+}
+
 #endif // OWDS_URDFHELPER_H
