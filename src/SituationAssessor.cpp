@@ -21,6 +21,7 @@ SituationAssessor::SituationAssessor(const std::string& agent_name, bool is_robo
     bullet_client_ = PhysicsServers::connectPhysicsServer(owds::CONNECT_DIRECT);
 
   robots_manager_.setBulletClient(bullet_client_);
+  objects_manager_.setBulletClient(bullet_client_);
 
   if(is_robot_)
   {
@@ -86,6 +87,7 @@ void SituationAssessor::assessmentLoop()
 void SituationAssessor::assess()
 {
   robots_manager_.update();
+  objects_manager_.update();
   auto entities = robots_manager_.getEntities();
 }
 
