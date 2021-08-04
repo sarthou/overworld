@@ -12,6 +12,11 @@ Pose::Pose(const std::array<double, 3>& translation, const std::array<double, 4>
                 )
 {}
 
+Pose::Pose(const std::array<double, 3>& translation, const std::array<double, 3>& rotation_euler)
+    : t_(Eigen::Translation3d(translation[0], translation[1], translation[2]) * Eigen::AngleAxisd(rotation_euler[0], Eigen::Vector3d::UnitX()) *
+         Eigen::AngleAxisd(rotation_euler[1], Eigen::Vector3d::UnitY()) * Eigen::AngleAxisd(rotation_euler[2], Eigen::Vector3d::UnitZ()))
+{}
+
 Pose::Pose(const geometry_msgs::TransformStamped& transform)
 {
     Eigen::Translation3d tra(transform.transform.translation.x, transform.transform.translation.y, transform.transform.translation.z);

@@ -24,6 +24,14 @@ public:
      */
     Pose(const std::array<double,3>& translation, const std::array<double, 4>& rotation);
 
+    /**
+     * @brief Construct a new Pose object
+     * 
+     * @param translation translation part of the pose (in meters)
+     * @param rotation_euler rotation in euler angles (radians) as defined by the 1-2-3 convention (roll, pitch, yaw)
+     */
+    Pose(const std::array<double, 3>& translation, const std::array<double, 3>& rotation_euler);
+
     Pose(const geometry_msgs::TransformStamped& transform);
     Pose(const geometry_msgs::PoseStamped& pose);
 
