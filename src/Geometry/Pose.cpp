@@ -70,10 +70,11 @@ Pose Pose::transformIn(const Pose& new_frame) const
     return new_frame.t_.inverse() * t_;
 }
 
-Pose& Pose::operator*=(const Pose& b)
+Pose Pose::operator*(const Pose& b) const
 {
-    t_ * b.t_;
-    return *this;
+    Pose p;
+    p.t_ = this->t_ * b.t_;
+    return p;
 }
 
 double Pose::getX() const

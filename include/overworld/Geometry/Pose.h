@@ -49,7 +49,7 @@ public:
      * @return Pose 
      */
     Pose transformIn(const Pose& new_frame) const;
-    Pose& operator*= (const Pose& b);
+    Pose operator* (const Pose& b) const;
 
     double getX() const;
     double getY() const;
@@ -62,11 +62,6 @@ public:
 protected:
     Eigen::Affine3d t_;
 };
-
-inline Pose operator*(Pose a, const Pose& b){
-    a *= b;
-    return a;
-}
 
 } // namespace owds
 
