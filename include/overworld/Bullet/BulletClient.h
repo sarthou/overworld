@@ -7,6 +7,7 @@
 #include <array>
 #include <vector>
 #include <unordered_map>
+#include <mutex>
 
 namespace owds {
 
@@ -165,6 +166,7 @@ public:
 private:
     b3PhysicsClientHandle* client_handle_;
     size_t client_id_;
+    std::mutex mutex_;
 
     std::string additional_path_;
 
