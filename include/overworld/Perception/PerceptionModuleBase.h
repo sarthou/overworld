@@ -42,7 +42,7 @@ protected:
   std::map<std::string, T> percepts_;
   bool is_activated_;
   bool updated_;
-  std::mutex mutex_;
+  static std::mutex mutex_;
 
   void setAllPerceptsUnseen()
   {
@@ -50,6 +50,9 @@ protected:
       percept.second.setUnseen();
   }
 };
+
+template<typename T>
+std::mutex PerceptionModuleBase_<T>::mutex_;
 
 template<typename T, class M>
 class PerceptionModuleBase : public PerceptionModuleBase_<T>
