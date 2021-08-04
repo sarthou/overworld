@@ -1,7 +1,8 @@
 #include "overworld/SituationAssessor.h"
 
-#include "overworld/Perception/Modalities/PR2JointsPerception.h"
 #include "overworld/Perception/Modalities/ArTrackPerceptionModule.h"
+#include "overworld/Perception/Modalities/PR2JointsPerception.h"
+#include "overworld/Perception/Modalities/StaticObjectsPerceptionModule.h"
 
 #include <chrono>
 #include <thread>
@@ -34,6 +35,9 @@ SituationAssessor::SituationAssessor(const std::string& agent_name, bool is_robo
     objects_manager_.setOwnerAgent(myself_agent_);
     auto ar_track_perception = new ArTrackPerceptionModule(&n_, myself_agent_);
     objects_manager_.addPerceptionModule("ar_track", ar_track_perception);
+    auto static_perception = new StaticObjectsPerceptionModule();
+    //static_perception->activate(false);
+    objects_manager_.addPerceptionModule("static", static_perception);
   }
 }
 

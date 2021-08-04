@@ -125,6 +125,7 @@ add_library(${PROJECT_NAME}_perception_lib STATIC
   src/Perception/ObjectsPerceptionManager.cpp
   src/Perception/Modalities/PR2JointsPerception.cpp
   src/Perception/Modalities/ArTrackPerceptionModule.cpp
+  src/Perception/Modalities/StaticObjectsPerceptionModule.cpp
   src/SituationAssessor.cpp
 )
 target_link_libraries(${PROJECT_NAME}_perception_lib PUBLIC
