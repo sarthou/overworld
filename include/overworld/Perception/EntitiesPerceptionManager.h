@@ -199,7 +199,7 @@ void EntitiesPerceptionManager<T>::addToBullet(T& entity)
             visual_id = bullet_client_->createVisualShapeBox(entity.getShape().scale,
                                                              {entity.getShape().color[0],
                                                               entity.getShape().color[1],
-                                                              entity.getShape().color[3],
+                                                              entity.getShape().color[2],
                                                               1});
             collision_id = bullet_client_->createCollisionShapeBox(entity.getShape().scale);
             break;
@@ -209,7 +209,7 @@ void EntitiesPerceptionManager<T>::addToBullet(T& entity)
             visual_id = bullet_client_->createVisualShapeSphere(entity.getShape().scale[0],
                                                                 {entity.getShape().color[0],
                                                                  entity.getShape().color[1],
-                                                                 entity.getShape().color[3],
+                                                                 entity.getShape().color[2],
                                                                  1});
             collision_id = bullet_client_->createCollisionShapeSphere(entity.getShape().scale[0]);
             break;
@@ -220,7 +220,7 @@ void EntitiesPerceptionManager<T>::addToBullet(T& entity)
                                                                   entity.getShape().scale[1],
                                                                   {entity.getShape().color[0],
                                                                    entity.getShape().color[1],
-                                                                   entity.getShape().color[3],
+                                                                   entity.getShape().color[2],
                                                                    1});
             collision_id = bullet_client_->createCollisionShapeCylinder(entity.getShape().scale[0],
                                                                         entity.getShape().scale[1]);
@@ -232,7 +232,7 @@ void EntitiesPerceptionManager<T>::addToBullet(T& entity)
                                                               entity.getShape().scale,
                                                               {entity.getShape().color[0],
                                                                entity.getShape().color[1],
-                                                               entity.getShape().color[3],
+                                                               entity.getShape().color[2],
                                                                1});
             collision_id = bullet_client_->createCollisionShapeMesh(entity.getShape().mesh_resource,
                                                                     entity.getShape().scale);
