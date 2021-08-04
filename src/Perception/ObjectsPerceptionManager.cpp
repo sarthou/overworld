@@ -11,6 +11,9 @@ void ObjectsPerceptionManager::getPercepts(const std::map<std::string, Object>& 
         auto it = entities_.find(percept.second.id());
         if(it == entities_.end())
         {
+            if(percept.second.isLocated() == false)
+              continue;
+
             it = entities_.insert(std::pair<std::string, Object>(percept.second.id(), percept.second)).first;
             addToBullet(it->second);
         }
@@ -26,7 +29,7 @@ void ObjectsPerceptionManager::getPercepts(const std::map<std::string, Object>& 
                 updateEntityPose(it->second, it->second.getHandIn()->pose(), ros::Time::now());
             }
         }
-        else if (it->second.hasBeenSeen())
+        else if (percept.second.hasBeenSeen())
           updateEntityPose(it->second, percept.second.pose(), percept.second.lastStamp());
     }
 }
@@ -64,6 +67,11 @@ void ObjectsPerceptionManager::reasoningOnUpdate()
 
 std::vector<PointOfInterest> ObjectsPerceptionManager::getPoisInFov(const Object& object)
 {
+  if(myself_agent_ == nullptr)
+  {
+    ShellDisplay::error("[ObjectsPerceptionManager] has no agent defined");
+    return object.getPointsOfInterest();
+  }
   if(myself_agent_->getHead() == nullptr)
     return object.getPointsOfInterest();
 
