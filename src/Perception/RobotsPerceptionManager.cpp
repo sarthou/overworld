@@ -11,7 +11,7 @@ Agent* RobotsPerceptionManager::getAgent(const std::string& agent_name)
   {
     it = agents_.insert(std::pair<std::string, Agent>(agent_name, 
                                                       Agent(agent_name,
-                                                            FieldOfView(54.8, 84.1,0.1,5)))).first;
+                                                            FieldOfView(34.8, 64.1,0.1,5)))).first;
   }
 
   return &it->second;
