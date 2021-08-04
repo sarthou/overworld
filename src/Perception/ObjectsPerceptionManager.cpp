@@ -84,9 +84,7 @@ std::vector<PointOfInterest> ObjectsPerceptionManager::getPoisInFov(const Object
     {
       auto poi_in_map = point.transformIn(object.pose());
       auto poi_in_head = poi_in_map.transformIn(myself_agent_->getHead()->pose());
-      if((poi_in_head.getZ() <= myself_agent_->getFieldOfView().getClipFar()) &&
-         (std::abs(poi_in_head.getOriginTilt()) <= myself_agent_->getFieldOfView().getHeight() * TO_HALF_RAD) &&
-         (std::abs(poi_in_head.getOriginPan()) < myself_agent_->getFieldOfView().getWidth() * TO_HALF_RAD))
+      if (myself_agent_->getFieldOfView().hasIn(poi_in_head))
         continue;
       else
       {

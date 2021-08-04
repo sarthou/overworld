@@ -1,7 +1,11 @@
 #ifndef OWDS_FIELDOFVIEW_H
 #define OWDS_FIELDOFVIEW_H
 
+#include "overworld/Geometry/Pose.h"
+
 namespace owds {
+
+#define TO_HALF_RAD M_PI / 180. / 2.
 
 class FieldOfView
 {
@@ -21,6 +25,19 @@ public:
     double getClipFar() const { return clip_far_; }
 
     double getRatio() const { return width_ / height_; }
+
+    /**
+     * @brief 
+     * 
+     * @param pose the pose in the right frame of reference (the FOV origin frame, camera convention)
+     * @return true 
+     * @return false 
+     */
+    inline bool hasIn(const Pose& pose) const
+    {
+        return pose.getZ() <= clip_far_ && std::abs(pose.getOriginTilt()) <= height_ * TO_HALF_RAD &&
+               std::abs(pose.getOriginPan()) <= width_ * TO_HALF_RAD;
+    }
 
 private:
     double height_; // degrees 
