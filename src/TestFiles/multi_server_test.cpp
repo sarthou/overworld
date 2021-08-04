@@ -52,20 +52,20 @@ int main(int argc, char** argv)
 	client_gui->performCollisionDetection();
 	auto raycast_info = client_gui->rayTestBatch({{0,0,1}}, {{3,3,1}});
 	client_gui->addUserDebugLine({0,0,1}, {3,3,1}, {0,0,1});
-	if(raycast_info.m_numRayHits)
+	if(raycast_info.size())
 	{
-		owds::ShellDisplay::info("hit gui " + std::to_string(raycast_info.m_numRayHits));
-		for(size_t i = 0; i < raycast_info.m_numRayHits; i++)
-			std::cout << "- " << raycast_info.m_rayHits[i].m_hitObjectUniqueId << " : " << raycast_info.m_rayHits[i].m_hitObjectLinkIndex << std::endl;
+		owds::ShellDisplay::info("hit gui " + std::to_string(raycast_info.size()));
+		for(auto& info : raycast_info)
+			std::cout << "- " << info.m_hitObjectUniqueId << " : " << info.m_hitObjectLinkIndex << std::endl;
 	}
 
     client_direct->performCollisionDetection();
 	raycast_info = client_direct->rayTestBatch({{0,0,1}}, {{-3,-3,0.5}});
-	if(raycast_info.m_numRayHits)
+	if(raycast_info.size())
 	{
-		owds::ShellDisplay::info("hit direct " + std::to_string(raycast_info.m_numRayHits));
-		for(size_t i = 0; i < raycast_info.m_numRayHits; i++)
-			std::cout << "- " << raycast_info.m_rayHits[i].m_hitObjectUniqueId << " : " << raycast_info.m_rayHits[i].m_hitObjectLinkIndex << std::endl;
+		owds::ShellDisplay::info("hit direct " + std::to_string(raycast_info.size()));
+		for(auto& info : raycast_info)
+			std::cout << "- " << info.m_hitObjectUniqueId << " : " << info.m_hitObjectLinkIndex << std::endl;
 	}
 
 	while(flag == false)

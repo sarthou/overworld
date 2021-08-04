@@ -114,15 +114,15 @@ bool ObjectsPerceptionManager::shouldBeSeen(const Object& object, const std::vec
       to_poses.push_back(point.arrays().first);
     auto ray_cast_info = bullet_client_->rayTestBatch(from_poses, to_poses, poi.getPoints().size(), true);
 
-    if(ray_cast_info.m_numRayHits == 0)
+    if(ray_cast_info.size() == 0)
       return true;
     else
     {
-      for(size_t i = 0; i < ray_cast_info.m_numRayHits; i++)
+      for(auto& info : ray_cast_info)
       {
-        bullet_client_->addUserDebugLine({ray_cast_info.m_rayHits[i].m_hitPositionWorld[0],
-                                          ray_cast_info.m_rayHits[i].m_hitPositionWorld[1],
-                                          ray_cast_info.m_rayHits[i].m_hitPositionWorld[2]},
+        bullet_client_->addUserDebugLine({info.m_hitPositionWorld[0],
+                                          info.m_hitPositionWorld[1],
+                                          info.m_hitPositionWorld[2]},
                                          myself_agent_->getHead()->pose().arrays().first,
                                          {1,0,0}, 1, 2.0);
         

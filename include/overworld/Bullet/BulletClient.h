@@ -153,15 +153,17 @@ public:
                           double life_time = 0,
                           int replace_id = -1);
 
-    struct b3RaycastInformation rayTestBatch(const std::vector<std::array<double, 3>>& from_poses,
-                                             const std::vector<std::array<double,3>>& to_poses,
-                                             int nb_thread = 1,
-                                             bool report_hit_number = false);
+    std::vector<struct b3RayHitInfo> rayTestBatch(const std::vector<std::array<double, 3>>& from_poses,
+                                                  const std::vector<std::array<double,3>>& to_poses,
+                                                  int nb_thread = 1,
+                                                  bool report_hit_number = false);
     
     void performCollisionDetection();
 
     struct aabb_t getAABB(int body_id, int link_index);
     struct b3AABBOverlapData getOverlappingObjects(const struct aabb_t& aabb);
+
+    void resetDebugVisualizerCamera(float distance, float yaw, float pitch, const std::array<float,3>& target_pose);
     
 private:
     b3PhysicsClientHandle* client_handle_;

@@ -657,14 +657,13 @@ long BulletClient::addUserDebugLine(const std::array<double, 3>& xyz_from,
     }
 }
 
-struct b3RaycastInformation BulletClient::rayTestBatch(const std::vector<std::array<double, 3>>& from_poses,
-                                                       const std::vector<std::array<double,3>>& to_poses,
-                                                       int nb_thread,
-                                                       bool report_hit_number)
+std::vector<struct b3RayHitInfo> BulletClient::rayTestBatch(const std::vector<std::array<double, 3>>& from_poses,
+                                                            const std::vector<std::array<double,3>>& to_poses,
+                                                            int nb_thread,
+                                                            bool report_hit_number)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    struct b3RaycastInformation raycast_info_empty;
-    raycast_info_empty.m_numRayHits = 0;
+    std::vector<struct b3RayHitInfo> raycast_info_res;
 
 	b3SharedMemoryCommandHandle command_handle = b3CreateRaycastBatchCommandInit(*client_handle_);
 	b3RaycastBatchSetNumThreads(command_handle, nb_thread);
@@ -672,14 +671,14 @@ struct b3RaycastInformation BulletClient::rayTestBatch(const std::vector<std::ar
     if (from_poses.size() != to_poses.size())
     {
         ShellDisplay::error("Size of from_positions need to be equal to size of to_positions.");
-        return raycast_info_empty;
+        return raycast_info_res;
     }
     else
     {
         if (from_poses.size() > MAX_RAY_INTERSECTION_BATCH_SIZE_STREAMING)
         {
             ShellDisplay::error("Number of rays exceed the maximum batch size.");
-            return raycast_info_empty;
+            return raycast_info_res;
         }
 
         for (int i = 0; i < from_poses.size(); i++)
@@ -695,10 +694,20 @@ struct b3RaycastInformation BulletClient::rayTestBatch(const std::vector<std::ar
 	{
 		struct b3RaycastInformation raycast_info;
 		b3GetRaycastInformation(*client_handle_, &raycast_info);
-		return raycast_info;
+
+        for(size_t i = 0; i < raycast_info.m_numRayHits; i++)
+        {
+            if((raycast_info.m_rayHits[i].m_hitObjectUniqueId != -1) ||
+               (raycast_info.m_rayHits[i].m_hitObjectLinkIndex != -1))
+            {
+                raycast_info_res.push_back(raycast_info.m_rayHits[i]);
+            }
+        }
+
+		return raycast_info_res;
 	}
 
-	return raycast_info_empty;
+	return raycast_info_res;
 }
 
 // perform collision detection: update aabbs, compute overlapping pairs and contact points
@@ -757,6 +766,18 @@ struct b3AABBOverlapData BulletClient::getOverlappingObjects(const struct aabb_t
 	b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
 	b3GetAABBOverlapResults(*client_handle_, &overlap_data);
     return overlap_data;
+}
+
+void BulletClient::resetDebugVisualizerCamera(float distance, float yaw, float pitch, const std::array<float,3>& target_pose)
+{
+	{
+		b3SharedMemoryCommandHandle commandHandle = b3InitConfigureOpenGLVisualizer(*client_handle_);
+		if ((distance >= 0))
+		{
+			b3ConfigureOpenGLVisualizerSetViewMatrix(commandHandle, distance, pitch, yaw, &target_pose[0]);
+		}
+		b3SubmitClientCommandAndWaitStatus(*client_handle_, commandHandle);
+	}
 }
 
 } // namespace owds
