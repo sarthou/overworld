@@ -32,17 +32,20 @@ public:
 
   void accessPercepts(const std::function<void(const std::map<std::string, T>&)>& accessor)
   {
-    mutex_.lock();
+    mutex_perception_.lock();
+    mutex_access_.lock();
     accessor(percepts_);
     updated_ = false;
-    mutex_.unlock();
+    mutex_access_.unlock();
+    mutex_perception_.unlock();
   }
 
 protected:
   std::map<std::string, T> percepts_;
   bool is_activated_;
   bool updated_;
-  static std::mutex mutex_;
+  std::mutex mutex_perception_;
+  static std::mutex mutex_access_;
 
   void setAllPerceptsUnseen()
   {
@@ -52,7 +55,7 @@ protected:
 };
 
 template<typename T>
-std::mutex PerceptionModuleBase_<T>::mutex_;
+std::mutex PerceptionModuleBase_<T>::mutex_access_;
 
 template<typename T, class M>
 class PerceptionModuleBase : public PerceptionModuleBase_<T>
@@ -70,10 +73,12 @@ private:
     if(!this->is_activated_)
       return;
 
-    this->mutex_.lock();
+    this->mutex_perception_.lock();
+    this->mutex_access_.lock();
+    this->mutex_perception_.unlock();
     if(perceptionCallback(msg))
       this->updated_ = true;
-    this->mutex_.unlock();
+    this->mutex_access_.unlock();
   }
 };
 
@@ -110,10 +115,12 @@ private:
     if(!this->is_activated_)
       return;
 
-    this->mutex_.lock();
+    this->mutex_perception_.lock();
+    this->mutex_access_.lock();
+    this->mutex_perception_.unlock();
     if(perceptionCallback(msg))
       this->updated_ = true;
-    this->mutex_.unlock();
+    this->mutex_access_.unlock();
   }
 };
 
@@ -148,10 +155,12 @@ private:
     if(!this->is_activated_)
       return;
 
-    this->mutex_.lock();
+    this->mutex_perception_.lock();
+    this->mutex_access_.lock();
+    this->mutex_perception_.unlock();
     if(perceptionCallback(first_msg, second_msg))
       this->updated_ = true;
-    this->mutex_.unlock();
+    this->mutex_access_.unlock();
   }
 };
 
