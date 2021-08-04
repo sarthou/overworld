@@ -30,10 +30,15 @@ bool ArTrackPerceptionModule::perceptionCallback(const ar_track_alvar_msgs::Alva
   std::unordered_set<size_t> invalid_main_markers_ids;
   for(const auto& visible_marker : visible_markers.markers)
   {
-    if(isInValidArea(Pose(visible_marker.pose)))
-        valid_visible_markers.push_back(visible_marker);
-      else
-        invalid_main_markers_ids.insert(visible_marker.main_id);
+    geometry_msgs::PoseStamped marker_pose;
+    auto old_pose = visible_marker.pose;
+    if(old_pose.header.frame_id[0] == '/')
+      old_pose.header.frame_id = old_pose.header.frame_id.substr(1);
+    tf_buffer_.transform(old_pose, marker_pose, "map", ros::Duration(1.0));
+    if(isInValidArea(Pose(marker_pose)))
+      valid_visible_markers.push_back(visible_marker);
+    else
+      invalid_main_markers_ids.insert(visible_marker.main_id);
   }
 
   updateEntities(markers, invalid_main_markers_ids);
@@ -52,7 +57,9 @@ bool ArTrackPerceptionModule::headHasMoved()
 {
   bool res = false;
 
-  if(agent_->getHead()->isLocated() == false)
+  if(agent_->getHead() == nullptr)
+    res = true;
+  else if(agent_->getHead()->isLocated() == false)
     res = true;
   else if(agent_->getHead()->pose().distanceTo(last_head_pose_) > 0.001)
     res = true;
@@ -68,7 +75,7 @@ bool ArTrackPerceptionModule::isInValidArea(const Pose& tag_pose)
   auto tag_in_head = tag_pose.transformIn(agent_->getHead()->pose());
   if((tag_in_head.getZ() <= agent_->getFieldOfView().getClipFar()) &&
       (std::abs(tag_in_head.getOriginTilt()) <= agent_->getFieldOfView().getHeight() * TO_HALF_RAD) &&
-      (std::abs(tag_in_head.getOriginPan()) < agent_->getFieldOfView().getWidth() * TO_HALF_RAD))
+      (std::abs(tag_in_head.getOriginPan()) <= agent_->getFieldOfView().getWidth() * TO_HALF_RAD))
     return true;
   else
     return false;
@@ -86,6 +93,9 @@ void ArTrackPerceptionModule::setPointOfInterest(const ar_track_alvar_msgs::Alva
     std::string poi_id = "ar_" + std::to_string(visible_marker.id);
     auto obj_it = percepts_.find(id_it->second);
 
+    if(obj_it->second.isLocated() == false)
+      return;
+
     for (const auto& poi : obj_it->second.getPointsOfInterest())
         if (poi.getId() == poi_id)
             return;
@@ -99,7 +109,10 @@ void ArTrackPerceptionModule::setPointOfInterest(const ar_track_alvar_msgs::Alva
                         Pose({{half_size, half_size, 0.0}}, {{0.0, 0.0, 0.0, 1.0}}),
                         Pose({{-half_size, half_size, 0.0}}, {{0.0, 0.0, 0.0, 1.0}})};
     geometry_msgs::PoseStamped map_to_visible_marker_g;
-    tf_buffer_.transform(visible_marker.pose, map_to_visible_marker_g, "map", ros::Duration(1.0));
+    auto old_pose = visible_marker.pose;
+    if(old_pose.header.frame_id[0] == '/')
+      old_pose.header.frame_id = old_pose.header.frame_id.substr(1);
+    tf_buffer_.transform(old_pose, map_to_visible_marker_g, "map", ros::Duration(1.0));
     Pose map_to_visible_marker(map_to_visible_marker_g);
     Pose map_to_marked_object = obj_it->second.pose();
 
@@ -130,7 +143,10 @@ void ArTrackPerceptionModule::updateEntities(const ar_track_alvar_msgs::AlvarMar
     if(blacklist_ids_.find(main_marker.id) != blacklist_ids_.end())
       continue;
     else if(invalid_main_markers_ids.find(main_marker.id) != invalid_main_markers_ids.end())
+    {
+      createNewEntity(main_marker);
       continue;
+    }
     else if(ids_map_.find(main_marker.id) == ids_map_.end())
     {
       createNewEntity(main_marker);
@@ -140,17 +156,13 @@ void ArTrackPerceptionModule::updateEntities(const ar_track_alvar_msgs::AlvarMar
     auto it_obj = percepts_.find(ids_map_[main_marker.id]);
     if(created || (main_marker.confidence < 0.2))
     {
-      geometry_msgs::TransformStamped to_map = tf_buffer_.lookupTransform("map", main_marker.header.frame_id, main_marker.header.stamp, ros::Duration(1.0) );
+      std::string frame_id = main_marker.header.frame_id;
+      if(frame_id[0] == '/')
+        frame_id = frame_id.substr(1);
+      geometry_msgs::TransformStamped to_map = tf_buffer_.lookupTransform("map", frame_id, main_marker.header.stamp, ros::Duration(1.0) );
       geometry_msgs::PoseStamped marker_in_map;
       tf2::doTransform(main_marker.pose, marker_in_map, to_map);
-      it_obj->second.updatePose({marker_in_map.pose.position.x,
-                                 marker_in_map.pose.position.y,
-                                 marker_in_map.pose.position.z},
-                                {marker_in_map.pose.orientation.x,
-                                 marker_in_map.pose.orientation.y,
-                                 marker_in_map.pose.orientation.z,
-                                 marker_in_map.pose.orientation.w},
-                                main_marker.header.stamp);
+      it_obj->second.updatePose(marker_in_map);
     }
   }
 }
