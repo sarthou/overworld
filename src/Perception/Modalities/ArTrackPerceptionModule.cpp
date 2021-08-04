@@ -87,12 +87,7 @@ bool ArTrackPerceptionModule::headHasMoved()
 bool ArTrackPerceptionModule::isInValidArea(const Pose& tag_pose)
 {
   auto tag_in_head = tag_pose.transformIn(agent_->getHead()->pose());
-  if((tag_in_head.getZ() <= agent_->getFieldOfView().getClipFar()) &&
-      (std::abs(tag_in_head.getOriginTilt()) <= agent_->getFieldOfView().getHeight() * TO_HALF_RAD) &&
-      (std::abs(tag_in_head.getOriginPan()) <= agent_->getFieldOfView().getWidth() * TO_HALF_RAD))
-    return true;
-  else
-    return false;
+  return agent_->getFieldOfView().hasIn(tag_in_head);
 }
 
 void ArTrackPerceptionModule::setPointOfInterest(const ar_track_alvar_msgs::AlvarVisibleMarker& visible_marker)
