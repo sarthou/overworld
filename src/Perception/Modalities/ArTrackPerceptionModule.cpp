@@ -48,7 +48,7 @@ bool ArTrackPerceptionModule::perceptionCallback(const ar_track_alvar_msgs::Alva
 
   for (auto& visible_marker : valid_visible_markers)
   {
-      if (visible_markers_with_pois_.count(visible_marker.id) == 0 && percepts_.count(ids_map_[visible_marker.main_id]) != 0)
+      if (visible_markers_with_pois_.count(visible_marker.id) == 0 && (ids_map_.find(visible_marker.main_id) != ids_map_.end()))
       {
           // This visible marker has never been seen before (or was not valid) or its entity was not created, let's create its pois
           setPointOfInterest(visible_marker);
@@ -59,7 +59,7 @@ bool ArTrackPerceptionModule::perceptionCallback(const ar_track_alvar_msgs::Alva
   for (const auto& seen_visible_markers : visible_markers.markers)
   {
       // For all the seen marker (even the invalid) if the entity has been created, we said it has been seen
-      if (percepts_.count(ids_map_[seen_visible_markers.main_id]) != 0)
+      if (ids_map_.find(seen_visible_markers.main_id) != ids_map_.end())
       {
           percepts_.at(ids_map_[seen_visible_markers.main_id]).setSeen();
       }
