@@ -29,6 +29,13 @@ void Entity::updatePose(const std::array<double, 3>& translation, const std::arr
     last_pose_ = stamp;
 }
 
+void Entity::updatePose(const geometry_msgs::PoseStamped& pose)
+{
+    pose_ = Pose(pose);
+    is_located_ = true;
+    last_pose_ = pose.header.stamp;
+}
+
 const Pose& Entity::pose() const
 {
     if (!is_located_){

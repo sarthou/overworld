@@ -18,6 +18,7 @@ public:
     void updatePose(const Pose& pose, ros::Time stamp = ros::Time::now());
     void updatePose(const std::array<double, 3>& translation, const std::array<double, 4>& rotation);
     void updatePose(const std::array<double, 3>& translation, const std::array<double, 4>& rotation, ros::Time stamp);
+    void updatePose(const geometry_msgs::PoseStamped& pose);
     void unsetPose() { is_located_ = false; }
     bool isLocated() const { return is_located_; }
     const Pose& pose() const;
