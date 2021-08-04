@@ -1,6 +1,7 @@
 #include "overworld/Perception/Modalities/ArTrackPerceptionModule.h"
 
 #include "overworld/Utility/ShellDisplay.h"
+#include <unordered_map>
 
 namespace owds {
 
@@ -28,28 +29,41 @@ bool ArTrackPerceptionModule::perceptionCallback(const ar_track_alvar_msgs::Alva
 
   std::vector<ar_track_alvar_msgs::AlvarVisibleMarker> valid_visible_markers;
   std::unordered_set<size_t> invalid_main_markers_ids;
-  for(const auto& visible_marker : visible_markers.markers)
+  std::unordered_map<size_t, double> main_marker_id_max_confidence;
+  for (const auto& visible_marker : visible_markers.markers)
   {
-    geometry_msgs::PoseStamped marker_pose;
-    auto old_pose = visible_marker.pose;
-    if(old_pose.header.frame_id[0] == '/')
-      old_pose.header.frame_id = old_pose.header.frame_id.substr(1);
-    tf_buffer_.transform(old_pose, marker_pose, "map", ros::Duration(1.0));
-    if(isInValidArea(Pose(marker_pose)))
-      valid_visible_markers.push_back(visible_marker);
-    else
-      invalid_main_markers_ids.insert(visible_marker.main_id);
+      geometry_msgs::PoseStamped marker_pose;
+      auto old_pose = visible_marker.pose;
+      if (old_pose.header.frame_id[0] == '/')
+          old_pose.header.frame_id = old_pose.header.frame_id.substr(1);
+      tf_buffer_.transform(old_pose, marker_pose, "map", ros::Duration(1.0));
+      if (isInValidArea(Pose(marker_pose)) && visible_marker.confidence < 0.2)
+          valid_visible_markers.push_back(visible_marker);
+      else
+          invalid_main_markers_ids.insert(visible_marker.main_id);
   }
 
   updateEntities(markers, invalid_main_markers_ids);
   setAllPoiUnseen();
 
-  for(auto& visible_marker : valid_visible_markers)
+  for (auto& visible_marker : valid_visible_markers)
   {
-    setPointOfInterest(visible_marker);
-    percepts_.at(ids_map_[visible_marker.main_id]).setSeen();
+      if (visible_markers_with_pois_.count(visible_marker.id) == 0 && percepts_.count(ids_map_[visible_marker.main_id]) != 0)
+      {
+          // This visible marker has never been seen before (or was not valid) or its entity was not created, let's create its pois
+          setPointOfInterest(visible_marker);
+          visible_markers_with_pois_.insert(visible_marker.id);
+      }
   }
 
+  for (const auto& seen_visible_markers : visible_markers.markers)
+  {
+      // For all the seen marker (even the invalid) if the entity has been created, we said it has been seen
+      if (percepts_.count(ids_map_[seen_visible_markers.main_id]) != 0)
+      {
+          percepts_.at(ids_map_[seen_visible_markers.main_id]).setSeen();
+      }
+  }
   return true;
 }
 
@@ -139,31 +153,26 @@ void ArTrackPerceptionModule::updateEntities(const ar_track_alvar_msgs::AlvarMar
 {
   for(const auto& main_marker : main_markers.markers)
   {
-    bool created = false;
-    if(blacklist_ids_.find(main_marker.id) != blacklist_ids_.end())
-      continue;
-    else if(invalid_main_markers_ids.find(main_marker.id) != invalid_main_markers_ids.end())
-    {
-      createNewEntity(main_marker);
-      continue;
-    }
-    else if(ids_map_.find(main_marker.id) == ids_map_.end())
-    {
-      createNewEntity(main_marker);
-      created = true;
-    }
+      bool created = false;
+      if (blacklist_ids_.find(main_marker.id) != blacklist_ids_.end())
+          continue;
+      else if (invalid_main_markers_ids.find(main_marker.id) != invalid_main_markers_ids.end())
+      {
+          continue;
+      }
+      else if (ids_map_.find(main_marker.id) == ids_map_.end())
+      {
+          createNewEntity(main_marker);
+      }
 
-    auto it_obj = percepts_.find(ids_map_[main_marker.id]);
-    if(created || (main_marker.confidence < 0.2))
-    {
+      auto it_obj = percepts_.find(ids_map_[main_marker.id]);
       std::string frame_id = main_marker.header.frame_id;
-      if(frame_id[0] == '/')
-        frame_id = frame_id.substr(1);
-      geometry_msgs::TransformStamped to_map = tf_buffer_.lookupTransform("map", frame_id, main_marker.header.stamp, ros::Duration(1.0) );
+      if (frame_id[0] == '/')
+          frame_id = frame_id.substr(1);
+      geometry_msgs::TransformStamped to_map = tf_buffer_.lookupTransform("map", frame_id, main_marker.header.stamp, ros::Duration(1.0));
       geometry_msgs::PoseStamped marker_in_map;
       tf2::doTransform(main_marker.pose, marker_in_map, to_map);
       it_obj->second.updatePose(marker_in_map);
-    }
   }
 }
 
