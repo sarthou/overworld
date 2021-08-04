@@ -77,8 +77,18 @@ void SituationAssessor::assessmentLoop()
 
     if(ros::ok() && isRunning())
     {
-      next_start_time = start_time + interval;
-      std::this_thread::sleep_until(next_start_time);
+      if(start_time + interval < std::chrono::high_resolution_clock::now())
+      {
+        auto delta = std::chrono::high_resolution_clock::now() - (start_time + interval);
+        ShellDisplay::warning("[SituationAssessor] The main loop is late of " + std::to_string(delta.count() / 1000000.) + " ms");
+      }
+      else
+      {
+        next_start_time = start_time + interval;
+        //auto delta = next_start_time - std::chrono::high_resolution_clock::now();
+        //ShellDisplay::info("sleep for " + std::to_string(delta.count() / 1000000.) + " ms");
+        std::this_thread::sleep_until(next_start_time);
+      }
     }
     
   }
