@@ -129,7 +129,7 @@ void ArTrackPerceptionModule::setPointOfInterest(const ar_track_alvar_msgs::Alva
     for (const auto& sub_poi : sub_pois)
     {
       Pose marked_obj_to_poi = marker_in_marked_obj * sub_poi;
-      p.addPoint(marker_in_marked_obj);
+      p.addPoint(marked_obj_to_poi);
     }
     obj_it->second.addPointOfInterest(p);
 }
