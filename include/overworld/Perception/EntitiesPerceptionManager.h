@@ -19,6 +19,7 @@ class EntitiesPerceptionManager
 {
     static_assert(std::is_base_of<Entity,T>::value, "T must be derived from Entity");
 public:
+    inline EntitiesPerceptionManager(): bullet_client_(nullptr){}
     void setBulletClient(BulletClient* client) { bullet_client_ = client; }
 
     void addPerceptionModule(const std::string& module_name, PerceptionModuleBase_<T>* perception_module);

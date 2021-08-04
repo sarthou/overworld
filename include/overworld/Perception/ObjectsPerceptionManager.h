@@ -10,6 +10,7 @@ namespace owds {
 class ObjectsPerceptionManager : public EntitiesPerceptionManager<Object>
 {
 public:
+  inline ObjectsPerceptionManager(): EntitiesPerceptionManager(), myself_agent_(nullptr){}
   void setOwnerAgent(Agent* agent) { myself_agent_ = agent; }
 
 private:
