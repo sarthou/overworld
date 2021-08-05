@@ -22,7 +22,7 @@ int main(int argc, char** argv)
 {
   signal(SIGSEGV, handler);
   signal(SIGABRT, handler);
-  ros::init(argc, argv, "listener");
+  ros::init(argc, argv, "overworld");
 
   owds::SituationAssessor robot_situation_assessor("pr2_robot", true);
 

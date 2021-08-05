@@ -3,6 +3,7 @@
 #include "overworld/Perception/Modalities/ArTrackPerceptionModule.h"
 #include "overworld/Perception/Modalities/PR2JointsPerception.h"
 #include "overworld/Perception/Modalities/StaticObjectsPerceptionModule.h"
+#include "overworld/Perception/Modalities/OptitrackPerceptionModule.h"
 
 #include <chrono>
 #include <thread>
@@ -16,13 +17,23 @@ SituationAssessor::SituationAssessor(const std::string& agent_name, bool is_robo
 
   n_.setCallbackQueue(&callback_queue_);
 
-  if(is_robot_)
-    bullet_client_ = PhysicsServers::connectPhysicsServer(owds::CONNECT_GUI);
+  if (is_robot_)
+  {
+      bullet_client_ = PhysicsServers::connectPhysicsServer(owds::CONNECT_GUI);
+      bullet_client_->configureDebugVisualizer(COV_ENABLE_DEPTH_BUFFER_PREVIEW, false);
+      bullet_client_->configureDebugVisualizer(COV_ENABLE_SHADOWS, false);
+      bullet_client_->configureDebugVisualizer(COV_ENABLE_PLANAR_REFLECTION, false);
+      bullet_client_->configureDebugVisualizer(COV_ENABLE_RGB_BUFFER_PREVIEW, false);
+      bullet_client_->configureDebugVisualizer(COV_ENABLE_SEGMENTATION_MARK_PREVIEW, false);
+      bullet_client_->configureDebugVisualizer(COV_ENABLE_WIREFRAME, false);
+      bullet_client_->configureDebugVisualizer(COV_ENABLE_RENDERING, true);
+  }
   else
-    bullet_client_ = PhysicsServers::connectPhysicsServer(owds::CONNECT_DIRECT);
+      bullet_client_ = PhysicsServers::connectPhysicsServer(owds::CONNECT_DIRECT);
 
   robots_manager_.setBulletClient(bullet_client_);
   objects_manager_.setBulletClient(bullet_client_);
+  humans_manager_.setBulletClient(bullet_client_);
 
   if(is_robot_)
   {
@@ -38,6 +49,11 @@ SituationAssessor::SituationAssessor(const std::string& agent_name, bool is_robo
     auto static_perception = new StaticObjectsPerceptionModule();
     //static_perception->activate(false);
     objects_manager_.addPerceptionModule("static", static_perception);
+
+    auto optitrack_perception = new OptitrackPerceptionModule(&n_, "human_0", {6.4868, 2.8506, 0});
+    humans_manager_.addPerceptionModule("optitrack", optitrack_perception);
+
+    ros_sender_ = new ROSSender(&n_);
   }
 }
 
@@ -45,6 +61,8 @@ SituationAssessor::~SituationAssessor()
 {
   robots_manager_.deleteModules();
   objects_manager_.deleteModules();
+  humans_manager_.deleteModules();
+  delete ros_sender_;
   delete bullet_client_;
 }
 
@@ -58,6 +76,7 @@ void SituationAssessor::stop()
 void SituationAssessor::run()
 {
   std::thread assessment_thread(&SituationAssessor::assessmentLoop, this);
+  run_ = true;
 
   while(ros::ok())
   {
@@ -103,7 +122,10 @@ void SituationAssessor::assess()
 {
   robots_manager_.update();
   objects_manager_.update();
-  auto entities = robots_manager_.getEntities();
+  humans_manager_.update();
+  auto entities = objects_manager_.getEntities();
+
+  ros_sender_->sendEntitiesToTFAndRViz("/rviz_test_markers", entities);
 }
 
 }

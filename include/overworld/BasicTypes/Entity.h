@@ -8,6 +8,9 @@
 #include "overworld/Geometry/Pose.h"
 #include "overworld/BasicTypes/Shape.h"
 
+#include <geometry_msgs/TransformStamped.h>
+#include <visualization_msgs/Marker.h>
+
 namespace owds {
 
 class Entity
@@ -38,6 +41,10 @@ public:
     void setUnseen() { if(nb_frame_unseen_ < 100) nb_frame_unseen_++; }
     bool hasBeenSeen() const { return (nb_frame_unseen_ == 0); }
     size_t getNbFrameUnseen() const { return nb_frame_unseen_; }
+
+
+    geometry_msgs::TransformStamped toTfTransform() const;
+    visualization_msgs::Marker toMarker(int id, double lifetime, const std::string& ns) const;
 
 protected:
     std::string id_;
