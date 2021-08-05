@@ -12,8 +12,16 @@ find_package(catkin REQUIRED COMPONENTS
   ontologenius
   roscpp
   std_msgs
-  tf
+  genmsg
+  message_generation
+  tf2
+  tf2_ros
+  tf2_eigen
+  tf2_geometry_msgs
   roslib
+  message_filters
+  ar_track_alvar_msgs
+  sensor_msgs
 )
 find_package (Eigen3 REQUIRED NO_MODULE)
 find_package(Threads REQUIRED)
@@ -43,36 +51,27 @@ foreach(lib_name ${BULLET_LIB_NAMES})
   unset(LIB_PATH CACHE)
 endforeach()
 
+find_package(optitrack_ros REQUIRED)
+
 ################################################
 ## Declare ROS messages, services and actions ##
 ################################################
 
-## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
-#   Message1.msg
-#   Message2.msg
-# )
+add_message_files(
+  FILES
+  StampedStringTest.msg
+)
 
-## Generate services in the 'srv' folder
 # add_service_files(
 #   FILES
 #   Service1.srv
 #   Service2.srv
 # )
 
-## Generate actions in the 'action' folder
-# add_action_files(
-#   FILES
-#   Action1.action
-#   Action2.action
-# )
-
-## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs
-# )
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+)
 
 ###################################
 ## catkin specific configuration ##
@@ -86,7 +85,7 @@ endforeach()
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES overworld
-   CATKIN_DEPENDS ontologenius roscpp std_msgs tf roslib
+   CATKIN_DEPENDS ontologenius roscpp std_msgs tf2 tf2_ros roslib
 #  DEPENDS system_lib
 )
 
@@ -98,12 +97,17 @@ include_directories(
   include
   ${EIGEN3_INCLUDE_DIRS}
   ${catkin_INCLUDE_DIRS}
+  ${optitrack_ros_INCLUDE_DIRS}
 )
 add_definitions( ${EIGEN3_DEFINITIONS} )
 
 add_library(Bullet3 INTERFACE)
 target_include_directories(Bullet3 INTERFACE ${BULLET_INCLUDE_DIRS})
-target_link_libraries(Bullet3 INTERFACE ${BULLET_LIBS} ${CMAKE_DL_LIBS} Threads::Threads)
+target_link_libraries(Bullet3 INTERFACE
+                      ${BULLET_LIBS}
+                      ${CMAKE_DL_LIBS}
+                      ${catkin_LIBRARIES}
+                      Threads::Threads)
 
 add_library(${PROJECT_NAME}_bullet_lib STATIC
   src/Bullet/PhysicsServers.cpp
@@ -119,8 +123,41 @@ add_library(${PROJECT_NAME}_types_lib STATIC
 )
 target_link_libraries(${PROJECT_NAME}_types_lib PUBLIC ${catkin_LIBRARIES})
 
-add_executable(${PROJECT_NAME}_test src/main.cpp )
-target_link_libraries(${PROJECT_NAME}_test PRIVATE
+add_library(${PROJECT_NAME}_perception_lib STATIC
+  src/Perception/RobotsPerceptionManager.cpp
+  src/Perception/ObjectsPerceptionManager.cpp
+  src/Perception/Modalities/PR2JointsPerception.cpp
+  src/Perception/Modalities/ArTrackPerceptionModule.cpp
+  src/Perception/Modalities/StaticObjectsPerceptionModule.cpp
+  src/Perception/Modalities/OptitrackPerceptionModule.cpp
+  src/SituationAssessor.cpp
+)
+target_link_libraries(${PROJECT_NAME}_perception_lib PUBLIC
+                      ${catkin_LIBRARIES}
+                      ${PROJECT_NAME}_bullet_lib
+                      ${PROJECT_NAME}_types_lib)
+
+add_executable(${PROJECT_NAME}_bullet_test src/TestFiles/bullet_test.cpp )
+target_link_libraries(${PROJECT_NAME}_bullet_test PRIVATE
                       ${PROJECT_NAME}_bullet_lib
                       ${PROJECT_NAME}_types_lib
+                      ${PROJECT_NAME}_perception_lib
                       ${catkin_LIBRARIES})
+
+add_executable(${PROJECT_NAME}_multi_server_test src/TestFiles/multi_server_test.cpp )
+target_link_libraries(${PROJECT_NAME}_multi_server_test PRIVATE
+                      ${PROJECT_NAME}_bullet_lib
+                      ${catkin_LIBRARIES})
+
+add_executable(${PROJECT_NAME}_perception_test src/TestFiles/perception_test.cpp )
+target_link_libraries(${PROJECT_NAME}_perception_test PRIVATE
+                      ${PROJECT_NAME}_types_lib
+                      ${PROJECT_NAME}_perception_lib
+                      ${catkin_LIBRARIES})
+add_dependencies(${PROJECT_NAME}_perception_test overworld_gencpp)
+
+add_executable(${PROJECT_NAME}_node src/Nodes/overworld.cpp src/SituationAssessor.cpp)
+target_link_libraries(${PROJECT_NAME}_node PRIVATE
+                      ${PROJECT_NAME}_perception_lib
+                      ${catkin_LIBRARIES})
+add_dependencies(${PROJECT_NAME}_node overworld_gencpp)

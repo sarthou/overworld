@@ -11,6 +11,9 @@
 
 #include "overworld/Utility/ShellDisplay.h"
 
+#include "overworld/Perception/Modalities/PR2JointsPerception.h"
+#include "overworld/Perception/EntitiesPerceptionManager.h"
+
 using namespace std::chrono_literals;
 
 static volatile std::sig_atomic_t flag;
@@ -23,6 +26,8 @@ void sigHandler(int signal)
 
 int main(int argc, char** argv)
 {
+	ros::init(argc, argv, "listener");
+    ros::NodeHandle n;
 	flag = false;
 
 	owds::BulletClient* client = owds::PhysicsServers::connectPhysicsServer(owds::CONNECT_GUI);
@@ -39,7 +44,10 @@ int main(int argc, char** argv)
 	std::string path_overworld = ros::package::getPath("overworld");
 	
 	client->setAdditionalSearchPath(path_overworld + "/models");
-	client->loadURDF("pr2.urdf", {-2,-2,0}, {0,0,0,1});
+	int robot_id = client->loadURDF("pr2.urdf", {-2,-2,0}, {0,0,0,1});
+
+	std::cout << "Robot id : " << robot_id << std::endl;
+	std::cout << "Nombre de joints: " << client->getNumJoints(robot_id) << std::endl;
 
 	client->configureDebugVisualizer(COV_ENABLE_DEPTH_BUFFER_PREVIEW, false);
 	client->configureDebugVisualizer(COV_ENABLE_SHADOWS, false);
@@ -53,11 +61,11 @@ int main(int argc, char** argv)
 	client->performCollisionDetection();
 	auto raycast_info = client->rayTestBatch({{0,0,1}}, {{3,3,1}});
 	client->addUserDebugLine({0,0,1}, {3,3,1}, {0,0,1});
-	if(raycast_info.m_numRayHits)
+	if(raycast_info.size())
 	{
-		owds::ShellDisplay::info("hit " + std::to_string(raycast_info.m_numRayHits));
-		for(size_t i = 0; i < raycast_info.m_numRayHits; i++)
-			std::cout << "- " << raycast_info.m_rayHits[i].m_hitObjectUniqueId << " : " << raycast_info.m_rayHits[i].m_hitObjectLinkIndex << std::endl;
+		owds::ShellDisplay::info("hit " + std::to_string(raycast_info.size()));
+		for(auto& info : raycast_info)
+			std::cout << "- " << info.m_hitObjectUniqueId << " : " << info.m_hitObjectLinkIndex << std::endl;
 	}
 
 	owds::Pose p1;
@@ -69,9 +77,14 @@ int main(int argc, char** argv)
 	obj2.updatePose({{3.0, 0.0, 0.0}}, {{0.0, 0.0, 0.0, 1.0}}, ros::Time(3.0));
 	std::cout << "The distance between " << obj1.id() << " and " << obj2.id() << " is: " << obj1.pose().distanceTo(obj2.pose()) << "m." << std::endl;
 
-	while(flag == false)
+	owds::PR2JointsPerception joint_perception(&n, "pr2_robot", {{"r_gripper_tool_frame", owds::BODY_PART_RIGHT_HAND}, {"l_gripper_tool_frame", owds::BODY_PART_LEFT_HAND}}, client, 2.0);
+	owds::EntitiesPerceptionManager<owds::BodyPart> entities_manager;
+	entities_manager.addPerceptionModule("PR2_joints", &joint_perception);
+
+	while(flag == false && ros::ok())
 	{
 		std::this_thread::sleep_for(100ms);
+		ros::spinOnce();
 	}
 
 	delete client;

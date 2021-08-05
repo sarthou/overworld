@@ -19,6 +19,7 @@ BulletClient::~BulletClient()
 
 void BulletClient::setAdditionalSearchPath(const std::string& path)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
 	if (path != "")
 	{
 		b3SharedMemoryCommandHandle command_handle = b3SetAdditionalSearchPath(*client_handle_, path.c_str());
@@ -52,10 +53,10 @@ int BulletClient::createVisualShapeCapsule(float radius, float height, const std
 
 int BulletClient::createVisualShapeMesh(const std::string& file_name, const std::array<double, 3>& scale, const std::array<double, 4>& rgba_color)
 {
-    return createVisualShape(GEOM_MESH, 0, {0}, 0, file_name, scale, rgba_color);
+    return createVisualShape(GEOM_MESH, 0, {0,0,0}, 0, getFullPath(file_name), scale, rgba_color);
 }
 
-int BulletClient::createVisualShape(ShapeType_e shape_type, 
+int BulletClient::createVisualShape(BulletShapeType_e shape_type, 
                                     float radius,
                                     const std::array<double, 3>& half_extents,
                                     float height,
@@ -63,6 +64,7 @@ int BulletClient::createVisualShape(ShapeType_e shape_type,
                                     const std::array<double, 3>& mesh_scale,
                                     const std::array<double, 4>& rgba_color)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
 	if (shape_type >= GEOM_SPHERE)
 	{
 		b3SharedMemoryCommandHandle command_handle = b3CreateVisualShapeCommandInit(*client_handle_);
@@ -142,10 +144,10 @@ int BulletClient::createCollisionShapeCapsule(float radius, float height, int fl
 
 int BulletClient::createCollisionShapeMesh(const std::string& file_name, const std::array<double, 3>& scale, int flags)
 {
-    return createCollisionShape(GEOM_MESH, 0, {0}, 0, file_name, scale, flags);
+    return createCollisionShape(GEOM_MESH, 0, {0}, 0, getFullPath(file_name), scale, flags);
 }
 
-int BulletClient::createCollisionShape(ShapeType_e shape_type, 
+int BulletClient::createCollisionShape(BulletShapeType_e shape_type, 
                                         float radius,
                                         const std::array<double, 3>& half_extents,
                                         float height,
@@ -153,6 +155,7 @@ int BulletClient::createCollisionShape(ShapeType_e shape_type,
                                         const std::array<double, 3>& mesh_scale,
                                         int flags)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
 	if (shape_type >= GEOM_SPHERE)
 	{
 		int shape_index = -1;
@@ -216,6 +219,7 @@ int BulletClient::createMultiBody(float base_mass,
                                   const std::array<double, 4>& base_orientation,
                                   int flags)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     b3SharedMemoryCommandHandle command_handle = b3CreateMultiBodyCommandInit(*client_handle_);
     double base_inertial_frame_position[3] = {0, 0, 0};
     double base_inertial_frame_orientation[4] = {0, 0, 0, 1};
@@ -232,7 +236,7 @@ int BulletClient::createMultiBody(float base_mass,
     b3SharedMemoryStatusHandle status_handle = b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
     int status_type = b3GetStatusType(status_handle);
     if (status_type == CMD_CREATE_MULTI_BODY_COMPLETED)
-            return b3GetStatusBodyIndex(status_handle);
+        return b3GetStatusBodyIndex(status_handle);
 
 	ShellDisplay::error("createMultiBody failed.");
 	return -1;
@@ -244,6 +248,7 @@ int BulletClient::loadURDF(const std::string& file_name,
                            bool use_fixed_base,
                            int flags)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
 	if (file_name != "")
 	{
         std::string full_path = file_name;
@@ -276,17 +281,33 @@ int BulletClient::loadURDF(const std::string& file_name,
 	}
 }
 
+int BulletClient::loadURDFRaw(const std::string& raw_urdf, const std::string& temp_file_name,
+                           const std::array<double, 3>& base_position,
+                           const std::array<double, 4>& base_orientation,
+                           bool use_fixed_base,
+                           int flags)
+{
+    std::ofstream out_file;
+    out_file.open(additional_path_ + "/" + temp_file_name + ".owds");
+    out_file << raw_urdf;
+    out_file.close();
+    return loadURDF(temp_file_name + ".owds", base_position, base_orientation, use_fixed_base, flags);
+
+}
+
 // Return the number of joints in an object based on
 // body index; body index is based on order of sequence
 // the object is loaded into simulation
 int BulletClient::getNumJoints(int body_id)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
 	return b3GetNumJoints(*client_handle_, body_id);
 }
 
 // Initalize all joint positions given a list of values
 bool BulletClient::resetJointState(int body_id, int joint_index, double target_value, double target_velocity)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     int nb_joints = b3GetNumJoints(*client_handle_, body_id);
     if ((joint_index >= nb_joints) || (joint_index < 0))
     {
@@ -310,6 +331,7 @@ bool BulletClient::resetJointState(int body_id, int joint_index, double target_v
 // and orientation quaternion [x,y,z,w]
 void BulletClient::resetBasePositionAndOrientation(int body_id, const std::array<double, 3>& position, const std::array<double, 4>& orientation)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
 	b3SharedMemoryCommandHandle command_handle = b3CreatePoseCommandInit(*client_handle_, body_id);
 
     b3CreatePoseCommandSetBasePosition(command_handle, position[0], position[1], position[2]);
@@ -328,6 +350,7 @@ long BulletClient::createUserConstraint(int parent_body_id, int parent_link_inde
                                         const std::array<double, 4>& parent_frame_orientation,
                                         const std::array<double, 4>& child_frame_orientation)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     struct b3JointInfo joint_info;
 	joint_info.m_jointType = joint_type;
 	joint_info.m_parentFrame[0] = parent_frame_pose[0];
@@ -354,7 +377,7 @@ long BulletClient::createUserConstraint(int parent_body_id, int parent_link_inde
 	b3SharedMemoryStatusHandle status_handle = b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
 	int status_type = b3GetStatusType(status_handle);
 	if (status_type == CMD_USER_CONSTRAINT_COMPLETED)
-		return b3GetStatusUserConstraintUniqueId(status_handle);
+        return b3GetStatusUserConstraintUniqueId(status_handle);
 
 	ShellDisplay::error("createConstraint failed.");
 	return -1;
@@ -362,6 +385,7 @@ long BulletClient::createUserConstraint(int parent_body_id, int parent_link_inde
 
 void BulletClient::removeUserConstraint(int user_constraint_id)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
 	b3SharedMemoryCommandHandle command_handle = b3InitRemoveUserConstraintCommand(*client_handle_, user_constraint_id);
 	b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
 }
@@ -371,6 +395,7 @@ void BulletClient::changeUserConstraint(int user_constraint_id,
                          const std::array<double, 4>& joint_child_frame_orientation,
                          double max_force)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
 	b3SharedMemoryCommandHandle command_handle = b3InitChangeUserConstraintCommand(*client_handle_, user_constraint_id);
 
     b3InitChangeUserConstraintSetPivotInB(command_handle, &joint_child_pivot[0]);
@@ -385,6 +410,7 @@ void BulletClient::changeUserConstraint(int user_constraint_id,
 // use the enum DynamicsActivationState for the activation_state
 void BulletClient::changeDynamicsInfo(int body_id, int link_index, int friction_anchor, int activation_state)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     b3SharedMemoryCommandHandle command_handle = b3InitChangeDynamicsInfo(*client_handle_);
 
     if (friction_anchor >= 0)
@@ -401,6 +427,7 @@ std::array<float, 16> BulletClient::computeProjectionMatrix(float fov,
                                                             float near_value,
                                                             float far_value)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
 	std::array<float, 16> projection_matrix;
 	b3ComputeProjectionMatrixFOV(fov, aspect, near_value, far_value, &projection_matrix[0]);
 	return projection_matrix;
@@ -413,6 +440,7 @@ std::array<float, 16> BulletClient::computeProjectionMatrix(float left,
                                                             float near_value,
                                                             float far_value)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
 	std::array<float, 16> projection_matrix;
 	b3ComputeProjectionMatrix(left, right, bottom, top, near_value, far_value, &projection_matrix[0]);
 	return projection_matrix;
@@ -425,6 +453,7 @@ std::array<float, 16> BulletClient::computeProjectionMatrix(const std::array<flo
                                                             float roll,
                                                             int up_axis_index)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
 	std::array<float, 16> projection_matrix;
 	b3ComputeViewMatrixFromYawPitchRoll(&camera_position[0], distance, yaw, pitch, roll, up_axis_index, &projection_matrix[0]);
 	return projection_matrix;
@@ -434,6 +463,7 @@ std::array<float, 16> BulletClient::computeViewMatrix(const std::array<float, 3>
                                                       const std::array<float, 3>& camera_target_position,
                                                       const std::array<float, 3>& camera_up_vector)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     std::array<float, 16> view_matrix;
 	b3ComputeViewMatrixFromPositions(&camera_eye_position[0], &camera_target_position[0], &camera_up_vector[0], &view_matrix[0]);
     return view_matrix;
@@ -446,6 +476,7 @@ std::array<float, 16> BulletClient::computeViewMatrix(const std::array<float, 3>
                                                       float roll,
                                                       int up_axis_index)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     std::array<float, 16> view_matrix;
 	b3ComputeViewMatrixFromYawPitchRoll(&camera_target_position[0], distance, yaw, pitch, roll, up_axis_index, &view_matrix[0]);
     return view_matrix;
@@ -457,6 +488,7 @@ struct b3CameraImageData BulletClient::getCameraImage(int width, int height,
                                                       Renderer_e renderer,
                                                       int flags)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
 	b3SharedMemoryCommandHandle command = b3InitRequestCameraImage(*client_handle_);
 	b3RequestCameraImageSetPixelResolution(command, width, height);
 
@@ -494,6 +526,7 @@ struct b3CameraImageData BulletClient::getCameraImage(int width, int height,
 
 void BulletClient::configureDebugVisualizer(b3ConfigureDebugVisualizerEnum flag, bool enable)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     b3SharedMemoryCommandHandle command_handle = b3InitConfigureOpenGLVisualizer(*client_handle_);
     b3ConfigureOpenGLVisualizerSetVisualizationFlags(command_handle, flag, enable);
     b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
@@ -501,6 +534,7 @@ void BulletClient::configureDebugVisualizer(b3ConfigureDebugVisualizerEnum flag,
 
 struct b3VisualShapeInformation BulletClient::getVisualShapeData(int object_id, int flags)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     b3SharedMemoryCommandHandle command_handle = b3InitRequestVisualShapeInformation(*client_handle_, object_id);
     b3SharedMemoryStatusHandle status_handle = b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
     int status_type = b3GetStatusType(status_handle);
@@ -522,6 +556,7 @@ struct b3VisualShapeInformation BulletClient::getVisualShapeData(int object_id, 
 
 struct b3LinkState BulletClient::getLinkState(int body_id, int link_index, bool compute_link_velocity, bool compute_forward_kinematics)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     struct b3LinkState link_state_empty;
 
     if (body_id < 0)
@@ -561,6 +596,7 @@ struct b3LinkState BulletClient::getLinkState(int body_id, int link_index, bool 
 
 struct b3JointInfo BulletClient::getJointInfo(int body_id, int joint_index)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
 	struct b3JointInfo info;
 
     if (b3GetJointInfo(*client_handle_, body_id, joint_index, &info))
@@ -572,6 +608,27 @@ struct b3JointInfo BulletClient::getJointInfo(int body_id, int joint_index)
     }
 }
 
+std::pair<std::unordered_map<std::string, int>, std::unordered_map<std::string, int>> BulletClient::findJointAndLinkIndices(int body_id)
+{
+    std::unordered_map<std::string, int> joint_name_index;
+    std::unordered_map<std::string, int> link_name_index;
+    int numJoints = getNumJoints(body_id);
+    std::cout << "Robot id: " << body_id << " Num_Joints : " << numJoints << std::endl;
+    if (numJoints == 0)
+    {
+        std::cout << "Warning: No joints found for Bullet body id: " << body_id << std::endl;
+        return {joint_name_index, link_name_index};
+    }
+    for (size_t i = 0; i < numJoints - 1; i++)
+    {
+        b3JointInfo joint = getJointInfo(body_id, i);
+        std::cout << joint.m_jointName << std::endl;
+        joint_name_index[joint.m_jointName] = i;
+        link_name_index[joint.m_linkName] = i;
+    }
+    return {joint_name_index, link_name_index};
+}
+
 long BulletClient::addUserDebugLine(const std::array<double, 3>& xyz_from,
                                     const std::array<double, 3>& xyz_to,
                                     const std::array<double, 3>& color_rgb,
@@ -579,6 +636,7 @@ long BulletClient::addUserDebugLine(const std::array<double, 3>& xyz_from,
                                     double life_time,
                                     int replace_id)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
 	b3SharedMemoryCommandHandle command_handle = b3InitUserDebugDrawAddLine3D(*client_handle_, 
                                                                               &xyz_from[0],
                                                                               &xyz_to[0],
@@ -591,7 +649,7 @@ long BulletClient::addUserDebugLine(const std::array<double, 3>& xyz_from,
 	b3SharedMemoryStatusHandle status_handle = b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
 	int status_type = b3GetStatusType(status_handle);
 	if (status_type == CMD_USER_DEBUG_DRAW_COMPLETED)
-		return b3GetDebugItemUniqueId(status_handle);
+        return b3GetDebugItemUniqueId(status_handle);
     else
     {
         ShellDisplay::error("failed to draw debug line");
@@ -599,13 +657,13 @@ long BulletClient::addUserDebugLine(const std::array<double, 3>& xyz_from,
     }
 }
 
-struct b3RaycastInformation BulletClient::rayTestBatch(const std::vector<std::array<double, 3>>& from_poses,
-                                                       const std::vector<std::array<double,3>>& to_poses,
-                                                       int nb_thread,
-                                                       bool report_hit_number)
+std::vector<struct b3RayHitInfo> BulletClient::rayTestBatch(const std::vector<std::array<double, 3>>& from_poses,
+                                                            const std::vector<std::array<double,3>>& to_poses,
+                                                            int nb_thread,
+                                                            bool report_hit_number)
 {
-    struct b3RaycastInformation raycast_info_empty;
-    raycast_info_empty.m_numRayHits = 0;
+    std::lock_guard<std::mutex> lock(mutex_);
+    std::vector<struct b3RayHitInfo> raycast_info_res;
 
 	b3SharedMemoryCommandHandle command_handle = b3CreateRaycastBatchCommandInit(*client_handle_);
 	b3RaycastBatchSetNumThreads(command_handle, nb_thread);
@@ -613,14 +671,14 @@ struct b3RaycastInformation BulletClient::rayTestBatch(const std::vector<std::ar
     if (from_poses.size() != to_poses.size())
     {
         ShellDisplay::error("Size of from_positions need to be equal to size of to_positions.");
-        return raycast_info_empty;
+        return raycast_info_res;
     }
     else
     {
         if (from_poses.size() > MAX_RAY_INTERSECTION_BATCH_SIZE_STREAMING)
         {
             ShellDisplay::error("Number of rays exceed the maximum batch size.");
-            return raycast_info_empty;
+            return raycast_info_res;
         }
 
         for (int i = 0; i < from_poses.size(); i++)
@@ -636,15 +694,26 @@ struct b3RaycastInformation BulletClient::rayTestBatch(const std::vector<std::ar
 	{
 		struct b3RaycastInformation raycast_info;
 		b3GetRaycastInformation(*client_handle_, &raycast_info);
-		return raycast_info;
+
+        for(size_t i = 0; i < raycast_info.m_numRayHits; i++)
+        {
+            if((raycast_info.m_rayHits[i].m_hitObjectUniqueId != -1) ||
+               (raycast_info.m_rayHits[i].m_hitObjectLinkIndex != -1))
+            {
+                raycast_info_res.push_back(raycast_info.m_rayHits[i]);
+            }
+        }
+
+		return raycast_info_res;
 	}
 
-	return raycast_info_empty;
+	return raycast_info_res;
 }
 
 // perform collision detection: update aabbs, compute overlapping pairs and contact points
 void BulletClient::performCollisionDetection()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (b3CanSubmitCommand(*client_handle_))
         b3SubmitClientCommandAndWaitStatus(*client_handle_, b3InitPerformCollisionDetectionCommand(*client_handle_));
     else
@@ -653,6 +722,7 @@ void BulletClient::performCollisionDetection()
 
 struct aabb_t BulletClient::getAABB(int body_id, int link_index)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     struct aabb_t aabb;
     aabb.is_valid = false;
 
@@ -683,18 +753,31 @@ struct aabb_t BulletClient::getAABB(int body_id, int link_index)
         aabb.is_valid = true;
         return aabb;
     }
-    else
-        return aabb;  
+
+    return aabb;  
 }
 
 struct b3AABBOverlapData BulletClient::getOverlappingObjects(const struct aabb_t& aabb)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
 	struct b3AABBOverlapData overlap_data;
 
 	b3SharedMemoryCommandHandle command_handle = b3InitAABBOverlapQuery(*client_handle_, &aabb.min[0], &aabb.max[0]);
 	b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
 	b3GetAABBOverlapResults(*client_handle_, &overlap_data);
     return overlap_data;
+}
+
+void BulletClient::resetDebugVisualizerCamera(float distance, float yaw, float pitch, const std::array<float,3>& target_pose)
+{
+	{
+		b3SharedMemoryCommandHandle commandHandle = b3InitConfigureOpenGLVisualizer(*client_handle_);
+		if ((distance >= 0))
+		{
+			b3ConfigureOpenGLVisualizerSetViewMatrix(commandHandle, distance, pitch, yaw, &target_pose[0]);
+		}
+		b3SubmitClientCommandAndWaitStatus(*client_handle_, commandHandle);
+	}
 }
 
 } // namespace owds

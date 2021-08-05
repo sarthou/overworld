@@ -151,8 +151,16 @@ BulletClient* PhysicsServers::connectPhysicsServer(BulletConnectionMothod_e meth
 		else
 		{
 			b3DisconnectSharedMemory(sm);
+			ShellDisplay::error("Can not submit command to bullet");
+			return nullptr;
 		}
 	}
+	else
+	{
+		ShellDisplay::error("Client creation failed");
+		return nullptr;
+	}
+
 	return new BulletClient(&clients_handles[free_index], free_index);
 }
 

@@ -6,10 +6,12 @@
 #include <string>
 #include <array>
 #include <vector>
+#include <unordered_map>
+#include <mutex>
 
 namespace owds {
 
-enum ShapeType_e {
+enum BulletShapeType_e {
     GEOM_SPHERE = 2,
 	GEOM_BOX,
 	GEOM_CYLINDER,
@@ -57,7 +59,7 @@ public:
     int createVisualShapeSphere(float radius, const std::array<double, 4>& rgba_color = {1});
     int createVisualShapeCylinder(float radius, float height, const std::array<double, 4>& rgba_color = {1});
     int createVisualShapeCapsule(float radius, float height, const std::array<double, 4>& rgba_color = {1});
-    int createVisualShapeMesh(const std::string& file_name, const std::array<double, 3>& scale, const std::array<double, 4>& rgba_color = {1});
+    int createVisualShapeMesh(const std::string& file_name, const std::array<double, 3>& scale, const std::array<double, 4>& rgba_color = {1,1,1,1});
 
     struct b3VisualShapeInformation getVisualShapeData(int object_id, int flags = 0);
 
@@ -80,6 +82,12 @@ public:
                 bool use_fixed_base = false,
                 int flags = 0);
 
+    int loadURDFRaw(const std::string& raw_urdf, const std::string& temp_file_name,
+                           const std::array<double, 3>& base_position,
+                           const std::array<double, 4>& base_orientation,
+                           bool use_fixed_base = false,
+                           int flags = 0);
+
     int getNumJoints(int body_id);
     bool resetJointState(int body_id, int joint_index, double target_value, double target_velocity = 0);
     void resetBasePositionAndOrientation(int body_id, const std::array<double, 3>& position, const std::array<double, 4>& orientation);
@@ -99,6 +107,7 @@ public:
 
     struct b3LinkState getLinkState(int body_id, int link_index, bool compute_link_velocity = false, bool compute_forward_kinematics = false);
     struct b3JointInfo getJointInfo(int body_id, int joint_index);
+    std::pair<std::unordered_map<std::string, int>, std::unordered_map<std::string, int>> findJointAndLinkIndices(int body_id);
     void changeDynamicsInfo(int body_id, int link_index, int friction_anchor, int activation_state);
 
     std::array<float, 16> computeProjectionMatrix(float fov,
@@ -144,23 +153,26 @@ public:
                           double life_time = 0,
                           int replace_id = -1);
 
-    struct b3RaycastInformation rayTestBatch(const std::vector<std::array<double, 3>>& from_poses,
-                                             const std::vector<std::array<double,3>>& to_poses,
-                                             int nb_thread = 1,
-                                             bool report_hit_number = false);
+    std::vector<struct b3RayHitInfo> rayTestBatch(const std::vector<std::array<double, 3>>& from_poses,
+                                                  const std::vector<std::array<double,3>>& to_poses,
+                                                  int nb_thread = 1,
+                                                  bool report_hit_number = false);
     
     void performCollisionDetection();
 
     struct aabb_t getAABB(int body_id, int link_index);
     struct b3AABBOverlapData getOverlappingObjects(const struct aabb_t& aabb);
+
+    void resetDebugVisualizerCamera(float distance, float yaw, float pitch, const std::array<float,3>& target_pose);
     
 private:
     b3PhysicsClientHandle* client_handle_;
     size_t client_id_;
+    std::mutex mutex_;
 
     std::string additional_path_;
 
-    int createVisualShape(ShapeType_e shape_type, 
+    int createVisualShape(BulletShapeType_e shape_type, 
                             float radius,
                             const std::array<double, 3>& half_extents,
                             float height,
@@ -168,7 +180,7 @@ private:
                             const std::array<double, 3>& mesh_scale,
                             const std::array<double, 4>& rgba_color);
 
-    int createCollisionShape(ShapeType_e shape_type, 
+    int createCollisionShape(BulletShapeType_e shape_type, 
                             float radius,
                             const std::array<double, 3>& half_extents,
                             float height,
