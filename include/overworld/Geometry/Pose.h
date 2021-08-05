@@ -59,6 +59,9 @@ public:
     Pose transformIn(const Pose& new_frame) const;
     Pose operator* (const Pose& b) const;
 
+    geometry_msgs::Transform toTransformMsg() const;
+    geometry_msgs::Pose toPoseMsg() const;
+
     double getX() const;
     double getY() const;
     double getZ() const;
