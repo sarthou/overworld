@@ -10,6 +10,7 @@
 
 #include "overworld/Perception/RobotsPerceptionManager.h"
 #include "overworld/Perception/ObjectsPerceptionManager.h"
+#include "overworld/Perception/HumansPerceptionManager.h"
 
 namespace owds {
 
@@ -35,6 +36,7 @@ private:
   BulletClient* bullet_client_;
   RobotsPerceptionManager robots_manager_;
   ObjectsPerceptionManager objects_manager_;
+  HumansPerceptionManager humans_manager_;
 
   void assessmentLoop();
   void assess();

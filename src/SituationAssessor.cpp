@@ -3,6 +3,7 @@
 #include "overworld/Perception/Modalities/ArTrackPerceptionModule.h"
 #include "overworld/Perception/Modalities/PR2JointsPerception.h"
 #include "overworld/Perception/Modalities/StaticObjectsPerceptionModule.h"
+#include "overworld/Perception/Modalities/OptitrackPerceptionModule.h"
 
 #include <chrono>
 #include <thread>
@@ -23,6 +24,7 @@ SituationAssessor::SituationAssessor(const std::string& agent_name, bool is_robo
 
   robots_manager_.setBulletClient(bullet_client_);
   objects_manager_.setBulletClient(bullet_client_);
+  humans_manager_.setBulletClient(bullet_client_);
 
   if(is_robot_)
   {
@@ -38,6 +40,9 @@ SituationAssessor::SituationAssessor(const std::string& agent_name, bool is_robo
     auto static_perception = new StaticObjectsPerceptionModule();
     //static_perception->activate(false);
     objects_manager_.addPerceptionModule("static", static_perception);
+
+    auto optitrack_perception = new OptitrackPerceptionModule(&n_, "human_0");
+    humans_manager_.addPerceptionModule("optitrack", optitrack_perception);
   }
 }
 
@@ -45,6 +50,7 @@ SituationAssessor::~SituationAssessor()
 {
   robots_manager_.deleteModules();
   objects_manager_.deleteModules();
+  humans_manager_.deleteModules();
   delete bullet_client_;
 }
 
@@ -103,6 +109,7 @@ void SituationAssessor::assess()
 {
   robots_manager_.update();
   objects_manager_.update();
+  humans_manager_.update();
   auto entities = robots_manager_.getEntities();
 }
 
