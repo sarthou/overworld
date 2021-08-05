@@ -21,15 +21,18 @@ void HumansPerceptionManager::getPercepts(const std::map<std::string, BodyPart>&
 {
     for(auto& percept : percepts)
     {
-        auto it = entities_.find(percept.second.id());
-        if(it == entities_.end())
+        if(percept.second.isLocated())
         {
-            it = entities_.insert(std::pair<std::string, BodyPart>(percept.second.id(), percept.second)).first;
-            addToBullet(it->second);
-            UpdateAgent(&it->second);
+          auto it = entities_.find(percept.second.id());
+          if(it == entities_.end())
+          {
+              it = entities_.insert(std::pair<std::string, BodyPart>(percept.second.id(), percept.second)).first;
+              addToBullet(it->second);
+              UpdateAgent(&it->second);
+          }
+          
+          updateEntityPose(it->second, percept.second.pose(), percept.second.lastStamp());
         }
-        
-        updateEntityPose(it->second, percept.second.pose(), percept.second.lastStamp());
     }
 }
 

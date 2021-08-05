@@ -41,7 +41,7 @@ SituationAssessor::SituationAssessor(const std::string& agent_name, bool is_robo
     //static_perception->activate(false);
     objects_manager_.addPerceptionModule("static", static_perception);
 
-    auto optitrack_perception = new OptitrackPerceptionModule(&n_, "human_0");
+    auto optitrack_perception = new OptitrackPerceptionModule(&n_, "human_0", {6.4868, 2.8506, 0});
     humans_manager_.addPerceptionModule("optitrack", optitrack_perception);
   }
 }
@@ -64,6 +64,7 @@ void SituationAssessor::stop()
 void SituationAssessor::run()
 {
   std::thread assessment_thread(&SituationAssessor::assessmentLoop, this);
+  run_ = true;
 
   while(ros::ok())
   {
