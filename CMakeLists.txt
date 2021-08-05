@@ -139,6 +139,7 @@ target_link_libraries(${PROJECT_NAME}_perception_lib PUBLIC
 
 add_library(${PROJECT_NAME}_facts_lib STATIC
   src/Facts/Publisher/FactsPublisher.cpp
+  src/Facts/Publisher/OntologeniusFactsPublisher.cpp
 )
 target_link_libraries(${PROJECT_NAME}_facts_lib PUBLIC
                       ${catkin_LIBRARIES})                
