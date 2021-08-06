@@ -10,7 +10,7 @@
 
 namespace owds {
 
-SituationAssessor::SituationAssessor(const std::string& agent_name, bool is_robot)
+SituationAssessor::SituationAssessor(const std::string& agent_name, bool is_robot) : facts_publisher_(&n_, agent_name)
 {
   agent_name_ = agent_name;
   is_robot_ = is_robot;
@@ -120,12 +120,62 @@ void SituationAssessor::assessmentLoop()
 
 void SituationAssessor::assess()
 {
+  std::map<std::string, std::unordered_set<int>> agents_segmentation_ids;
+
   robots_manager_.update();
   objects_manager_.update();
   humans_manager_.update();
-  auto entities = objects_manager_.getEntities();
+  auto objects = objects_manager_.getEntities();
+  auto robots = robots_manager_.getAgents();
+  auto humans = humans_manager_.getAgents();
+  auto body_parts = humans_manager_.getEntities();
 
-  ros_sender_->sendEntitiesToTFAndRViz("/rviz_test_markers", entities);
+  if(is_robot_)
+  {
+    for(auto human : humans)
+    {
+      if(human.second->getHead() == nullptr)
+        continue;
+      else if(human.second->getHead()->isLocated() == false)
+        continue;
+
+      auto proj_matrix = bullet_client_->computeProjectionMatrix(human.second->getFieldOfView().getHeight(),
+                                                                 human.second->getFieldOfView().getRatio(),
+                                                                 human.second->getFieldOfView().getClipNear(),
+                                                                 human.second->getFieldOfView().getClipFar());
+      Pose target_pose = human.second->getHead()->pose() * Pose({0,0,1}, {0,0,0,1});
+      auto head_pose_trans = human.second->getHead()->pose().arrays().first;
+      auto target_pose_trans = target_pose.arrays().first;
+      auto view_matrix = bullet_client_->computeViewMatrix({(float)head_pose_trans[0], (float)head_pose_trans[1], (float)head_pose_trans[2]},
+                                                           {(float)target_pose_trans[0], (float)target_pose_trans[1], (float)target_pose_trans[2]},
+                                                           {0.,0.,1.});
+      auto images = bullet_client_->getCameraImage(200*human.second->getFieldOfView().getRatio(), 200, view_matrix, proj_matrix, owds::BULLET_HARDWARE_OPENGL);
+
+      ros_sender_->sendImage(human.first + "/view", images);
+      agents_segmentation_ids[human.first] = getSegmentationIds(images);
+    }
+  }
+
+  auto agents = humans;
+  agents.insert(robots.begin(), robots.end());
+
+  auto facts = facts_calculator_.computeFacts(objects, agents, agents_segmentation_ids);
+  facts_publisher_.publish(facts);
+
+  if(is_robot_)
+    ros_sender_->sendEntitiesToTFAndRViz(myself_agent_->getId() + "/objects_markers", objects);
+  else
+    ros_sender_->sendEntitiesToRViz(myself_agent_->getId() + "/objects_markers", objects);
+  ros_sender_->sendEntitiesToRViz(myself_agent_->getId() + "/humans_markers", body_parts);
+}
+
+std::unordered_set<int> SituationAssessor::getSegmentationIds(const b3CameraImageData& image)
+{
+  std::unordered_set<int> segmentation_ids;
+  for(size_t i = 0; i < image.m_pixelHeight*image.m_pixelWidth; i++)
+    segmentation_ids.insert(image.m_segmentationMaskValues[i]);
+
+  return segmentation_ids;
 }
 
 }

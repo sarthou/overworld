@@ -12,6 +12,8 @@
 #include "overworld/Perception/ObjectsPerceptionManager.h"
 #include "overworld/Perception/HumansPerceptionManager.h"
 #include "overworld/Senders/ROSSender.h"
+#include "overworld/Facts/FactsCalculator.h"
+#include "overworld/Facts/Publisher/OntologeniusFactsPublisher.h"
 
 namespace owds {
 
@@ -39,10 +41,15 @@ private:
   ObjectsPerceptionManager objects_manager_;
   HumansPerceptionManager humans_manager_;
 
+  FactsCalculator facts_calculator_;
+  OntologeniusFactsPublisher facts_publisher_;
+
   ROSSender* ros_sender_;
 
   void assessmentLoop();
   void assess();
+
+  std::unordered_set<int> getSegmentationIds(const b3CameraImageData& image);
 };
 
 } // namespace owds

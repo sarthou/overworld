@@ -16,7 +16,7 @@ class FactsCalculator
 public:
   std::vector<Fact> computeFacts(const std::map<std::string, Object*>& objects,
                                  const std::map<std::string, Agent*>& agents,
-                                 const std::unordered_set<int>& segmation_ids);
+                                 const std::map<std::string, std::unordered_set<int>>& segmantation_ids);
 
 private:
   std::vector<Fact> facts_;

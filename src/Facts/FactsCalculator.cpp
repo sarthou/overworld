@@ -4,7 +4,7 @@ namespace owds {
 
 std::vector<Fact> FactsCalculator::computeFacts(const std::map<std::string, Object*>& objects,
                                                 const std::map<std::string, Agent*>& agents,
-                                                const std::unordered_set<int>& segmation_ids)
+                                                const std::map<std::string, std::unordered_set<int>>& segmantation_ids)
 {
   facts_.clear();
 
@@ -32,7 +32,9 @@ std::vector<Fact> FactsCalculator::computeFacts(const std::map<std::string, Obje
     isInHand(agent_from.second);
     for (auto& obj: objects)
     {
-      isLookingAt(agent_from.second, segmation_ids, obj.second);
+      auto image_it = segmantation_ids.find(agent_from.first);
+      if(image_it != segmantation_ids.end())
+        isLookingAt(agent_from.second, image_it->second, obj.second);
     }
     for(auto& agent_to : agents)
     {
