@@ -20,8 +20,8 @@ private:
   void getPercepts(const std::map<std::string, Object>& percepts) override;
   void reasoningOnUpdate() override;
 
-  std::vector<PointOfInterest> getPoisInFov(const Object& object);
-  bool shouldBeSeen(const Object& object, const std::vector<PointOfInterest>& pois);
+  std::vector<PointOfInterest> getPoisInFov(Object* object);
+  bool shouldBeSeen(Object* object, const std::vector<PointOfInterest>& pois);
 };
 
 } // namespace owds

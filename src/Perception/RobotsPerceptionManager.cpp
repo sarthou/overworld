@@ -24,9 +24,10 @@ void RobotsPerceptionManager::getPercepts(const std::map<std::string, BodyPart>&
         auto it = entities_.find(percept.second.id());
         if(it == entities_.end())
         {
-            it = entities_.insert(std::pair<std::string, BodyPart>(percept.second.id(), percept.second)).first;
+            auto new_body_part = new BodyPart(percept.second);
+            it = entities_.insert(std::pair<std::string, BodyPart*>(percept.second.id(), new_body_part)).first;
             addToBullet(it->second);
-            UpdateAgent(&it->second);
+            UpdateAgent(it->second);
         }
         
         updateEntityPose(it->second, percept.second.pose(), percept.second.lastStamp());

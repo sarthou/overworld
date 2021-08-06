@@ -125,7 +125,7 @@ void SituationAssessor::assess()
   humans_manager_.update();
   auto entities = objects_manager_.getEntities();
 
-  ros_sender_->sendEntitiesToTFAndRViz("/rviz_test_markers", entities);
+  //ros_sender_->sendEntitiesToTFAndRViz("/rviz_test_markers", entities);
 }
 
 }
