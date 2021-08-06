@@ -82,6 +82,36 @@ Pose Pose::operator*(const Pose& b) const
     return p;
 }
 
+geometry_msgs::Transform Pose::toTransformMsg() const
+{
+    geometry_msgs::Transform transform;
+    Eigen::Quaternion<double> quat(t_.rotation());
+    Eigen::Vector3d tra(t_.translation());
+    transform.translation.x = tra.x();
+    transform.translation.y = tra.y();
+    transform.translation.z = tra.z();
+    transform.rotation.x = quat.x();
+    transform.rotation.y = quat.y();
+    transform.rotation.z = quat.z();
+    transform.rotation.w = quat.w();
+    return transform;
+}
+
+geometry_msgs::Pose Pose::toPoseMsg() const
+{
+    geometry_msgs::Pose pose;
+    Eigen::Quaternion<double> quat(t_.rotation());
+    Eigen::Vector3d tra(t_.translation());
+    pose.position.x = tra.x();
+    pose.position.y = tra.y();
+    pose.position.z = tra.z();
+    pose.orientation.x = quat.x();
+    pose.orientation.y = quat.y();
+    pose.orientation.z = quat.z();
+    pose.orientation.w = quat.w();
+    return pose;
+}
+
 double Pose::getX() const
 {
     return t_.translation().x();

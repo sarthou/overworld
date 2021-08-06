@@ -1,9 +1,11 @@
 #include "overworld/Perception/Modalities/OptitrackPerceptionModule.h"
 
 namespace owds {
-OptitrackPerceptionModule::OptitrackPerceptionModule(ros::NodeHandle* n, const std::string& human_name)
+OptitrackPerceptionModule::OptitrackPerceptionModule(ros::NodeHandle* n, const std::string& human_name, const std::array<double,3>& offset)
     : human_name_(human_name), ontologies_manipulator_(n)
 {
+    mocap_offset_ = Pose(offset, {0,0,0,1});
+
     ontologies_manipulator_.waitInit();
     ontologies_manipulator_.add("robot");
     onto_ = ontologies_manipulator_.get("robot");
@@ -21,7 +23,7 @@ OptitrackPerceptionModule::OptitrackPerceptionModule(ros::NodeHandle* n, const s
     percepts_.at(head_name_).setAgentName(human_name_);
     percepts_.at(head_name_).setType(BodyPartType_e::BODY_PART_HEAD);
     Shape_t head_shape, left_hand_shape, right_hand_shape;
-    head_shape.color = {0.988, 0.859, 0.0};
+    head_shape.color = {0.976470588, 0.894117647, 0.717647059};
     if (head_meshs.size())
     {
         head_shape.type = SHAPE_MESH;
@@ -37,7 +39,7 @@ OptitrackPerceptionModule::OptitrackPerceptionModule(ros::NodeHandle* n, const s
     percepts_.emplace(left_hand_name_, left_hand_name_);
     percepts_.at(left_hand_name_).setAgentName(human_name_);
     percepts_.at(left_hand_name_).setType(BodyPartType_e::BODY_PART_LEFT_HAND);
-    left_hand_shape.color = {0.988, 0.859, 0.0};
+    left_hand_shape.color = {0.976470588, 0.894117647, 0.717647059};
     if (left_hand_meshs.size())
     {
         left_hand_shape.type = SHAPE_MESH;
@@ -53,12 +55,11 @@ OptitrackPerceptionModule::OptitrackPerceptionModule(ros::NodeHandle* n, const s
     percepts_.emplace(right_hand_name_, right_hand_name_);
     percepts_.at(right_hand_name_).setAgentName(human_name_);
     percepts_.at(right_hand_name_).setType(BodyPartType_e::BODY_PART_RIGHT_HAND);
-    right_hand_shape.color = {0.988, 0.859, 0.0};
+    right_hand_shape.color = {0.976470588, 0.894117647, 0.717647059};
     if (right_hand_meshs.size())
     {
         right_hand_shape.type = SHAPE_MESH;
         right_hand_shape.mesh_resource = right_hand_meshs[0].substr(right_hand_meshs[0].find("#") + 1);
-        right_hand_shape.scale = {1.0, -1.0, 1.0};
     }
     else
     {
@@ -81,6 +82,7 @@ bool OptitrackPerceptionModule::perceptionCallback(const BodyPartOptitrackPose& 
     auto optipos = msg.second.pos[0];
     auto optiatt = msg.second.att[0];
     Pose p({optipos.x, optipos.y, optipos.z}, {optiatt.qx, optiatt.qy, optiatt.qz, optiatt.qw});
+    p = mocap_offset_ * p;
     ros::Time stamp(msg.second.ts.sec, msg.second.ts.nsec);
     switch (msg.first)
     {

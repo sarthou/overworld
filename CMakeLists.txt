@@ -22,6 +22,8 @@ find_package(catkin REQUIRED COMPONENTS
   message_filters
   ar_track_alvar_msgs
   sensor_msgs
+  visualization_msgs
+  image_transport
 )
 find_package (Eigen3 REQUIRED NO_MODULE)
 find_package(Threads REQUIRED)
@@ -127,6 +129,7 @@ target_link_libraries(${PROJECT_NAME}_types_lib PUBLIC ${catkin_LIBRARIES})
 add_library(${PROJECT_NAME}_perception_lib STATIC
   src/Perception/RobotsPerceptionManager.cpp
   src/Perception/ObjectsPerceptionManager.cpp
+  src/Perception/HumansPerceptionManager.cpp
   src/Perception/Modalities/PR2JointsPerception.cpp
   src/Perception/Modalities/ArTrackPerceptionModule.cpp
   src/Perception/Modalities/StaticObjectsPerceptionModule.cpp
@@ -142,8 +145,16 @@ add_library(${PROJECT_NAME}_facts_lib STATIC
   src/Facts/Publisher/FactsPublisher.cpp
   src/Facts/Publisher/OntologeniusFactsPublisher.cpp
 )
+
 target_link_libraries(${PROJECT_NAME}_facts_lib PUBLIC
                       ${catkin_LIBRARIES})                
+add_library(${PROJECT_NAME}_sender_lib STATIC
+  src/Senders/ROSSender.cpp
+)
+target_link_libraries(${PROJECT_NAME}_sender_lib PUBLIC
+                      ${catkin_LIBRARIES}
+                      Bullet3 # For b3CameraImage
+                      ${PROJECT_NAME}_types_lib)
 
 add_executable(${PROJECT_NAME}_bullet_test src/TestFiles/bullet_test.cpp )
 target_link_libraries(${PROJECT_NAME}_bullet_test PRIVATE
@@ -167,5 +178,6 @@ add_dependencies(${PROJECT_NAME}_perception_test overworld_gencpp)
 add_executable(${PROJECT_NAME}_node src/Nodes/overworld.cpp src/SituationAssessor.cpp)
 target_link_libraries(${PROJECT_NAME}_node PRIVATE
                       ${PROJECT_NAME}_perception_lib
+                      ${PROJECT_NAME}_sender_lib
                       ${catkin_LIBRARIES})
 add_dependencies(${PROJECT_NAME}_node overworld_gencpp)
