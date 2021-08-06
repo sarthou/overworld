@@ -7,6 +7,9 @@ namespace owds {
 Hand::Hand(const std::string& id, bool is_true_id) : BodyPart(id, is_true_id)
 {}
 
+Hand::Hand(const BodyPart& body_part) : BodyPart(body_part)
+{}
+
 void Hand::putInHand(Object* object)
 {
   if(has_in_.find(object->id()) == has_in_.end())

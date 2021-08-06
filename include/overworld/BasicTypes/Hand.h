@@ -14,6 +14,7 @@ class Hand : public BodyPart
 {
 public:
   Hand(const std::string& id, bool is_true_id = true);
+  Hand(const BodyPart& body_part);
 
   void putInHand(Object* object);
   //should be remove from hand through the object function

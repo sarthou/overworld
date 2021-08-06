@@ -1,6 +1,7 @@
 #include "overworld/Perception/HumansPerceptionManager.h"
 
 #include "overworld/Utility/ShellDisplay.h"
+#include "overworld/BasicTypes/Hand.h"
 
 namespace owds {
 
@@ -26,7 +27,11 @@ void HumansPerceptionManager::getPercepts(const std::map<std::string, BodyPart>&
           auto it = entities_.find(percept.second.id());
           if(it == entities_.end())
           {
-              auto new_body_part = new BodyPart(percept.second);
+              BodyPart* new_body_part = nullptr;
+              if((percept.second.getType() == BODY_PART_LEFT_HAND) || (percept.second.getType() == BODY_PART_RIGHT_HAND))
+                new_body_part = new Hand(percept.second);
+              else
+                new_body_part = new BodyPart(percept.second);
               it = entities_.insert(std::pair<std::string, BodyPart*>(percept.second.id(), new_body_part)).first;
               addToBullet(it->second);
               UpdateAgent(it->second);
@@ -57,13 +62,13 @@ void HumansPerceptionManager::UpdateAgent(BodyPart* body_part)
       }
       case BODY_PART_LEFT_HAND:
       {
-        it_agent->second.setLeftHand(body_part);
+        it_agent->second.setLeftHand(static_cast<Hand*>(body_part));
         ShellDisplay::info("Left hand has been setted for " + it_agent->second.getId());
         break;
       }
       case BODY_PART_RIGHT_HAND:
       {
-        it_agent->second.setRightHand(body_part);
+        it_agent->second.setRightHand(static_cast<Hand*>(body_part));
         ShellDisplay::info("Right hand has been setted for " + it_agent->second.getId());
         break;
       }
