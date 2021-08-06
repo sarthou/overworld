@@ -124,7 +124,9 @@ add_library(${PROJECT_NAME}_types_lib STATIC
   src/BasicTypes/Object.cpp
   src/BasicTypes/Hand.cpp
 )
-target_link_libraries(${PROJECT_NAME}_types_lib PUBLIC ${catkin_LIBRARIES})
+target_link_libraries(${PROJECT_NAME}_types_lib PUBLIC
+                      ${catkin_LIBRARIES}
+                      ${PROJECT_NAME}_bullet_lib)
 
 add_library(${PROJECT_NAME}_perception_lib STATIC
   src/Perception/RobotsPerceptionManager.cpp

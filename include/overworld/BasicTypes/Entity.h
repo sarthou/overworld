@@ -11,6 +11,8 @@
 #include <geometry_msgs/TransformStamped.h>
 #include <visualization_msgs/Marker.h>
 
+#include "overworld/Bullet/BulletClient.h"
+
 namespace owds {
 
 class Entity
@@ -34,8 +36,13 @@ public:
     void setBulletId(int bullet_id) { bullet_id_ = bullet_id; }
     int bulletId() const { return bullet_id_; }
 
+    void setAabb(const struct aabb_t& aabb) { aabb_ = aabb; }
+    struct aabb_t getAabb() { return aabb_; }
+    bool isAabbValid() { return aabb_.is_valid; }
+
     void setShape(const Shape_t& shape) { shape_ = shape; }
     const Shape_t& getShape() { return shape_; }
+    bool hasShape() { return (shape_.type != SHAPE_NONE); }
 
     void setSeen() { nb_frame_unseen_ = 0; }
     void setUnseen() { if(nb_frame_unseen_ < 100) nb_frame_unseen_++; }
@@ -55,6 +62,7 @@ protected:
     int bullet_id_;
     Shape_t shape_;
     size_t nb_frame_unseen_;
+    struct aabb_t aabb_;
 };
 
 class UnlocatedEntityError: public std::runtime_error

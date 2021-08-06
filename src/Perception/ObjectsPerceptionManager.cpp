@@ -71,6 +71,7 @@ void ObjectsPerceptionManager::reasoningOnUpdate()
       }
     }
   }
+  UpdateAabbs();
 }
 
 std::vector<PointOfInterest> ObjectsPerceptionManager::getPoisInFov(Object* object)

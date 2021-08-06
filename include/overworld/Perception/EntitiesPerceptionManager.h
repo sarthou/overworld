@@ -49,6 +49,8 @@ protected:
 
     void addToBullet(T* entity);
     void updateToBullet(T* entity);
+
+    void UpdateAabbs();
 };
 
 template<typename T>
@@ -276,6 +278,14 @@ void EntitiesPerceptionManager<T>::updateToBullet(T* entity)
                                                             {0.0, 0.0, -100.0},
                                                             {0.0, 0.0, 0.0, 1.0});
     }
+}
+
+template<typename T>
+void EntitiesPerceptionManager<T>::UpdateAabbs()
+{
+    for(auto entity : entities_)
+        if(entity.second->isLocated() && entity.second->hasShape()) // TODO test if entity has moved
+            entity.second->setAabb(bullet_client_->getAABB(entity.second->bulletId()));
 }
 
 } // namespace owds
