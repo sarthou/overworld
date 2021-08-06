@@ -54,11 +54,10 @@ template<typename T>
 void ROSSender::sendEntitiesToRViz(const std::string& topic_name, const std::vector<T*>& entities)
 {
     static_assert(std::is_base_of<Entity,T>::value, "T must be derived from Entity");
-    if (rviz_publishers_.count(topic_name) == 0)
-    {
-        rviz_publishers_.insert(std::make_pair(topic_name, n_->advertise<visualization_msgs::MarkerArray>(topic_name, 1, false)));
-    }
-    ros::Publisher& pub = rviz_publishers_.at(topic_name);
+    auto pub_it = rviz_publishers_.find(topic_name);
+    if (pub_it == rviz_publishers_.end())
+        pub_it = rviz_publishers_.insert(std::make_pair(topic_name, n_->advertise<visualization_msgs::MarkerArray>(topic_name, 1, false))).first;
+
     visualization_msgs::MarkerArray markers;
     size_t id = 0;
     for (const auto& entity : entities)
@@ -68,18 +67,17 @@ void ROSSender::sendEntitiesToRViz(const std::string& topic_name, const std::vec
             markers.markers.push_back(entity->toMarker(id++, 1.0, "marker"));
         }
     }
-    pub.publish(markers);
+    pub_it->second.publish(markers);
 }
 
 template<typename T>
 void ROSSender::sendEntitiesToTFAndRViz(const std::string& rviz_topic_name, const std::vector<T*>& entities)
 {
     static_assert(std::is_base_of<Entity,T>::value, "T must be derived from Entity");
-    if (rviz_publishers_.count(rviz_topic_name) == 0)
-    {
-        rviz_publishers_.insert(std::make_pair(rviz_topic_name, n_->advertise<visualization_msgs::MarkerArray>(rviz_topic_name, 1, false)));
-    }
-    ros::Publisher& pub = rviz_publishers_.at(rviz_topic_name);
+    auto pub_it = rviz_publishers_.find(rviz_topic_name);
+    if (pub_it == rviz_publishers_.end())
+        pub_it = rviz_publishers_.insert(std::make_pair(rviz_topic_name, n_->advertise<visualization_msgs::MarkerArray>(rviz_topic_name, 1, false))).first;
+
     std::vector<geometry_msgs::TransformStamped> transforms;
     visualization_msgs::MarkerArray markers;
     size_t id = 0;
@@ -91,7 +89,7 @@ void ROSSender::sendEntitiesToTFAndRViz(const std::string& rviz_topic_name, cons
             transforms.push_back(entity->toTfTransform());
         }
     }
-    pub.publish(markers);
+    pub_it->second.publish(markers);
     tf_broadcaster_.sendTransform(transforms);
 }
 
@@ -114,11 +112,10 @@ template<typename T>
 void ROSSender::sendEntitiesToRViz(const std::string& topic_name, const std::map<std::string, T*>& entities)
 {
     static_assert(std::is_base_of<Entity,T>::value, "T must be derived from Entity");
-    if (rviz_publishers_.count(topic_name) == 0)
-    {
-        rviz_publishers_.insert(std::make_pair(topic_name, n_->advertise<visualization_msgs::MarkerArray>(topic_name, 1, false)));
-    }
-    ros::Publisher& pub = rviz_publishers_.at(topic_name);
+    auto pub_it = rviz_publishers_.find(topic_name);
+    if (pub_it == rviz_publishers_.end())
+        pub_it = rviz_publishers_.insert(std::make_pair(topic_name, n_->advertise<visualization_msgs::MarkerArray>(topic_name, 1, false))).first;
+
     visualization_msgs::MarkerArray markers;
     size_t id = 0;
     for (const auto& entity : entities)
@@ -128,18 +125,17 @@ void ROSSender::sendEntitiesToRViz(const std::string& topic_name, const std::map
             markers.markers.push_back(entity.second->toMarker(id++, 1.0, "marker"));
         }
     }
-    pub.publish(markers);
+    pub_it->second.publish(markers);
 }
 
 template<typename T>
 void ROSSender::sendEntitiesToTFAndRViz(const std::string& rviz_topic_name, const std::map<std::string, T*>& entities)
 {
     static_assert(std::is_base_of<Entity,T>::value, "T must be derived from Entity");
-    if (rviz_publishers_.count(rviz_topic_name) == 0)
-    {
-        rviz_publishers_.insert(std::make_pair(rviz_topic_name, n_->advertise<visualization_msgs::MarkerArray>(rviz_topic_name, 1, false)));
-    }
-    ros::Publisher& pub = rviz_publishers_.at(rviz_topic_name);
+    auto pub_it = rviz_publishers_.find(rviz_topic_name);
+    if (pub_it == rviz_publishers_.end())
+        pub_it = rviz_publishers_.insert(std::make_pair(rviz_topic_name, n_->advertise<visualization_msgs::MarkerArray>(rviz_topic_name, 1, false))).first;
+    
     std::vector<geometry_msgs::TransformStamped> transforms;
     visualization_msgs::MarkerArray markers;
     size_t id = 0;
@@ -151,7 +147,7 @@ void ROSSender::sendEntitiesToTFAndRViz(const std::string& rviz_topic_name, cons
             transforms.push_back(entity.second->toTfTransform());
         }
     }
-    pub.publish(markers);
+    pub_it->second.publish(markers);
     tf_broadcaster_.sendTransform(transforms);
 }
 
