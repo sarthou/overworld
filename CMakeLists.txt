@@ -146,10 +146,13 @@ target_link_libraries(${PROJECT_NAME}_perception_lib PUBLIC
 add_library(${PROJECT_NAME}_facts_lib STATIC
   src/Facts/Publisher/FactsPublisher.cpp
   src/Facts/Publisher/OntologeniusFactsPublisher.cpp
+  src/Facts/FactsCalculator.cpp
 )
-
 target_link_libraries(${PROJECT_NAME}_facts_lib PUBLIC
-                      ${catkin_LIBRARIES})                
+                      ${catkin_LIBRARIES}
+                      ${PROJECT_NAME}_bullet_lib
+                      ${PROJECT_NAME}_types_lib)
+           
 add_library(${PROJECT_NAME}_sender_lib STATIC
   src/Senders/ROSSender.cpp
 )
