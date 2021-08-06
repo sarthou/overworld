@@ -44,6 +44,27 @@ const Pose& Entity::pose() const
     return last_poses_.back().pose;
 }
 
+bool Entity::hasMoved() const
+{
+    if (!is_located_)
+    {
+        throw UnlocatedEntityError(id_);
+    }
+    if (last_poses_.size() <= 1)
+    {
+        return true;
+    }
+    if (pose().distanceTo(last_poses_.at(last_poses_.size() - 2).pose) > 0.001)
+    {
+        return true;
+    }
+    if (pose().angularDistance(last_poses_.at(last_poses_.size() - 2).pose) > 0.001)
+    {
+        return true;
+    }
+    return false;
+}
+
 void Entity::setId(const std::string& id, bool is_true_id)
 {
     id_ = id;

@@ -69,19 +69,11 @@ bool ArTrackPerceptionModule::perceptionCallback(const ar_track_alvar_msgs::Alva
 
 bool ArTrackPerceptionModule::headHasMoved()
 {
-  bool res = false;
-
-  if(agent_->getHead() == nullptr)
-    res = true;
-  else if(agent_->getHead()->isLocated() == false)
-    res = true;
-  else if(agent_->getHead()->pose().distanceTo(last_head_pose_) > 0.001)
-    res = true;
-  else if(agent_->getHead()->pose().angularDistance(last_head_pose_) > 0.001)
-    res = true;
-  
-  last_head_pose_ = agent_->getHead()->pose();
-  return res;
+    if (agent_->getHead() == nullptr)
+        return true;
+    if (agent_->getHead()->isLocated() == false)
+        return true;
+    return agent_->getHead()->hasMoved();
 }
 
 bool ArTrackPerceptionModule::isInValidArea(const Pose& tag_pose)
