@@ -12,9 +12,9 @@ Entity::Entity(const std::string& id, bool is_true_id): id_(id),
 
 void Entity::updatePose(const Pose& pose, ros::Time stamp)
 {
-    pose_ = pose;
+
+    last_poses_.push_back({pose, stamp});
     is_located_ = true;
-    last_pose_ = stamp;
 }
 
 void Entity::updatePose(const std::array<double, 3>& translation, const std::array<double, 4>& rotation)
@@ -24,16 +24,16 @@ void Entity::updatePose(const std::array<double, 3>& translation, const std::arr
 
 void Entity::updatePose(const std::array<double, 3>& translation, const std::array<double, 4>& rotation, ros::Time stamp)
 {
-    pose_ = Pose(translation, rotation);
+    PoseStamped_s pose_stamped = {Pose(translation, rotation), stamp};
     is_located_ = true;
-    last_pose_ = stamp;
+    last_poses_.push_back(pose_stamped);
 }
 
 void Entity::updatePose(const geometry_msgs::PoseStamped& pose)
 {
-    pose_ = Pose(pose);
+    PoseStamped_s pose_stamped = {Pose(pose), pose.header.stamp};
     is_located_ = true;
-    last_pose_ = pose.header.stamp;
+    last_poses_.push_back(pose_stamped);
 }
 
 const Pose& Entity::pose() const
@@ -41,7 +41,28 @@ const Pose& Entity::pose() const
     if (!is_located_){
         throw UnlocatedEntityError(id_);
     }
-    return pose_;
+    return last_poses_.back().pose;
+}
+
+bool Entity::hasMoved() const
+{
+    if (!is_located_)
+    {
+        throw UnlocatedEntityError(id_);
+    }
+    if (last_poses_.size() <= 1)
+    {
+        return true;
+    }
+    if (pose().distanceTo(last_poses_.at(last_poses_.size() - 2).pose) > 0.001)
+    {
+        return true;
+    }
+    if (pose().angularDistance(last_poses_.at(last_poses_.size() - 2).pose) > 0.001)
+    {
+        return true;
+    }
+    return false;
 }
 
 void Entity::setId(const std::string& id, bool is_true_id)
@@ -57,10 +78,10 @@ geometry_msgs::TransformStamped Entity::toTfTransform() const
         throw std::runtime_error("Called toTfTransform on a non located entity: '" + id_ + "'.");
     }
     geometry_msgs::TransformStamped transform;
-    transform.header.stamp = last_pose_;
+    transform.header.stamp = last_poses_.back().stamp;
     transform.header.frame_id = "map";
     transform.child_frame_id = id_;
-    transform.transform = pose_.toTransformMsg();
+    transform.transform = last_poses_.back().pose.toTransformMsg();
     return transform;
 }
 
@@ -72,7 +93,7 @@ visualization_msgs::Marker Entity::toMarker(int id, double lifetime, const std::
     }
     visualization_msgs::Marker marker;
     marker.header.frame_id = "map";
-    marker.header.stamp = last_pose_;
+    marker.header.stamp = last_poses_.back().stamp;
     marker.id = id;
     marker.lifetime = ros::Duration(lifetime);
     switch (shape_.type)
@@ -105,7 +126,7 @@ visualization_msgs::Marker Entity::toMarker(int id, double lifetime, const std::
     marker.color.a = 1.0;
     marker.ns = ns;
     marker.action = marker.ADD;
-    marker.pose = pose_.toPoseMsg();
+    marker.pose = last_poses_.back().pose.toPoseMsg();
     return marker;
 }
 
