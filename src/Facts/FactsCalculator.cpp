@@ -101,13 +101,15 @@ bool FactsCalculator::isInHand(Agent* agent)
   if(agent->getLeftHand()->isEmpty() == false)
   {
     res = true;
-    facts_.emplace_back(agent->getId(), "hasInLeftHand", agent->getLeftHand()->getInHand());
+    for(auto& object_name : agent->getLeftHand()->getInHand())
+      facts_.emplace_back(agent->getId(), "hasInLeftHand", object_name);
   }
 
   if(agent->getRightHand()->isEmpty() == false)
   {
     res = true;
-    facts_.emplace_back(agent->getId(), "hasInRightHand", agent->getRightHand()->getInHand());
+    for(auto& object_name : agent->getRightHand()->getInHand())
+      facts_.emplace_back(agent->getId(), "hasInRightHand", object_name);
   }
 
   return res;
