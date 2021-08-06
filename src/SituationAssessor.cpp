@@ -143,13 +143,13 @@ void SituationAssessor::assess()
                                                                  human.second->getFieldOfView().getRatio(),
                                                                  human.second->getFieldOfView().getClipNear(),
                                                                  human.second->getFieldOfView().getClipFar());
-      Pose target_pose = human.second->getHead()->pose() * Pose({0,0,1}, {0,0,0,1});
+      Pose target_pose = human.second->getHead()->pose() * Pose({1,0,0}, {0,0,0,1});
       auto head_pose_trans = human.second->getHead()->pose().arrays().first;
       auto target_pose_trans = target_pose.arrays().first;
       auto view_matrix = bullet_client_->computeViewMatrix({(float)head_pose_trans[0], (float)head_pose_trans[1], (float)head_pose_trans[2]},
                                                            {(float)target_pose_trans[0], (float)target_pose_trans[1], (float)target_pose_trans[2]},
                                                            {0.,0.,1.});
-      auto images = bullet_client_->getCameraImage(200*human.second->getFieldOfView().getRatio(), 200, view_matrix, proj_matrix, owds::BULLET_HARDWARE_OPENGL);
+      auto images = bullet_client_->getCameraImage(175*human.second->getFieldOfView().getRatio(), 175, view_matrix, proj_matrix, owds::BULLET_HARDWARE_OPENGL);
 
       ros_sender_->sendImage(human.first + "/view", images);
       agents_segmentation_ids[human.first] = getSegmentationIds(images);
