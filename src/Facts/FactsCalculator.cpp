@@ -12,10 +12,14 @@ std::vector<Fact> FactsCalculator::computeFacts(const std::map<std::string, Obje
   {
     if(obj_from.second->isInHand())
       continue;
+    else if(obj_from.second->isStatic())
+      continue;
 
     for(auto& obj_to : objects)
     {
       if(obj_to.second->isInHand())
+        continue;
+      else if(obj_to.second->isStatic())
         continue;
 
       if(obj_from.first != obj_to.first)
@@ -32,6 +36,9 @@ std::vector<Fact> FactsCalculator::computeFacts(const std::map<std::string, Obje
     isInHand(agent_from.second);
     for (auto& obj: objects)
     {
+      if(obj.second->isStatic())
+        continue;
+        
       auto image_it = segmantation_ids.find(agent_from.first);
       if(image_it != segmantation_ids.end())
         isLookingAt(agent_from.second, image_it->second, obj.second);
@@ -100,19 +107,21 @@ bool FactsCalculator::overlapXY(const struct aabb_t& aabb_1, const struct aabb_t
 bool FactsCalculator::isInHand(Agent* agent)
 {
   bool res = false;
-  if(agent->getLeftHand()->isEmpty() == false)
-  {
-    res = true;
-    for(auto& object_name : agent->getLeftHand()->getInHand())
-      facts_.emplace_back(agent->getId(), "hasInLeftHand", object_name);
-  }
+  if(agent->getLeftHand() != nullptr)
+    if(agent->getLeftHand()->isEmpty() == false)
+    {
+      res = true;
+      for(auto& object_name : agent->getLeftHand()->getInHand())
+        facts_.emplace_back(agent->getId(), "hasInLeftHand", object_name);
+    }
 
-  if(agent->getRightHand()->isEmpty() == false)
-  {
-    res = true;
-    for(auto& object_name : agent->getRightHand()->getInHand())
-      facts_.emplace_back(agent->getId(), "hasInRightHand", object_name);
-  }
+  if(agent->getRightHand() != nullptr)
+    if(agent->getRightHand()->isEmpty() == false)
+    {
+      res = true;
+      for(auto& object_name : agent->getRightHand()->getInHand())
+        facts_.emplace_back(agent->getId(), "hasInRightHand", object_name);
+    }
 
   return res;
 }
