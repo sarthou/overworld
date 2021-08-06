@@ -7,11 +7,18 @@
 
 #include "overworld/Geometry/Pose.h"
 #include "overworld/BasicTypes/Shape.h"
+#include "overworld/Utility/CircularBuffer.h"
 
 #include <geometry_msgs/TransformStamped.h>
 #include <visualization_msgs/Marker.h>
 
 namespace owds {
+
+struct PoseStamped_s
+{
+    Pose pose;
+    ros::Time stamp;
+};
 
 class Entity
 {
@@ -25,7 +32,7 @@ public:
     void unsetPose() { is_located_ = false; }
     bool isLocated() const { return is_located_; }
     const Pose& pose() const;
-    ros::Time lastStamp() const { return last_pose_; }
+    ros::Time lastStamp() const { return last_poses_.back().stamp; }
 
     void setId(const std::string& id, bool is_true_id = true);
     std::string id() const { return id_; }
@@ -49,8 +56,7 @@ public:
 protected:
     std::string id_;
     bool is_true_id_;
-    Pose pose_;
-    ros::Time last_pose_;
+    CircularBuffer<PoseStamped_s, 10> last_poses_;
     bool is_located_;
     int bullet_id_;
     Shape_t shape_;
