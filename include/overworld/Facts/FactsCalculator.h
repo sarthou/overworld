@@ -3,6 +3,7 @@
 
 #include <map>
 #include <string>
+#include <unordered_set>
 
 #include "overworld/BasicTypes/Object.h"
 #include "overworld/BasicTypes/Agent.h"
@@ -26,7 +27,7 @@ private:
   bool isInHand(Agent* agent);
   bool isPerceiving(Agent* agent_perceiving, Agent* agent_perceived);
 
-  bool isLookingAt(Agent* agent/*, segmentation_image*/);
+  bool isLookingAt(Agent* agent, std::unordered_set<int>& seen_bullet_ids, const Object* object);
 };
 
 } // namespace owds

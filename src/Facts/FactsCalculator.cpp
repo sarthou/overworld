@@ -29,7 +29,11 @@ std::vector<Fact> FactsCalculator::computeFacts(const std::map<std::string, Obje
   for(auto& agent_from : agents)
   {
     isInHand(agent_from.second);
-    isLookingAt(agent_from.second);
+    for (auto& obj: objects)
+    {
+      std::unordered_set<int> seen_bullet_ids({});
+      isLookingAt(agent_from.second, seen_bullet_ids, obj.second);
+    }
     for(auto& agent_to : agents)
     {
       if(agent_from.first != agent_to.first)
@@ -111,11 +115,53 @@ bool FactsCalculator::isInHand(Agent* agent)
 
 bool FactsCalculator::isPerceiving(Agent* agent_perceiving, Agent* agent_perceived)
 {
+  if (agent_perceiving->getHead() == nullptr || agent_perceiving->getHead()->isLocated() == false){
+    return false;
+  }
+  Pose head_pose = agent_perceiving->getHead()->pose();
+  if (agent_perceived->getHead() != nullptr && agent_perceived->getHead()->isLocated()){
+    if (agent_perceived->getFieldOfView().hasIn(agent_perceived->getHead()->pose().transformIn(head_pose))){
+      facts_.emplace_back(agent_perceiving->getId(), "isPerceiving", agent_perceived->getId());
+      return true;
+    }
+  }
+
+  if (agent_perceived->getLeftHand() != nullptr && agent_perceived->getLeftHand()->isLocated()){
+    if (agent_perceived->getFieldOfView().hasIn(agent_perceived->getLeftHand()->pose().transformIn(head_pose))){
+      facts_.emplace_back(agent_perceiving->getId(), "isPerceiving", agent_perceived->getId());
+      return true;
+    }
+  }
+
+  if (agent_perceived->getRightHand() != nullptr && agent_perceived->getRightHand()->isLocated()){
+    if (agent_perceived->getFieldOfView().hasIn(agent_perceived->getRightHand()->pose().transformIn(head_pose))){
+      facts_.emplace_back(agent_perceiving->getId(), "isPerceiving", agent_perceived->getId());
+      return true;
+    }
+  }
+
+  if (agent_perceived->getTorso() != nullptr && agent_perceived->getTorso()->isLocated()){
+    if (agent_perceived->getFieldOfView().hasIn(agent_perceived->getTorso()->pose().transformIn(head_pose))){
+      facts_.emplace_back(agent_perceiving->getId(), "isPerceiving", agent_perceived->getId());
+      return true;
+    }
+  }
+
+  if (agent_perceived->getBase() != nullptr && agent_perceived->getBase()->isLocated()){
+    if (agent_perceived->getFieldOfView().hasIn(agent_perceived->getBase()->pose().transformIn(head_pose))){
+      facts_.emplace_back(agent_perceiving->getId(), "isPerceiving", agent_perceived->getId());      
+      return true;
+    }
+  }
   return false;
 }
 
-bool FactsCalculator::isLookingAt(Agent* agent/*, segmentation_image*/)
+bool FactsCalculator::isLookingAt(Agent* agent, std::unordered_set<int>& seen_bullet_ids, const Object* object)
 {
+  if (seen_bullet_ids.count(object->bulletId())){
+    facts_.emplace_back(agent->getId(), "isLookingAt", object->id());
+    return true;
+  }
   return false;
 }
 
