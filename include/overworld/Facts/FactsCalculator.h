@@ -15,7 +15,8 @@ class FactsCalculator
 {
 public:
   std::vector<Fact> computeFacts(const std::map<std::string, Object*>& objects,
-                                 const std::map<std::string, Agent*>& agents);
+                                 const std::map<std::string, Agent*>& agents,
+                                 const std::unordered_set<int>& segmation_ids);
 
 private:
   std::vector<Fact> facts_;
@@ -27,7 +28,7 @@ private:
   bool isInHand(Agent* agent);
   bool isPerceiving(Agent* agent_perceiving, Agent* agent_perceived);
 
-  bool isLookingAt(Agent* agent, std::unordered_set<int>& seen_bullet_ids, const Object* object);
+  bool isLookingAt(Agent* agent, const std::unordered_set<int>& seen_bullet_ids, const Object* object);
 };
 
 } // namespace owds

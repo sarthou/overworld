@@ -3,7 +3,8 @@
 namespace owds {
 
 std::vector<Fact> FactsCalculator::computeFacts(const std::map<std::string, Object*>& objects,
-                                                const std::map<std::string, Agent*>& agents)
+                                                const std::map<std::string, Agent*>& agents,
+                                                const std::unordered_set<int>& segmation_ids)
 {
   facts_.clear();
 
@@ -31,8 +32,7 @@ std::vector<Fact> FactsCalculator::computeFacts(const std::map<std::string, Obje
     isInHand(agent_from.second);
     for (auto& obj: objects)
     {
-      std::unordered_set<int> seen_bullet_ids({});
-      isLookingAt(agent_from.second, seen_bullet_ids, obj.second);
+      isLookingAt(agent_from.second, segmation_ids, obj.second);
     }
     for(auto& agent_to : agents)
     {
@@ -158,7 +158,7 @@ bool FactsCalculator::isPerceiving(Agent* agent_perceiving, Agent* agent_perceiv
   return false;
 }
 
-bool FactsCalculator::isLookingAt(Agent* agent, std::unordered_set<int>& seen_bullet_ids, const Object* object)
+bool FactsCalculator::isLookingAt(Agent* agent, const std::unordered_set<int>& seen_bullet_ids, const Object* object)
 {
   if (seen_bullet_ids.count(object->bulletId())){
     facts_.emplace_back(agent->getId(), "isLookingAt", object->id());
