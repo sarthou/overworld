@@ -1,5 +1,7 @@
 #include "overworld/Perception/ObjectsPerceptionManager.h"
 
+#include "overworld/BasicTypes/Hand.h"
+
 #define TO_HALF_RAD M_PI / 180. / 2.
 
 namespace owds {
