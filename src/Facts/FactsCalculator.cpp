@@ -44,17 +44,69 @@ std::vector<Fact> FactsCalculator::computeFacts(const std::map<std::string, Obje
 
 bool FactsCalculator::isOnTopfOf(Object* object_under, Object* object_on)
 {
-  return false;
+  if((object_under->isAabbValid() == false) || (object_on->isAabbValid() == false))
+    return false;
+  else if(overlapXY(object_under->getAabb(), object_on->getAabb()) == false)
+    return false;
+  else if(std::abs(object_under->getAabb().max[2] - object_on->getAabb().min[2]) > 0.04)
+    return false;
+  else
+  {
+    facts_.emplace_back(object_on->id(), "isOnTopOf", object_under->id());
+    return true;
+  }
 }
 
 bool FactsCalculator::isInContainer(Object* object_around, Object* object_in)
 {
-  return false;
+  if((object_around->isAabbValid() == false) || (object_in->isAabbValid() == false))
+    return false;
+  else if(object_around->getAabb().min[2] - 0.04 > object_in->getAabb().min[2])
+    return false;
+  else if(object_around->getAabb().max[2] + 0.04 < object_in->getAabb().max[2])
+    return false;
+  else if((object_around->getAabb().min[0] > object_in->getAabb().min[0]) || 
+          (object_around->getAabb().min[1] > object_in->getAabb().min[1]))
+    return false;
+  else if((object_around->getAabb().max[0] < object_in->getAabb().max[0]) || 
+          (object_around->getAabb().max[1] < object_in->getAabb().max[1]))
+    return false;
+  else
+  {
+    facts_.emplace_back(object_in->id(), "isInContainer", object_around->id());
+    return true;
+  }
+}
+
+bool FactsCalculator::overlapXY(const struct aabb_t& aabb_1, const struct aabb_t& aabb_2)
+{
+  if((aabb_1.min[0] == aabb_1.max[0]) || (aabb_1.min[1] == aabb_1.max[1]) ||
+     (aabb_2.min[0] == aabb_2.max[0]) || (aabb_2.min[1] == aabb_2.max[1]))
+     return false;
+  else if((aabb_1.min[0] >= aabb_2.max[0]) || (aabb_2.min[0] >= aabb_1.max[0]))
+    return false;
+  else if((aabb_1.min[1] >= aabb_2.max[1]) || (aabb_2.min[1] >= aabb_1.max[1]))
+    return false;
+  else
+    return true;
 }
 
 bool FactsCalculator::isInHand(Agent* agent)
 {
-  return false;
+  bool res = false;
+  if(agent->getLeftHand()->isEmpty() == false)
+  {
+    res = true;
+    facts_.emplace_back(agent->getId(), "hasInLeftHand", agent->getLeftHand()->getInHand());
+  }
+
+  if(agent->getRightHand()->isEmpty() == false)
+  {
+    res = true;
+    facts_.emplace_back(agent->getId(), "hasInRightHand", agent->getRightHand()->getInHand());
+  }
+
+  return res;
 }
 
 bool FactsCalculator::isPerceiving(Agent* agent_perceiving, Agent* agent_perceived)
@@ -68,54 +120,3 @@ bool FactsCalculator::isLookingAt(Agent* agent/*, segmentation_image*/)
 }
 
 } // namespace owds
-
-/*
-def is_on_top(bb1, bb2):
-    """ For obj 1 to be on top of obj 2:
-         - obj1 must be above obj 2
-         - the bottom of obj 1 must be close to the top of obj 2
-    """
-    bb1_min, _ = bb1
-    _, bb2_max = bb2
-
-    x1,y1,z1 = bb1_min
-    x2,y2,z2 = bb2_max
-    return z1 < z2 + ONTOP_EPSILON and is_above(bb1, bb2)
-
-def is_above(bb1, bb2):
-    """ For obj 1 to be above obj 2:
-         - the bottom of its bounding box must be higher that
-           the top of obj 2's bounding box
-         - the bounding box footprint of both objects must overlap
-    """
-
-    bb1_min, _ = bb1
-    _, bb2_max = bb2
-
-    x1,y1,z1 = bb1_min
-    x2,y2,z2 = bb2_max
-    if z1 < z2 - ISABOVE_EPSILON:
-        return False
-
-    return overlap(bb_footprint(bb1),
-                   bb_footprint(bb2))
-
-
-def bb_footprint(bb):
-    """ Returns a rectangle that defines the bottom face of a bounding box
-    """
-    x1,y1,z1 = bb[0]
-    x2,y2,z2 = bb[1]
-
-    return (x1,y1), (x2,y2)
-
-def overlap(bbox_a, bbox_b):
-    """Returns the overlap ratio"""
-    xa = int(max(bbox_a.xmin, bbox_b.xmin))
-    ya = int(max(bbox_a.ymin, bbox_b.ymin))
-    xb = int(min(bbox_a.xmax, bbox_b.xmax))
-    yb = int(min(bbox_a.ymax, bbox_b.ymax))
-    intersection_area = (max(0, xb-xa+1)*max(0, yb-ya+1))
-    return intersection_area / bbox_a.area()
-
-*/

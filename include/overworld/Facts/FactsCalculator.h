@@ -21,6 +21,7 @@ private:
 
   bool isOnTopfOf(Object* object_under, Object* object_on);
   bool isInContainer(Object* object_around, Object* object_in);
+  bool overlapXY(const struct aabb_t& aabb_1, const struct aabb_t& aabb_2);
 
   bool isInHand(Agent* agent);
   bool isPerceiving(Agent* agent_perceiving, Agent* agent_perceived);
