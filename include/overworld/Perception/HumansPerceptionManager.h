@@ -10,11 +10,14 @@ namespace owds {
 class HumansPerceptionManager : public EntitiesPerceptionManager<BodyPart>
 {
 public:
-  inline HumansPerceptionManager(): EntitiesPerceptionManager(){}
+  HumansPerceptionManager(): EntitiesPerceptionManager(){}
+  ~HumansPerceptionManager();
+  
   Agent* getAgent(const std::string& agent_name);
+  std::map<std::string, Agent*> getAgents() { return agents_; }
 
 private:
-  std::map<std::string, Agent> agents_;
+  std::map<std::string, Agent*> agents_;
 
   void getPercepts(const std::map<std::string, BodyPart>& percepts) override;
 
