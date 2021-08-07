@@ -140,7 +140,8 @@ add_library(${PROJECT_NAME}_perception_lib STATIC
   src/Perception/Modalities/ArTrackPerceptionModule.cpp
   src/Perception/Modalities/StaticObjectsPerceptionModule.cpp
   src/Perception/Modalities/OptitrackPerceptionModule.cpp
-  src/SituationAssessor.cpp
+  src/Perception/Modalities/ObjectsEmulatedPerceptionModule.cpp
+  src/Perception/Modalities/HumansEmulatedPerceptionModule.cpp
 )
 target_link_libraries(${PROJECT_NAME}_perception_lib PUBLIC
                       ${catkin_LIBRARIES}
