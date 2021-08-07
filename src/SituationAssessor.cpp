@@ -4,6 +4,8 @@
 #include "overworld/Perception/Modalities/PR2JointsPerception.h"
 #include "overworld/Perception/Modalities/StaticObjectsPerceptionModule.h"
 #include "overworld/Perception/Modalities/OptitrackPerceptionModule.h"
+#include "overworld/Perception/Modalities/ObjectsEmulatedPerceptionModule.h"
+#include "overworld/Perception/Modalities/HumansEmulatedPerceptionModule.h"
 
 #include <chrono>
 #include <thread>
@@ -37,24 +39,30 @@ SituationAssessor::SituationAssessor(const std::string& agent_name, bool is_robo
 
   if(is_robot_)
   {
-    auto pr2_joint_perception =  new PR2JointsPerception(&n_, agent_name, 
-                                                         {{"r_gripper_tool_frame", owds::BODY_PART_RIGHT_HAND}, {"l_gripper_tool_frame", owds::BODY_PART_LEFT_HAND}, {"head_mount_kinect2_rgb_optical_frame", owds::BODY_PART_HEAD}},
-                                                         bullet_client_, 0.09);
-    robots_manager_.addPerceptionModule("pr2_joints", pr2_joint_perception);
     myself_agent_ = robots_manager_.getAgent(agent_name);
-
-    objects_manager_.setOwnerAgent(myself_agent_);
+    
     auto ar_track_perception = new ArTrackPerceptionModule(&n_, myself_agent_);
     objects_manager_.addPerceptionModule("ar_track", ar_track_perception);
-    auto static_perception = new StaticObjectsPerceptionModule();
-    //static_perception->activate(false);
-    objects_manager_.addPerceptionModule("static", static_perception);
-
+    
     auto optitrack_perception = new OptitrackPerceptionModule(&n_, "human_0", {6.4868, 2.8506, 0});
     humans_manager_.addPerceptionModule("optitrack", optitrack_perception);
-
-    ros_sender_ = new ROSSender(&n_);
   }
+  else
+  {
+    myself_agent_ = humans_manager_.getAgent(agent_name);
+  }
+
+  objects_manager_.setOwnerAgent(myself_agent_);
+
+  auto static_perception = new StaticObjectsPerceptionModule();
+  objects_manager_.addPerceptionModule("static", static_perception);
+
+  auto pr2_joint_perception =  new PR2JointsPerception(&n_, agent_name, 
+                                                         {{"r_gripper_tool_frame", owds::BODY_PART_RIGHT_HAND}, {"l_gripper_tool_frame", owds::BODY_PART_LEFT_HAND}, {"head_mount_kinect2_rgb_optical_frame", owds::BODY_PART_HEAD}},
+                                                         bullet_client_, 0.09);
+  robots_manager_.addPerceptionModule("pr2_joints", pr2_joint_perception);
+
+  ros_sender_ = new ROSSender(&n_);
 }
 
 SituationAssessor::~SituationAssessor()
@@ -84,6 +92,21 @@ void SituationAssessor::run()
   }
 
   assessment_thread.join();
+}
+
+void SituationAssessor::addObjectPerceptionModule(const std::string& module_name, PerceptionModuleBase_<Object>* module)
+{
+  objects_manager_.addPerceptionModule(module_name, module);
+}
+
+void SituationAssessor::addHumanPerceptionModule(const std::string& module_name, PerceptionModuleBase_<BodyPart>* module)
+{
+  humans_manager_.addPerceptionModule(module_name, module);
+}
+
+void SituationAssessor::addRobotPerceptionModule(const std::string& module_name, PerceptionModuleBase_<BodyPart>* module)
+{
+  robots_manager_.addPerceptionModule(module_name, module);
 }
 
 void SituationAssessor::assessmentLoop()
@@ -153,6 +176,8 @@ void SituationAssessor::assess()
 
       ros_sender_->sendImage(human.first + "/view", images);
       agents_segmentation_ids[human.first] = getSegmentationIds(images);
+
+      updateHumansPerspective(human.first, objects, body_parts, agents_segmentation_ids[human.first]);
     }
   }
 
@@ -176,6 +201,50 @@ std::unordered_set<int> SituationAssessor::getSegmentationIds(const b3CameraImag
     segmentation_ids.insert(image.m_segmentationMaskValues[i]);
 
   return segmentation_ids;
+}
+
+void SituationAssessor::updateHumansPerspective(const std::string& human_name,
+                                                const std::map<std::string, Object*>& objects,
+                                                const std::map<std::string, BodyPart*>& humans,
+                                                const std::unordered_set<int>& segmented_ids)
+{
+  auto assessor_it = humans_assessors_.find(human_name);
+  if(assessor_it == humans_assessors_.end())
+    assessor_it = createHumanAssessor(human_name);
+
+  std::vector<Object*> seen_objects;
+  for(auto object : objects)
+  {
+    if(segmented_ids.find(object.second->bulletId()) != segmented_ids.end())
+      seen_objects.push_back(object.second);
+  }
+
+  std::vector<BodyPart*> seen_humans;
+  for(auto body_part : humans)
+  {
+    if(body_part.second->getAgentName() == human_name)
+      seen_humans.push_back(body_part.second);
+    else if(segmented_ids.find(body_part.second->bulletId()) != segmented_ids.end())
+      seen_humans.push_back(body_part.second);
+  }
+
+  assessor_it->second.objects_module->sendPerception(seen_objects);
+  assessor_it->second.humans_module->sendPerception(seen_humans);
+}
+
+std::map<std::string, HumanAssessor_t>::iterator SituationAssessor::createHumanAssessor(const std::string& human_name)
+{
+  auto assessor = humans_assessors_.insert(std::make_pair(human_name, HumanAssessor_t())).first;
+
+  assessor->second.assessor = new SituationAssessor(human_name);
+  assessor->second.objects_module = new ObjectsEmulatedPerceptionModule();
+  assessor->second.humans_module = new HumansEmulatedPerceptionModule();
+  assessor->second.assessor->addObjectPerceptionModule("emulated_objects", assessor->second.objects_module);
+  assessor->second.assessor->addHumanPerceptionModule("emulated_humans", assessor->second.humans_module);
+  std::thread th(&SituationAssessor::run, assessor->second.assessor);
+  assessor->second.thread = std::move(th);
+
+  return assessor;
 }
 
 }
