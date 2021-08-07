@@ -15,6 +15,8 @@ std::vector<Fact> FactsCalculator::computeFacts(const std::map<std::string, Obje
     else if(obj_from.second->isStatic())
       continue;
 
+    bool is_in = false;
+
     for(auto& obj_to : objects)
     {
       if(obj_to.second->isInHand())
@@ -23,12 +25,20 @@ std::vector<Fact> FactsCalculator::computeFacts(const std::map<std::string, Obje
         continue;
 
       if(obj_from.first != obj_to.first)
-      {
-        bool is_in = isInContainer(obj_to.second, obj_from.second);
-        if(is_in == false)
-          isOnTopfOf(obj_to.second, obj_from.second);
-      }
+        is_in = is_in || isInContainer(obj_to.second, obj_from.second);
     }
+
+    if(is_in == false)
+      for(auto& obj_to : objects)
+      {
+        if(obj_to.second->isInHand())
+          continue;
+        else if(obj_to.second->isStatic())
+          continue;
+
+        if(obj_from.first != obj_to.first)
+            isOnTopfOf(obj_to.second, obj_from.second);
+      }
   }
 
   for(auto& agent_from : agents)
