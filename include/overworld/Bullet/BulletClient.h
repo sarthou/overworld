@@ -7,6 +7,7 @@
 #include <array>
 #include <vector>
 #include <unordered_map>
+#include <unordered_set>
 #include <mutex>
 
 namespace owds {
@@ -145,6 +146,8 @@ public:
                                             std::array<float, 16>& projection_matrix,
                                             Renderer_e renderer,
                                             int flags = -1);
+
+    std::unordered_set<int> getSegmentationIds(const b3CameraImageData& image);
 
     long addUserDebugLine(const std::array<double, 3>& xyz_from,
                           const std::array<double, 3>& xyz_to,

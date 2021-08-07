@@ -75,8 +75,6 @@ private:
   void assessmentLoop();
   void assess();
 
-  std::unordered_set<int> getSegmentationIds(const b3CameraImageData& image);
-
   void updateHumansPerspective(const std::string& human_name,
                                const std::map<std::string, Object*>& objects,
                                const std::map<std::string, BodyPart*>& humans,

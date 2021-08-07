@@ -175,7 +175,7 @@ void SituationAssessor::assess()
       auto images = bullet_client_->getCameraImage(175*human.second->getFieldOfView().getRatio(), 175, view_matrix, proj_matrix, owds::BULLET_HARDWARE_OPENGL);
 
       ros_sender_->sendImage(human.first + "/view", images);
-      agents_segmentation_ids[human.first] = getSegmentationIds(images);
+      agents_segmentation_ids[human.first] = bullet_client_->getSegmentationIds(images);
 
       updateHumansPerspective(human.first, objects, body_parts, agents_segmentation_ids[human.first]);
     }
@@ -192,15 +192,6 @@ void SituationAssessor::assess()
   else
     ros_sender_->sendEntitiesToRViz(myself_agent_->getId() + "/objects_markers", objects);
   ros_sender_->sendEntitiesToRViz(myself_agent_->getId() + "/humans_markers", body_parts);
-}
-
-std::unordered_set<int> SituationAssessor::getSegmentationIds(const b3CameraImageData& image)
-{
-  std::unordered_set<int> segmentation_ids;
-  for(size_t i = 0; i < image.m_pixelHeight*image.m_pixelWidth; i++)
-    segmentation_ids.insert(image.m_segmentationMaskValues[i]);
-
-  return segmentation_ids;
 }
 
 void SituationAssessor::updateHumansPerspective(const std::string& human_name,

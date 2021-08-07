@@ -524,6 +524,15 @@ struct b3CameraImageData BulletClient::getCameraImage(int width, int height,
 	return image_data_empty;
 }
 
+std::unordered_set<int> BulletClient::getSegmentationIds(const b3CameraImageData& image)
+{
+  std::unordered_set<int> segmentation_ids;
+  for(size_t i = 0; i < image.m_pixelHeight*image.m_pixelWidth; i++)
+    segmentation_ids.insert(image.m_segmentationMaskValues[i]);
+
+  return segmentation_ids;
+}
+
 void BulletClient::configureDebugVisualizer(b3ConfigureDebugVisualizerEnum flag, bool enable)
 {
     std::lock_guard<std::mutex> lock(mutex_);

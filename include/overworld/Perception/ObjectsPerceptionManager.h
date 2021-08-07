@@ -22,6 +22,7 @@ private:
 
   std::vector<PointOfInterest> getPoisInFov(Object* object);
   bool shouldBeSeen(Object* object, const std::vector<PointOfInterest>& pois);
+  std::unordered_set<int> getObjectsInCamera();
 };
 
 } // namespace owds
