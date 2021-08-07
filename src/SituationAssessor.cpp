@@ -57,7 +57,7 @@ SituationAssessor::SituationAssessor(const std::string& agent_name, bool is_robo
   auto static_perception = new StaticObjectsPerceptionModule();
   objects_manager_.addPerceptionModule("static", static_perception);
 
-  auto pr2_joint_perception =  new PR2JointsPerception(&n_, agent_name, 
+  auto pr2_joint_perception =  new PR2JointsPerception(&n_, "pr2_robot",  // TODO how to avoid fix name ? 
                                                          {{"r_gripper_tool_frame", owds::BODY_PART_RIGHT_HAND}, {"l_gripper_tool_frame", owds::BODY_PART_LEFT_HAND}, {"head_mount_kinect2_rgb_optical_frame", owds::BODY_PART_HEAD}},
                                                          bullet_client_, 0.09);
   robots_manager_.addPerceptionModule("pr2_joints", pr2_joint_perception);
