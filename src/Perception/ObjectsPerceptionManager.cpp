@@ -53,24 +53,44 @@ void ObjectsPerceptionManager::reasoningOnUpdate()
     {
       if(object.second->getNbFrameUnseen() >= 5)
       {
-        auto pois_in_fov = getPoisInFov(object.second);
-        if(pois_in_fov.size() != 0)
+        if(object.second->getPointsOfInterest().size() != 0)
         {
-          if(shouldBeSeen(object.second, pois_in_fov))
+          auto pois_in_fov = getPoisInFov(object.second);
+          if(pois_in_fov.size() != 0)
           {
-            auto it_unseen = lost_objects_nb_frames_.find(object.first);
-            if(it_unseen == lost_objects_nb_frames_.end())
-              it_unseen = lost_objects_nb_frames_.insert(std::make_pair<std::string, size_t>(object.second->id(), size_t(0))).first;
-            it_unseen->second++;
-            if(it_unseen->second > 5)
+            if(shouldBeSeen(object.second, pois_in_fov))
             {
-              removeEntityPose(object.second);
+              auto it_unseen = lost_objects_nb_frames_.find(object.first);
+              if(it_unseen == lost_objects_nb_frames_.end())
+                it_unseen = lost_objects_nb_frames_.insert(std::make_pair<std::string, size_t>(object.second->id(), size_t(0))).first;
+              it_unseen->second++;
+              if(it_unseen->second > 5)
+              {
+                removeEntityPose(object.second);
+              }
             }
           }
+        }
+        else
+        {
+          // Object has no poi
+          no_data_objects.push_back(object.second);
         }
       }
     }
   }
+
+  if(no_data_objects.size())
+  {
+    auto objects_in_camera = getObjectsInCamera();
+
+    for(auto no_data_obj : no_data_objects)
+    {
+      if(objects_in_camera.find(no_data_obj->bulletId()) != objects_in_camera.end())
+        removeEntityPose(no_data_obj);
+    }
+  }
+
   UpdateAabbs();
 }
 
@@ -146,6 +166,30 @@ bool ObjectsPerceptionManager::shouldBeSeen(Object* object, const std::vector<Po
   }
 
   return false;
+}
+
+std::unordered_set<int> ObjectsPerceptionManager::getObjectsInCamera()
+{
+  if(myself_agent_ == nullptr)
+    return {};
+  else if(myself_agent_->getHead() == nullptr)
+    return {};
+  else if(myself_agent_->getHead()->isLocated() == false)
+    return {};
+
+  auto proj_matrix = bullet_client_->computeProjectionMatrix(myself_agent_->getFieldOfView().getHeight(),
+                                                              myself_agent_->getFieldOfView().getRatio(),
+                                                              myself_agent_->getFieldOfView().getClipNear(),
+                                                              myself_agent_->getFieldOfView().getClipFar());
+  Pose target_pose = myself_agent_->getHead()->pose() * Pose({1,0,0}, {0,0,0,1});
+  auto head_pose_trans = myself_agent_->getHead()->pose().arrays().first;
+  auto target_pose_trans = target_pose.arrays().first;
+  auto view_matrix = bullet_client_->computeViewMatrix({(float)head_pose_trans[0], (float)head_pose_trans[1], (float)head_pose_trans[2]},
+                                                        {(float)target_pose_trans[0], (float)target_pose_trans[1], (float)target_pose_trans[2]},
+                                                        {0.,0.,1.});
+  auto images = bullet_client_->getCameraImage(175*myself_agent_->getFieldOfView().getRatio(), 175, view_matrix, proj_matrix, owds::BULLET_HARDWARE_OPENGL);
+
+  return bullet_client_->getSegmentationIds(images);
 }
 
 } // namespace owds
