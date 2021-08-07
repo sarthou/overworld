@@ -13,6 +13,7 @@ bool ObjectsEmulatedPerceptionModule::perceptionCallback(const std::vector<Objec
     if(percept_it == percepts_.end())
       percept_it =  createNewPercept(object);
     percept_it->second.updatePose(object->pose());
+    percept_it->second.setSeen();
   }
 
   return true;
