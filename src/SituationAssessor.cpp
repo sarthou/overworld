@@ -86,9 +86,16 @@ void SituationAssessor::run()
   std::thread assessment_thread(&SituationAssessor::assessmentLoop, this);
   run_ = true;
 
-  while(ros::ok())
+  while(ros::ok() && isRunning())
   {
     callback_queue_.callAvailable(ros::WallDuration(0.1));
+  }
+
+  for(auto& human_assessor : humans_assessors_)
+  {
+    human_assessor.second.assessor->stop();
+    human_assessor.second.thread.join();
+    delete human_assessor.second.assessor;
   }
 
   assessment_thread.join();
@@ -111,7 +118,7 @@ void SituationAssessor::addRobotPerceptionModule(const std::string& module_name,
 
 void SituationAssessor::assessmentLoop()
 {
-  std::chrono::milliseconds interval(90);
+  std::chrono::milliseconds interval(100);
 
   std::chrono::high_resolution_clock::time_point start_time(std::chrono::high_resolution_clock::now());
   std::chrono::high_resolution_clock::time_point next_start_time(start_time);
@@ -127,7 +134,7 @@ void SituationAssessor::assessmentLoop()
       if(start_time + interval < std::chrono::high_resolution_clock::now())
       {
         auto delta = std::chrono::high_resolution_clock::now() - (start_time + interval);
-        ShellDisplay::warning("[SituationAssessor] The main loop is late of " + std::to_string(delta.count() / 1000000.) + " ms");
+        ShellDisplay::warning("[SituationAssessor] [" + agent_name_ + "] The main loop is late of " + std::to_string(delta.count() / 1000000.) + " ms");
       }
       else
       {
@@ -206,8 +213,9 @@ void SituationAssessor::updateHumansPerspective(const std::string& human_name,
   std::vector<Object*> seen_objects;
   for(auto object : objects)
   {
-    if(segmented_ids.find(object.second->bulletId()) != segmented_ids.end())
-      seen_objects.push_back(object.second);
+    if(object.second->isStatic() == false)
+      if(segmented_ids.find(object.second->bulletId()) != segmented_ids.end())
+        seen_objects.push_back(object.second);
   }
 
   std::vector<BodyPart*> seen_humans;
