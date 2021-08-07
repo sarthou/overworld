@@ -103,6 +103,10 @@ include_directories(
 )
 add_definitions( ${EIGEN3_DEFINITIONS} )
 
+#################
+#   Libraries   #
+#################
+
 add_library(Bullet3 INTERFACE)
 target_include_directories(Bullet3 INTERFACE ${BULLET_INCLUDE_DIRS})
 target_link_libraries(Bullet3 INTERFACE
@@ -122,8 +126,11 @@ add_library(${PROJECT_NAME}_types_lib STATIC
   src/BasicTypes/Entity.cpp
   src/BasicTypes/BodyPart.cpp
   src/BasicTypes/Object.cpp
+  src/BasicTypes/Hand.cpp
 )
-target_link_libraries(${PROJECT_NAME}_types_lib PUBLIC ${catkin_LIBRARIES})
+target_link_libraries(${PROJECT_NAME}_types_lib PUBLIC
+                      ${catkin_LIBRARIES}
+                      ${PROJECT_NAME}_bullet_lib)
 
 add_library(${PROJECT_NAME}_perception_lib STATIC
   src/Perception/RobotsPerceptionManager.cpp
@@ -140,6 +147,16 @@ target_link_libraries(${PROJECT_NAME}_perception_lib PUBLIC
                       ${PROJECT_NAME}_bullet_lib
                       ${PROJECT_NAME}_types_lib)
 
+add_library(${PROJECT_NAME}_facts_lib STATIC
+  src/Facts/Publisher/FactsPublisher.cpp
+  src/Facts/Publisher/OntologeniusFactsPublisher.cpp
+  src/Facts/FactsCalculator.cpp
+)
+target_link_libraries(${PROJECT_NAME}_facts_lib PUBLIC
+                      ${catkin_LIBRARIES}
+                      ${PROJECT_NAME}_bullet_lib
+                      ${PROJECT_NAME}_types_lib)
+           
 add_library(${PROJECT_NAME}_sender_lib STATIC
   src/Senders/ROSSender.cpp
 )
@@ -147,6 +164,22 @@ target_link_libraries(${PROJECT_NAME}_sender_lib PUBLIC
                       ${catkin_LIBRARIES}
                       Bullet3 # For b3CameraImage
                       ${PROJECT_NAME}_types_lib)
+
+#################
+#     Nodes     #
+#################
+
+add_executable(${PROJECT_NAME}_node src/Nodes/overworld.cpp src/SituationAssessor.cpp)
+target_link_libraries(${PROJECT_NAME}_node PRIVATE
+                      ${PROJECT_NAME}_perception_lib
+                      ${PROJECT_NAME}_sender_lib
+                      ${PROJECT_NAME}_facts_lib
+                      ${catkin_LIBRARIES})
+add_dependencies(${PROJECT_NAME}_node overworld_gencpp)
+
+#################
+#  Test files   #
+#################
 
 add_executable(${PROJECT_NAME}_bullet_test src/TestFiles/bullet_test.cpp )
 target_link_libraries(${PROJECT_NAME}_bullet_test PRIVATE
@@ -166,10 +199,3 @@ target_link_libraries(${PROJECT_NAME}_perception_test PRIVATE
                       ${PROJECT_NAME}_perception_lib
                       ${catkin_LIBRARIES})
 add_dependencies(${PROJECT_NAME}_perception_test overworld_gencpp)
-
-add_executable(${PROJECT_NAME}_node src/Nodes/overworld.cpp src/SituationAssessor.cpp)
-target_link_libraries(${PROJECT_NAME}_node PRIVATE
-                      ${PROJECT_NAME}_perception_lib
-                      ${PROJECT_NAME}_sender_lib
-                      ${catkin_LIBRARIES})
-add_dependencies(${PROJECT_NAME}_node overworld_gencpp)

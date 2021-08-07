@@ -160,7 +160,7 @@ public:
     
     void performCollisionDetection();
 
-    struct aabb_t getAABB(int body_id, int link_index);
+    struct aabb_t getAABB(int body_id, int link_index = -1);
     struct b3AABBOverlapData getOverlappingObjects(const struct aabb_t& aabb);
 
     void resetDebugVisualizerCamera(float distance, float yaw, float pitch, const std::array<float,3>& target_pose);

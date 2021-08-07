@@ -19,7 +19,9 @@ class EntitiesPerceptionManager
 {
     static_assert(std::is_base_of<Entity,T>::value, "T must be derived from Entity");
 public:
-    inline EntitiesPerceptionManager(): bullet_client_(nullptr){}
+    EntitiesPerceptionManager(): bullet_client_(nullptr){}
+    virtual ~EntitiesPerceptionManager();
+
     void setBulletClient(BulletClient* client) { bullet_client_ = client; }
 
     void addPerceptionModule(const std::string& module_name, PerceptionModuleBase_<T>* perception_module);
@@ -29,12 +31,12 @@ public:
     std::string getModulesListStr();
     std::string getActivatedModulesListStr();
     void deleteModules();
-    std::map<std::string, T> getEntities() { return entities_; }
+    std::map<std::string, T*> getEntities() { return entities_; }
 
     bool update();
 
 protected:
-    std::map<std::string, T> entities_;
+    std::map<std::string, T*> entities_;
     std::map<std::string, PerceptionModuleBase_<T>* > perception_modules_;
     BulletClient* bullet_client_;
 
@@ -42,12 +44,22 @@ protected:
     virtual void getPercepts(const std::map<std::string, T>& percepts);
     virtual void reasoningOnUpdate() {}
 
-    void updateEntityPose(T& entity, const Pose& pose, const ros::Time& stamp);
-    void removeEntityPose(T& entity);
+    void updateEntityPose(T* entity, const Pose& pose, const ros::Time& stamp);
+    void removeEntityPose(T* entity);
 
-    void addToBullet(T& entity);
-    void updateToBullet(T& entity);
+    void addToBullet(T* entity);
+    void updateToBullet(T* entity);
+
+    void UpdateAabbs();
 };
+
+template<typename T>
+EntitiesPerceptionManager<T>::~EntitiesPerceptionManager()
+{
+    for(auto& entity : entities_)
+        delete entity.second;
+    entities_.clear();
+}
 
 template<typename T>
 void EntitiesPerceptionManager<T>::addPerceptionModule(const std::string& module_name, PerceptionModuleBase_<T>* perception_module)
@@ -146,7 +158,8 @@ void EntitiesPerceptionManager<T>::getPercepts(const std::map<std::string, T>& p
         auto it = entities_.find(percept.second.id());
         if(it == entities_.end())
         {
-            it = entities_.insert(std::pair<std::string, T>(percept.second.id(), percept.second)).first;
+            T* new_entity = new T(percept.second);
+            it = entities_.insert(std::pair<std::string, T*>(percept.second.id(), new_entity)).first;
             addToBullet(it->second);
         }
         
@@ -161,7 +174,7 @@ bool EntitiesPerceptionManager<T>::update()
         return false;
 
     for(auto& entity : entities_)
-        entity.second.setUnseen();
+        entity.second->setUnseen();
 
     for(const auto& module : perception_modules_)
         if(module.second->isActivated() && module.second->hasBeenUpdated())
@@ -173,98 +186,106 @@ bool EntitiesPerceptionManager<T>::update()
 }
 
 template<typename T>
-void EntitiesPerceptionManager<T>::updateEntityPose(T& entity, const Pose& pose, const ros::Time& stamp)
+void EntitiesPerceptionManager<T>::updateEntityPose(T* entity, const Pose& pose, const ros::Time& stamp)
 {
-    entity.updatePose(pose, stamp);
+    entity->updatePose(pose, stamp);
     updateToBullet(entity);
-    entity.setSeen();
+    entity->setSeen();
 }
 
 template<typename T>
-void EntitiesPerceptionManager<T>::removeEntityPose(T& entity)
+void EntitiesPerceptionManager<T>::removeEntityPose(T* entity)
 {
-    entity.unsetPose();
+    entity->unsetPose();
     updateToBullet(entity);
 }
 
 template<typename T>
-void EntitiesPerceptionManager<T>::addToBullet(T& entity)
+void EntitiesPerceptionManager<T>::addToBullet(T* entity)
 {
     int visual_id = -1;
     int collision_id = -1;
 
-    switch(entity.getShape().type)
+    switch(entity->getShape().type)
     {
         case SHAPE_CUBE:
         {
-            visual_id = bullet_client_->createVisualShapeBox(entity.getShape().scale,
-                                                             {entity.getShape().color[0],
-                                                              entity.getShape().color[1],
-                                                              entity.getShape().color[2],
+            visual_id = bullet_client_->createVisualShapeBox(entity->getShape().scale,
+                                                             {entity->getShape().color[0],
+                                                              entity->getShape().color[1],
+                                                              entity->getShape().color[2],
                                                               1});
-            collision_id = bullet_client_->createCollisionShapeBox(entity.getShape().scale);
+            collision_id = bullet_client_->createCollisionShapeBox(entity->getShape().scale);
             break;
         }
         case SHAPE_SPEHERE:
         {
-            visual_id = bullet_client_->createVisualShapeSphere(entity.getShape().scale[0],
-                                                                {entity.getShape().color[0],
-                                                                 entity.getShape().color[1],
-                                                                 entity.getShape().color[2],
+            visual_id = bullet_client_->createVisualShapeSphere(entity->getShape().scale[0],
+                                                                {entity->getShape().color[0],
+                                                                 entity->getShape().color[1],
+                                                                 entity->getShape().color[2],
                                                                  1});
-            collision_id = bullet_client_->createCollisionShapeSphere(entity.getShape().scale[0]);
+            collision_id = bullet_client_->createCollisionShapeSphere(entity->getShape().scale[0]);
             break;
         }
         case SHAPE_CYLINDER:
         {
-            visual_id = bullet_client_->createVisualShapeCylinder(entity.getShape().scale[0],
-                                                                  entity.getShape().scale[1],
-                                                                  {entity.getShape().color[0],
-                                                                   entity.getShape().color[1],
-                                                                   entity.getShape().color[2],
+            visual_id = bullet_client_->createVisualShapeCylinder(entity->getShape().scale[0],
+                                                                  entity->getShape().scale[1],
+                                                                  {entity->getShape().color[0],
+                                                                   entity->getShape().color[1],
+                                                                   entity->getShape().color[2],
                                                                    1});
-            collision_id = bullet_client_->createCollisionShapeCylinder(entity.getShape().scale[0],
-                                                                        entity.getShape().scale[1]);
+            collision_id = bullet_client_->createCollisionShapeCylinder(entity->getShape().scale[0],
+                                                                        entity->getShape().scale[1]);
             break;
         }
         case SHAPE_MESH:
         {
-            visual_id = bullet_client_->createVisualShapeMesh(entity.getShape().mesh_resource,
-                                                              entity.getShape().scale,
-                                                              {entity.getShape().color[0],
-                                                               entity.getShape().color[1],
-                                                               entity.getShape().color[2],
+            visual_id = bullet_client_->createVisualShapeMesh(entity->getShape().mesh_resource,
+                                                              entity->getShape().scale,
+                                                              {entity->getShape().color[0],
+                                                               entity->getShape().color[1],
+                                                               entity->getShape().color[2],
                                                                1});
-            collision_id = bullet_client_->createCollisionShapeMesh(entity.getShape().mesh_resource,
-                                                                    entity.getShape().scale);
+            collision_id = bullet_client_->createCollisionShapeMesh(entity->getShape().mesh_resource,
+                                                                    entity->getShape().scale);
             break;
         }
     }
 
     if((visual_id != -1) && (collision_id != -1))
     {
-        auto entity_pose = entity.pose().arrays();
+        auto entity_pose = entity->pose().arrays();
         int obj_id = bullet_client_->createMultiBody(0, collision_id, visual_id, entity_pose.first, entity_pose.second);
-        entity.setBulletId(obj_id);
+        entity->setBulletId(obj_id);
     }
 }
 
 template<typename T>
-void EntitiesPerceptionManager<T>::updateToBullet(T& entity)
+void EntitiesPerceptionManager<T>::updateToBullet(T* entity)
 {
-    if(entity.bulletId() != -1)
+    if(entity->bulletId() != -1)
     {
-        if(entity.isLocated() == true){
-            auto entity_pose = entity.pose().arrays();
-            bullet_client_->resetBasePositionAndOrientation(entity.bulletId(),
+        if(entity->isLocated() == true){
+            auto entity_pose = entity->pose().arrays();
+            bullet_client_->resetBasePositionAndOrientation(entity->bulletId(),
                                                             entity_pose.first,
                                                             entity_pose.second);
         }
         else
-            bullet_client_->resetBasePositionAndOrientation(entity.bulletId(),
+            bullet_client_->resetBasePositionAndOrientation(entity->bulletId(),
                                                             {0.0, 0.0, -100.0},
                                                             {0.0, 0.0, 0.0, 1.0});
     }
+}
+
+template<typename T>
+void EntitiesPerceptionManager<T>::UpdateAabbs()
+{
+    for(auto entity : entities_)
+        if(entity.second->isLocated() && entity.second->hasShape()) // TODO test if entity has moved
+            entity.second->setAabb(bullet_client_->getAABB(entity.second->bulletId()));
 }
 
 } // namespace owds
