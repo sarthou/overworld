@@ -13,7 +13,7 @@
 
 namespace owds {
 
-SituationAssessor::SituationAssessor(const std::string& agent_name, bool is_robot) : facts_publisher_(&n_, agent_name)
+SituationAssessor::SituationAssessor(const std::string& agent_name, bool is_robot) : facts_publisher_(&n_, agent_name), facts_calculator_(&n_)
 {
   agent_name_ = agent_name;
   is_robot_ = is_robot;

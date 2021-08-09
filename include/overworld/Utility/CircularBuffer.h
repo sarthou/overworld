@@ -25,20 +25,15 @@ template <typename T, std::size_t capacity> class CircularBuffer
         {
             throw std::out_of_range("Called 'back' function on an empty buffer");
         }
-        if(lastIndex_ != 0)
-            return buffer_[lastIndex_ - 1];
-        else
-            return buffer_[capacity - 1];
+        return buffer_[(lastIndex_ + capacity - 1) % capacity];
     }
 
     inline void push_back(const T& element)
     {
-        if(size_ == 0)
-            size_++;
-        else if ((lastIndex_) % capacity == firstIndex_)
+        if (size_ == capacity)
         {
             // Buffer full, overwrite the first element
-            assert(size_ == capacity);
+            assert(lastIndex_ == firstIndex_);
             firstIndex_ = (firstIndex_ + 1) % capacity;
         }
         else

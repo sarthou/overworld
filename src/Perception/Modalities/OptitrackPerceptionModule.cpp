@@ -1,5 +1,7 @@
 #include "overworld/Perception/Modalities/OptitrackPerceptionModule.h"
 
+#include "overworld/Utility/ShellDisplay.h"
+
 namespace owds {
 OptitrackPerceptionModule::OptitrackPerceptionModule(ros::NodeHandle* n, const std::string& human_name, const std::array<double,3>& offset)
     : human_name_(human_name), ontologies_manipulator_(n)
@@ -11,9 +13,19 @@ OptitrackPerceptionModule::OptitrackPerceptionModule(ros::NodeHandle* n, const s
     onto_ = ontologies_manipulator_.get("robot");
     onto_->close();
 
-    head_name_ = onto_->individuals.getOn(human_name_, "hasHead").at(0);
-    left_hand_name_ = onto_->individuals.getOn(human_name_, "hasLeftHand").at(0);
-    right_hand_name_ = onto_->individuals.getOn(human_name_, "hasRightHand").at(0);
+    auto head_names = onto_->individuals.getOn(human_name_, "hasHead");
+    auto left_hand_names = onto_->individuals.getOn(human_name_, "hasLeftHand");
+    auto right_hand_names = onto_->individuals.getOn(human_name_, "hasRightHand");
+
+    if (head_names.size() == 0 || left_hand_names.size() == 0 || right_hand_names.size() == 0)
+    {
+        ShellDisplay::error("No body part defined in the ontology for human: '" + human_name_ + "'.");
+        throw std::runtime_error("No body part defined in the ontology for human: '" + human_name_ + "'.");
+    }
+
+    head_name_ = head_names.at(0);
+    left_hand_name_ = left_hand_names.at(0);
+    right_hand_name_ = right_hand_names.at(0);
 
     auto head_meshs = onto_->individuals.getOn(head_name_, "hasMesh");
     auto left_hand_meshs = onto_->individuals.getOn(left_hand_name_, "hasMesh");
