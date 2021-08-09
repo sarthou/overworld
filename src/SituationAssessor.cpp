@@ -2,6 +2,7 @@
 
 #include "overworld/Perception/Modalities/ArTrackPerceptionModule.h"
 #include "overworld/Perception/Modalities/PR2JointsPerception.h"
+#include "overworld/Perception/Modalities/Pr2GripperPerceptionModule.h"
 #include "overworld/Perception/Modalities/StaticObjectsPerceptionModule.h"
 #include "overworld/Perception/Modalities/OptitrackPerceptionModule.h"
 #include "overworld/Perception/Modalities/ObjectsEmulatedPerceptionModule.h"
@@ -37,13 +38,30 @@ SituationAssessor::SituationAssessor(const std::string& agent_name, bool is_robo
   objects_manager_.setBulletClient(bullet_client_);
   humans_manager_.setBulletClient(bullet_client_);
 
+  /***************************
+   * Set perception modules  *
+  ***************************/
+
+  auto static_perception = new StaticObjectsPerceptionModule();
+  objects_manager_.addPerceptionModule("static", static_perception);
+
+  auto pr2_joint_perception =  new PR2JointsPerception(&n_, "pr2_robot",  // TODO how to avoid fix name ? 
+                                                         {{"r_gripper_tool_frame", owds::BODY_PART_RIGHT_HAND}, {"l_gripper_tool_frame", owds::BODY_PART_LEFT_HAND}, {"head_mount_kinect2_rgb_optical_frame", owds::BODY_PART_HEAD}},
+                                                         bullet_client_, 0.09);
+  robots_manager_.addPerceptionModule("pr2_joints", pr2_joint_perception);
+
   if(is_robot_)
   {
     myself_agent_ = robots_manager_.getAgent(agent_name);
     
     auto ar_track_perception = new ArTrackPerceptionModule(&n_, myself_agent_);
     objects_manager_.addPerceptionModule("ar_track", ar_track_perception);
-    
+
+    auto left_gripper_perception = new Pr2GripperPerceptionModule(&n_, PR2_GRIPPER_LEFT, bullet_client_, pr2_joint_perception->getPr2BulletId(), myself_agent_);
+    objects_manager_.addPerceptionModule("pr2_left_gripper", left_gripper_perception);
+    auto right_gripper_perception = new Pr2GripperPerceptionModule(&n_, PR2_GRIPPER_RIGHT, bullet_client_, pr2_joint_perception->getPr2BulletId(), myself_agent_);
+    objects_manager_.addPerceptionModule("pr2_right_gripper", right_gripper_perception);
+
     auto optitrack_perception = new OptitrackPerceptionModule(&n_, "human_0", {6.4868, 2.8506, 0});
     humans_manager_.addPerceptionModule("optitrack", optitrack_perception);
   }
@@ -53,14 +71,6 @@ SituationAssessor::SituationAssessor(const std::string& agent_name, bool is_robo
   }
 
   objects_manager_.setOwnerAgent(myself_agent_);
-
-  auto static_perception = new StaticObjectsPerceptionModule();
-  objects_manager_.addPerceptionModule("static", static_perception);
-
-  auto pr2_joint_perception =  new PR2JointsPerception(&n_, "pr2_robot",  // TODO how to avoid fix name ? 
-                                                         {{"r_gripper_tool_frame", owds::BODY_PART_RIGHT_HAND}, {"l_gripper_tool_frame", owds::BODY_PART_LEFT_HAND}, {"head_mount_kinect2_rgb_optical_frame", owds::BODY_PART_HEAD}},
-                                                         bullet_client_, 0.09);
-  robots_manager_.addPerceptionModule("pr2_joints", pr2_joint_perception);
 
   ros_sender_ = new ROSSender(&n_);
 }

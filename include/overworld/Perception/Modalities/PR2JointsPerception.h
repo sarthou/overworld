@@ -29,6 +29,8 @@ class PR2JointsPerception : public owds::PerceptionModuleRosBase<owds::BodyPart,
                         double min_period);
     virtual ~PR2JointsPerception() = default;
 
+    int getPr2BulletId() { return robot_body_id_; }
+
   protected:
     bool perceptionCallback(const sensor_msgs::JointState& msg) override;
     int robot_body_id_;
