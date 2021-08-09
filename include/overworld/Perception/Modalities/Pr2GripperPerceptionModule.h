@@ -39,6 +39,9 @@ private:
   size_t obj_id_;
   std::string current_obj_id_;
 
+  double min_period_;
+  ros::Time last_update_;
+
   bool perceptionCallback(const pr2_msgs::PressureState& msg);
   double getGripperDistance();
 };

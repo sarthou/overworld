@@ -2,6 +2,8 @@
 
 #include <numeric>
 
+#define PRESSURE_DIFF 3000
+
 namespace owds {
 
 Pr2GripperPerceptionModule::Pr2GripperPerceptionModule(ros::NodeHandle* n,
@@ -24,7 +26,9 @@ Pr2GripperPerceptionModule::Pr2GripperPerceptionModule(ros::NodeHandle* n,
   has_picked_ = false;
   obj_id_ = 0;
 
-   auto p = bullet_client_->findJointAndLinkIndices(pr2_bullet_id_);
+  min_period_ = 0.5;
+
+  auto p = bullet_client_->findJointAndLinkIndices(pr2_bullet_id_);
   auto joint_name_id = p.first;
   auto link_name_id = p.second;
 
@@ -44,6 +48,10 @@ Pr2GripperPerceptionModule::Pr2GripperPerceptionModule(ros::NodeHandle* n,
 
 bool Pr2GripperPerceptionModule::perceptionCallback(const pr2_msgs::PressureState& msg)
 {
+  if ((ros::Time::now() - last_update_).toSec() < min_period_)
+        return false;
+  last_update_ = ros::Time::now();
+
   left_tip_pressure_prev_ = left_tip_pressure_;
   right_tip_pressure_prev_ = right_tip_pressure_;
 
@@ -57,10 +65,10 @@ bool Pr2GripperPerceptionModule::perceptionCallback(const pr2_msgs::PressureStat
 
     if(has_picked_ == false)
     {
-      if((pressure_diff_left > 4000) && (pressure_diff_right > 4000))
+      if((pressure_diff_left > PRESSURE_DIFF) && (pressure_diff_right > PRESSURE_DIFF))
       {
         double dist = getGripperDistance();
-        if(dist >= 0.04) // 4cm
+        if(dist >= 0.03) // 4cm
         {
           if(side_ == PR2_GRIPPER_LEFT)
             current_obj_id_ = "obj_pr2_gripper_left_" + std::to_string(obj_id_);
@@ -70,21 +78,30 @@ bool Pr2GripperPerceptionModule::perceptionCallback(const pr2_msgs::PressureStat
           Object percept(current_obj_id_, false);
           Shape_t shape;
           shape.type = SHAPE_CUBE;
-          shape.scale.fill(dist);
+          shape.scale.fill(dist/2.);
           percept.setShape(shape);
+          percept.setSeen();
 
           percepts_.insert(std::make_pair(percept.id(), percept));
 
           if(side_ == PR2_GRIPPER_LEFT)
           {
             if(agent_->getLeftHand() != nullptr)
+            {
+              percepts_.at(percept.id()).updatePose(agent_->getLeftHand()->pose());
               percepts_.at(percept.id()).setInHand(agent_->getLeftHand());
+            }
           }
           else
           {
             if(agent_->getRightHand() != nullptr)
+            {
+              percepts_.at(percept.id()).updatePose(agent_->getRightHand()->pose());
               percepts_.at(percept.id()).setInHand(agent_->getRightHand());
+            }
           }
+
+          has_picked_ = true;
 
           return true;
         }
@@ -94,19 +111,32 @@ bool Pr2GripperPerceptionModule::perceptionCallback(const pr2_msgs::PressureStat
     }
     else
     {
-      if((pressure_diff_left < 4000) && (pressure_diff_right < 4000))
+      if((pressure_diff_left < -PRESSURE_DIFF) && (pressure_diff_right < -PRESSURE_DIFF))
       {
         has_picked_ = false;
         percepts_.at(current_obj_id_).unsetPose();
+        percepts_.at(current_obj_id_).setUnseen();
         if(percepts_.at(current_obj_id_).isInHand())
           percepts_.at(current_obj_id_).removeFromHand();
         
         current_obj_id_ = "";
         obj_id_++;
-        return true;
       }
       else
-        return false;
+      {
+        if(side_ == PR2_GRIPPER_LEFT)
+          {
+            if(agent_->getLeftHand() != nullptr)
+              percepts_.at(percepts_.at(current_obj_id_).id()).updatePose(agent_->getLeftHand()->pose());
+          }
+          else
+          {
+            if(agent_->getRightHand() != nullptr)
+              percepts_.at(percepts_.at(current_obj_id_).id()).updatePose(agent_->getRightHand()->pose());
+          }
+      }
+      
+      return true;
     }
 
     return true;
@@ -130,7 +160,7 @@ double Pr2GripperPerceptionModule::getGripperDistance()
   double* right_rot = right_tip_link_state.m_worldLinkFrameOrientation;
   Pose right_tip_pose({right_pos[0], right_pos[1], right_pos[2]}, {right_rot[0], right_rot[1], right_rot[2], right_rot[3]});
 
-  return left_tip_pose.distanceSqTo(right_tip_pose);
+  return left_tip_pose.distanceTo(right_tip_pose);
 }
 
 } // namespace owds
