@@ -20,6 +20,13 @@ void ObjectsPerceptionManager::getPercepts(const std::map<std::string, Object>& 
             it = entities_.insert(std::pair<std::string, Object*>(percept.second.id(), new_object)).first;
             addToBullet(it->second);
         }
+
+        if(percept.second.isInHand() && (it->second->isInHand() == false))
+        {
+          auto hand = percept.second.getHandIn();
+          hand->removeFromHand(percept.first);
+          it->second->setInHand(hand);
+        }
         
         if(it->second->isInHand())
         {
@@ -27,6 +34,10 @@ void ObjectsPerceptionManager::getPercepts(const std::map<std::string, Object>& 
           {
             it->second->removeFromHand();
             updateEntityPose(it->second, percept.second.pose(), percept.second.lastStamp());
+          }
+          else if(percept.second.isLocated() == false)
+          {
+            it->second->removeFromHand();
           }
           else
           {
@@ -182,7 +193,12 @@ std::unordered_set<int> ObjectsPerceptionManager::getObjectsInCamera()
                                                               myself_agent_->getFieldOfView().getRatio(),
                                                               myself_agent_->getFieldOfView().getClipNear(),
                                                               myself_agent_->getFieldOfView().getClipFar());
-  Pose target_pose = myself_agent_->getHead()->pose() * Pose({1,0,0}, {0,0,0,1});
+
+  std::array<double, 3> axes = {1,0,0};
+  if(myself_agent_->getType() == AgentType_e::PR2_ROBOT)
+    axes = {0,0,1};
+
+  Pose target_pose = myself_agent_->getHead()->pose() * Pose(axes, {0,0,0,1});
   auto head_pose_trans = myself_agent_->getHead()->pose().arrays().first;
   auto target_pose_trans = target_pose.arrays().first;
   auto view_matrix = bullet_client_->computeViewMatrix({(float)head_pose_trans[0], (float)head_pose_trans[1], (float)head_pose_trans[2]},
