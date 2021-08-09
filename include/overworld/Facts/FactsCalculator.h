@@ -8,18 +8,23 @@
 #include "overworld/BasicTypes/Object.h"
 #include "overworld/BasicTypes/Agent.h"
 #include "overworld/Facts/Fact.h"
+#include <ontologenius/OntologiesManipulator.h>
 
 namespace owds {
 
 class FactsCalculator
 {
 public:
+  FactsCalculator(ros::NodeHandle* nh);
   std::vector<Fact> computeFacts(const std::map<std::string, Object*>& objects,
                                  const std::map<std::string, Agent*>& agents,
                                  const std::map<std::string, std::unordered_set<int>>& segmantation_ids);
 
 private:
   std::vector<Fact> facts_;
+  OntologiesManipulator ontos_;
+  OntologyManipulator* onto_;
+
 
   bool isOnTopfOf(Object* object_under, Object* object_on);
   bool isInContainer(Object* object_around, Object* object_in);
@@ -29,6 +34,7 @@ private:
   bool isPerceiving(Agent* agent_perceiving, Agent* agent_perceived);
 
   bool isLookingAt(Agent* agent, const std::unordered_set<int>& seen_bullet_ids, const Object* object);
+  bool hasInHand(Agent* agent, Object* object);
 };
 
 } // namespace owds

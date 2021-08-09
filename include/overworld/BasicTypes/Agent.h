@@ -7,10 +7,15 @@
 
 namespace owds {
 
+enum AgentType_e
+{
+  PR2_ROBOT = 0,
+  HUMAN
+};
 class Agent
 {
 public:
-  Agent(const std::string id, const FieldOfView& field_of_view) : id_(id), field_of_view_(field_of_view)
+  Agent(const std::string id, const FieldOfView& field_of_view, const AgentType_e type) : id_(id), field_of_view_(field_of_view), type_(type)
   {
     head_ = nullptr;
     left_hand_ = nullptr;
@@ -21,6 +26,7 @@ public:
 
   std::string getId() { return id_; }
   const FieldOfView& getFieldOfView() { return field_of_view_; }
+  const AgentType_e getType() { return type_;}
   
   void setHead(BodyPart* head) { head_ = head; }
   void setLeftHand(Hand* hand) { left_hand_ = hand; }
@@ -37,6 +43,7 @@ public:
 private:
   std::string id_;
   FieldOfView field_of_view_;
+  AgentType_e type_;
 
   BodyPart* head_;
   Hand* left_hand_;

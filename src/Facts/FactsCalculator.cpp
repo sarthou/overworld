@@ -2,6 +2,15 @@
 
 namespace owds {
 
+FactsCalculator::FactsCalculator(ros::NodeHandle* nh): ontos_(OntologiesManipulator(nh))
+{
+  ontos_.waitInit();
+  ontos_.add("robot");
+  onto_ = ontos_.get("robot");
+  onto_->close();
+
+}
+
 std::vector<Fact> FactsCalculator::computeFacts(const std::map<std::string, Object*>& objects,
                                                 const std::map<std::string, Agent*>& agents,
                                                 const std::map<std::string, std::unordered_set<int>>& segmantation_ids)
@@ -48,7 +57,10 @@ std::vector<Fact> FactsCalculator::computeFacts(const std::map<std::string, Obje
     {
       if(obj.second->isStatic())
         continue;
-        
+
+      if (agent_from.second->getType() == AgentType_e::HUMAN){
+        hasInHand(agent_from.second, obj.second);    
+      } 
       auto image_it = segmantation_ids.find(agent_from.first);
       if(image_it != segmantation_ids.end())
         isLookingAt(agent_from.second, image_it->second, obj.second);
@@ -184,6 +196,59 @@ bool FactsCalculator::isLookingAt(Agent* agent, const std::unordered_set<int>& s
   if (seen_bullet_ids.count(object->bulletId())){
     facts_.emplace_back(agent->getId(), "isLookingAt", object->id());
     return true;
+  }
+  return false;
+}
+
+bool FactsCalculator::hasInHand(Agent* agent, Object* object)
+{
+  Hand *leftHand, *rightHand;
+  if ((leftHand = agent->getLeftHand()) != nullptr)
+  {
+    const auto inLeftHand = leftHand->getInHand();
+    if (std::find(inLeftHand.begin(), inLeftHand.end(), object->id()) != inLeftHand.end())
+    {
+      facts_.emplace_back(agent->getId(), "hasInLeftHand", object->id());
+      return true;
+    }
+    else if (leftHand->isLocated() && object->isLocated())
+    {
+      if (leftHand->pose().distanceTo(object->pose()) < 0.08)
+      {
+        std::vector<std::string> types = onto_->individuals.getUp(object->id());
+        if (std::find(types.begin(), types.end(), "Pickable") != types.end())
+        {
+          object->setInHand(leftHand);
+          leftHand->putInHand(object);
+          facts_.emplace_back(agent->getId(), "hasInLeftHand", object->id());
+          return true;
+        }
+      }
+    }
+  }
+
+  if ((rightHand = agent->getRightHand()) != nullptr)
+  {
+    const auto inRightHand = rightHand->getInHand();
+    if (std::find(inRightHand.begin(), inRightHand.end(), object->id()) != inRightHand.end())
+    {
+      facts_.emplace_back(agent->getId(), "hasInRightHand", object->id());
+      return true;
+    }
+    else if (rightHand->isLocated() && object->isLocated())
+    {
+      if (rightHand->pose().distanceTo(object->pose()) < 0.08)
+      {
+        std::vector<std::string> types = onto_->individuals.getUp(object->id());
+        if (std::find(types.begin(), types.end(), "Pickable") != types.end())
+        {
+          object->setInHand(rightHand);
+          rightHand->putInHand(object);
+          facts_.emplace_back(agent->getId(), "hasInRightHand", object->id());
+          return true;
+        }
+      }
+    }
   }
   return false;
 }
