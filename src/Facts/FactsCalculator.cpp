@@ -2,6 +2,15 @@
 
 namespace owds {
 
+FactsCalculator::FactsCalculator(ros::NodeHandle* nh): ontos_(OntologiesManipulator(nh))
+{
+  ontos_.waitInit();
+  ontos_.add("robot");
+  onto_ = ontos_.get("robot");
+  onto_->close();
+
+}
+
 std::vector<Fact> FactsCalculator::computeFacts(const std::map<std::string, Object*>& objects,
                                                 const std::map<std::string, Agent*>& agents,
                                                 const std::map<std::string, std::unordered_set<int>>& segmantation_ids)
@@ -196,38 +205,48 @@ bool FactsCalculator::hasInHand(Agent* agent, Object* object)
   Hand *leftHand, *rightHand;
   if ((leftHand = agent->getLeftHand()) != nullptr)
   {
-    if (std::count(leftHand->getInHand().begin(), leftHand->getInHand().end(), object->id()) > 0)
+    const auto inLeftHand = leftHand->getInHand();
+    if (std::find(inLeftHand.begin(), inLeftHand.end(), object->id()) != inLeftHand.end())
     {
       facts_.emplace_back(agent->getId(), "hasInLeftHand", object->id());
       return true;
     }
-    else if (leftHand->isLocated())
+    else if (leftHand->isLocated() && object->isLocated())
     {
-      if (leftHand->pose().distanceTo(object->pose()) < 0.03)
+      if (leftHand->pose().distanceTo(object->pose()) < 0.08)
       {
-        object->setInHand(leftHand);
-        leftHand->putInHand(object);
-        facts_.emplace_back(agent->getId(), "hasInLeftHand", object->id());
-        return true;
+        std::vector<std::string> types = onto_->individuals.getUp(object->id());
+        if (std::find(types.begin(), types.end(), "Pickable") != types.end())
+        {
+          object->setInHand(leftHand);
+          leftHand->putInHand(object);
+          facts_.emplace_back(agent->getId(), "hasInLeftHand", object->id());
+          return true;
+        }
       }
     }
   }
 
   if ((rightHand = agent->getRightHand()) != nullptr)
   {
-    if (std::count(rightHand->getInHand().begin(), rightHand->getInHand().end(), object->id()) > 0)
+    const auto inRightHand = rightHand->getInHand();
+    if (std::find(inRightHand.begin(), inRightHand.end(), object->id()) != inRightHand.end())
     {
       facts_.emplace_back(agent->getId(), "hasInRightHand", object->id());
       return true;
     }
-    else if (rightHand->isLocated())
+    else if (rightHand->isLocated() && object->isLocated())
     {
-      if (rightHand->pose().distanceTo(object->pose()) < 0.03)
+      if (rightHand->pose().distanceTo(object->pose()) < 0.08)
       {
-        object->setInHand(rightHand);
-        rightHand->putInHand(object);
-        facts_.emplace_back(agent->getId(), "hasInRightHand", object->id());
-        return true;
+        std::vector<std::string> types = onto_->individuals.getUp(object->id());
+        if (std::find(types.begin(), types.end(), "Pickable") != types.end())
+        {
+          object->setInHand(rightHand);
+          rightHand->putInHand(object);
+          facts_.emplace_back(agent->getId(), "hasInRightHand", object->id());
+          return true;
+        }
       }
     }
   }
