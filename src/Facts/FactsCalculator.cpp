@@ -49,7 +49,9 @@ std::vector<Fact> FactsCalculator::computeFacts(const std::map<std::string, Obje
       if(obj.second->isStatic())
         continue;
 
-      hasInHand(agent_from.second, obj.second);     
+      if (agent_from.second->getType() == AgentType_e::HUMAN){
+        hasInHand(agent_from.second, obj.second);    
+      } 
       auto image_it = segmantation_ids.find(agent_from.first);
       if(image_it != segmantation_ids.end())
         isLookingAt(agent_from.second, image_it->second, obj.second);
