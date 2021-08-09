@@ -23,14 +23,15 @@ void ObjectsPerceptionManager::getPercepts(const std::map<std::string, Object>& 
         
         if(it->second->isInHand())
         {
-          if(lost_objects_nb_frames_.find(percept.first) != lost_objects_nb_frames_.end())
-            if(lost_objects_nb_frames_[percept.first] < 5)
-            {
-              if(it->second->pose().distanceSqTo(percept.second.pose()) > 0.55) // Add a condition on time ?
-                it->second->removeFromHand();
-              else
-                updateEntityPose(it->second, it->second->getHandIn()->pose(), ros::Time::now());
-            }
+          if (percept.second.hasBeenSeen() && it->second->getHandIn()->pose().distanceTo(percept.second.pose()) >= 0.30)
+          {
+            it->second->removeFromHand();
+            updateEntityPose(it->second, percept.second.pose(), percept.second.lastStamp());
+          }
+          else
+          {
+            updateEntityPose(it->second, it->second->getHandIn()->pose(), ros::Time::now());
+          }
         }
         else if (percept.second.hasBeenSeen())
           updateEntityPose(it->second, percept.second.pose(), percept.second.lastStamp());
