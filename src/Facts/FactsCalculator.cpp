@@ -48,7 +48,8 @@ std::vector<Fact> FactsCalculator::computeFacts(const std::map<std::string, Obje
     {
       if(obj.second->isStatic())
         continue;
-        
+
+      hasInHand(agent_from.second, obj.second);     
       auto image_it = segmantation_ids.find(agent_from.first);
       if(image_it != segmantation_ids.end())
         isLookingAt(agent_from.second, image_it->second, obj.second);
@@ -184,6 +185,49 @@ bool FactsCalculator::isLookingAt(Agent* agent, const std::unordered_set<int>& s
   if (seen_bullet_ids.count(object->bulletId())){
     facts_.emplace_back(agent->getId(), "isLookingAt", object->id());
     return true;
+  }
+  return false;
+}
+
+bool FactsCalculator::hasInHand(Agent* agent, Object* object)
+{
+  Hand *leftHand, *rightHand;
+  if ((leftHand = agent->getLeftHand()) != nullptr)
+  {
+    if (std::count(leftHand->getInHand().begin(), leftHand->getInHand().end(), object->id()) > 0)
+    {
+      facts_.emplace_back(agent->getId(), "hasInLeftHand", object->id());
+      return true;
+    }
+    else if (leftHand->isLocated())
+    {
+      if (leftHand->pose().distanceTo(object->pose()) < 0.03)
+      {
+        object->setInHand(leftHand);
+        leftHand->putInHand(object);
+        facts_.emplace_back(agent->getId(), "hasInLeftHand", object->id());
+        return true;
+      }
+    }
+  }
+
+  if ((rightHand = agent->getRightHand()) != nullptr)
+  {
+    if (std::count(rightHand->getInHand().begin(), rightHand->getInHand().end(), object->id()) > 0)
+    {
+      facts_.emplace_back(agent->getId(), "hasInRightHand", object->id());
+      return true;
+    }
+    else if (rightHand->isLocated())
+    {
+      if (rightHand->pose().distanceTo(object->pose()) < 0.03)
+      {
+        object->setInHand(rightHand);
+        rightHand->putInHand(object);
+        facts_.emplace_back(agent->getId(), "hasInRightHand", object->id());
+        return true;
+      }
+    }
   }
   return false;
 }

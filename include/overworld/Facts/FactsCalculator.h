@@ -29,6 +29,7 @@ private:
   bool isPerceiving(Agent* agent_perceiving, Agent* agent_perceived);
 
   bool isLookingAt(Agent* agent, const std::unordered_set<int>& seen_bullet_ids, const Object* object);
+  bool hasInHand(Agent* agent, Object* object);
 };
 
 } // namespace owds
