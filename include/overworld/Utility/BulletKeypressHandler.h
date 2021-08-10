@@ -3,6 +3,7 @@
 #include "overworld/Bullet/BulletClient.h"
 #include "overworld/Geometry/GeometryUtils.h"
 #include "overworld/Perception/RobotsPerceptionManager.h"
+#include "overworld/Utility/ShellDisplay.h"
 
 namespace owds {
 
@@ -29,10 +30,15 @@ inline void handleKeypress(BulletClient* bullet_client, RobotsPerceptionManager&
         {
             switch (keyboard.m_keyboardEvents[i].m_keyCode)
             {
-            case 32:
+            case ' ':
                 onSpacebarPressed(bullet_client, robots_manager);
                 break;
+            case 65281:  // F2
+                ShellDisplay::success("Debug visualizer has been disabled");
+                bullet_client->configureDebugVisualizer(COV_ENABLE_RENDERING, false);
+                break;
             default:
+                //std::cout << keyboard.m_keyboardEvents[i].m_keyCode << std::endl;
                 break;
             }
         }
