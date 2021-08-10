@@ -7,8 +7,8 @@ OntologeniusFactsPublisher::OntologeniusFactsPublisher(ros::NodeHandle* n,
                                                                                         ontologies_manipulator_(n)
 {
   ontologies_manipulator_.waitInit();
-  ontologies_manipulator_.add("robot");
-  onto_ = ontologies_manipulator_.get("robot");
+  ontologies_manipulator_.add(agent_name_);
+  onto_ = ontologies_manipulator_.get(agent_name_);
   onto_->close();
 }
 
