@@ -41,6 +41,9 @@ public:
     std::string id() const { return id_; }
     bool isTrueId() const { return is_true_id_; }
 
+    void addFalseId(const std::string& false_id) { false_ids_.insert(false_id); }
+    std::unordered_set<std::string> getFalseIds() { return false_ids_; }
+ 
     void setBulletId(int bullet_id) { bullet_id_ = bullet_id; }
     int bulletId() const { return bullet_id_; }
 
@@ -66,6 +69,8 @@ public:
 protected:
     std::string id_;
     bool is_true_id_;
+    std::unordered_set<std::string> false_ids_;
+
     CircularBuffer<PoseStamped_s, 10> last_poses_;
     bool is_located_;
     int bullet_id_;
