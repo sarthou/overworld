@@ -58,6 +58,7 @@ public:
     bool hasBeenSeen() const { return (nb_frame_unseen_ == 0); }
     size_t getNbFrameUnseen() const { return nb_frame_unseen_; }
 
+    void merge(const Entity* other);
 
     geometry_msgs::TransformStamped toTfTransform() const;
     visualization_msgs::Marker toMarker(int id, double lifetime, const std::string& ns) const;
