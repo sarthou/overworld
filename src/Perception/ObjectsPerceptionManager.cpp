@@ -44,12 +44,13 @@ void ObjectsPerceptionManager::getPercepts(const std::map<std::string, Object>& 
             addToBullet(it->second);
         }
 
-        if(percept.second.isInHand() && (it->second->isInHand() == false))
-        {
-          auto hand = percept.second.getHandIn();
-          hand->removeFromHand(percept.first);
-          it->second->setInHand(hand);
-        }
+        if(merged_ids_.find(percept.first) == merged_ids_.end())
+          if(percept.second.isInHand() && (it->second->isInHand() == false))
+          {
+            auto hand = percept.second.getHandIn();
+            hand->removeFromHand(percept.first);
+            it->second->setInHand(hand);
+          }
         
         if(it->second->isInHand())
         {
@@ -253,9 +254,16 @@ void ObjectsPerceptionManager::mergeFalseIdData()
 
     for(auto entity : entities_)
     {
+      if(entity.second->isStatic())
+        continue;
+      else if(entity.second->isLocated() == false)
+        continue;
+      else if(merged_ids_.find(entity.first) != merged_ids_.end())
+        continue;
+
       if(entity.first != obj->first)
       {
-        if(entity.second->pose().distanceTo(obj->second->pose()) <= 0.03) // TODO tune
+        if(entity.second->pose().distanceTo(obj->second->pose()) <= 0.1) // TODO tune
         {
           double error = std::abs(obj_volume - entity.second->getAabbVolume());
           if(error < min_error)
@@ -271,6 +279,7 @@ void ObjectsPerceptionManager::mergeFalseIdData()
     {
       merged.insert(id);
       to_be_merged->merge(obj->second);
+      to_be_merged->addFalseId(id);
       merged_ids_.insert(std::make_pair(id, to_be_merged->id()));
     }
   }

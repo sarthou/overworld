@@ -114,7 +114,7 @@ bool Pr2GripperPerceptionModule::perceptionCallback(const pr2_msgs::PressureStat
       if((pressure_diff_left < -PRESSURE_DIFF) && (pressure_diff_right < -PRESSURE_DIFF))
       {
         has_picked_ = false;
-        percepts_.at(current_obj_id_).unsetPose();
+        // percepts_.at(current_obj_id_).unsetPose();
         percepts_.at(current_obj_id_).setUnseen();
         if(percepts_.at(current_obj_id_).isInHand())
           percepts_.at(current_obj_id_).removeFromHand();
