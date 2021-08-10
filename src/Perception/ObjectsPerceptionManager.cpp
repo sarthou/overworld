@@ -6,10 +6,33 @@
 
 namespace owds {
 
+std::map<std::string, Object*> ObjectsPerceptionManager::getEntities()
+{
+  if(merged_ids_.size() == 0)
+    return entities_;
+  else
+  {
+    std::map<std::string, Object*> res;
+    for(auto& entity : entities_)
+    {
+      if(merged_ids_.find(entity.first) == merged_ids_.end())
+        res.insert(entity);
+    }
+
+    return res;
+  }
+}
+
 void ObjectsPerceptionManager::getPercepts(const std::map<std::string, Object>& percepts)
 {
   for(auto& percept : percepts)
     {
+        if(percept.second.isTrueId() == false)
+        {
+          if(merged_ids_.find(percept.first) == merged_ids_.end())
+            false_ids_to_be_merged_.insert(percept.first);
+        }
+
         auto it = entities_.find(percept.second.id());
         if(it == entities_.end())
         {
@@ -20,6 +43,14 @@ void ObjectsPerceptionManager::getPercepts(const std::map<std::string, Object>& 
             it = entities_.insert(std::pair<std::string, Object*>(percept.second.id(), new_object)).first;
             addToBullet(it->second);
         }
+
+        if(merged_ids_.find(percept.first) == merged_ids_.end())
+          if(percept.second.isInHand() && (it->second->isInHand() == false))
+          {
+            auto hand = percept.second.getHandIn();
+            hand->removeFromHand(percept.first);
+            it->second->setInHand(hand);
+          }
         
         if(it->second->isInHand())
         {
@@ -27,6 +58,10 @@ void ObjectsPerceptionManager::getPercepts(const std::map<std::string, Object>& 
           {
             it->second->removeFromHand();
             updateEntityPose(it->second, percept.second.pose(), percept.second.lastStamp());
+          }
+          else if(percept.second.isLocated() == false)
+          {
+            it->second->removeFromHand();
           }
           else
           {
@@ -40,8 +75,19 @@ void ObjectsPerceptionManager::getPercepts(const std::map<std::string, Object>& 
 
 void ObjectsPerceptionManager::reasoningOnUpdate()
 {
-  std::vector<Object*> no_data_objects;
   bullet_client_->performCollisionDetection();
+  UpdateAabbs();
+
+  if(false_ids_to_be_merged_.size())
+    mergeFalseIdData();
+
+  for(auto& merged : merged_ids_)
+  {
+    entities_.at(merged.second)->merge(entities_.at(merged.first));
+    removeEntityPose(entities_.at(merged.first));
+  }
+
+  std::vector<Object*> no_data_objects;
   for(auto& object : entities_)
   {
     if(object.second->isStatic() == true)
@@ -49,7 +95,6 @@ void ObjectsPerceptionManager::reasoningOnUpdate()
     else if (object.second->isLocated() == false)
       continue;
     
-
     if(object.second->isInHand() == false)
     {
       if(object.second->getNbFrameUnseen() >= 5)
@@ -91,8 +136,6 @@ void ObjectsPerceptionManager::reasoningOnUpdate()
         removeEntityPose(no_data_obj);
     }
   }
-
-  UpdateAabbs();
 }
 
 std::vector<PointOfInterest> ObjectsPerceptionManager::getPoisInFov(Object* object)
@@ -106,8 +149,7 @@ std::vector<PointOfInterest> ObjectsPerceptionManager::getPoisInFov(Object* obje
   {
     ShellDisplay::error("[ObjectsPerceptionManager] defined agent has no head");
     return object->getPointsOfInterest();
-  }
-    
+  } 
 
   std::vector<PointOfInterest> pois_in_fov;
 
@@ -182,7 +224,12 @@ std::unordered_set<int> ObjectsPerceptionManager::getObjectsInCamera()
                                                               myself_agent_->getFieldOfView().getRatio(),
                                                               myself_agent_->getFieldOfView().getClipNear(),
                                                               myself_agent_->getFieldOfView().getClipFar());
-  Pose target_pose = myself_agent_->getHead()->pose() * Pose({1,0,0}, {0,0,0,1});
+
+  std::array<double, 3> axes = {1,0,0};
+  if(myself_agent_->getType() == AgentType_e::PR2_ROBOT)
+    axes = {0,0,1};
+
+  Pose target_pose = myself_agent_->getHead()->pose() * Pose(axes, {0,0,0,1});
   auto head_pose_trans = myself_agent_->getHead()->pose().arrays().first;
   auto target_pose_trans = target_pose.arrays().first;
   auto view_matrix = bullet_client_->computeViewMatrix({(float)head_pose_trans[0], (float)head_pose_trans[1], (float)head_pose_trans[2]},
@@ -190,6 +237,54 @@ std::unordered_set<int> ObjectsPerceptionManager::getObjectsInCamera()
                                                         {0.,0.,1.});
   auto images = bullet_client_->getCameraImage(100*myself_agent_->getFieldOfView().getRatio(), 100, view_matrix, proj_matrix, owds::BULLET_HARDWARE_OPENGL);
   return bullet_client_->getSegmentationIds(images);
+}
+
+void ObjectsPerceptionManager::mergeFalseIdData()
+{
+  std::unordered_set<std::string> merged;
+
+  for(auto& id : false_ids_to_be_merged_)
+  {
+    auto obj = entities_.find(id);
+
+    double obj_volume = obj->second->getAabbVolume();
+    double min_error = 10000;
+    Object* to_be_merged = nullptr;
+
+    for(auto entity : entities_)
+    {
+      if(entity.second->isStatic())
+        continue;
+      else if(entity.second->isLocated() == false)
+        continue;
+      else if(merged_ids_.find(entity.first) != merged_ids_.end())
+        continue;
+
+      if(entity.first != obj->first)
+      {
+        if(entity.second->pose().distanceTo(obj->second->pose()) <= 0.1) // TODO tune
+        {
+          double error = std::abs(obj_volume - entity.second->getAabbVolume());
+          if(error < min_error)
+          {
+            to_be_merged = entity.second;
+            min_error = error;
+          }
+        }
+      }
+    }
+
+    if(to_be_merged != nullptr)
+    {
+      merged.insert(id);
+      to_be_merged->merge(obj->second);
+      to_be_merged->addFalseId(id);
+      merged_ids_.insert(std::make_pair(id, to_be_merged->id()));
+    }
+  }
+
+  for(auto& id : merged)
+    false_ids_to_be_merged_.erase(id);
 }
 
 } // namespace owds

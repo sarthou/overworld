@@ -71,6 +71,30 @@ void Entity::setId(const std::string& id, bool is_true_id)
     is_true_id_ = is_true_id;
 }
 
+double Entity::getAabbVolume() const
+{
+    if(isAabbValid() == false)
+        return 0;
+    else
+        return (aabb_.max[0] - aabb_.min[0]) * (aabb_.max[1] - aabb_.min[1]) * (aabb_.max[2] - aabb_.min[2]);
+}
+
+void Entity::merge(const Entity* other)
+{
+    if(other->hasShape())
+    {
+        if(shape_.type == ShapeType_e::SHAPE_NONE)
+            shape_ = other->getShape();
+        else if(shape_.type != ShapeType_e::SHAPE_MESH)
+            shape_ = other->getShape();
+    }
+
+    if((isLocated() == false) && other->isLocated())
+        updatePose(other->pose());
+    else if(other->isLocated() && (getNbFrameUnseen() < other->getNbFrameUnseen()))
+        updatePose(other->pose());
+}
+
 geometry_msgs::TransformStamped Entity::toTfTransform() const
 {
     if (!isLocated())

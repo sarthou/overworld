@@ -54,15 +54,17 @@ bool ArTrackPerceptionModule::perceptionCallback(const ar_track_alvar_msgs::Alva
           setPointOfInterest(visible_marker);
           visible_markers_with_pois_.insert(visible_marker.id);
       }
+      if (ids_map_.find(visible_marker.main_id) != ids_map_.end())
+        percepts_.at(ids_map_[visible_marker.main_id]).setSeen();
   }
 
   for (const auto& seen_visible_markers : visible_markers.markers)
   {
-      // For all the seen marker (even the invalid) if the entity has been created, we said it has been seen
+      // For all the seen marker (even the invalid) if the entity has been created,
+      // we said it has been seen if it has been seen just before
       if (ids_map_.find(seen_visible_markers.main_id) != ids_map_.end())
-      {
+        if(percepts_.at(ids_map_[seen_visible_markers.main_id]).getNbFrameUnseen() < 2)
           percepts_.at(ids_map_[seen_visible_markers.main_id]).setSeen();
-      }
   }
   return true;
 }

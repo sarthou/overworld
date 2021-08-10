@@ -45,4 +45,16 @@ void Object::removeFromHand()
         ShellDisplay::warning("[Object] Try to remove " + id_ + " from hand while the object is not in any hand");
 }
 
+void Object::merge(Object* other)
+{
+    Entity::merge(other);
+
+    if((isInHand() == false) && other->isInHand())
+    {
+        auto hand = other->getHandIn();
+        other->removeFromHand();
+        hand->putInHand(this);
+    }
+}
+
 } // namespace owds

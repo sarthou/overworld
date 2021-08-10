@@ -28,6 +28,8 @@ public:
     bool isInHand() const { return (hand_in_ != nullptr); }
     Hand* getHandIn() const { return hand_in_; }
 
+    void merge(Object* other);
+
 protected:
     std::vector<PointOfInterest> points_of_interest_;
     bool is_static_;
