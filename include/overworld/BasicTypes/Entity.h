@@ -36,22 +36,22 @@ public:
     const Pose& pose() const;
     ros::Time lastStamp() const { return last_poses_.back().stamp; }
     bool hasMoved() const;
-    
 
     void setId(const std::string& id, bool is_true_id = true);
     std::string id() const { return id_; }
-    bool isTrueId() { return is_true_id_; }
+    bool isTrueId() const { return is_true_id_; }
 
     void setBulletId(int bullet_id) { bullet_id_ = bullet_id; }
     int bulletId() const { return bullet_id_; }
 
     void setAabb(const struct aabb_t& aabb) { aabb_ = aabb; }
-    struct aabb_t getAabb() { return aabb_; }
-    bool isAabbValid() { return aabb_.is_valid; }
+    struct aabb_t getAabb() const { return aabb_; }
+    double getAabbVolume() const;
+    bool isAabbValid() const { return aabb_.is_valid; }
 
     void setShape(const Shape_t& shape) { shape_ = shape; }
-    const Shape_t& getShape() { return shape_; }
-    bool hasShape() { return (shape_.type != SHAPE_NONE); }
+    const Shape_t& getShape() const { return shape_; }
+    bool hasShape() const { return (shape_.type != SHAPE_NONE); }
 
     void setSeen() { nb_frame_unseen_ = 0; }
     void setUnseen() { if(nb_frame_unseen_ < 100) nb_frame_unseen_++; }
