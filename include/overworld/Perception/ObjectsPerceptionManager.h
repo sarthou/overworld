@@ -17,12 +17,17 @@ private:
   Agent* myself_agent_;
   std::map<std::string, size_t> lost_objects_nb_frames_;
 
+  std::unordered_set<std::string> false_ids_to_be_merged_;
+  std::map<std::string, std::string> merged_ids_;
+
   void getPercepts(const std::map<std::string, Object>& percepts) override;
   void reasoningOnUpdate() override;
 
   std::vector<PointOfInterest> getPoisInFov(Object* object);
   bool shouldBeSeen(Object* object, const std::vector<PointOfInterest>& pois);
   std::unordered_set<int> getObjectsInCamera();
+
+  void mergeFalseIdData();
 };
 
 } // namespace owds

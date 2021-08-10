@@ -10,6 +10,12 @@ void ObjectsPerceptionManager::getPercepts(const std::map<std::string, Object>& 
 {
   for(auto& percept : percepts)
     {
+        if(percept.second.isTrueId() == false)
+        {
+          if(merged_ids_.find(percept.first) == merged_ids_.end())
+            false_ids_to_be_merged_.insert(percept.first);
+        }
+
         auto it = entities_.find(percept.second.id());
         if(it == entities_.end())
         {
@@ -51,8 +57,19 @@ void ObjectsPerceptionManager::getPercepts(const std::map<std::string, Object>& 
 
 void ObjectsPerceptionManager::reasoningOnUpdate()
 {
-  std::vector<Object*> no_data_objects;
   bullet_client_->performCollisionDetection();
+  UpdateAabbs();
+
+  if(false_ids_to_be_merged_.size())
+    mergeFalseIdData();
+
+  for(auto& merged : merged_ids_)
+  {
+    entities_.at(merged.second)->merge(entities_.at(merged.first));
+    removeEntityPose(entities_.at(merged.first));
+  }
+
+  std::vector<Object*> no_data_objects;
   for(auto& object : entities_)
   {
     if(object.second->isStatic() == true)
@@ -60,7 +77,6 @@ void ObjectsPerceptionManager::reasoningOnUpdate()
     else if (object.second->isLocated() == false)
       continue;
     
-
     if(object.second->isInHand() == false)
     {
       if(object.second->getNbFrameUnseen() >= 5)
@@ -102,8 +118,6 @@ void ObjectsPerceptionManager::reasoningOnUpdate()
         removeEntityPose(no_data_obj);
     }
   }
-
-  UpdateAabbs();
 }
 
 std::vector<PointOfInterest> ObjectsPerceptionManager::getPoisInFov(Object* object)
@@ -117,8 +131,7 @@ std::vector<PointOfInterest> ObjectsPerceptionManager::getPoisInFov(Object* obje
   {
     ShellDisplay::error("[ObjectsPerceptionManager] defined agent has no head");
     return object->getPointsOfInterest();
-  }
-    
+  } 
 
   std::vector<PointOfInterest> pois_in_fov;
 
@@ -207,6 +220,46 @@ std::unordered_set<int> ObjectsPerceptionManager::getObjectsInCamera()
   auto images = bullet_client_->getCameraImage(175*myself_agent_->getFieldOfView().getRatio(), 175, view_matrix, proj_matrix, owds::BULLET_HARDWARE_OPENGL);
 
   return bullet_client_->getSegmentationIds(images);
+}
+
+void ObjectsPerceptionManager::mergeFalseIdData()
+{
+  std::unordered_set<std::string> merged;
+
+  for(auto& id : false_ids_to_be_merged_)
+  {
+    auto obj = entities_.find(id);
+
+    double obj_volume = obj->second->getAabbVolume();
+    double min_error = 10000;
+    Object* to_be_merged = nullptr;
+
+    for(auto entity : entities_)
+    {
+      if(entity.first != obj->first)
+      {
+        if(entity.second->pose().distanceTo(obj->second->pose()) <= 0.03) // TODO tune
+        {
+          double error = std::abs(obj_volume - entity.second->getAabbVolume());
+          if(error < min_error)
+          {
+            to_be_merged = entity.second;
+            min_error = error;
+          }
+        }
+      }
+    }
+
+    if(to_be_merged != nullptr)
+    {
+      merged.insert(id);
+      to_be_merged->merge(obj->second);
+      merged_ids_.insert(std::make_pair(id, to_be_merged->id()));
+    }
+  }
+
+  for(auto& id : merged)
+    false_ids_to_be_merged_.erase(id);
 }
 
 } // namespace owds
