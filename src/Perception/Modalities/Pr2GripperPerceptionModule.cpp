@@ -2,7 +2,7 @@
 
 #include <numeric>
 
-#define PRESSURE_DIFF 3000
+#define PRESSURE_DIFF 1000
 
 namespace owds {
 
@@ -55,8 +55,15 @@ bool Pr2GripperPerceptionModule::perceptionCallback(const pr2_msgs::PressureStat
   left_tip_pressure_prev_ = left_tip_pressure_;
   right_tip_pressure_prev_ = right_tip_pressure_;
 
-  left_tip_pressure_ = std::accumulate(msg.l_finger_tip.begin(), msg.l_finger_tip.end(), decltype(msg.l_finger_tip)::value_type(0));
-  right_tip_pressure_ = std::accumulate(msg.r_finger_tip.begin(), msg.r_finger_tip.end(), decltype(msg.r_finger_tip)::value_type(0));
+  left_tip_pressure_ = 0;
+  for(auto& p : msg.l_finger_tip)
+    left_tip_pressure_ += (double)p;
+  left_tip_pressure_ /= (double)msg.l_finger_tip.size();
+
+  right_tip_pressure_ = 0;
+  for(auto& p : msg.r_finger_tip)
+    right_tip_pressure_ += (double)p;
+  right_tip_pressure_ /= (double)msg.r_finger_tip.size();
 
   if(is_init_)
   {
