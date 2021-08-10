@@ -13,6 +13,8 @@ public:
   inline ObjectsPerceptionManager(): EntitiesPerceptionManager(), myself_agent_(nullptr){}
   void setOwnerAgent(Agent* agent) { myself_agent_ = agent; }
 
+  std::map<std::string, Object*> getEntities();
+
 private:
   Agent* myself_agent_;
   std::map<std::string, size_t> lost_objects_nb_frames_;

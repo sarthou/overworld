@@ -6,6 +6,23 @@
 
 namespace owds {
 
+std::map<std::string, Object*> ObjectsPerceptionManager::getEntities()
+{
+  if(merged_ids_.size() == 0)
+    return entities_;
+  else
+  {
+    std::map<std::string, Object*> res;
+    for(auto& entity : entities_)
+    {
+      if(merged_ids_.find(entity.first) == merged_ids_.end())
+        res.insert(entity);
+    }
+
+    return res;
+  }
+}
+
 void ObjectsPerceptionManager::getPercepts(const std::map<std::string, Object>& percepts)
 {
   for(auto& percept : percepts)
