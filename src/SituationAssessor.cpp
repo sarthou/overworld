@@ -6,6 +6,7 @@
 #include "overworld/Perception/Modalities/OptitrackPerceptionModule.h"
 #include "overworld/Perception/Modalities/ObjectsEmulatedPerceptionModule.h"
 #include "overworld/Perception/Modalities/HumansEmulatedPerceptionModule.h"
+#include "overworld/Utility/BulletKeypressHandler.h"
 
 #include <chrono>
 #include <thread>
@@ -128,7 +129,7 @@ void SituationAssessor::assessmentLoop()
     start_time = std::chrono::high_resolution_clock::now();
 
     assess();
-
+    handleKeypress(bullet_client_, robots_manager_);
     if(ros::ok() && isRunning())
     {
       if(start_time + interval < std::chrono::high_resolution_clock::now())
@@ -183,7 +184,6 @@ void SituationAssessor::assess()
 
       ros_sender_->sendImage(human.first + "/view", images);
       agents_segmentation_ids[human.first] = bullet_client_->getSegmentationIds(images);
-
       updateHumansPerspective(human.first, objects, body_parts, agents_segmentation_ids[human.first]);
     }
   }

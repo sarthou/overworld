@@ -167,6 +167,8 @@ public:
     struct b3AABBOverlapData getOverlappingObjects(const struct aabb_t& aabb);
 
     void resetDebugVisualizerCamera(float distance, float yaw, float pitch, const std::array<float,3>& target_pose);
+    b3MouseEventsData getMouseEvents();
+    b3KeyboardEventsData getKeyboardEvents();
     
 private:
     b3PhysicsClientHandle* client_handle_;

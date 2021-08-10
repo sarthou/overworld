@@ -789,4 +789,24 @@ void BulletClient::resetDebugVisualizerCamera(float distance, float yaw, float p
 	}
 }
 
+b3MouseEventsData BulletClient::getMouseEvents()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+	struct b3MouseEventsData mouseEventsData;
+	b3SharedMemoryCommandHandle command_handle = b3RequestMouseEventsCommandInit(*client_handle_);
+	b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+	b3GetMouseEventsData(*client_handle_, &mouseEventsData);
+	return mouseEventsData;
+}
+
+b3KeyboardEventsData BulletClient::getKeyboardEvents()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+	struct b3KeyboardEventsData keyboardEvent;
+	b3SharedMemoryCommandHandle command_handle = b3RequestKeyboardEventsCommandInit(*client_handle_);
+	b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+	b3GetKeyboardEventsData(*client_handle_, &keyboardEvent);
+	return keyboardEvent;
+}
+
 } // namespace owds
