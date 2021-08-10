@@ -23,6 +23,22 @@ void Hand::removeFromHand(const std::string& object_name)
 {
   if(has_in_.find(object_name) != has_in_.end())
     has_in_.erase(object_name);
+  else
+  {
+    Object* obj_true = nullptr;
+    for(auto& obj : has_in_)
+    {
+      auto false_ids = obj.second->getFalseIds();
+      if(false_ids.find(object_name) != false_ids.end())
+      {
+        obj_true = obj.second;
+        break;
+      }
+    }
+
+    if(obj_true != nullptr)
+      obj_true->removeFromHand();
+  }
 }
 
 bool Hand::isInHand(const std::string& object_name) const
