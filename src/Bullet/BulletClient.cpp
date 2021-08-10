@@ -495,6 +495,7 @@ struct b3CameraImageData BulletClient::getCameraImage(int width, int height,
 	b3RequestCameraImageSetCameraMatrices(command, &view_matrix[0], &projection_matrix[0]);
 	if (flags >= 0)
 		b3RequestCameraImageSetFlags(command, flags);
+    b3RequestCameraImageSetShadow(command, 0);
 
 	b3RequestCameraImageSelectRenderer(command, renderer);
 

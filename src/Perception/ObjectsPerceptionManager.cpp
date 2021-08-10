@@ -188,8 +188,7 @@ std::unordered_set<int> ObjectsPerceptionManager::getObjectsInCamera()
   auto view_matrix = bullet_client_->computeViewMatrix({(float)head_pose_trans[0], (float)head_pose_trans[1], (float)head_pose_trans[2]},
                                                         {(float)target_pose_trans[0], (float)target_pose_trans[1], (float)target_pose_trans[2]},
                                                         {0.,0.,1.});
-  auto images = bullet_client_->getCameraImage(175*myself_agent_->getFieldOfView().getRatio(), 175, view_matrix, proj_matrix, owds::BULLET_HARDWARE_OPENGL);
-
+  auto images = bullet_client_->getCameraImage(100*myself_agent_->getFieldOfView().getRatio(), 100, view_matrix, proj_matrix, owds::BULLET_HARDWARE_OPENGL);
   return bullet_client_->getSegmentationIds(images);
 }
 
