@@ -24,6 +24,7 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   visualization_msgs
   image_transport
+  pr2_motion_tasks_msgs
 )
 find_package (Eigen3 REQUIRED NO_MODULE)
 find_package(Threads REQUIRED)
@@ -161,6 +162,7 @@ target_link_libraries(${PROJECT_NAME}_facts_lib PUBLIC
            
 add_library(${PROJECT_NAME}_sender_lib STATIC
   src/Senders/ROSSender.cpp
+  src/Senders/MotionPlanningPoseSender.cpp
 )
 target_link_libraries(${PROJECT_NAME}_sender_lib PUBLIC
                       ${catkin_LIBRARIES}

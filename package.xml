@@ -27,6 +27,8 @@
   <build_depend>sensor_msgs</build_depend>
   <build_depend>visualization_msgs</build_depend>
   <build_depend>image_transport</build_depend>
+  <build_depend>pr2_motion_tasks_msgs</build_depend>
+
 
   <build_export_depend>ontologenius</build_export_depend>
   <build_export_depend>roscpp</build_export_depend>
@@ -42,6 +44,7 @@
   <build_export_depend>sensor_msgs</build_export_depend>
   <build_export_depend>visualization_msgs</build_export_depend>
   <build_export_depend>image_transport</build_export_depend>
+  <build_export_depend>pr2_motion_tasks_msgs</build_export_depend>
 
   <exec_depend>ontologenius</exec_depend>
   <exec_depend>roscpp</exec_depend>
@@ -58,6 +61,7 @@
   <exec_depend>sensor_msgs</exec_depend>
   <exec_depend>visualization_msgs</exec_depend>
   <exec_depend>image_transport</exec_depend>
+  <exec_depend>pr2_motion_tasks_msgs</exec_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>

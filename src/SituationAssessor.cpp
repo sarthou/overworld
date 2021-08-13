@@ -74,6 +74,7 @@ SituationAssessor::SituationAssessor(const std::string& agent_name, bool is_robo
   objects_manager_.setOwnerAgent(myself_agent_);
 
   ros_sender_ = new ROSSender(&n_);
+  motion_planning_pose_sender_ = new MotionPlanningPoseSender(&n_, objects_manager_);
 }
 
 SituationAssessor::~SituationAssessor()
@@ -82,6 +83,7 @@ SituationAssessor::~SituationAssessor()
   objects_manager_.deleteModules();
   humans_manager_.deleteModules();
   delete ros_sender_;
+  delete motion_planning_pose_sender_;
   delete bullet_client_;
 }
 
