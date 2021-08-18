@@ -151,7 +151,8 @@ void ArTrackPerceptionModule::updateEntities(const ar_track_alvar_msgs::AlvarMar
       }
       else if (ids_map_.find(main_marker.id) == ids_map_.end())
       {
-          createNewEntity(main_marker);
+          if(createNewEntity(main_marker) == false)
+            continue;
       }
 
       auto it_obj = percepts_.find(ids_map_[main_marker.id]);
@@ -171,6 +172,7 @@ bool ArTrackPerceptionModule::createNewEntity(const ar_track_alvar_msgs::AlvarMa
   if(true_id.size() == 0)
   {
     blacklist_ids_.insert(marker.id);
+    ShellDisplay::warning("[ArTrackPerceptionModule] marker " + std::to_string(marker.id) + " was added to the blacklist");
     return false;
   }
 
@@ -198,6 +200,8 @@ bool ArTrackPerceptionModule::createNewEntity(const ar_track_alvar_msgs::AlvarMa
   obj.setShape(shape);
 
   percepts_.insert(std::make_pair(obj.id(), obj));
+
+  return true;
 }
 
 } // namespace owds
