@@ -1,6 +1,7 @@
 #ifndef OWDS_PERCEPTIONMODULEBASE_H
 #define OWDS_PERCEPTIONMODULEBASE_H
 
+#include <atomic>
 #include <map>
 #include <mutex>
 #include <memory>
@@ -42,8 +43,8 @@ public:
 
 protected:
   std::map<std::string, T> percepts_;
-  bool is_activated_;
-  bool updated_;
+  std::atomic<bool> is_activated_;
+  std::atomic<bool> updated_;
   std::mutex mutex_perception_;
   static std::mutex mutex_access_;
 
