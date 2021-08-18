@@ -780,14 +780,12 @@ struct b3AABBOverlapData BulletClient::getOverlappingObjects(const struct aabb_t
 
 void BulletClient::resetDebugVisualizerCamera(float distance, float yaw, float pitch, const std::array<float,3>& target_pose)
 {
-	{
-		b3SharedMemoryCommandHandle commandHandle = b3InitConfigureOpenGLVisualizer(*client_handle_);
-		if ((distance >= 0))
-		{
-			b3ConfigureOpenGLVisualizerSetViewMatrix(commandHandle, distance, pitch, yaw, &target_pose[0]);
-		}
-		b3SubmitClientCommandAndWaitStatus(*client_handle_, commandHandle);
-	}
+    std::lock_guard<std::mutex> lock(mutex_);
+    b3SharedMemoryCommandHandle commandHandle = b3InitConfigureOpenGLVisualizer(*client_handle_);
+    if (distance >= 0)
+        b3ConfigureOpenGLVisualizerSetViewMatrix(commandHandle, distance, pitch, yaw, &target_pose[0]);
+
+    b3SubmitClientCommandAndWaitStatus(*client_handle_, commandHandle);
 }
 
 b3MouseEventsData BulletClient::getMouseEvents()
