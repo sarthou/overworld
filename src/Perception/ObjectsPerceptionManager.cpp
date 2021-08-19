@@ -128,12 +128,15 @@ void ObjectsPerceptionManager::reasoningOnUpdate()
 
   if(no_data_objects.size())
   {
-    auto objects_in_camera = getObjectsInCamera();
-
-    for(auto no_data_obj : no_data_objects)
+    if(isObjectsInFovAabb(no_data_objects))
     {
-      if(objects_in_camera.find(no_data_obj->bulletId()) != objects_in_camera.end())
-        removeEntityPose(no_data_obj);
+      auto objects_in_camera = getObjectsInCamera();
+
+      for(auto no_data_obj : no_data_objects)
+      {
+        if(objects_in_camera.find(no_data_obj->bulletId()) != objects_in_camera.end())
+          removeEntityPose(no_data_obj);
+      }
     }
   }
 }
@@ -174,6 +177,30 @@ std::vector<PointOfInterest> ObjectsPerceptionManager::getPoisInFov(Object* obje
   }
 
   return pois_in_fov;
+}
+
+bool ObjectsPerceptionManager::isObjectsInFovAabb(std::vector<Object*> objects)
+{
+  for(auto object : objects)
+  {
+    std::array<Pose, 8> points = { Pose({object->getAabb().min[0], object->getAabb().min[1], object->getAabb().min[2]}, {0,0,0,1}),
+                                   Pose({object->getAabb().min[0], object->getAabb().min[1], object->getAabb().max[2]}, {0,0,0,1}),
+                                   Pose({object->getAabb().min[0], object->getAabb().max[1], object->getAabb().min[2]}, {0,0,0,1}),
+                                   Pose({object->getAabb().min[0], object->getAabb().max[1], object->getAabb().max[2]}, {0,0,0,1}),
+                                   Pose({object->getAabb().max[0], object->getAabb().min[1], object->getAabb().min[2]}, {0,0,0,1}),
+                                   Pose({object->getAabb().max[0], object->getAabb().min[1], object->getAabb().max[2]}, {0,0,0,1}),
+                                   Pose({object->getAabb().max[0], object->getAabb().max[1], object->getAabb().min[2]}, {0,0,0,1}),
+                                   Pose({object->getAabb().max[0], object->getAabb().max[1], object->getAabb().max[2]}, {0,0,0,1}) };
+
+    for(const auto& point : points)
+    {
+      auto point_in_head = point.transformIn(myself_agent_->getHead()->pose());
+      if (myself_agent_->getFieldOfView().hasIn(point_in_head))
+        return true;
+    }
+  }
+
+  return false;
 }
 
 bool ObjectsPerceptionManager::shouldBeSeen(Object* object, const std::vector<PointOfInterest>& pois)
