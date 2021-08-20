@@ -44,13 +44,15 @@ void ObjectsPerceptionManager::getPercepts(const std::map<std::string, Object>& 
             addToBullet(it->second);
         }
 
-        if(merged_ids_.find(percept.first) == merged_ids_.end())
-          if(percept.second.isInHand() && (it->second->isInHand() == false))
-          {
-            auto hand = percept.second.getHandIn();
-            hand->removeFromHand(percept.first);
-            it->second->setInHand(hand);
-          }
+        if(merged_ids_.find(percept.first) != merged_ids_.end())
+          continue;
+
+        if(percept.second.isInHand() && (it->second->isInHand() == false))
+        {
+          auto hand = percept.second.getHandIn();
+          hand->removeFromHand(percept.first);
+          it->second->setInHand(hand);
+        }
         
         if(it->second->isInHand())
         {
