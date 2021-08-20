@@ -26,6 +26,7 @@ private:
   void reasoningOnUpdate() override;
 
   std::vector<PointOfInterest> getPoisInFov(Object* object);
+  bool isObjectsInFovAabb(std::vector<Object*> objects);
   bool shouldBeSeen(Object* object, const std::vector<PointOfInterest>& pois);
   std::unordered_set<int> getObjectsInCamera();
 

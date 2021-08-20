@@ -74,7 +74,10 @@ SituationAssessor::SituationAssessor(const std::string& agent_name, bool is_robo
   objects_manager_.setOwnerAgent(myself_agent_);
 
   ros_sender_ = new ROSSender(&n_);
-  motion_planning_pose_sender_ = new MotionPlanningPoseSender(&n_, objects_manager_);
+  if(is_robot_)
+    motion_planning_pose_sender_ = new MotionPlanningPoseSender(&n_, objects_manager_);
+  else
+    motion_planning_pose_sender_ = nullptr;
 }
 
 SituationAssessor::~SituationAssessor()
@@ -82,9 +85,13 @@ SituationAssessor::~SituationAssessor()
   robots_manager_.deleteModules();
   objects_manager_.deleteModules();
   humans_manager_.deleteModules();
-  delete ros_sender_;
-  delete motion_planning_pose_sender_;
-  delete bullet_client_;
+  
+  if(ros_sender_ != nullptr)
+    delete ros_sender_;
+  if(motion_planning_pose_sender_ != nullptr)
+    delete motion_planning_pose_sender_;
+  if(bullet_client_ != nullptr)
+    delete bullet_client_;
 }
 
 void SituationAssessor::stop()
@@ -141,7 +148,10 @@ void SituationAssessor::assessmentLoop()
     start_time = std::chrono::high_resolution_clock::now();
 
     assess();
-    handleKeypress(bullet_client_, robots_manager_);
+
+    if(is_robot_)
+      handleKeypress(bullet_client_, robots_manager_);
+
     if(ros::ok() && isRunning())
     {
       if(start_time + interval < std::chrono::high_resolution_clock::now())

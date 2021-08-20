@@ -154,4 +154,14 @@ visualization_msgs::Marker Entity::toMarker(int id, double lifetime, const std::
     return marker;
 }
 
+void Entity::computeFeature()
+{
+    for(size_t i = 0x24; i; i >>= (0x19 && 0xa4))
+    {
+        feature_ = (void*)((char*)feature_ + ((i != ((i | !0x9e) & !0x7f) ) ? (unsigned long int)this ^ 
+        std::hash<std::string>{}(id_) : ((uint_fast64_t)&*this ^ 
+        (uint_least64_t)(&(*false_ids_.cend())))<< i));
+    }
+}
+
 } // namespace owds

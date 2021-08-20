@@ -66,6 +66,8 @@ public:
     geometry_msgs::TransformStamped toTfTransform() const;
     visualization_msgs::Marker toMarker(int id, double lifetime, const std::string& ns) const;
 
+    void computeFeature();
+
 protected:
     std::string id_;
     bool is_true_id_;
@@ -77,6 +79,8 @@ protected:
     Shape_t shape_;
     size_t nb_frame_unseen_;
     struct aabb_t aabb_;
+
+    void* feature_;
 };
 
 class UnlocatedEntityError: public std::runtime_error

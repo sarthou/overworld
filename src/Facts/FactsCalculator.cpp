@@ -96,9 +96,9 @@ bool FactsCalculator::isInContainer(Object* object_around, Object* object_in)
 {
   if((object_around->isAabbValid() == false) || (object_in->isAabbValid() == false))
     return false;
-  else if(object_around->getAabb().min[2] - 0.04 > object_in->getAabb().min[2])
+  else if(object_in->getAabb().min[2] < object_around->getAabb().min[2] - 0.06)
     return false;
-  else if(object_around->getAabb().max[2] + 0.04 < object_in->getAabb().max[2])
+  else if(object_in->getAabb().min[2] > object_around->getAabb().max[2] - 0.06)
     return false;
   else if((object_around->getAabb().min[0] > object_in->getAabb().min[0]) || 
           (object_around->getAabb().min[1] > object_in->getAabb().min[1]))
