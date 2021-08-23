@@ -5,6 +5,8 @@ namespace owds {
 void FactsPublisher::publish(const std::vector<Fact>& facts)
 {
   std::unordered_set<size_t> done_facts_;
+  std::vector<Fact> to_insert;
+
   for(auto& fact : facts)
   {
     if(fact.getPredicate() == "pick")
@@ -12,7 +14,7 @@ void FactsPublisher::publish(const std::vector<Fact>& facts)
       if(held_by_.find(fact.getObject()) == held_by_.end())
       {
         held_by_.insert(fact.getObject());
-        addToKb(fact);
+        to_insert.push_back(fact);
       }
     }
     else if((fact.getPredicate() == "place") && (fact.getPredicate() == "release"))
@@ -28,7 +30,7 @@ void FactsPublisher::publish(const std::vector<Fact>& facts)
       if(pending_facts_.find(fact.getHash()) == pending_facts_.end())
       {
         pending_facts_.insert(std::make_pair(fact.getHash(), fact));
-        addToKb(fact);
+        to_insert.push_back(fact);
       }
 
       done_facts_.insert(fact.getHash());
@@ -47,6 +49,9 @@ void FactsPublisher::publish(const std::vector<Fact>& facts)
     removeFromKb(pending_facts_.at(hash));
     pending_facts_.erase(hash);
   }
+
+  for(auto fact : to_insert)
+    addToKb(fact);
 }
 
 } // namespace owds
