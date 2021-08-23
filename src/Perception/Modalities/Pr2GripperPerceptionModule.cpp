@@ -10,7 +10,7 @@ Pr2GripperPerceptionModule::Pr2GripperPerceptionModule(ros::NodeHandle* n,
                                                        Pr2GripperSide_e side,
                                                        BulletClient* bullet_client,
                                                        int pr2_bullet_id,
-                                                       Agent* agent) : PerceptionModuleRosBase(n, "pressure/" + std::string((side == PR2_GRIPPER_LEFT) ? "l" : "r") + "_gripper_motor")
+                                                       Agent* agent) : PerceptionModuleRosBase(n, "pressure/" + std::string((side == PR2_GRIPPER_LEFT) ? "l" : "r") + "_gripper_motor", true)
 {
   agent_ = agent;
   bullet_client_ = bullet_client;
