@@ -43,7 +43,13 @@ bool PR2JointsPerception::perceptionCallback(const sensor_msgs::JointState& msg)
     if ((ros::Time::now() - last_update_).toSec() < min_period_){
         return false;
     }
-    geometry_msgs::TransformStamped robot_base = tf_buffer_.lookupTransform("map", "base_footprint", msg.header.stamp, ros::Duration(1.0));
+    geometry_msgs::TransformStamped robot_base;
+    try {
+        robot_base = tf_buffer_.lookupTransform("map", "base_footprint", msg.header.stamp, ros::Duration(1.0));
+    }
+    catch(...) {
+        return false;
+    }
     bullet_->resetBasePositionAndOrientation(
         robot_body_id_, {robot_base.transform.translation.x, robot_base.transform.translation.y, robot_base.transform.translation.z},
         {robot_base.transform.rotation.x, robot_base.transform.rotation.y, robot_base.transform.rotation.z, robot_base.transform.rotation.w});
