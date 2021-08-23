@@ -14,6 +14,7 @@
 #include "overworld/Perception/HumansPerceptionManager.h"
 #include "overworld/Senders/ROSSender.h"
 #include "overworld/Senders/MotionPlanningPoseSender.h"
+#include "overworld/Senders/Bernie.h"
 #include "overworld/Facts/FactsCalculator.h"
 #include "overworld/Facts/Publisher/OntologeniusFactsPublisher.h"
 
@@ -71,6 +72,7 @@ private:
 
   ROSSender* ros_sender_;
   MotionPlanningPoseSender* motion_planning_pose_sender_;
+  BernieSenders* bernie_sender_;
 
   std::map<std::string, HumanAssessor_t> humans_assessors_;
 

@@ -102,7 +102,7 @@ geometry_msgs::TransformStamped Entity::toTfTransform() const
         throw std::runtime_error("Called toTfTransform on a non located entity: '" + id_ + "'.");
     }
     geometry_msgs::TransformStamped transform;
-    transform.header.stamp = ros::Time::now(); //last_poses_.back().stamp;
+    transform.header.stamp = ros::Time::now(); //last_poses_.back().stamp; Because tf does not like old transforms
     transform.header.frame_id = "map";
     transform.child_frame_id = id_;
     transform.transform = last_poses_.back().pose.toTransformMsg();

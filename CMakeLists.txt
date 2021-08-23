@@ -25,9 +25,11 @@ find_package(catkin REQUIRED COMPONENTS
   visualization_msgs
   image_transport
   pr2_motion_tasks_msgs
+  cv_bridge
 )
 find_package (Eigen3 REQUIRED NO_MODULE)
 find_package(Threads REQUIRED)
+find_package(CURL REQUIRED)
 
 list(APPEND BULLET_LIB_NAMES BulletRoboticsGUI
                              BulletExampleBrowserLib
@@ -101,6 +103,7 @@ include_directories(
   ${EIGEN3_INCLUDE_DIRS}
   ${catkin_INCLUDE_DIRS}
   ${optitrack_ros_INCLUDE_DIRS}
+  ${CURL_INCLUDE_DIRS}
 )
 add_definitions( ${EIGEN3_DEFINITIONS} )
 
@@ -163,10 +166,12 @@ target_link_libraries(${PROJECT_NAME}_facts_lib PUBLIC
 add_library(${PROJECT_NAME}_sender_lib STATIC
   src/Senders/ROSSender.cpp
   src/Senders/MotionPlanningPoseSender.cpp
+  src/Senders/Bernie.cpp
 )
 target_link_libraries(${PROJECT_NAME}_sender_lib PUBLIC
                       ${catkin_LIBRARIES}
                       Bullet3 # For b3CameraImage
+                      ${CURL_LIBRARIES}
                       ${PROJECT_NAME}_types_lib)
 
 #################

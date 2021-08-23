@@ -75,9 +75,15 @@ SituationAssessor::SituationAssessor(const std::string& agent_name, bool is_robo
 
   ros_sender_ = new ROSSender(&n_);
   if(is_robot_)
+  {
     motion_planning_pose_sender_ = new MotionPlanningPoseSender(&n_, objects_manager_);
+    bernie_sender_ =  new BernieSenders(&n_);
+  }
   else
+  {
     motion_planning_pose_sender_ = nullptr;
+    bernie_sender_ = nullptr;
+  }
 }
 
 SituationAssessor::~SituationAssessor()
@@ -90,6 +96,8 @@ SituationAssessor::~SituationAssessor()
     delete ros_sender_;
   if(motion_planning_pose_sender_ != nullptr)
     delete motion_planning_pose_sender_;
+  if (bernie_sender_ != nullptr)
+    delete bernie_sender_;
   if(bullet_client_ != nullptr)
     delete bullet_client_;
 }
@@ -217,7 +225,10 @@ void SituationAssessor::assess()
   facts_publisher_.publish(facts);
 
   if(is_robot_)
+  {
     ros_sender_->sendEntitiesToTFAndRViz(myself_agent_->getId() + "/objects_markers", objects);
+    //bernie_sender_->sendBernie();
+  }
   else
     ros_sender_->sendEntitiesToRViz(myself_agent_->getId() + "/objects_markers", objects);
   ros_sender_->sendEntitiesToRViz(myself_agent_->getId() + "/humans_markers", body_parts);
