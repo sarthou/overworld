@@ -7,7 +7,7 @@ namespace owds {
 
 #define TO_HALF_RAD M_PI / 180. / 2.
 
-ArTrackPerceptionModule::ArTrackPerceptionModule(ros::NodeHandle* n, Agent* agent) : PerceptionModuleRosSyncBase(n, "ar_pose_marker", "ar_pose_visible_marker"),
+ArTrackPerceptionModule::ArTrackPerceptionModule(ros::NodeHandle* n, Agent* agent) : PerceptionModuleRosSyncBase(n, "ar_pose_marker", "ar_pose_visible_marker", true),
                                                                                      ontologies_manipulator_(n),
                                                                                      tf2_listener_(tf_buffer_)
 {

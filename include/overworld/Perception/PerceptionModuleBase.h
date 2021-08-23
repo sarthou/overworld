@@ -20,8 +20,9 @@ class PerceptionModuleBase_
 {
   static_assert(std::is_base_of<Entity,T>::value, "T must be derived from Entity");
 public:
-  PerceptionModuleBase_()
+  PerceptionModuleBase_(bool need_access_to_external_entities = false)
   {
+    need_access_to_external_entities_ = need_access_to_external_entities;
     is_activated_ = true;
     updated_ = false;
   }
@@ -34,10 +35,12 @@ public:
   void accessPercepts(const std::function<void(const std::map<std::string, T>&)>& accessor)
   {
     mutex_perception_.lock();
-    mutex_access_.lock();
+    if(need_access_to_external_entities_)
+      mutex_access_.lock();
     accessor(percepts_);
     updated_ = false;
-    mutex_access_.unlock();
+    if(need_access_to_external_entities_)
+      mutex_access_.unlock();
     mutex_perception_.unlock();
   }
 
@@ -47,6 +50,7 @@ protected:
   std::atomic<bool> updated_;
   std::mutex mutex_perception_;
   static std::mutex mutex_access_;
+  bool need_access_to_external_entities_;
 
   void setAllPerceptsUnseen()
   {
@@ -62,6 +66,7 @@ template<typename T, class M>
 class PerceptionModuleBase : public PerceptionModuleBase_<T>
 {
 public:
+  PerceptionModuleBase(bool need_access_to_external_entities = false) : PerceptionModuleBase_<T>(need_access_to_external_entities) {}
   virtual ~PerceptionModuleBase() = default;
   void sendPerception(const M& msg) { privatePerceptionCallback(msg); }
 
@@ -74,12 +79,22 @@ private:
     if(!this->is_activated_)
       return;
 
-    this->mutex_perception_.lock();
-    this->mutex_access_.lock();
-    this->mutex_perception_.unlock();
+    if(this->need_access_to_external_entities_)
+    {
+      this->mutex_perception_.lock();
+      this->mutex_access_.lock();
+      this->mutex_perception_.unlock();
+    }
+    else
+      this->mutex_perception_.lock();
+    
     if(perceptionCallback(msg))
       this->updated_ = true;
-    this->mutex_access_.unlock();
+
+    if(this->need_access_to_external_entities_)
+      this->mutex_access_.unlock();
+    else
+      this->mutex_perception_.unlock();
   }
 };
 
@@ -87,7 +102,10 @@ template<typename T>
 class PerceptionModuleRosBase_ : public PerceptionModuleBase_<T>
 {
 public:
-  PerceptionModuleRosBase_(ros::NodeHandle* n) { n_ = n; }
+  PerceptionModuleRosBase_(ros::NodeHandle* n, bool need_access_to_external_entities = false) : PerceptionModuleBase_<T>(need_access_to_external_entities)
+  {
+    n_ = n;
+  }
   virtual ~PerceptionModuleRosBase_() = default;
 protected:
   ros::NodeHandle* n_;
@@ -98,7 +116,7 @@ template<typename T, class M>
 class PerceptionModuleRosBase : public PerceptionModuleRosBase_<T>
 {
 public:
-  PerceptionModuleRosBase(ros::NodeHandle* n, const std::string& topic_name) : PerceptionModuleRosBase_<T>(n)
+  PerceptionModuleRosBase(ros::NodeHandle* n, const std::string& topic_name, bool need_access_to_external_entities = false) : PerceptionModuleRosBase_<T>(n, need_access_to_external_entities)
   {
     sub_ = this->n_->subscribe(topic_name, 1, &PerceptionModuleRosBase::privatePerceptionCallback, this);
     std::cout << "PerceptionModuleRosBase subscribed to " << topic_name << std::endl;
@@ -116,12 +134,22 @@ private:
     if(!this->is_activated_)
       return;
 
-    this->mutex_perception_.lock();
-    this->mutex_access_.lock();
-    this->mutex_perception_.unlock();
+    if(this->need_access_to_external_entities_)
+    {
+      this->mutex_perception_.lock();
+      this->mutex_access_.lock();
+      this->mutex_perception_.unlock();
+    }
+    else
+      this->mutex_perception_.lock();
+
     if(perceptionCallback(msg))
       this->updated_ = true;
-    this->mutex_access_.unlock();
+
+    if(this->need_access_to_external_entities_)
+      this->mutex_access_.unlock();
+    else
+      this->mutex_perception_.unlock();
   }
 };
 
@@ -131,7 +159,8 @@ class PerceptionModuleRosSyncBase : public PerceptionModuleRosBase_<T>
 public:
   PerceptionModuleRosSyncBase(ros::NodeHandle* n,
                               const std::string& first_topic_name,
-                              const std::string& second_topic_name): PerceptionModuleRosBase_<T>(n)
+                              const std::string& second_topic_name,
+                              bool need_access_to_external_entities = false): PerceptionModuleRosBase_<T>(n, need_access_to_external_entities)
   {
     sub_0_.subscribe(*n, first_topic_name, 1);
     sub_1_.subscribe(*n, second_topic_name, 1);
@@ -156,12 +185,22 @@ private:
     if(!this->is_activated_)
       return;
 
-    this->mutex_perception_.lock();
-    this->mutex_access_.lock();
-    this->mutex_perception_.unlock();
+    if(this->need_access_to_external_entities_)
+    {
+      this->mutex_perception_.lock();
+      this->mutex_access_.lock();
+      this->mutex_perception_.unlock();
+    }
+    else
+      this->mutex_perception_.lock();
+
     if(perceptionCallback(first_msg, second_msg))
       this->updated_ = true;
-    this->mutex_access_.unlock();
+
+    if(this->need_access_to_external_entities_)
+      this->mutex_access_.unlock();
+    else
+      this->mutex_perception_.unlock();
   }
 };
 
