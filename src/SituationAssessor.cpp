@@ -138,7 +138,7 @@ void SituationAssessor::addRobotPerceptionModule(const std::string& module_name,
 
 void SituationAssessor::assessmentLoop()
 {
-  std::chrono::milliseconds interval(100);
+  std::chrono::milliseconds interval(60);
 
   std::chrono::high_resolution_clock::time_point start_time(std::chrono::high_resolution_clock::now());
   std::chrono::high_resolution_clock::time_point next_start_time(start_time);
