@@ -2,7 +2,7 @@
 
 #include <numeric>
 
-#define PRESSURE_DIFF 1000
+#define PRESSURE_DIFF 800
 
 namespace owds {
 
