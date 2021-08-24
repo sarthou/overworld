@@ -185,16 +185,12 @@ bool ArTrackPerceptionModule::createNewEntity(const ar_track_alvar_msgs::AlvarMa
   {
     shape.type = SHAPE_MESH;
     shape.mesh_resource = meshs[0].substr(meshs[0].find("#") + 1);
-
-    if(onto_->individuals.isA(obj.id(), "Cube"))
-      shape.color = {0,0,1};
-    else if(onto_->individuals.isA(obj.id(), "Box"))
-      shape.color = {0.82, 0.42, 0.12};
+    shape.color = getColor(obj.id());
   }
   else
   {
     shape.type = SHAPE_CUBE;
-    shape.color = {1,0,0};
+    shape.color = getColor(obj.id(), {1,0,0});
     shape.scale = {0.05, 0.05, 0.003};
   }
   obj.setShape(shape);
@@ -202,6 +198,28 @@ bool ArTrackPerceptionModule::createNewEntity(const ar_track_alvar_msgs::AlvarMa
   percepts_.insert(std::make_pair(obj.id(), obj));
 
   return true;
+}
+
+std::array<double, 3> ArTrackPerceptionModule::getColor(const std::string& indiv_name, const std::array<double, 3>& default_value)
+{
+  auto color = onto_->individuals.getOn(indiv_name, "hasColor");
+  if(color.size() != 0)
+  {
+    auto hex_value = onto_->individuals.getOn(color.front(), "hexRgbValue");
+    if(hex_value.size())
+    {
+      int hex = 0;
+      sscanf(hex_value[0].c_str(), "%x", &hex);
+      return { ((hex >> 16) & 0xff) / 255., ((hex >> 8) & 0xff) / 255., (hex & 0xff) / 255. };
+    }
+  }
+  
+  if(onto_->individuals.isA(indiv_name, "Cube"))
+    return {0,0,1};
+  else if(onto_->individuals.isA(indiv_name, "Box"))
+    return {0.82, 0.42, 0.12};
+  else
+    return default_value;
 }
 
 } // namespace owds
