@@ -26,7 +26,6 @@
   <build_depend>ar_track_alvar_msgs</build_depend>
   <build_depend>sensor_msgs</build_depend>
   <build_depend>visualization_msgs</build_depend>
-  <build_depend>image_transport</build_depend>
   <build_depend>pr2_motion_tasks_msgs</build_depend>
   <build_depend>cv_bridge</build_depend>
 
@@ -44,7 +43,6 @@
   <build_export_depend>ar_track_alvar_msgs</build_export_depend>
   <build_export_depend>sensor_msgs</build_export_depend>
   <build_export_depend>visualization_msgs</build_export_depend>
-  <build_export_depend>image_transport</build_export_depend>
   <build_export_depend>pr2_motion_tasks_msgs</build_export_depend>
   <build_export_depend>cv_bridge</build_export_depend>
 
@@ -63,7 +61,6 @@
   <exec_depend>ar_track_alvar_msgs</exec_depend>
   <exec_depend>sensor_msgs</exec_depend>
   <exec_depend>visualization_msgs</exec_depend>
-  <exec_depend>image_transport</exec_depend>
   <exec_depend>pr2_motion_tasks_msgs</exec_depend>
   <exec_depend>cv_bridge</exec_depend>
 

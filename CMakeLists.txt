@@ -23,7 +23,6 @@ find_package(catkin REQUIRED COMPONENTS
   ar_track_alvar_msgs
   sensor_msgs
   visualization_msgs
-  image_transport
   pr2_motion_tasks_msgs
   cv_bridge
 )
