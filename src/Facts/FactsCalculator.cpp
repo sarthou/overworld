@@ -59,7 +59,8 @@ std::vector<Fact> FactsCalculator::computeFacts(const std::map<std::string, Obje
         continue;
 
       if (agent_from.second->getType() == AgentType_e::HUMAN){
-        hasInHand(agent_from.second, obj.second);    
+        hasInHand(agent_from.second, obj.second);
+        isHandMovingTowards(agent_from.second, obj.second);
       } 
       auto image_it = segmantation_ids.find(agent_from.first);
       if(image_it != segmantation_ids.end())
@@ -246,6 +247,70 @@ bool FactsCalculator::hasInHand(Agent* agent, Object* object)
           rightHand->putInHand(object);
           facts_.emplace_back(agent->getId(), "hasInRightHand", object->id());
           return true;
+        }
+      }
+    }
+  }
+  return false;
+}
+
+bool FactsCalculator::isHandMovingTowards(Agent* agent, Object* object)
+{
+  Hand *left_hand, *right_hand;
+  bool ret = false;
+  if ((left_hand = agent->getLeftHand()) != nullptr)
+  {
+    const auto in_left_hand = left_hand->getInHand();
+    if (std::find(in_left_hand.begin(), in_left_hand.end(), object->id()) != in_left_hand.end())
+    {
+      return false;
+    }
+    else if (left_hand->isLocated() && object->isLocated())
+    {
+      std::array<double, 3> object_to_pose = object->pose().subtractTranslations(left_hand->pose());
+      double dist = std::sqrt(object_to_pose[0] * object_to_pose[0] + object_to_pose[1] * object_to_pose[1] + object_to_pose[2] * object_to_pose[2]);
+      if (dist < 0.9)
+      {
+        std::array<double, 3> handSpeed = left_hand->computeTranslationSpeed();
+        double handSpeedNorm = std::sqrt(handSpeed[0] * handSpeed[0] + handSpeed[1] * handSpeed[1] + handSpeed[2] * handSpeed[2]);
+        if (handSpeedNorm > 0.1)
+        {
+          double speed_dot_dist = handSpeed[0] * object_to_pose[0] + handSpeed[1] * object_to_pose[1] + handSpeed[2] * object_to_pose[2];
+          double speed_to_dist_angle = std::acos(speed_dot_dist / (handSpeedNorm * dist)) * 180. / M_PI;
+          if (abs(speed_to_dist_angle) < 10)
+          {
+            facts_.emplace_back(agent->getId(), "hasLeftHandMovingToward", object->id());
+            ret = true;
+          }
+        }
+      }
+    }
+  }
+
+  if ((right_hand = agent->getRightHand()) != nullptr)
+  {
+    const auto in_right_hand = right_hand->getInHand();
+    if (std::find(in_right_hand.begin(), in_right_hand.end(), object->id()) != in_right_hand.end())
+    {
+      return false;
+    }
+    else if (right_hand->isLocated() && object->isLocated())
+    {
+      std::array<double, 3> object_to_pose = object->pose().subtractTranslations(right_hand->pose());
+      double dist = std::sqrt(object_to_pose[0] * object_to_pose[0] + object_to_pose[1] * object_to_pose[1] + object_to_pose[2] * object_to_pose[2]);
+      if (dist < 0.9)
+      {
+        std::array<double, 3> handSpeed = right_hand->computeTranslationSpeed();
+        double handSpeedNorm = std::sqrt(handSpeed[0] * handSpeed[0] + handSpeed[1] * handSpeed[1] + handSpeed[2] * handSpeed[2]);
+        if (handSpeedNorm > 0.1)
+        {
+          double speed_dot_dist = handSpeed[0] * object_to_pose[0] + handSpeed[1] * object_to_pose[1] + handSpeed[2] * object_to_pose[2];
+          double speed_to_dist_angle = std::acos(speed_dot_dist / (handSpeedNorm * dist)) * 180. / M_PI;
+          if (abs(speed_to_dist_angle) < 10)
+          {
+            facts_.emplace_back(agent->getId(), "hasRightHandMovingToward", object->id());
+            ret = true;
+          }
         }
       }
     }

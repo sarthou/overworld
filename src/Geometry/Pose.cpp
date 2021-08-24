@@ -47,6 +47,12 @@ double Pose::angularDistance(const Pose& pose) const
     return rot.angularDistance(Eigen::Quaternion<double>(pose.t_.rotation()));
 }
 
+std::array<double, 3> Pose::subtractTranslations(const Pose& other) const
+{
+    Eigen::Vector3d diff(t_.translation() - other.t_.translation());
+    return {diff.x(), diff.y(), diff.z()};
+}
+
 std::pair<std::array<double, 3>, std::array<double, 4>> Pose::arrays() const
 {
     Eigen::Vector3d translation(t_.translation());
