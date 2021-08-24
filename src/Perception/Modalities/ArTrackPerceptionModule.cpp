@@ -209,7 +209,7 @@ std::array<double, 3> ArTrackPerceptionModule::getColor(const std::string& indiv
     if(hex_value.size())
     {
       int hex = 0;
-      sscanf(hex_value[0].c_str(), "%x", &hex);
+      sscanf(hex_value[0].substr(hex_value[0].find("#") + 1).c_str(), "%x", &hex);
       return { ((hex >> 16) & 0xff) / 255., ((hex >> 8) & 0xff) / 255., (hex & 0xff) / 255. };
     }
   }
