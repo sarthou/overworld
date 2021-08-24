@@ -37,6 +37,8 @@ public:
     ros::Time lastStamp() const { return last_poses_.back().stamp; }
     bool hasMoved() const;
 
+    std::array<double, 3> computeTranslationSpeed() const;
+
     void setId(const std::string& id, bool is_true_id = true);
     std::string id() const { return id_; }
     bool isTrueId() const { return is_true_id_; }

@@ -65,6 +65,25 @@ bool Entity::hasMoved() const
     return false;
 }
 
+std::array<double, 3> Entity::computeTranslationSpeed() const
+{
+    if (!hasMoved())
+    {
+        return {0.0, 0.0, 0.0};
+    }
+    if (last_poses_.size() < 2)
+    {
+        return {0.0, 0.0, 0.0};
+    }
+
+    const PoseStamped_s& oldest_pose = last_poses_.at(0);
+    const PoseStamped_s& last_pose = last_poses_.back();
+    auto pose_diff = last_pose.pose.subtractTranslations(oldest_pose.pose);
+    double dt = (last_pose.stamp - oldest_pose.stamp).toSec();
+    return {pose_diff[0] / dt, pose_diff[1] / dt, pose_diff[2] / dt};
+}
+
+
 void Entity::setId(const std::string& id, bool is_true_id)
 {
     id_ = id;
