@@ -19,7 +19,7 @@ public:
 private:
   std::map<std::string, Agent*> agents_;
 
-  void getPercepts(const std::map<std::string, BodyPart>& percepts) override;
+  void getPercepts( std::map<std::string, BodyPart>& percepts) override;
 
   void UpdateAgent(BodyPart* body_part);
 };

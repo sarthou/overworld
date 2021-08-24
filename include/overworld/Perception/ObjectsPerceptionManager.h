@@ -22,7 +22,7 @@ private:
   std::unordered_set<std::string> false_ids_to_be_merged_;
   std::map<std::string, std::string> merged_ids_;
 
-  void getPercepts(const std::map<std::string, Object>& percepts) override;
+  void getPercepts( std::map<std::string, Object>& percepts) override;
   void reasoningOnUpdate() override;
 
   std::vector<PointOfInterest> getPoisInFov(Object* object);

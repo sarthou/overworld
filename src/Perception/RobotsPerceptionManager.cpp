@@ -24,7 +24,7 @@ Agent* RobotsPerceptionManager::getAgent(const std::string& agent_name)
   return it->second;
 }
 
-void RobotsPerceptionManager::getPercepts(const std::map<std::string, BodyPart>& percepts)
+void RobotsPerceptionManager::getPercepts( std::map<std::string, BodyPart>& percepts)
 {
     for(auto& percept : percepts)
     {

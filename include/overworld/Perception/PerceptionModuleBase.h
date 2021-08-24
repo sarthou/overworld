@@ -32,7 +32,7 @@ public:
   bool isActivated() { return is_activated_; }
   bool hasBeenUpdated() { return updated_; }
 
-  void accessPercepts(const std::function<void(const std::map<std::string, T>&)>& accessor)
+  void accessPercepts(const std::function<void(std::map<std::string, T>&)>& accessor)
   {
     mutex_perception_.lock();
     if(need_access_to_external_entities_)

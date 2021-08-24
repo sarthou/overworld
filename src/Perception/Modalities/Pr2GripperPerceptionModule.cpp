@@ -75,7 +75,7 @@ bool Pr2GripperPerceptionModule::perceptionCallback(const pr2_msgs::PressureStat
       if((pressure_diff_left > PRESSURE_DIFF) && (pressure_diff_right > PRESSURE_DIFF))
       {
         double dist = getGripperDistance();
-        if(dist >= 0.03) // 4cm
+        if(dist >= 0.03) // 3cm
         {
           if(side_ == PR2_GRIPPER_LEFT)
             current_obj_id_ = "obj_pr2_gripper_left_" + std::to_string(obj_id_);

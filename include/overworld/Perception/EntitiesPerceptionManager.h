@@ -41,7 +41,7 @@ protected:
     BulletClient* bullet_client_;
 
     bool shouldRun();
-    virtual void getPercepts(const std::map<std::string, T>& percepts);
+    virtual void getPercepts( std::map<std::string, T>& percepts);
     virtual void reasoningOnUpdate() {}
 
     void updateEntityPose(T* entity, const Pose& pose, const ros::Time& stamp);
@@ -150,7 +150,7 @@ bool EntitiesPerceptionManager<T>::shouldRun()
 }
 
 template<typename T>
-void EntitiesPerceptionManager<T>::getPercepts(const std::map<std::string, T>& percepts)
+void EntitiesPerceptionManager<T>::getPercepts( std::map<std::string, T>& percepts)
 {
     // This implementation only has test purposes
     for(auto& percept : percepts)
@@ -178,7 +178,7 @@ bool EntitiesPerceptionManager<T>::update()
 
     for(const auto& module : perception_modules_)
         if(module.second->isActivated() && module.second->hasBeenUpdated())
-            module.second->accessPercepts([this](const std::map<std::string, T>& percepts){ this->getPercepts(percepts); });
+            module.second->accessPercepts([this](std::map<std::string, T>& percepts){ this->getPercepts(percepts); });
 
     reasoningOnUpdate();
 

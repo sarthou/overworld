@@ -23,7 +23,7 @@ std::map<std::string, Object*> ObjectsPerceptionManager::getEntities()
   }
 }
 
-void ObjectsPerceptionManager::getPercepts(const std::map<std::string, Object>& percepts)
+void ObjectsPerceptionManager::getPercepts( std::map<std::string, Object>& percepts)
 {
   for(auto& percept : percepts)
     {
@@ -40,6 +40,7 @@ void ObjectsPerceptionManager::getPercepts(const std::map<std::string, Object>& 
               continue;
 
             auto new_object = new Object(percept.second);
+            new_object->setInHand(nullptr);
             it = entities_.insert(std::pair<std::string, Object*>(percept.second.id(), new_object)).first;
             addToBullet(it->second);
         }
@@ -49,14 +50,20 @@ void ObjectsPerceptionManager::getPercepts(const std::map<std::string, Object>& 
 
         if(percept.second.isInHand() && (it->second->isInHand() == false))
         {
+          // this is a big shit, I know that
           auto hand = percept.second.getHandIn();
-          hand->removeFromHand(percept.first);
-          it->second->setInHand(hand);
+          percept.second.removeFromHand();
+          hand->putInHand(it->second);
+          percept.second.setInHand(hand);
         }
         
         if(it->second->isInHand())
         {
-          if (percept.second.hasBeenSeen() && it->second->getHandIn()->pose().distanceTo(percept.second.pose()) >= 0.30)
+          if(it->second->getHandIn()->isInHand(it->first) == false)
+          {
+            it->second->removeFromHand();
+          }
+          else if (percept.second.hasBeenSeen() && it->second->getHandIn()->pose().distanceTo(percept.second.pose()) >= 0.30)
           {
             it->second->removeFromHand();
             updateEntityPose(it->second, percept.second.pose(), percept.second.lastStamp());
