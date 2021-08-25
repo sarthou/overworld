@@ -75,8 +75,27 @@ std::array<double, 3> Entity::computeTranslationSpeed() const
     {
         return {0.0, 0.0, 0.0};
     }
+    ros::Time now = ros::Time::now();
+    if ((now - last_poses_.back().stamp).toSec() > 0.5)
+    {
+        return {0.0, 0.0, 0.0};
+    }
 
-    const PoseStamped_s& oldest_pose = last_poses_.at(0);
+    PoseStamped_s oldest_pose;
+    size_t oldest_i = 0;
+    for (size_t i = 0; i < last_poses_.size() - 1; i++){
+        if ((now - last_poses_.at(i).stamp).toSec() < 0.5)
+        {
+            oldest_pose = last_poses_.at(i);
+            oldest_i = i;
+            break;
+        }
+    }
+    if (oldest_i >= last_poses_.size() - 2)
+    {
+        // We have less than 2 poses more recent than 2 seconds, we cannot compute a speed
+        return {0.0, 0.0, 0.0};
+    }
     const PoseStamped_s& last_pose = last_poses_.back();
     auto pose_diff = last_pose.pose.subtractTranslations(oldest_pose.pose);
     double dt = (last_pose.stamp - oldest_pose.stamp).toSec();
