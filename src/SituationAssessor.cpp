@@ -5,6 +5,7 @@
 #include "overworld/Perception/Modalities/Pr2GripperPerceptionModule.h"
 #include "overworld/Perception/Modalities/StaticObjectsPerceptionModule.h"
 #include "overworld/Perception/Modalities/OptitrackPerceptionModule.h"
+#include "overworld/Perception/Modalities/RoboSherlockPerceptionModule.h"
 #include "overworld/Perception/Modalities/ObjectsEmulatedPerceptionModule.h"
 #include "overworld/Perception/Modalities/HumansEmulatedPerceptionModule.h"
 #include "overworld/Utility/BulletKeypressHandler.h"
