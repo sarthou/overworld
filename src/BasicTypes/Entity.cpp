@@ -13,7 +13,7 @@ Entity::Entity(const std::string& id, bool is_true_id): id_(id),
 void Entity::updatePose(const Pose& pose, ros::Time stamp)
 {
 
-    last_poses_.push_back({pose, stamp});
+    last_poses_.push_back({pose, ros::Time::now()});
     is_located_ = true;
 }
 
@@ -24,14 +24,14 @@ void Entity::updatePose(const std::array<double, 3>& translation, const std::arr
 
 void Entity::updatePose(const std::array<double, 3>& translation, const std::array<double, 4>& rotation, ros::Time stamp)
 {
-    PoseStamped_s pose_stamped = {Pose(translation, rotation), stamp};
+    PoseStamped_s pose_stamped = {Pose(translation, rotation), ros::Time::now()};
     is_located_ = true;
     last_poses_.push_back(pose_stamped);
 }
 
 void Entity::updatePose(const geometry_msgs::PoseStamped& pose)
 {
-    PoseStamped_s pose_stamped = {Pose(pose), pose.header.stamp};
+    PoseStamped_s pose_stamped = {Pose(pose), ros::Time::now()};
     is_located_ = true;
     last_poses_.push_back(pose_stamped);
 }
