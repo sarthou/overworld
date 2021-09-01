@@ -282,6 +282,8 @@ void ObjectsPerceptionManager::mergeFalseIdData()
   for(auto& id : false_ids_to_be_merged_)
   {
     auto obj = entities_.find(id);
+    if(obj->second->isLocated() == false)
+      continue;
 
     double obj_volume = obj->second->getAabbVolume();
     double min_error = 10000;
