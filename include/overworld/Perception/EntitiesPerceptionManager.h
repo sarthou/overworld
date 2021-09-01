@@ -177,7 +177,7 @@ bool EntitiesPerceptionManager<T>::update()
         entity.second->setUnseen();
 
     for(const auto& module : perception_modules_)
-        if(module.second->isActivated() && module.second->hasBeenUpdated())
+        if(module.second->isActivated() )// && module.second->hasBeenUpdated())
             module.second->accessPercepts([this](std::map<std::string, T>& percepts){ this->getPercepts(percepts); });
 
     reasoningOnUpdate();
