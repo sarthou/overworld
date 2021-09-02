@@ -35,7 +35,7 @@ bool RoboSherlockPerceptionModule::headHasMoved()
 
 void RoboSherlockPerceptionModule::updateEntities(const visualization_msgs::MarkerArray& markers)
 {
-  for(auto percept : percepts_)
+  for(auto& percept : percepts_)
     percept.second.setUnseen();
 
   geometry_msgs::PoseStamped marker_pose;
