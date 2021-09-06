@@ -84,6 +84,8 @@ SituationAssessor::SituationAssessor(const std::string& agent_name, bool is_robo
     motion_planning_pose_sender_ = nullptr;
     bernie_sender_ = nullptr;
   }
+  n_.advertiseService(agent_name_ + "/startPerceptionModules", &SituationAssessor::startModules, this);
+  n_.advertiseService(agent_name_ + "/stopPerceptionModules", &SituationAssessor::stopModules, this);
 }
 
 SituationAssessor::~SituationAssessor()
@@ -277,6 +279,82 @@ std::map<std::string, HumanAssessor_t>::iterator SituationAssessor::createHumanA
   assessor->second.thread = std::move(th);
 
   return assessor;
+}
+
+bool SituationAssessor::startModules(overworld::StartStopModules::Request &req, overworld::StartStopModules::Response &res)
+{
+  res.statuses.resize(req.modules.size());
+  for (size_t i=0; i < req.modules.size(); i++)
+  {
+    const std::string& module_name = req.modules[i];
+    PerceptionModuleBase_<Object>* perception_module_obj = objects_manager_.getPerceptionModule(module_name);
+    if (perception_module_obj != nullptr)
+    {
+      if (perception_module_obj->isActivated())
+        res.statuses[i] = overworld::StartStopModules::Response::ALREADY_ON;
+      else
+      {
+        perception_module_obj->activate(true);
+        res.statuses[i] = overworld::StartStopModules::Response::OK;
+      }
+      continue;
+    }
+
+    PerceptionModuleBase_<BodyPart>* perception_module_bp = robots_manager_.getPerceptionModule(module_name);
+    if (perception_module_bp == nullptr)
+      perception_module_bp = humans_manager_.getPerceptionModule(module_name);
+    if (perception_module_bp != nullptr)
+    {
+      if (perception_module_bp->isActivated())
+        res.statuses[i] = overworld::StartStopModules::Response::ALREADY_ON;
+      else
+      {
+        perception_module_bp->activate(true);
+        res.statuses[i] = overworld::StartStopModules::Response::OK;
+      }
+      continue;
+    }
+    res.statuses[i] = overworld::StartStopModules::Response::MODULE_NOT_FOUND;
+  }
+  return true;
+}
+
+bool SituationAssessor::stopModules(overworld::StartStopModules::Request &req, overworld::StartStopModules::Response &res)
+{
+  res.statuses.resize(req.modules.size());
+  for (size_t i=0; i < req.modules.size(); i++)
+  {
+    const std::string& module_name = req.modules[i];
+    PerceptionModuleBase_<Object>* perception_module_obj = objects_manager_.getPerceptionModule(module_name);
+    if (perception_module_obj != nullptr)
+    {
+      if (!perception_module_obj->isActivated())
+        res.statuses[i] = overworld::StartStopModules::Response::ALREADY_OFF;
+      else
+      {
+        perception_module_obj->activate(false);
+        res.statuses[i] = overworld::StartStopModules::Response::OK;
+      }
+      continue;
+    }
+
+    PerceptionModuleBase_<BodyPart>* perception_module_bp = robots_manager_.getPerceptionModule(module_name);
+    if (perception_module_bp == nullptr)
+      perception_module_bp = humans_manager_.getPerceptionModule(module_name);
+    if (perception_module_bp != nullptr)
+    {
+      if (!perception_module_bp->isActivated())
+        res.statuses[i] = overworld::StartStopModules::Response::ALREADY_OFF;
+      else
+      {
+        perception_module_bp->activate(false);
+        res.statuses[i] = overworld::StartStopModules::Response::OK;
+      }
+      continue;
+    }
+    res.statuses[i] = overworld::StartStopModules::Response::MODULE_NOT_FOUND;
+  }
+  return true;
 }
 
 }

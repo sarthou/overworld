@@ -18,6 +18,8 @@
 #include "overworld/Facts/FactsCalculator.h"
 #include "overworld/Facts/Publisher/OntologeniusFactsPublisher.h"
 
+#include <overworld/StartStopModules.h>
+
 namespace owds {
 
 class SituationAssessor;
@@ -84,6 +86,9 @@ private:
                                const std::map<std::string, BodyPart*>& humans,
                                const std::unordered_set<int>& segmented_ids);
   std::map<std::string, HumanAssessor_t>::iterator createHumanAssessor(const std::string& human_name);
+
+  bool stopModules(overworld::StartStopModules::Request &req, overworld::StartStopModules::Response &res);
+  bool startModules(overworld::StartStopModules::Request &req, overworld::StartStopModules::Response &res);
 };
 
 } // namespace owds
