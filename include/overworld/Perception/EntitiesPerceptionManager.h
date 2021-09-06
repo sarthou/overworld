@@ -73,7 +73,7 @@ void EntitiesPerceptionManager<T>::addPerceptionModule(const std::string& module
 template<typename T>
 PerceptionModuleBase_<T>* EntitiesPerceptionManager<T>::getPerceptionModule(const std::string& module_name)
 {
-    if(perception_modules_.find(module_name) == perception_modules_.end())
+    if(perception_modules_.find(module_name) != perception_modules_.end())
         return perception_modules_[module_name];
     else
         return nullptr;
