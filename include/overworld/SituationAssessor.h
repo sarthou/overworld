@@ -89,8 +89,48 @@ private:
 
   bool stopModules(overworld::StartStopModules::Request &req, overworld::StartStopModules::Response &res);
   bool startModules(overworld::StartStopModules::Request &req, overworld::StartStopModules::Response &res);
+  template<typename T>
+  bool startModule(EntitiesPerceptionManager<T>& manager, const std::string& module_name, int& status);
+  template<typename T>
+  bool stopModule(EntitiesPerceptionManager<T>& manager, const std::string& module_name, int& status);
+
 };
 
+template<typename T>
+bool SituationAssessor::startModule(EntitiesPerceptionManager<T>& manager, const std::string& module_name, int& status)
+{
+  PerceptionModuleBase_<T>* perception_module = manager.getPerceptionModule(module_name);
+  if (perception_module != nullptr)
+  {
+      if (perception_module->isActivated())
+        status = overworld::StartStopModules::Response::ALREADY_ON;
+      else
+      {
+        perception_module->activate(true);
+        status = overworld::StartStopModules::Response::OK;
+      }
+      return true;
+  }
+  return false;
+}
+
+template<typename T>
+bool SituationAssessor::stopModule(EntitiesPerceptionManager<T>& manager, const std::string& module_name, int& status)
+{
+  PerceptionModuleBase_<T>* perception_module = manager.getPerceptionModule(module_name);
+  if (perception_module != nullptr)
+  {
+      if (!perception_module->isActivated())
+        status = overworld::StartStopModules::Response::ALREADY_OFF;
+      else
+      {
+        perception_module->activate(false);
+        status = overworld::StartStopModules::Response::OK;
+      }
+      return true;
+  }
+  return false;
+}
 } // namespace owds
 
 #endif // OWDS_SITUATIONASSESSOR_H
