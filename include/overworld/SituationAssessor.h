@@ -62,6 +62,8 @@ private:
 
   ros::NodeHandle n_;
   ros::CallbackQueue callback_queue_;
+  ros::ServiceServer start_modules_service_;
+  ros::ServiceServer stop_modules_service_;
   std::atomic<bool> run_;
 
   BulletClient* bullet_client_;

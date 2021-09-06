@@ -84,8 +84,8 @@ SituationAssessor::SituationAssessor(const std::string& agent_name, bool is_robo
     motion_planning_pose_sender_ = nullptr;
     bernie_sender_ = nullptr;
   }
-  n_.advertiseService(agent_name_ + "/startPerceptionModules", &SituationAssessor::startModules, this);
-  n_.advertiseService(agent_name_ + "/stopPerceptionModules", &SituationAssessor::stopModules, this);
+  start_modules_service_ = n_.advertiseService(agent_name_ + "/startPerceptionModules", &SituationAssessor::startModules, this);
+  stop_modules_service_ = n_.advertiseService(agent_name_ + "/stopPerceptionModules", &SituationAssessor::stopModules, this);
 }
 
 SituationAssessor::~SituationAssessor()
