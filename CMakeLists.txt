@@ -66,11 +66,11 @@ add_message_files(
   StampedStringTest.msg
 )
 
-# add_service_files(
-#   FILES
-#   Service1.srv
+add_service_files(
+  FILES
+  StartStopModules.srv
 #   Service2.srv
-# )
+)
 
 generate_messages(
   DEPENDENCIES

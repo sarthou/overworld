@@ -18,6 +18,8 @@
 #include "overworld/Facts/FactsCalculator.h"
 #include "overworld/Facts/Publisher/OntologeniusFactsPublisher.h"
 
+#include <overworld/StartStopModules.h>
+
 namespace owds {
 
 class SituationAssessor;
@@ -60,6 +62,8 @@ private:
 
   ros::NodeHandle n_;
   ros::CallbackQueue callback_queue_;
+  ros::ServiceServer start_modules_service_;
+  ros::ServiceServer stop_modules_service_;
   std::atomic<bool> run_;
 
   BulletClient* bullet_client_;
@@ -84,8 +88,51 @@ private:
                                const std::map<std::string, BodyPart*>& humans,
                                const std::unordered_set<int>& segmented_ids);
   std::map<std::string, HumanAssessor_t>::iterator createHumanAssessor(const std::string& human_name);
+
+  bool stopModules(overworld::StartStopModules::Request &req, overworld::StartStopModules::Response &res);
+  bool startModules(overworld::StartStopModules::Request &req, overworld::StartStopModules::Response &res);
+  template<typename T>
+  bool startModule(EntitiesPerceptionManager<T>& manager, const std::string& module_name, int& status);
+  template<typename T>
+  bool stopModule(EntitiesPerceptionManager<T>& manager, const std::string& module_name, int& status);
+
 };
 
+template<typename T>
+bool SituationAssessor::startModule(EntitiesPerceptionManager<T>& manager, const std::string& module_name, int& status)
+{
+  PerceptionModuleBase_<T>* perception_module = manager.getPerceptionModule(module_name);
+  if (perception_module != nullptr)
+  {
+      if (perception_module->isActivated())
+        status = overworld::StartStopModules::Response::ALREADY_ON;
+      else
+      {
+        perception_module->activate(true);
+        status = overworld::StartStopModules::Response::OK;
+      }
+      return true;
+  }
+  return false;
+}
+
+template<typename T>
+bool SituationAssessor::stopModule(EntitiesPerceptionManager<T>& manager, const std::string& module_name, int& status)
+{
+  PerceptionModuleBase_<T>* perception_module = manager.getPerceptionModule(module_name);
+  if (perception_module != nullptr)
+  {
+      if (!perception_module->isActivated())
+        status = overworld::StartStopModules::Response::ALREADY_OFF;
+      else
+      {
+        perception_module->activate(false);
+        status = overworld::StartStopModules::Response::OK;
+      }
+      return true;
+  }
+  return false;
+}
 } // namespace owds
 
 #endif // OWDS_SITUATIONASSESSOR_H

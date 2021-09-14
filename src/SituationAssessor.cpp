@@ -88,6 +88,8 @@ SituationAssessor::SituationAssessor(const std::string& agent_name, bool is_robo
     motion_planning_pose_sender_ = nullptr;
     bernie_sender_ = nullptr;
   }
+  start_modules_service_ = n_.advertiseService(agent_name_ + "/startPerceptionModules", &SituationAssessor::startModules, this);
+  stop_modules_service_ = n_.advertiseService(agent_name_ + "/stopPerceptionModules", &SituationAssessor::stopModules, this);
 }
 
 SituationAssessor::~SituationAssessor()
@@ -281,6 +283,40 @@ std::map<std::string, HumanAssessor_t>::iterator SituationAssessor::createHumanA
   assessor->second.thread = std::move(th);
 
   return assessor;
+}
+
+bool SituationAssessor::startModules(overworld::StartStopModules::Request &req, overworld::StartStopModules::Response &res)
+{
+  res.statuses.resize(req.modules.size());
+  for (size_t i=0; i < req.modules.size(); i++)
+  {
+    const std::string& module_name = req.modules[i];
+    if (startModule(objects_manager_, module_name, res.statuses[i]))
+      continue;
+    if (startModule(robots_manager_, module_name, res.statuses[i]))
+      continue;
+    if (startModule(humans_manager_, module_name, res.statuses[i]))
+      continue;
+    res.statuses[i] = overworld::StartStopModules::Response::MODULE_NOT_FOUND;
+  }
+  return true;
+}
+
+bool SituationAssessor::stopModules(overworld::StartStopModules::Request &req, overworld::StartStopModules::Response &res)
+{
+  res.statuses.resize(req.modules.size());
+  for (size_t i=0; i < req.modules.size(); i++)
+  {
+    const std::string& module_name = req.modules[i];
+    if (stopModule(objects_manager_, module_name, res.statuses[i]))
+      continue;
+    if (stopModule(robots_manager_, module_name, res.statuses[i]))
+      continue;
+    if (stopModule(humans_manager_, module_name, res.statuses[i]))
+      continue;
+    res.statuses[i] = overworld::StartStopModules::Response::MODULE_NOT_FOUND;
+  }
+  return true;
 }
 
 }
