@@ -327,6 +327,7 @@ bool SituationAssessor::getBoundingBox(overworld::BoundingBox::Request &req, ove
     res.y = bb[1];
     res.z = bb[2];
   }
+  return true;
 }
 
 }
