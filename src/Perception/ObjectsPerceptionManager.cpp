@@ -331,12 +331,12 @@ void ObjectsPerceptionManager::getObjectBoundingBox(Object* object)
     return;
 
   auto tmp_pose = object->pose();
-  object->updatePose({0,0,0}, {0,0,0,1});
+  updateEntityPose(object, {{0,0,0}, {0,0,0,1}}, ros::Time::now());
 
   bullet_client_->performCollisionDetection();
   auto bb = bullet_client_->getAABB(object->bulletId());
 
-  object->updatePose(tmp_pose);
+  updateEntityPose(object, tmp_pose, ros::Time::now());
 
   object->setBoundingBox({bb.max[0] - bb.min[0], bb.max[1] - bb.min[1], bb.max[2] - bb.min[2]});
 }
