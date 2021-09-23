@@ -69,7 +69,7 @@ add_message_files(
 add_service_files(
   FILES
   StartStopModules.srv
-#   Service2.srv
+  BoundingBox.srv
 )
 
 generate_messages(

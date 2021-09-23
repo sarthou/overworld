@@ -30,10 +30,14 @@ public:
 
     void merge(Object* other);
 
+    void setBoundingBox(const std::array<double, 3>& bb) { bounding_box_ = bb; }
+    std::array<double, 3> getBoundingBox() { return bounding_box_; }
+
 protected:
     std::vector<PointOfInterest> points_of_interest_;
     bool is_static_;
     Hand* hand_in_;
+    std::array<double, 3> bounding_box_;
 };
 
 } // namespace owds

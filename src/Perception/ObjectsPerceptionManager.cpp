@@ -43,6 +43,8 @@ void ObjectsPerceptionManager::getPercepts( std::map<std::string, Object>& perce
             new_object->setInHand(nullptr);
             it = entities_.insert(std::pair<std::string, Object*>(percept.second.id(), new_object)).first;
             addToBullet(it->second);
+
+            getObjectBoundingBox(it->second);
         }
 
         if(merged_ids_.find(percept.first) != merged_ids_.end())
@@ -321,6 +323,22 @@ void ObjectsPerceptionManager::mergeFalseIdData()
 
   for(auto& id : merged)
     false_ids_to_be_merged_.erase(id);
+}
+
+void ObjectsPerceptionManager::getObjectBoundingBox(Object* object)
+{
+  if(object->isLocated() == false)
+    return;
+
+  auto tmp_pose = object->pose();
+  object->updatePose({0,0,0}, {0,0,0,1});
+
+  bullet_client_->performCollisionDetection();
+  auto bb = bullet_client_->getAABB(object->bulletId());
+
+  object->updatePose(tmp_pose);
+
+  object->setBoundingBox({bb.max[0] - bb.min[0], bb.max[1] - bb.min[1], bb.max[2] - bb.min[2]});
 }
 
 } // namespace owds

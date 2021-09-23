@@ -86,6 +86,7 @@ SituationAssessor::SituationAssessor(const std::string& agent_name, bool is_robo
   }
   start_modules_service_ = n_.advertiseService(agent_name_ + "/startPerceptionModules", &SituationAssessor::startModules, this);
   stop_modules_service_ = n_.advertiseService(agent_name_ + "/stopPerceptionModules", &SituationAssessor::stopModules, this);
+  bounding_box_service_ = n_.advertiseService(agent_name_ + "/getBoundingBox", &SituationAssessor::getBoundingBox, this);
 }
 
 SituationAssessor::~SituationAssessor()
@@ -313,6 +314,19 @@ bool SituationAssessor::stopModules(overworld::StartStopModules::Request &req, o
     res.statuses[i] = overworld::StartStopModules::Response::MODULE_NOT_FOUND;
   }
   return true;
+}
+
+bool SituationAssessor::getBoundingBox(overworld::BoundingBox::Request &req, overworld::BoundingBox::Response &res)
+{
+  auto entities = objects_manager_.getEntities();
+  auto object = entities.find(req.object_id);
+  if(object != entities.end())
+  {
+    auto bb = object->second->getBoundingBox();
+    res.x = bb[0];
+    res.y = bb[1];
+    res.z = bb[2];
+  }
 }
 
 }
