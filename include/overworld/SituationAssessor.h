@@ -19,6 +19,7 @@
 #include "overworld/Facts/Publisher/OntologeniusFactsPublisher.h"
 
 #include <overworld/StartStopModules.h>
+#include <overworld/BoundingBox.h>
 
 namespace owds {
 
@@ -64,6 +65,7 @@ private:
   ros::CallbackQueue callback_queue_;
   ros::ServiceServer start_modules_service_;
   ros::ServiceServer stop_modules_service_;
+  ros::ServiceServer bounding_box_service_;
   std::atomic<bool> run_;
 
   BulletClient* bullet_client_;
@@ -95,6 +97,7 @@ private:
   bool startModule(EntitiesPerceptionManager<T>& manager, const std::string& module_name, int& status);
   template<typename T>
   bool stopModule(EntitiesPerceptionManager<T>& manager, const std::string& module_name, int& status);
+  bool getBoundingBox(overworld::BoundingBox::Request &req, overworld::BoundingBox::Response &res);
 
 };
 

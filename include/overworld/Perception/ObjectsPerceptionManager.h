@@ -31,6 +31,8 @@ private:
   std::unordered_set<int> getObjectsInCamera();
 
   void mergeFalseIdData();
+
+  void getObjectBoundingBox(Object* object);
 };
 
 } // namespace owds
