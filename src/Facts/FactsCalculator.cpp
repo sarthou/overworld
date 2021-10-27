@@ -5,8 +5,8 @@ namespace owds {
 FactsCalculator::FactsCalculator(ros::NodeHandle* nh): ontos_(OntologiesManipulator(nh))
 {
   ontos_.waitInit();
-  ontos_.add("robot");
-  onto_ = ontos_.get("robot");
+  ontos_.add("pr2_robot");
+  onto_ = ontos_.get("pr2_robot");
   onto_->close();
 
 }

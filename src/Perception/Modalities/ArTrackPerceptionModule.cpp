@@ -14,8 +14,8 @@ ArTrackPerceptionModule::ArTrackPerceptionModule(ros::NodeHandle* n, Agent* agen
   agent_ = agent;
 
   ontologies_manipulator_.waitInit();
-  ontologies_manipulator_.add("robot");
-  onto_ = ontologies_manipulator_.get("robot");
+  ontologies_manipulator_.add("pr2_robot");
+  onto_ = ontologies_manipulator_.get("pr2_robot");
   onto_->close();
 }
 

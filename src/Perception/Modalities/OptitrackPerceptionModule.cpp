@@ -9,8 +9,8 @@ OptitrackPerceptionModule::OptitrackPerceptionModule(ros::NodeHandle* n, const s
     mocap_offset_ = Pose(offset, {0,0,0,1});
 
     ontologies_manipulator_.waitInit();
-    ontologies_manipulator_.add("robot");
-    onto_ = ontologies_manipulator_.get("robot");
+    ontologies_manipulator_.add("pr2_robot");
+    onto_ = ontologies_manipulator_.get("pr2_robot");
     onto_->close();
 
     auto head_names = onto_->individuals.getOn(human_name_, "hasHead");
