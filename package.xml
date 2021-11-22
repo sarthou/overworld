@@ -15,20 +15,54 @@
   <build_depend>ontologenius</build_depend>
   <build_depend>roscpp</build_depend>
   <build_depend>std_msgs</build_depend>
-  <build_depend>tf</build_depend>
+  <build_depend>tf2</build_depend>
+  <build_depend>tf2_ros</build_depend>
+  <build_depend>tf2_geometry_msgs</build_depend>
+  <build_depend>tf2_eigen</build_depend>
   <build_depend>bullet</build_depend>
+  <build_depend>roslib</build_depend>
+  <build_depend>eigen</build_depend>
+  <build_depend>message_filters</build_depend>
+  <build_depend>ar_track_alvar_msgs</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>visualization_msgs</build_depend>
+  <build_depend>pr2_motion_tasks_msgs</build_depend>
+  <build_depend>cv_bridge</build_depend>
+
 
   <build_export_depend>ontologenius</build_export_depend>
   <build_export_depend>roscpp</build_export_depend>
   <build_export_depend>std_msgs</build_export_depend>
-  <build_export_depend>tf</build_export_depend>
+  <build_export_depend>tf2</build_export_depend>
+  <build_export_depend>tf2_ros</build_export_depend>
+  <build_export_depend>tf2_geometry_msgs</build_export_depend>
+  <build_export_depend>tf2_eigen</build_export_depend>
   <build_export_depend>bullet</build_export_depend>
+  <build_export_depend>eigen</build_export_depend>
+  <build_export_depend>message_filters</build_export_depend>
+  <build_export_depend>ar_track_alvar_msgs</build_export_depend>
+  <build_export_depend>sensor_msgs</build_export_depend>
+  <build_export_depend>visualization_msgs</build_export_depend>
+  <build_export_depend>pr2_motion_tasks_msgs</build_export_depend>
+  <build_export_depend>cv_bridge</build_export_depend>
+
 
   <exec_depend>ontologenius</exec_depend>
   <exec_depend>roscpp</exec_depend>
   <exec_depend>std_msgs</exec_depend>
-  <exec_depend>tf</exec_depend>
+  <exec_depend>tf2</exec_depend>
+  <exec_depend>tf2_ros</exec_depend>
+  <exec_depend>tf2_geometry_msgs</exec_depend>
+  <exec_depend>tf2_eigen</exec_depend>
   <exec_depend>bullet</exec_depend>
+  <exec_depend>roslib</exec_depend>
+  <exec_depend>eigen</exec_depend>
+  <exec_depend>message_filters</exec_depend>
+  <exec_depend>ar_track_alvar_msgs</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>visualization_msgs</exec_depend>
+  <exec_depend>pr2_motion_tasks_msgs</exec_depend>
+  <exec_depend>cv_bridge</exec_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>

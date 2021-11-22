@@ -1,27 +1,60 @@
 #include "overworld/BasicTypes/Object.h"
 
-namespace owds{
+#include "overworld/BasicTypes/Hand.h"
+#include "overworld/Utility/ShellDisplay.h"
 
-Object::Object(): Entity(){
+namespace owds {
 
-}
-Object::Object(const std::string& id): Entity(id){
+Object::Object(const std::string& id, bool is_true_id): Entity(id, is_true_id), is_static_(false), hand_in_(nullptr)
+{}
 
-}
-
-void Object::setPointsOfInterest(const std::vector<Pose>& pointsOfInterest){
-    pointsOfInterest_ = pointsOfInterest;
-}
-
-void Object::addPointOfInterest(const Pose& pointOfInterest){
-    pointsOfInterest_.push_back(pointOfInterest);
+void Object::setPointsOfInterest(const std::vector<PointOfInterest>& points_of_interest)
+{
+    points_of_interest_ = points_of_interest;
 }
 
-void Object::emptyPointsOfInterest(){
-    pointsOfInterest_.empty();
+void Object::addPointOfInterest(const PointOfInterest& point_of_interest)
+{
+    points_of_interest_.push_back(point_of_interest);
 }
 
-const std::vector<Pose>& Object::getPointsOfInterest() const{
-    return pointsOfInterest_;
+void Object::emptyPointsOfInterest()
+{
+    points_of_interest_.empty();
 }
+
+const std::vector<PointOfInterest>& Object::getPointsOfInterest() const
+{
+    return points_of_interest_;
 }
+
+void Object::setAllPoiUnseen()
+{
+    for(auto& poi : points_of_interest_)
+        poi.setUnseen();
+}
+
+void Object::removeFromHand()
+{
+    if(hand_in_ != nullptr)
+    {
+        hand_in_->removeFromHand(id_);
+        hand_in_ = nullptr;
+    }
+    else
+        ShellDisplay::warning("[Object] Try to remove " + id_ + " from hand while the object is not in any hand");
+}
+
+void Object::merge(Object* other)
+{
+    Entity::merge(other);
+
+    if((isInHand() == false) && other->isInHand())
+    {
+        auto hand = other->getHandIn();
+        other->removeFromHand();
+        hand->putInHand(this);
+    }
+}
+
+} // namespace owds

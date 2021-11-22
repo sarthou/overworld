@@ -1,3 +1,5 @@
+# <img src="docs/images/overworld.png" width="150">
+
 ## Install bullet
 
 ```
