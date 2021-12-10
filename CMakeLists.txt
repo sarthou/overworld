@@ -136,9 +136,9 @@ target_link_libraries(${PROJECT_NAME}_types_lib PUBLIC
                       ${PROJECT_NAME}_bullet_lib)
 
 add_library(${PROJECT_NAME}_perception_lib STATIC
-  src/Perception/RobotsPerceptionManager.cpp
-  src/Perception/ObjectsPerceptionManager.cpp
-  src/Perception/HumansPerceptionManager.cpp
+  src/Perception/Managers/RobotsPerceptionManager.cpp
+  src/Perception/Managers/ObjectsPerceptionManager.cpp
+  src/Perception/Managers/HumansPerceptionManager.cpp
   src/Perception/Modalities/PR2JointsPerception.cpp
   src/Perception/Modalities/ArTrackPerceptionModule.cpp
   src/Perception/Modalities/StaticObjectsPerceptionModule.cpp

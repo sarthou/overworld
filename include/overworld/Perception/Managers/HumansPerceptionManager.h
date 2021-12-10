@@ -1,7 +1,7 @@
 #ifndef OWDS_HUMANSPERCEPTIONMANAGER_H
 #define OWDS_HUMANSPERCEPTIONMANAGER_H
 
-#include "overworld/Perception/EntitiesPerceptionManager.h"
+#include "overworld/Perception/Managers/EntitiesPerceptionManager.h"
 #include "overworld/BasicTypes/BodyPart.h"
 #include "overworld/BasicTypes/Agent.h"
 

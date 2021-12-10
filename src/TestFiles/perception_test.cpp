@@ -1,5 +1,5 @@
 #include "overworld/Perception/PerceptionModuleBase.h"
-#include "overworld/Perception/EntitiesPerceptionManager.h"
+#include "overworld/Perception/Managers/EntitiesPerceptionManager.h"
 
 #include "overworld/StampedStringTest.h"
 

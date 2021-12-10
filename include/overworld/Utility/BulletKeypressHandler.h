@@ -2,7 +2,7 @@
 #define OWDS_BULLETKEYPRESSHANDLER_H
 #include "overworld/Bullet/BulletClient.h"
 #include "overworld/Geometry/GeometryUtils.h"
-#include "overworld/Perception/RobotsPerceptionManager.h"
+#include "overworld/Perception/Managers/RobotsPerceptionManager.h"
 #include "overworld/Utility/ShellDisplay.h"
 
 namespace owds {

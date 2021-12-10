@@ -12,7 +12,7 @@
 #include "overworld/Utility/ShellDisplay.h"
 
 #include "overworld/Perception/Modalities/PR2JointsPerception.h"
-#include "overworld/Perception/EntitiesPerceptionManager.h"
+#include "overworld/Perception/Managers/EntitiesPerceptionManager.h"
 
 using namespace std::chrono_literals;
 

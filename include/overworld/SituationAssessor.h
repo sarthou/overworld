@@ -9,9 +9,9 @@
 
 #include "overworld/Bullet/PhysicsServers.h"
 
-#include "overworld/Perception/RobotsPerceptionManager.h"
-#include "overworld/Perception/ObjectsPerceptionManager.h"
-#include "overworld/Perception/HumansPerceptionManager.h"
+#include "overworld/Perception/Managers/RobotsPerceptionManager.h"
+#include "overworld/Perception/Managers/ObjectsPerceptionManager.h"
+#include "overworld/Perception/Managers/HumansPerceptionManager.h"
 #include "overworld/Senders/ROSSender.h"
 #include "overworld/Senders/MotionPlanningPoseSender.h"
 #include "overworld/Senders/Bernie.h"
