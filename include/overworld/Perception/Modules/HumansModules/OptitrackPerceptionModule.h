@@ -2,7 +2,7 @@
 #define OWDS_OPTITRACKPERCEPTIONMODULE_H
 
 #include "overworld/BasicTypes/BodyPart.h"
-#include "overworld/Perception/PerceptionModuleBase.h"
+#include "overworld/Perception/Modules/PerceptionModuleBase.h"
 
 #include <optitrack_ros/or_pose_estimator_state.h>
 

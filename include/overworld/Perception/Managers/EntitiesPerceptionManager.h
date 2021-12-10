@@ -7,7 +7,7 @@
 
 #include "overworld/BasicTypes/Entity.h"
 #include "overworld/Bullet/BulletClient.h"
-#include "overworld/Perception/PerceptionModuleBase.h"
+#include "overworld/Perception/Modules/PerceptionModuleBase.h"
 
 #include "overworld/Utility/ShellDisplay.h"
 

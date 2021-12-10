@@ -1,4 +1,4 @@
-#include "overworld/Perception/Modalities/PR2JointsPerception.h"
+#include "overworld/Perception/Modules/RobotsModules/PR2JointsPerception.h"
 
 #include <ros/package.h>
 

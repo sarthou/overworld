@@ -2,7 +2,7 @@
 #define OWDS_HUMANSEMULATEDPERCEPTIONMODULE_H
 
 #include "overworld/BasicTypes/BodyPart.h"
-#include "overworld/Perception/PerceptionModuleBase.h"
+#include "overworld/Perception/Modules/PerceptionModuleBase.h"
 
 #include <vector>
 

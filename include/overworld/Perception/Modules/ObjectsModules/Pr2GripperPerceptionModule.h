@@ -4,7 +4,7 @@
 #include "overworld/BasicTypes/Object.h"
 #include "overworld/BasicTypes/Agent.h"
 #include "overworld/Bullet/BulletClient.h"
-#include "overworld/Perception/PerceptionModuleBase.h"
+#include "overworld/Perception/Modules/PerceptionModuleBase.h"
 
 #include "pr2_msgs/PressureState.h"
 

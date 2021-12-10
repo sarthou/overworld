@@ -1,4 +1,4 @@
-#include "overworld/Perception/Modalities/Pr2GripperPerceptionModule.h"
+#include "overworld/Perception/Modules/ObjectsModules/Pr2GripperPerceptionModule.h"
 
 #include <numeric>
 

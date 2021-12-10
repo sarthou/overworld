@@ -3,7 +3,7 @@
 
 #include "overworld/BasicTypes/BodyPart.h"
 #include "overworld/Bullet/PhysicsServers.h"
-#include "overworld/Perception/PerceptionModuleBase.h"
+#include "overworld/Perception/Modules/PerceptionModuleBase.h"
 #include <sensor_msgs/JointState.h>
 #include <tf2_ros/transform_listener.h>
 

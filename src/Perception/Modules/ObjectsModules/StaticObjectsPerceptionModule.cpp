@@ -1,4 +1,4 @@
-#include "overworld/Perception/Modalities/StaticObjectsPerceptionModule.h"
+#include "overworld/Perception/Modules/ObjectsModules/StaticObjectsPerceptionModule.h"
 
 namespace owds {
 

@@ -136,16 +136,16 @@ target_link_libraries(${PROJECT_NAME}_types_lib PUBLIC
                       ${PROJECT_NAME}_bullet_lib)
 
 add_library(${PROJECT_NAME}_perception_lib STATIC
-  src/Perception/Managers/RobotsPerceptionManager.cpp
   src/Perception/Managers/ObjectsPerceptionManager.cpp
+  src/Perception/Managers/RobotsPerceptionManager.cpp
   src/Perception/Managers/HumansPerceptionManager.cpp
-  src/Perception/Modalities/PR2JointsPerception.cpp
-  src/Perception/Modalities/ArTrackPerceptionModule.cpp
-  src/Perception/Modalities/StaticObjectsPerceptionModule.cpp
-  src/Perception/Modalities/OptitrackPerceptionModule.cpp
-  src/Perception/Modalities/ObjectsEmulatedPerceptionModule.cpp
-  src/Perception/Modalities/HumansEmulatedPerceptionModule.cpp
-  src/Perception/Modalities/Pr2GripperPerceptionModule.cpp
+  src/Perception/Modules/ObjectsModules/ArTrackPerceptionModule.cpp
+  src/Perception/Modules/ObjectsModules/StaticObjectsPerceptionModule.cpp
+  src/Perception/Modules/ObjectsModules/ObjectsEmulatedPerceptionModule.cpp
+  src/Perception/Modules/ObjectsModules/Pr2GripperPerceptionModule.cpp
+  src/Perception/Modules/RobotsModules/PR2JointsPerception.cpp
+  src/Perception/Modules/HumansModules/OptitrackPerceptionModule.cpp
+  src/Perception/Modules/HumansModules/HumansEmulatedPerceptionModule.cpp
 )
 target_link_libraries(${PROJECT_NAME}_perception_lib PUBLIC
                       ${catkin_LIBRARIES}

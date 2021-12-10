@@ -3,7 +3,7 @@
 
 #include "overworld/BasicTypes/Object.h"
 #include "overworld/BasicTypes/Agent.h"
-#include "overworld/Perception/PerceptionModuleBase.h"
+#include "overworld/Perception/Modules/PerceptionModuleBase.h"
 
 #include "ar_track_alvar_msgs/AlvarMarkers.h"
 #include "ar_track_alvar_msgs/AlvarVisibleMarkers.h"

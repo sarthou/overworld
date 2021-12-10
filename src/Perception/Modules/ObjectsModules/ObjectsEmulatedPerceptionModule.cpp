@@ -1,4 +1,4 @@
-#include "overworld/Perception/Modalities/ObjectsEmulatedPerceptionModule.h"
+#include "overworld/Perception/Modules/ObjectsModules/ObjectsEmulatedPerceptionModule.h"
 
 namespace owds {
 

@@ -1,4 +1,4 @@
-#include "overworld/Perception/Modalities/OptitrackPerceptionModule.h"
+#include "overworld/Perception/Modules/HumansModules/OptitrackPerceptionModule.h"
 
 #include "overworld/Utility/ShellDisplay.h"
 
