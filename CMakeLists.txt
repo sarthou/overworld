@@ -146,6 +146,7 @@ add_library(${PROJECT_NAME}_perception_lib STATIC
   src/Perception/Modules/RobotsModules/PR2JointsPerception.cpp
   src/Perception/Modules/HumansModules/OptitrackPerceptionModule.cpp
   src/Perception/Modules/HumansModules/HumansEmulatedPerceptionModule.cpp
+  src/Perception/PerceptionConfiguration.cpp
 )
 target_link_libraries(${PROJECT_NAME}_perception_lib PUBLIC
                       ${catkin_LIBRARIES}
@@ -207,3 +208,10 @@ target_link_libraries(${PROJECT_NAME}_perception_test PRIVATE
                       ${PROJECT_NAME}_perception_lib
                       ${catkin_LIBRARIES})
 add_dependencies(${PROJECT_NAME}_perception_test overworld_gencpp)
+
+add_executable(${PROJECT_NAME}_config_test src/TestFiles/config_test.cpp )
+target_link_libraries(${PROJECT_NAME}_config_test PRIVATE
+                      ${PROJECT_NAME}_types_lib
+                      ${PROJECT_NAME}_perception_lib
+                      ${catkin_LIBRARIES})
+add_dependencies(${PROJECT_NAME}_config_test overworld_gencpp)
