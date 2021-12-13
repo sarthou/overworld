@@ -44,7 +44,7 @@ struct HumanAssessor_t
 class SituationAssessor
 {
 public:
-  SituationAssessor(const std::string& agent_name, bool is_robot = false);
+  SituationAssessor(const std::string& agent_name, const std::string& config_path, bool is_robot = false);
   ~SituationAssessor();
 
   void run();
@@ -59,6 +59,8 @@ private:
   std::string agent_name_;
   Agent* myself_agent_;
   bool is_robot_;
+
+  std::string config_path_;
 
   ros::NodeHandle n_;
   ros::CallbackQueue callback_queue_;

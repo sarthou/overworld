@@ -4,6 +4,8 @@
 
 #include <pluginlib/class_list_macros.h>
 
+#include "overworld/Utility/ShellDisplay.h"
+
 namespace owds {
 
 Pr2GripperPerceptionModule::Pr2GripperPerceptionModule() : PerceptionModuleRosBase("", true)
@@ -36,7 +38,7 @@ void Pr2GripperPerceptionModule::setParameter(const std::string& parameter_name,
   else if(parameter_name == "min_period")
     min_period_ = std::stod(parameter_value);
   else
-      std::cout << "Unkown parameter " << parameter_name << std::endl;
+      ShellDisplay::warning("[Pr2GripperPerceptionModule] Unkown parameter " + parameter_name);
 }
 
 bool Pr2GripperPerceptionModule::closeInitialization()

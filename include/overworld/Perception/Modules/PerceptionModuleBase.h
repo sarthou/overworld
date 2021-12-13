@@ -16,6 +16,8 @@
 
 #include "overworld/Bullet/PhysicsServers.h"
 
+#include "overworld/Utility/ShellDisplay.h"
+
 namespace owds {
 
 template<typename T>
@@ -150,7 +152,7 @@ public:
   {
     PerceptionModuleRosBase_<T>::initialize(n, bullet_client, robot_bullet_id, robot_agent);
     sub_ = this->n_->subscribe(topic_name_, 1, &PerceptionModuleRosBase::privatePerceptionCallback, this);
-    std::cout << "PerceptionModuleRosBase subscribed to " << topic_name_ << std::endl;
+    ShellDisplay::info("PerceptionModuleRosBase subscribed to " + topic_name_);
   }
 
 protected:
@@ -209,7 +211,7 @@ public:
     sub_1_.subscribe(*n, second_topic_name_, 1);
     sync_.reset(new Sync(SyncPolicy(10), sub_0_, sub_1_));
     sync_->registerCallback(&PerceptionModuleRosSyncBase::privatePerceptionCallback, this);
-    std::cout << "PerceptionModuleRosSyncBase subscribed to " << first_topic_name_ << " and " << second_topic_name_ << std::endl;
+    ShellDisplay::info("PerceptionModuleRosSyncBase subscribed to " + first_topic_name_ + " and " + second_topic_name_);
   }
 
 protected:

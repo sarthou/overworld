@@ -2,6 +2,8 @@
 
 #include <pluginlib/class_loader.h>
 
+#include "overworld/Utility/ShellDisplay.h"
+
 namespace owds {
 
 PerceptionManager::PerceptionManager(ros::NodeHandle* n, BulletClient* bullet_client)
@@ -114,7 +116,7 @@ bool PerceptionManager::applyConfiguration(const std::string& config_path, Confi
 {
     if(configuration_.read(config_path) == false)
     {
-        std::cout << "can not open configuration file" << std::endl;
+        ShellDisplay::error("Can not open configuration file: " + config_path);
         return false;
     }
 
@@ -123,7 +125,7 @@ bool PerceptionManager::applyConfiguration(const std::string& config_path, Confi
     modules_list = configuration_["modules"];
     if(!modules_list.getElementsKeys().size())
     {
-        std::cout << "No modules defined" << std::endl;
+        ShellDisplay::error("No modules defined in the configuration file");
         return false;
     }
 
@@ -131,7 +133,7 @@ bool PerceptionManager::applyConfiguration(const std::string& config_path, Confi
 
     if((robot_modules.size() != 1) || (modules_list["robot"][robot_modules.front()].value().size() != 1))
     {
-        std::cout << "One and only one robot perception module should be provided. " << robot_modules.size() << " provided" << std::endl;
+        ShellDisplay::error("One and only one robot perception module should be provided. " + std::to_string(robot_modules.size()) + " provided");
         return false;
     }
 

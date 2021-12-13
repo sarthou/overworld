@@ -25,7 +25,7 @@ void PR2JointsPerception::setParameter(const std::string& parameter_name, const 
     else if(parameter_name == "head")
         head_ink_ = parameter_value;
     else
-        std::cout << "Unkown parameter " << parameter_name << std::endl;
+        ShellDisplay::warning("[PR2JointsPerception] Unkown parameter " + parameter_name);
 }
 
 bool PR2JointsPerception::closeInitialization()

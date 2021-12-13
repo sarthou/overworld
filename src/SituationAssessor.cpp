@@ -15,12 +15,15 @@
 
 namespace owds {
 
-SituationAssessor::SituationAssessor(const std::string& agent_name, bool is_robot) : facts_publisher_(&n_, agent_name),
+SituationAssessor::SituationAssessor(const std::string& agent_name,
+                                     const std::string& config_path,
+                                     bool is_robot) : facts_publisher_(&n_, agent_name),
                                                                                      facts_calculator_(&n_),
                                                                                      perception_manager_(&n_)
 {
   agent_name_ = agent_name;
   is_robot_ = is_robot;
+  config_path_ = config_path;
 
   n_.setCallbackQueue(&callback_queue_);
 
@@ -46,12 +49,12 @@ SituationAssessor::SituationAssessor(const std::string& agent_name, bool is_robo
 
   if(is_robot_)
   {
-    perception_manager_.applyConfigurationRobot("");
+    perception_manager_.applyConfigurationRobot(config_path_);
     myself_agent_ = perception_manager_.robots_manager_.getAgent(agent_name);
   }
   else
   {
-    perception_manager_.applyConfigurationHuman("");
+    perception_manager_.applyConfigurationHuman(config_path_);
     myself_agent_ = perception_manager_.humans_manager_.getAgent(agent_name);
   }
 
@@ -249,7 +252,7 @@ std::map<std::string, HumanAssessor_t>::iterator SituationAssessor::createHumanA
 {
   auto assessor = humans_assessors_.insert(std::make_pair(human_name, HumanAssessor_t())).first;
 
-  assessor->second.assessor = new SituationAssessor(human_name);
+  assessor->second.assessor = new SituationAssessor(human_name, config_path_);
   assessor->second.objects_module = new ObjectsEmulatedPerceptionModule();
   assessor->second.humans_module = new HumansEmulatedPerceptionModule();
   assessor->second.assessor->addObjectPerceptionModule("emulated_objects", assessor->second.objects_module);

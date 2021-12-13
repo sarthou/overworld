@@ -23,6 +23,8 @@ void OptitrackPerceptionModule::setParameter(const std::string& parameter_name, 
         offset_y_ = std::stod(parameter_value);
     else if(parameter_name == "offset_z")
         offset_z_ = std::stod(parameter_value);
+    else
+        ShellDisplay::warning("[OptitrackPerceptionModule] Unkown parameter " + parameter_name);
 }
 
 bool OptitrackPerceptionModule::closeInitialization()

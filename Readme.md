@@ -11,4 +11,5 @@ then
 
 ```
 export BULLET_INSTALL_PATH=your/install/path
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$BULLET_INSTALL_PATH/lib
 ```
