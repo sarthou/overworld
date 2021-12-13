@@ -2,15 +2,42 @@
 
 #include "overworld/Utility/ShellDisplay.h"
 
-namespace owds {
-OptitrackPerceptionModule::OptitrackPerceptionModule(ros::NodeHandle* n, const std::string& human_name, const std::array<double,3>& offset)
-    : human_name_(human_name), ontologies_manipulator_(n)
-{
-    mocap_offset_ = Pose(offset, {0,0,0,1});
+#include <pluginlib/class_list_macros.h>
 
-    ontologies_manipulator_.waitInit();
-    ontologies_manipulator_.add("pr2_robot");
-    onto_ = ontologies_manipulator_.get("pr2_robot");
+namespace owds {
+
+OptitrackPerceptionModule::OptitrackPerceptionModule()
+{
+    offset_x_ = 0;
+    offset_y_ = 0;
+    offset_z_ = 0;
+}
+
+void OptitrackPerceptionModule::setParameter(const std::string& parameter_name, const std::string& parameter_value)
+{
+    if(parameter_name == "name")
+        human_name_ = parameter_value;
+    else if(parameter_name == "offset_x")
+        offset_x_ = std::stod(parameter_value);
+    else if(parameter_name == "offset_y")
+        offset_y_ = std::stod(parameter_value);
+    else if(parameter_name == "offset_z")
+        offset_z_ = std::stod(parameter_value);
+}
+
+bool OptitrackPerceptionModule::closeInitialization()
+{
+    if(human_name_ == "")
+    {
+        return false;
+    }
+
+    mocap_offset_ = Pose({offset_x_, offset_y_, offset_z_}, {0,0,0,1});
+
+    ontologies_manipulator_ = new OntologiesManipulator(n_);
+    ontologies_manipulator_->waitInit();
+    ontologies_manipulator_->add(robot_agent_->getId());
+    onto_ = ontologies_manipulator_->get(robot_agent_->getId());
     onto_->close();
 
     auto head_names = onto_->individuals.getOn(human_name_, "hasHead");
@@ -80,9 +107,11 @@ OptitrackPerceptionModule::OptitrackPerceptionModule(ros::NodeHandle* n, const s
     }
     percepts_.at(right_hand_name_).setShape(right_hand_shape);
 
-    optitrack_head_sub_ = n->subscribe("/optitrack/bodies/" + head_name_, 1, &OptitrackPerceptionModule::headRosCallback, this);
-    optitrack_left_hand_sub_ = n->subscribe("/optitrack/bodies/" + left_hand_name_, 1, &OptitrackPerceptionModule::leftHandRosCallback, this);
-    optitrack_right_hand_sub_ = n->subscribe("/optitrack/bodies/" + right_hand_name_, 1, &OptitrackPerceptionModule::rightHandRosCallback, this);
+    optitrack_head_sub_ = n_->subscribe("/optitrack/bodies/" + head_name_, 1, &OptitrackPerceptionModule::headRosCallback, this);
+    optitrack_left_hand_sub_ = n_->subscribe("/optitrack/bodies/" + left_hand_name_, 1, &OptitrackPerceptionModule::leftHandRosCallback, this);
+    optitrack_right_hand_sub_ = n_->subscribe("/optitrack/bodies/" + right_hand_name_, 1, &OptitrackPerceptionModule::rightHandRosCallback, this);
+
+    return true;
 }
 
 bool OptitrackPerceptionModule::perceptionCallback(const BodyPartOptitrackPose& msg)
@@ -143,4 +172,7 @@ void OptitrackPerceptionModule::privatePerceptionCallback(const BodyPartOptitrac
       this->updated_ = true;
     this->mutex_access_.unlock();
 }
-}// namespace owds
+
+} // namespace owds
+
+PLUGINLIB_EXPORT_CLASS(owds::OptitrackPerceptionModule, owds::PerceptionModuleBase_<owds::BodyPart>)

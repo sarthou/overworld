@@ -15,7 +15,10 @@ typedef std::pair<BodyPartType_e, optitrack_ros::or_pose_estimator_state> BodyPa
 class OptitrackPerceptionModule : public PerceptionModuleBase_<BodyPart>
 {
   public:
-    OptitrackPerceptionModule(ros::NodeHandle* n, const std::string& human_name, const std::array<double,3>& offset = {0});
+    OptitrackPerceptionModule();
+
+    void setParameter(const std::string& parameter_name, const std::string& parameter_value);
+    bool closeInitialization();
 
   private:
     void headRosCallback(const optitrack_ros::or_pose_estimator_state& msg);
@@ -27,8 +30,11 @@ class OptitrackPerceptionModule : public PerceptionModuleBase_<BodyPart>
   protected:
     bool perceptionCallback(const BodyPartOptitrackPose& msg);
 
-    OntologiesManipulator ontologies_manipulator_;
+    OntologiesManipulator* ontologies_manipulator_;
     OntologyManipulator* onto_;
+    double offset_x_;
+    double offset_y_;
+    double offset_z_;
     Pose mocap_offset_;
 
     std::string human_name_;

@@ -13,19 +13,20 @@ namespace owds {
 enum Pr2GripperSide_e
 {
   PR2_GRIPPER_LEFT,
-  PR2_GRIPPER_RIGHT
+  PR2_GRIPPER_RIGHT,
+  PR2_GRIPER_UNDEFINED
 };
 
 class Pr2GripperPerceptionModule : public PerceptionModuleRosBase<Object, pr2_msgs::PressureState>
 {
 public:
-  Pr2GripperPerceptionModule(ros::NodeHandle* n, Pr2GripperSide_e side, BulletClient* bullet_client, int pr2_bullet_id, Agent* agent);
+  Pr2GripperPerceptionModule();
+
+  void setParameter(const std::string& parameter_name, const std::string& parameter_value);
+  bool closeInitialization();
 
 private:
-  Agent* agent_;
   Pr2GripperSide_e side_;
-  BulletClient* bullet_client_;
-  int pr2_bullet_id_;
   int pr2_left_tip_bullet_id_;
   int pr2_right_tip_bullet_id_;
 
@@ -39,6 +40,8 @@ private:
   size_t obj_id_;
   std::string current_obj_id_;
 
+  double pressure_threshold_;
+  double distance_threshold_;
   double min_period_;
   ros::Time last_update_;
 

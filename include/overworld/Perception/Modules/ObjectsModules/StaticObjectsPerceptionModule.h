@@ -10,6 +10,7 @@ class StaticObjectsPerceptionModule : public PerceptionModuleBase_<Object>
 {
 public:
     StaticObjectsPerceptionModule();
+    
 private:
     void addObject(const std::string& name,
                    const std::string& file,

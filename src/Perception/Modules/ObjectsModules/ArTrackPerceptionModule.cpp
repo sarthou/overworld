@@ -3,26 +3,31 @@
 #include "overworld/Utility/ShellDisplay.h"
 #include <unordered_map>
 
+#include <pluginlib/class_list_macros.h>
+
 namespace owds {
 
 #define TO_HALF_RAD M_PI / 180. / 2.
 
-ArTrackPerceptionModule::ArTrackPerceptionModule(ros::NodeHandle* n, Agent* agent) : PerceptionModuleRosSyncBase(n, "ar_pose_marker", "ar_pose_visible_marker", true),
-                                                                                     ontologies_manipulator_(n),
-                                                                                     tf2_listener_(tf_buffer_)
-{
-  agent_ = agent;
+ArTrackPerceptionModule::ArTrackPerceptionModule() : PerceptionModuleRosSyncBase("ar_pose_marker", "ar_pose_visible_marker", true),
+                                                     tf2_listener_(tf_buffer_)
+{}
 
-  ontologies_manipulator_.waitInit();
-  ontologies_manipulator_.add("pr2_robot");
-  onto_ = ontologies_manipulator_.get("pr2_robot");
+bool ArTrackPerceptionModule::closeInitialization()
+{
+  ontologies_manipulator_ = new OntologiesManipulator(n_);
+  ontologies_manipulator_->waitInit();
+  ontologies_manipulator_->add("pr2_robot");
+  onto_ = ontologies_manipulator_->get("pr2_robot");
   onto_->close();
+
+  return true;
 }
 
 bool ArTrackPerceptionModule::perceptionCallback(const ar_track_alvar_msgs::AlvarMarkers& markers,
                                                  const ar_track_alvar_msgs::AlvarVisibleMarkers& visible_markers)
 {
-  if(agent_ == nullptr)
+  if(robot_agent_ == nullptr)
     return false;
   else if(headHasMoved())
     return false;
@@ -71,17 +76,17 @@ bool ArTrackPerceptionModule::perceptionCallback(const ar_track_alvar_msgs::Alva
 
 bool ArTrackPerceptionModule::headHasMoved()
 {
-    if (agent_->getHead() == nullptr)
+    if (robot_agent_->getHead() == nullptr)
         return true;
-    if (agent_->getHead()->isLocated() == false)
+    if (robot_agent_->getHead()->isLocated() == false)
         return true;
-    return agent_->getHead()->hasMoved();
+    return robot_agent_->getHead()->hasMoved();
 }
 
 bool ArTrackPerceptionModule::isInValidArea(const Pose& tag_pose)
 {
-  auto tag_in_head = tag_pose.transformIn(agent_->getHead()->pose());
-  return agent_->getFieldOfView().hasIn(tag_in_head);
+  auto tag_in_head = tag_pose.transformIn(robot_agent_->getHead()->pose());
+  return robot_agent_->getFieldOfView().hasIn(tag_in_head);
 }
 
 void ArTrackPerceptionModule::setPointOfInterest(const ar_track_alvar_msgs::AlvarVisibleMarker& visible_marker)
@@ -223,3 +228,5 @@ std::array<double, 3> ArTrackPerceptionModule::getColor(const std::string& indiv
 }
 
 } // namespace owds
+
+PLUGINLIB_EXPORT_CLASS(owds::ArTrackPerceptionModule, owds::PerceptionModuleBase_<owds::Object>)

@@ -9,9 +9,8 @@
 
 #include "overworld/Bullet/PhysicsServers.h"
 
-#include "overworld/Perception/Managers/RobotsPerceptionManager.h"
-#include "overworld/Perception/Managers/ObjectsPerceptionManager.h"
-#include "overworld/Perception/Managers/HumansPerceptionManager.h"
+#include "overworld/Perception/PerceptionManager.h"
+
 #include "overworld/Senders/ROSSender.h"
 #include "overworld/Senders/MotionPlanningPoseSender.h"
 #include "overworld/Senders/Bernie.h"
@@ -69,9 +68,7 @@ private:
   std::atomic<bool> run_;
 
   BulletClient* bullet_client_;
-  RobotsPerceptionManager robots_manager_;
-  ObjectsPerceptionManager objects_manager_;
-  HumansPerceptionManager humans_manager_;
+  PerceptionManager perception_manager_;
 
   FactsCalculator facts_calculator_;
   OntologeniusFactsPublisher facts_publisher_;

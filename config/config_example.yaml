@@ -18,9 +18,12 @@ pr2_joints:
 
 pr2_left_gripper:
   side: 0 # = left
+  pressure_threshold: 400
+  distance_threshold: 0.03
 
 pr2_right_gripper:
   side: 1 # = right
+  distance_threshold: 0.03
 
 optitrack:
   name: "human_0"

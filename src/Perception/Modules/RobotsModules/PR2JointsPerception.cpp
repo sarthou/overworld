@@ -2,23 +2,58 @@
 
 #include <ros/package.h>
 
+#include <pluginlib/class_list_macros.h>
+
 namespace owds {
 
-PR2JointsPerception::PR2JointsPerception(ros::NodeHandle* n,
-                                         const std::string& robot_name,
-                                         const std::vector<std::pair<std::string, BodyPartType_e>>& links_to_entity,
-                                         BulletClient* robot_world_client,
-                                         double min_period)
-                                                            : PerceptionModuleRosBase(n, "/joint_states"),
-                                                            robot_name_(robot_name),
-                                                            links_to_entity_(links_to_entity),
-                                                            tf2_listener_(tf_buffer_),
-                                                            bullet_(robot_world_client),
-                                                            min_period_(min_period)
+PR2JointsPerception::PR2JointsPerception(): PerceptionModuleRosBase("/joint_states"),
+                                            tf2_listener_(tf_buffer_)
 {
+    min_period_ = 0.9;
+}
+
+void PR2JointsPerception::setParameter(const std::string& parameter_name, const std::string& parameter_value)
+{
+    if(parameter_name == "name")
+        robot_name_ = parameter_value;
+    else if(parameter_name == "min_period")
+        min_period_ = std::stod(parameter_value);
+    else if(parameter_name == "right_hand")
+        right_hand_link_ = parameter_value;
+    else if(parameter_name == "left_hand")
+        left_hand_link_ = parameter_value;
+    else if(parameter_name == "head")
+        head_ink_ = parameter_value;
+    else
+        std::cout << "Unkown parameter " << parameter_name << std::endl;
+}
+
+bool PR2JointsPerception::closeInitialization()
+{
+    if(robot_name_ == "")
+    {
+        return false;
+    }
+    if(right_hand_link_ == "")
+    {
+        return false;
+    }
+    if(left_hand_link_ == "")
+    {
+        return false;
+    }
+    if(head_ink_ == "")
+    {
+        return false;
+    }
+
+    links_to_entity_ = {{right_hand_link_, owds::BODY_PART_RIGHT_HAND},
+                        {left_hand_link_, owds::BODY_PART_LEFT_HAND},
+                        {head_ink_, owds::BODY_PART_HEAD}};
+
     loadPr2Model();
 
-    auto p = bullet_->findJointAndLinkIndices(robot_body_id_);
+    auto p = bullet_client_->findJointAndLinkIndices(robot_bullet_id_);
     joint_name_id_ = p.first;
     link_name_id_ = p.second;
     for (const auto& link_pair : links_to_entity_)
@@ -36,6 +71,8 @@ PR2JointsPerception::PR2JointsPerception(ros::NodeHandle* n,
     percepts_.emplace("base_footprint", BodyPart("base_footprint"));
     percepts_.at("base_footprint").setAgentName(robot_name_);
     percepts_.at("base_footprint").setType(BODY_PART_BASE);
+
+    return true;
 }
 
 bool PR2JointsPerception::perceptionCallback(const sensor_msgs::JointState& msg)
@@ -50,8 +87,8 @@ bool PR2JointsPerception::perceptionCallback(const sensor_msgs::JointState& msg)
     catch(...) {
         return false;
     }
-    bullet_->resetBasePositionAndOrientation(
-        robot_body_id_, {robot_base.transform.translation.x, robot_base.transform.translation.y, robot_base.transform.translation.z},
+    bullet_client_->resetBasePositionAndOrientation(
+        robot_bullet_id_, {robot_base.transform.translation.x, robot_base.transform.translation.y, robot_base.transform.translation.z},
         {robot_base.transform.rotation.x, robot_base.transform.rotation.y, robot_base.transform.rotation.z, robot_base.transform.rotation.w});
     percepts_.at("base_footprint")
         .updatePose(
@@ -65,11 +102,11 @@ bool PR2JointsPerception::perceptionCallback(const sensor_msgs::JointState& msg)
             //std::cout << "Joint name not found in Bullet: " << name << std::endl;
             continue;
         }
-        bullet_->resetJointState(robot_body_id_, joint_name_id_[name], msg.position[i]);
+        bullet_client_->resetJointState(robot_bullet_id_, joint_name_id_[name], msg.position[i]);
     }
     for (const auto& link_pair : links_to_entity_)
     {
-        b3LinkState link = bullet_->getLinkState(robot_body_id_, link_name_id_[link_pair.first]);
+        b3LinkState link = bullet_client_->getLinkState(robot_bullet_id_, link_name_id_[link_pair.first]);
         double* pos = link.m_worldLinkFramePosition;
         double* rot = link.m_worldLinkFrameOrientation;
         percepts_.at(link_pair.first).updatePose({{pos[0], pos[1], pos[2]}}, {{rot[0], rot[1], rot[2], rot[3]}}, msg.header.stamp);
@@ -84,15 +121,17 @@ void PR2JointsPerception::loadPr2Model()
 	path_pr2_description = path_pr2_description.substr(0, path_pr2_description.size() - std::string("/pr2_description").size());
 	std::string path_overworld = ros::package::getPath("overworld");
 	
-	bullet_->setAdditionalSearchPath(path_overworld + "/models");
+	bullet_client_->setAdditionalSearchPath(path_overworld + "/models");
 
     std::string urdf = n_->param<std::string>("/robot_description", "");
     if (urdf == "")
     {
-	    robot_body_id_ = bullet_->loadURDF("pr2.urdf", {0,0,0}, {0,0,0,1});
+	    robot_bullet_id_ = bullet_client_->loadURDF("pr2.urdf", {0,0,0}, {0,0,0,1});
     }else{
-        robot_body_id_ = bullet_->loadURDFRaw(urdf, "pr2_tmp.urdf", {0,0,0}, {0,0,0,1});
+        robot_bullet_id_ = bullet_client_->loadURDFRaw(urdf, "pr2_tmp.urdf", {0,0,0}, {0,0,0,1});
     }
 }
 
 } // namespace owds
+
+PLUGINLIB_EXPORT_CLASS(owds::PR2JointsPerception, owds::PerceptionModuleBase_<owds::BodyPart>)

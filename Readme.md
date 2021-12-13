@@ -3,7 +3,7 @@
 ## Install bullet
 
 ```
-cmake .. -DCMAKE_INSTALL_PREFIX=your/install/path
+cmake .. -DCMAKE_INSTALL_PREFIX=your/install/path -DBUILD_SHARED_LIBS=ON
 make install
 ```
 

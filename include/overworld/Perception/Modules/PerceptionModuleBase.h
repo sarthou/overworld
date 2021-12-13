@@ -12,6 +12,9 @@
 #include <message_filters/sync_policies/approximate_time.h>
 
 #include "overworld/BasicTypes/Entity.h"
+#include "overworld/BasicTypes/Agent.h"
+
+#include "overworld/Bullet/PhysicsServers.h"
 
 namespace owds {
 
@@ -27,6 +30,23 @@ public:
     updated_ = false;
   }
   virtual ~PerceptionModuleBase_() = default;
+
+  virtual void initialize(ros::NodeHandle* n,
+                          BulletClient* bullet_client,
+                          int robot_bullet_id,
+                          Agent* robot_agent)
+  {
+    n_ = n;
+    bullet_client_ = bullet_client;
+    robot_bullet_id_ = robot_bullet_id;
+    robot_agent_ = robot_agent;
+  }
+
+  virtual void setParameter(const std::string& parameter_name, const std::string& parameter_value) {}
+  virtual bool closeInitialization() { return true; }
+
+  virtual std::string getAgentName() { return ""; } 
+  virtual int getAgentBulletId() { return -1; }
 
   void activate(bool is_activated) { is_activated_ = is_activated; }
   bool isActivated() { return is_activated_; }
@@ -52,6 +72,11 @@ protected:
   static std::mutex mutex_access_;
   bool need_access_to_external_entities_;
 
+  ros::NodeHandle* n_;
+  BulletClient* bullet_client_;
+  int robot_bullet_id_;
+  Agent* robot_agent_;
+
   void setAllPerceptsUnseen()
   {
     for(auto& percept : percepts_)
@@ -68,6 +93,7 @@ class PerceptionModuleBase : public PerceptionModuleBase_<T>
 public:
   PerceptionModuleBase(bool need_access_to_external_entities = false) : PerceptionModuleBase_<T>(need_access_to_external_entities) {}
   virtual ~PerceptionModuleBase() = default;
+
   void sendPerception(const M& msg) { privatePerceptionCallback(msg); }
 
 protected:
@@ -102,13 +128,8 @@ template<typename T>
 class PerceptionModuleRosBase_ : public PerceptionModuleBase_<T>
 {
 public:
-  PerceptionModuleRosBase_(ros::NodeHandle* n, bool need_access_to_external_entities = false) : PerceptionModuleBase_<T>(need_access_to_external_entities)
-  {
-    n_ = n;
-  }
+  PerceptionModuleRosBase_(bool need_access_to_external_entities = false) : PerceptionModuleBase_<T>(need_access_to_external_entities) {}
   virtual ~PerceptionModuleRosBase_() = default;
-protected:
-  ros::NodeHandle* n_;
 };
 
 
@@ -116,18 +137,30 @@ template<typename T, class M>
 class PerceptionModuleRosBase : public PerceptionModuleRosBase_<T>
 {
 public:
-  PerceptionModuleRosBase(ros::NodeHandle* n, const std::string& topic_name, bool need_access_to_external_entities = false) : PerceptionModuleRosBase_<T>(n, need_access_to_external_entities)
+  PerceptionModuleRosBase(const std::string& topic_name, bool need_access_to_external_entities = false) : PerceptionModuleRosBase_<T>(need_access_to_external_entities)
   {
-    sub_ = this->n_->subscribe(topic_name, 1, &PerceptionModuleRosBase::privatePerceptionCallback, this);
-    std::cout << "PerceptionModuleRosBase subscribed to " << topic_name << std::endl;
+    topic_name_ = topic_name;
   }
   virtual ~PerceptionModuleRosBase() = default;
+
+  virtual void initialize(ros::NodeHandle* n,
+                          BulletClient* bullet_client,
+                          int robot_bullet_id,
+                          Agent* robot_agent)
+  {
+    PerceptionModuleRosBase_<T>::initialize(n, bullet_client, robot_bullet_id, robot_agent);
+    sub_ = this->n_->subscribe(topic_name_, 1, &PerceptionModuleRosBase::privatePerceptionCallback, this);
+    std::cout << "PerceptionModuleRosBase subscribed to " << topic_name_ << std::endl;
+  }
 
 protected:
   virtual bool perceptionCallback(const M& msg) = 0;
 
+  void setTopicName(const std::string& topic_name) { topic_name_ = topic_name; }
+
 private:
   ros::Subscriber sub_;
+  std::string topic_name_;
 
   void privatePerceptionCallback(const M& msg)
   {
@@ -157,23 +190,34 @@ template<typename T, class M0, class M1>
 class PerceptionModuleRosSyncBase : public PerceptionModuleRosBase_<T>
 {
 public:
-  PerceptionModuleRosSyncBase(ros::NodeHandle* n,
-                              const std::string& first_topic_name,
+  PerceptionModuleRosSyncBase(const std::string& first_topic_name,
                               const std::string& second_topic_name,
-                              bool need_access_to_external_entities = false): PerceptionModuleRosBase_<T>(n, need_access_to_external_entities)
+                              bool need_access_to_external_entities = false): PerceptionModuleRosBase_<T>(need_access_to_external_entities)
   {
-    sub_0_.subscribe(*n, first_topic_name, 1);
-    sub_1_.subscribe(*n, second_topic_name, 1);
-    sync_.reset(new Sync(SyncPolicy(10), sub_0_, sub_1_));
-    sync_->registerCallback(&PerceptionModuleRosSyncBase::privatePerceptionCallback, this);
-    std::cout << "PerceptionModuleRosSyncBase subscribed to " << first_topic_name << " and " << second_topic_name << std::endl;
+    first_topic_name_ = first_topic_name;
+    second_topic_name_ = second_topic_name;
   }
   virtual ~PerceptionModuleRosSyncBase() = default;
+
+  virtual void initialize(ros::NodeHandle* n,
+                          BulletClient* bullet_client,
+                          int robot_bullet_id,
+                          Agent* robot_agent)
+  {
+    PerceptionModuleRosBase_<T>::initialize(n, bullet_client, robot_bullet_id, robot_agent);
+    sub_0_.subscribe(*n, first_topic_name_, 1);
+    sub_1_.subscribe(*n, second_topic_name_, 1);
+    sync_.reset(new Sync(SyncPolicy(10), sub_0_, sub_1_));
+    sync_->registerCallback(&PerceptionModuleRosSyncBase::privatePerceptionCallback, this);
+    std::cout << "PerceptionModuleRosSyncBase subscribed to " << first_topic_name_ << " and " << second_topic_name_ << std::endl;
+  }
 
 protected:
   virtual bool perceptionCallback(const M0& first_msg, const M1& second_msg) = 0;
 
 private:
+  std::string first_topic_name_;
+  std::string second_topic_name_;
   message_filters::Subscriber<M0> sub_0_;
   message_filters::Subscriber<M1> sub_1_;
   typedef message_filters::sync_policies::ApproximateTime<M0, M1> SyncPolicy;

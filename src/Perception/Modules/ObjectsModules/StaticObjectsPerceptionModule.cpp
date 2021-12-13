@@ -1,5 +1,7 @@
 #include "overworld/Perception/Modules/ObjectsModules/StaticObjectsPerceptionModule.h"
 
+#include <pluginlib/class_list_macros.h>
+
 namespace owds {
 
 StaticObjectsPerceptionModule::StaticObjectsPerceptionModule()
@@ -41,3 +43,5 @@ void StaticObjectsPerceptionModule::addObject(const std::string& name,
 }
 
 } //namespace owds
+
+PLUGINLIB_EXPORT_CLASS(owds::StaticObjectsPerceptionModule, owds::PerceptionModuleBase_<owds::Object>)

@@ -36,6 +36,15 @@ public:
       return {};
   }
 
+  std::vector<std::string> getElementsKeys()
+  {
+    std::vector<std::string> res;
+    if(subelem)
+      for(auto& elem : subelem.value())
+        res.push_back(elem.first);
+    return res;
+  }
+
 private:
   std::experimental::optional<std::vector<std::string>> data;
   std::experimental::optional<std::map<std::string, ConfigElement>> subelem;

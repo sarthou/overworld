@@ -1,0 +1,22 @@
+<library path="lib/liboverworld_modules_plugin">
+  <class type="owds::PR2JointsPerception" base_class_type="owds::PerceptionModuleBase_<owds::BodyPart>">
+    <description>Plop.</description>
+  </class>
+
+  <class type="owds::OptitrackPerceptionModule" base_class_type="owds::PerceptionModuleBase_<owds::BodyPart>">
+    <description>Plop.</description>
+  </class>
+
+  <class type="owds::ArTrackPerceptionModule" base_class_type="owds::PerceptionModuleBase_<owds::Object>">
+    <description>Plop.</description>
+  </class>
+  <class type="owds::Pr2GripperPerceptionModule" base_class_type="owds::PerceptionModuleBase_<owds::Object>">
+    <description>Plop.</description>
+  </class>
+  <class type="owds::StaticObjectsPerceptionModule" base_class_type="owds::PerceptionModuleBase_<owds::Object>">
+    <description>Plop.</description>
+  </class>
+
+
+
+</library>

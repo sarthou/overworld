@@ -21,19 +21,18 @@ namespace owds {
 class ArTrackPerceptionModule : public PerceptionModuleRosSyncBase<Object, ar_track_alvar_msgs::AlvarMarkers, ar_track_alvar_msgs::AlvarVisibleMarkers>
 {
 public:
-  ArTrackPerceptionModule(ros::NodeHandle* n, Agent* agent = nullptr);
+  ArTrackPerceptionModule();
 
-  void setAgent(Agent* agent) { agent_ = agent; }
+  bool closeInitialization();
 
 private:
-  Agent* agent_;
   Pose last_head_pose_;
 
   std::map<size_t, std::string> ids_map_;
   std::unordered_set<size_t> blacklist_ids_;
   std::unordered_set<size_t> visible_markers_with_pois_;  // The id of the visible markers that we already seen at least once and were valid (and thus, have their pois created)
 
-  OntologiesManipulator ontologies_manipulator_;
+  OntologiesManipulator* ontologies_manipulator_;
   OntologyManipulator* onto_;
 
   tf2_ros::Buffer tf_buffer_;
