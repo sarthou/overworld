@@ -36,7 +36,7 @@ std::map<std::string, ConfigElement> PerceptionConfiguration::read(const std::ve
 {
   std::map<std::string, ConfigElement> res;
 
-  std::regex element_regex(R"(^\s*([^\s]*)\s*:\s*([^\n]*)\s*$)");
+  std::regex element_regex(R"(^\s*([^\s]*)\s*:\s*([^\n\s]*)\s*$)");
   std::regex list_regex(R"(^\s*-\s*(.*)\s*$)");
   std::smatch match;
 
