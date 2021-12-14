@@ -81,9 +81,9 @@ bool PR2JointsPerception::closeInitialization()
 
 bool PR2JointsPerception::perceptionCallback(const sensor_msgs::JointState& msg)
 {
-    if ((ros::Time::now() - last_update_).toSec() < min_period_){
+    if ((ros::Time::now() - last_update_).toSec() < min_period_)
         return false;
-    }
+    
     geometry_msgs::TransformStamped robot_base;
     try {
         robot_base = tf_buffer_.lookupTransform("map", "base_footprint", msg.header.stamp, ros::Duration(1.0));
@@ -91,6 +91,7 @@ bool PR2JointsPerception::perceptionCallback(const sensor_msgs::JointState& msg)
     catch(...) {
         return false;
     }
+
     bullet_client_->resetBasePositionAndOrientation(
         robot_bullet_id_, {robot_base.transform.translation.x, robot_base.transform.translation.y, robot_base.transform.translation.z},
         {robot_base.transform.rotation.x, robot_base.transform.rotation.y, robot_base.transform.rotation.z, robot_base.transform.rotation.w});
@@ -98,6 +99,7 @@ bool PR2JointsPerception::perceptionCallback(const sensor_msgs::JointState& msg)
         .updatePose(
             {robot_base.transform.translation.x, robot_base.transform.translation.y, robot_base.transform.translation.z},
             {robot_base.transform.rotation.x, robot_base.transform.rotation.y, robot_base.transform.rotation.z, robot_base.transform.rotation.w});
+    
     for (size_t i = 0; i < msg.name.size(); i++)
     {
         std::string name = msg.name[i];
@@ -129,11 +131,9 @@ void PR2JointsPerception::loadPr2Model()
 
     std::string urdf = n_->param<std::string>("/robot_description", "");
     if (urdf == "")
-    {
 	    robot_bullet_id_ = bullet_client_->loadURDF("pr2.urdf", {0,0,0}, {0,0,0,1});
-    }else{
+    else
         robot_bullet_id_ = bullet_client_->loadURDFRaw(urdf, "pr2_tmp.urdf", {0,0,0}, {0,0,0,1});
-    }
 }
 
 } // namespace owds
