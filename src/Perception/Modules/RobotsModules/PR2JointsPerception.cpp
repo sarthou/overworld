@@ -32,18 +32,22 @@ bool PR2JointsPerception::closeInitialization()
 {
     if(robot_name_ == "")
     {
+        ShellDisplay::error("[PR2JointsPerception] No robot name has been defined");
         return false;
     }
     if(right_hand_link_ == "")
     {
+        ShellDisplay::error("[PR2JointsPerception] No right hand link has been defined");
         return false;
     }
     if(left_hand_link_ == "")
     {
+        ShellDisplay::error("[PR2JointsPerception] No left hand link has been defined");
         return false;
     }
     if(head_ink_ == "")
     {
+        ShellDisplay::error("[PR2JointsPerception] No head link has been defined");
         return false;
     }
 

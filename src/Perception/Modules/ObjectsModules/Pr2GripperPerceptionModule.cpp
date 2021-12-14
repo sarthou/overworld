@@ -45,6 +45,7 @@ bool Pr2GripperPerceptionModule::closeInitialization()
 {
   if(side_ == PR2_GRIPER_UNDEFINED)
   {
+    ShellDisplay::error("[Pr2GripperPerceptionModule] No gripper side has been defined");
     return false;
   }
 

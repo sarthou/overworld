@@ -31,6 +31,7 @@ bool OptitrackPerceptionModule::closeInitialization()
 {
     if(human_name_ == "")
     {
+        ShellDisplay::error("[OptitrackPerceptionModule] No human name has been defined");
         return false;
     }
 
