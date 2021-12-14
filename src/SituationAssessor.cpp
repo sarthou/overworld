@@ -18,7 +18,7 @@ namespace owds {
 SituationAssessor::SituationAssessor(const std::string& agent_name,
                                      const std::string& config_path,
                                      bool is_robot) : facts_publisher_(&n_, agent_name),
-                                                                                     facts_calculator_(&n_),
+                                                      facts_calculator_(&n_, agent_name),
                                                                                      perception_manager_(&n_)
 {
   agent_name_ = agent_name;
