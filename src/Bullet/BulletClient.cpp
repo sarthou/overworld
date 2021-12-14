@@ -623,7 +623,7 @@ std::pair<std::unordered_map<std::string, int>, std::unordered_map<std::string, 
     std::unordered_map<std::string, int> joint_name_index;
     std::unordered_map<std::string, int> link_name_index;
     int numJoints = getNumJoints(body_id);
-    std::cout << "Robot id: " << body_id << " Num_Joints : " << numJoints << std::endl;
+    // std::cout << "Robot id: " << body_id << " Num_Joints : " << numJoints << std::endl;
     if (numJoints == 0)
     {
         std::cout << "Warning: No joints found for Bullet body id: " << body_id << std::endl;
@@ -632,7 +632,7 @@ std::pair<std::unordered_map<std::string, int>, std::unordered_map<std::string, 
     for (size_t i = 0; i < numJoints - 1; i++)
     {
         b3JointInfo joint = getJointInfo(body_id, i);
-        std::cout << joint.m_jointName << std::endl;
+        // std::cout << joint.m_jointName << std::endl;
         joint_name_index[joint.m_jointName] = i;
         link_name_index[joint.m_linkName] = i;
     }
