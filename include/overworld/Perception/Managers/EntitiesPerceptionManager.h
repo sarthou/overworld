@@ -230,14 +230,14 @@ void EntitiesPerceptionManager<T>::addToBullet(T* entity)
         }
         case SHAPE_CYLINDER:
         {
-            visual_id = bullet_client_->createVisualShapeCylinder(entity->getShape().scale[0],
-                                                                  entity->getShape().scale[1],
+            visual_id = bullet_client_->createVisualShapeCylinder(std::min(entity->getShape().scale[0], entity->getShape().scale[1]) / 2.,
+                                                                  entity->getShape().scale[2],
                                                                   {entity->getShape().color[0],
                                                                    entity->getShape().color[1],
                                                                    entity->getShape().color[2],
                                                                    1});
-            collision_id = bullet_client_->createCollisionShapeCylinder(entity->getShape().scale[0],
-                                                                        entity->getShape().scale[1]);
+            collision_id = bullet_client_->createCollisionShapeCylinder(std::min(entity->getShape().scale[0], entity->getShape().scale[1]) / 2.,
+                                                                        entity->getShape().scale[2]);
             break;
         }
         case SHAPE_MESH:
