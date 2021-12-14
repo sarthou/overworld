@@ -22,6 +22,8 @@ public:
     EntitiesPerceptionManager(): bullet_client_(nullptr){}
     virtual ~EntitiesPerceptionManager();
 
+    void setBulletClient(BulletClient* client) { bullet_client_ = client; }
+
     void addPerceptionModule(const std::string& module_name, PerceptionModuleBase_<T>* perception_module);
     PerceptionModuleBase_<T>* getPerceptionModule(const std::string& module_name);
     std::vector<std::string> getModulesList();

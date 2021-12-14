@@ -19,7 +19,13 @@ public:
     ObjectsPerceptionManager objects_manager_;
     HumansPerceptionManager humans_manager_;
 
-    void setBulletClient(BulletClient* bullet_client) { bullet_client_ = bullet_client; }
+    void setBulletClient(BulletClient* bullet_client)
+    {
+        bullet_client_ = bullet_client;
+        robots_manager_.setBulletClient(bullet_client_);
+        objects_manager_.setBulletClient(bullet_client_);
+        humans_manager_.setBulletClient(bullet_client_);
+    }
 
     void update();
 
