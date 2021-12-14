@@ -2,11 +2,11 @@
 
 namespace owds {
 
-FactsCalculator::FactsCalculator(ros::NodeHandle* nh): ontos_(OntologiesManipulator(nh))
+FactsCalculator::FactsCalculator(ros::NodeHandle* nh, const std::string& agent_name): ontos_(OntologiesManipulator(nh))
 {
   ontos_.waitInit();
-  ontos_.add("pr2_robot");
-  onto_ = ontos_.get("pr2_robot");
+  ontos_.add(agent_name);
+  onto_ = ontos_.get(agent_name);
   onto_->close();
 
 }
