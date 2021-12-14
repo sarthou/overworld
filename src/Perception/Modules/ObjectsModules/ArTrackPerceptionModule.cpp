@@ -17,8 +17,9 @@ bool ArTrackPerceptionModule::closeInitialization()
 {
   ontologies_manipulator_ = new OntologiesManipulator(n_);
   ontologies_manipulator_->waitInit();
-  ontologies_manipulator_->add("pr2_robot");
-  onto_ = ontologies_manipulator_->get("pr2_robot");
+  std::string robot_name = robot_agent_->getId();
+  ontologies_manipulator_->add(robot_name);
+  onto_ = ontologies_manipulator_->get(robot_name);
   onto_->close();
 
   return true;
