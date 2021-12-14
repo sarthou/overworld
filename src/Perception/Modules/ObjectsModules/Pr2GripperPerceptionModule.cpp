@@ -110,7 +110,7 @@ bool Pr2GripperPerceptionModule::perceptionCallback(const pr2_msgs::PressureStat
           Object percept(current_obj_id_, false);
           Shape_t shape;
           shape.type = SHAPE_CUBE;
-          shape.scale.fill(dist/2.);
+          shape.scale.fill(dist);
           percept.setShape(shape);
           percept.setSeen();
 
