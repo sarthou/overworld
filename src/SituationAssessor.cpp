@@ -49,7 +49,8 @@ SituationAssessor::SituationAssessor(const std::string& agent_name,
 
   if(is_robot_)
   {
-    perception_manager_.applyConfigurationRobot(config_path_);
+    if(perception_manager_.applyConfigurationRobot(config_path_) == false)
+      throw std::runtime_error("The configuration of overworld has failed. Please look above for more information.");
     myself_agent_ = perception_manager_.robots_manager_.getAgent(agent_name);
   }
   else
