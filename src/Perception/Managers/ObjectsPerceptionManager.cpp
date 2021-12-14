@@ -264,7 +264,7 @@ std::unordered_set<int> ObjectsPerceptionManager::getObjectsInCamera()
                                                               myself_agent_->getFieldOfView().getClipFar());
 
   std::array<double, 3> axes = {1,0,0};
-  if(myself_agent_->getType() == AgentType_e::PR2_ROBOT)
+  if(myself_agent_->getType() == AgentType_e::ROBOT)
     axes = {0,0,1};
 
   Pose target_pose = myself_agent_->getHead()->pose() * Pose(axes, {0,0,0,1});
