@@ -213,7 +213,9 @@ void EntitiesPerceptionManager<T>::addToBullet(T* entity)
                                                               entity->getShape().color[1],
                                                               entity->getShape().color[2],
                                                               1});
-            collision_id = bullet_client_->createCollisionShapeBox(entity->getShape().scale);
+            collision_id = bullet_client_->createCollisionShapeBox({entity->getShape().scale[0] / 2.,
+                                                                    entity->getShape().scale[1] / 2.,
+                                                                    entity->getShape().scale[2] / 2.});
             break;
         }
         case SHAPE_SPEHERE:
