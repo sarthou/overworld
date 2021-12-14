@@ -43,7 +43,7 @@ int BulletClient::createVisualShapeSphere(float radius, const std::array<double,
 
 int BulletClient::createVisualShapeCylinder(float radius, float height, const std::array<double, 4>& rgba_color)
 {
-    return createVisualShape(GEOM_CYLINDER, radius, {0}, 0, "", {0}, rgba_color);
+    return createVisualShape(GEOM_CYLINDER, radius, {0}, height, "", {0}, rgba_color);
 }
 
 int BulletClient::createVisualShapeCapsule(float radius, float height, const std::array<double, 4>& rgba_color)
@@ -134,7 +134,7 @@ int BulletClient::createCollisionShapeSphere(float radius, int flags)
 
 int BulletClient::createCollisionShapeCylinder(float radius, float height, int flags)
 {
-    return createCollisionShape(GEOM_CYLINDER, radius, {0}, 0, "", {0}, flags);
+    return createCollisionShape(GEOM_CYLINDER, radius, {0}, height, "", {0}, flags);
 }
 
 int BulletClient::createCollisionShapeCapsule(float radius, float height, int flags)
