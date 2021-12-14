@@ -126,20 +126,11 @@ private:
   }
 };
 
-template<typename T>
-class PerceptionModuleRosBase_ : public PerceptionModuleBase_<T>
-{
-public:
-  PerceptionModuleRosBase_(bool need_access_to_external_entities = false) : PerceptionModuleBase_<T>(need_access_to_external_entities) {}
-  virtual ~PerceptionModuleRosBase_() = default;
-};
-
-
 template<typename T, class M>
-class PerceptionModuleRosBase : public PerceptionModuleRosBase_<T>
+class PerceptionModuleRosBase : public PerceptionModuleBase_<T>
 {
 public:
-  PerceptionModuleRosBase(const std::string& topic_name, bool need_access_to_external_entities = false) : PerceptionModuleRosBase_<T>(need_access_to_external_entities)
+  PerceptionModuleRosBase(const std::string& topic_name, bool need_access_to_external_entities = false) : PerceptionModuleBase_<T>(need_access_to_external_entities)
   {
     topic_name_ = topic_name;
   }
@@ -150,15 +141,26 @@ public:
                           int robot_bullet_id,
                           Agent* robot_agent)
   {
-    PerceptionModuleRosBase_<T>::initialize(n, bullet_client, robot_bullet_id, robot_agent);
-    sub_ = this->n_->subscribe(topic_name_, 1, &PerceptionModuleRosBase::privatePerceptionCallback, this);
-    ShellDisplay::info("PerceptionModuleRosBase subscribed to " + topic_name_);
+    PerceptionModuleBase_<T>::initialize(n, bullet_client, robot_bullet_id, robot_agent);
+    if(topic_name_ != "")
+    {
+      sub_ = this->n_->subscribe(topic_name_, 1, &PerceptionModuleRosBase::privatePerceptionCallback, this);
+      ShellDisplay::info("PerceptionModuleRosBase subscribed to " + topic_name_);
+    }
   }
 
 protected:
   virtual bool perceptionCallback(const M& msg) = 0;
 
-  void setTopicName(const std::string& topic_name) { topic_name_ = topic_name; }
+  void setTopicName(const std::string& topic_name)
+  {
+    topic_name_ = topic_name;
+    if(topic_name_ != "")
+    {
+      sub_ = this->n_->subscribe(topic_name_, 1, &PerceptionModuleRosBase::privatePerceptionCallback, this);
+      ShellDisplay::info("PerceptionModuleRosBase subscribed to " + topic_name_);
+    }
+  }
 
 private:
   ros::Subscriber sub_;
@@ -189,12 +191,12 @@ private:
 };
 
 template<typename T, class M0, class M1>
-class PerceptionModuleRosSyncBase : public PerceptionModuleRosBase_<T>
+class PerceptionModuleRosSyncBase : public PerceptionModuleBase_<T>
 {
 public:
   PerceptionModuleRosSyncBase(const std::string& first_topic_name,
                               const std::string& second_topic_name,
-                              bool need_access_to_external_entities = false): PerceptionModuleRosBase_<T>(need_access_to_external_entities)
+                              bool need_access_to_external_entities = false): PerceptionModuleBase_<T>(need_access_to_external_entities)
   {
     first_topic_name_ = first_topic_name;
     second_topic_name_ = second_topic_name;
@@ -206,7 +208,7 @@ public:
                           int robot_bullet_id,
                           Agent* robot_agent)
   {
-    PerceptionModuleRosBase_<T>::initialize(n, bullet_client, robot_bullet_id, robot_agent);
+    PerceptionModuleBase_<T>::initialize(n, bullet_client, robot_bullet_id, robot_agent);
     sub_0_.subscribe(*n, first_topic_name_, 1);
     sub_1_.subscribe(*n, second_topic_name_, 1);
     sync_.reset(new Sync(SyncPolicy(10), sub_0_, sub_1_));
