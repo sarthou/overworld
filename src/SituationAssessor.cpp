@@ -19,7 +19,7 @@ SituationAssessor::SituationAssessor(const std::string& agent_name,
                                      const std::string& config_path,
                                      bool is_robot) : facts_publisher_(&n_, agent_name),
                                                       facts_calculator_(&n_, agent_name),
-                                                                                     perception_manager_(&n_)
+                                                      perception_manager_(&n_)
 {
   agent_name_ = agent_name;
   is_robot_ = is_robot;
@@ -51,6 +51,8 @@ SituationAssessor::SituationAssessor(const std::string& agent_name,
   {
     if(perception_manager_.applyConfigurationRobot(config_path_) == false)
       throw std::runtime_error("The configuration of overworld has failed. Please look above for more information.");
+    if(perception_manager_.getRobotName() != agent_name)
+      throw std::runtime_error("The robot name provided in the launch file is different from the robot perception module.");
     myself_agent_ = perception_manager_.robots_manager_.getAgent(agent_name);
   }
   else

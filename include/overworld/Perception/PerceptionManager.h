@@ -32,6 +32,8 @@ public:
     bool applyConfigurationRobot(const std::string& config_path);
     bool applyConfigurationHuman(const std::string& config_path);
 
+    std::string getRobotName() { return robot_name_; }
+
 private:
     ros::NodeHandle* n_;
     BulletClient* bullet_client_;
