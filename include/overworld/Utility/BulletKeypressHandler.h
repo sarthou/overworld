@@ -1,18 +1,24 @@
 #ifndef OWDS_BULLETKEYPRESSHANDLER_H
 #define OWDS_BULLETKEYPRESSHANDLER_H
+
 #include "overworld/Bullet/BulletClient.h"
 #include "overworld/Geometry/GeometryUtils.h"
-#include "overworld/Perception/RobotsPerceptionManager.h"
+#include "overworld/Perception/Managers/RobotsPerceptionManager.h"
 #include "overworld/Utility/ShellDisplay.h"
 
 namespace owds {
 
 inline void onSpacebarPressed(BulletClient* bullet_client, RobotsPerceptionManager& robots_manager)
 {
-    if (robots_manager.getAgent("pr2_robot") != nullptr && robots_manager.getAgent("pr2_robot")->getHead() != nullptr &&
-        robots_manager.getAgent("pr2_robot")->getHead()->isLocated())
+    auto agents = robots_manager.getAgents();
+    if(agents.size() != 1)
+        return;
+
+    Agent* agent = agents.begin()->second;
+    if (agent != nullptr && agent->getHead() != nullptr &&
+        agent->getHead()->isLocated())
     {
-        auto head_pose = robots_manager.getAgent("pr2_robot")->getHead()->pose();
+        auto head_pose = agent->getHead()->pose();
         auto head_pose_arrays = head_pose.arrays();
         std::array<float, 3> head_posef = {(float)head_pose_arrays.first.at(0), (float)head_pose_arrays.first.at(1),
                                            (float)head_pose_arrays.first.at(2)};

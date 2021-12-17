@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.0.2)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 project(overworld)
 
 add_compile_options(-std=c++14)
@@ -25,10 +26,12 @@ find_package(catkin REQUIRED COMPONENTS
   visualization_msgs
   pr2_motion_tasks_msgs
   cv_bridge
+  pluginlib
 )
 find_package (Eigen3 REQUIRED NO_MODULE)
 find_package(Threads REQUIRED)
 find_package(CURL REQUIRED)
+find_package(pluginlib REQUIRED)
 
 list(APPEND BULLET_LIB_NAMES BulletRoboticsGUI
                              BulletExampleBrowserLib
@@ -123,6 +126,7 @@ add_library(${PROJECT_NAME}_bullet_lib STATIC
   src/Bullet/BulletClient.cpp
 )
 target_link_libraries(${PROJECT_NAME}_bullet_lib PUBLIC Bullet3)
+set_target_properties(${PROJECT_NAME}_bullet_lib PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 add_library(${PROJECT_NAME}_types_lib STATIC
   src/Geometry/Pose.cpp
@@ -134,18 +138,16 @@ add_library(${PROJECT_NAME}_types_lib STATIC
 target_link_libraries(${PROJECT_NAME}_types_lib PUBLIC
                       ${catkin_LIBRARIES}
                       ${PROJECT_NAME}_bullet_lib)
+set_target_properties(${PROJECT_NAME}_types_lib PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 add_library(${PROJECT_NAME}_perception_lib STATIC
-  src/Perception/RobotsPerceptionManager.cpp
-  src/Perception/ObjectsPerceptionManager.cpp
-  src/Perception/HumansPerceptionManager.cpp
-  src/Perception/Modalities/PR2JointsPerception.cpp
-  src/Perception/Modalities/ArTrackPerceptionModule.cpp
-  src/Perception/Modalities/StaticObjectsPerceptionModule.cpp
-  src/Perception/Modalities/OptitrackPerceptionModule.cpp
-  src/Perception/Modalities/ObjectsEmulatedPerceptionModule.cpp
-  src/Perception/Modalities/HumansEmulatedPerceptionModule.cpp
-  src/Perception/Modalities/Pr2GripperPerceptionModule.cpp
+  src/Perception/Managers/ObjectsPerceptionManager.cpp
+  src/Perception/Managers/RobotsPerceptionManager.cpp
+  src/Perception/Managers/HumansPerceptionManager.cpp
+  src/Perception/Modules/ObjectsModules/ObjectsEmulatedPerceptionModule.cpp
+  src/Perception/Modules/HumansModules/HumansEmulatedPerceptionModule.cpp
+  src/Perception/PerceptionManager.cpp
+  src/Perception/PerceptionConfiguration.cpp
 )
 target_link_libraries(${PROJECT_NAME}_perception_lib PUBLIC
                       ${catkin_LIBRARIES}
@@ -171,6 +173,22 @@ target_link_libraries(${PROJECT_NAME}_sender_lib PUBLIC
                       ${catkin_LIBRARIES}
                       Bullet3 # For b3CameraImage
                       ${CURL_LIBRARIES}
+                      ${PROJECT_NAME}_types_lib)
+
+#################
+#    Plugins    #
+#################
+
+add_library(overworld_modules_plugin MODULE
+  src/Perception/Modules/ObjectsModules/ArTrackPerceptionModule.cpp
+  src/Perception/Modules/ObjectsModules/StaticObjectsPerceptionModule.cpp
+  src/Perception/Modules/ObjectsModules/Pr2GripperPerceptionModule.cpp
+  src/Perception/Modules/RobotsModules/PR2JointsPerception.cpp
+  src/Perception/Modules/HumansModules/OptitrackPerceptionModule.cpp
+)
+target_link_libraries(overworld_modules_plugin PUBLIC
+                      ${catkin_LIBRARIES}
+                      ${PROJECT_NAME}_bullet_lib
                       ${PROJECT_NAME}_types_lib)
 
 #################
@@ -201,9 +219,9 @@ target_link_libraries(${PROJECT_NAME}_multi_server_test PRIVATE
                       ${PROJECT_NAME}_bullet_lib
                       ${catkin_LIBRARIES})
 
-add_executable(${PROJECT_NAME}_perception_test src/TestFiles/perception_test.cpp )
-target_link_libraries(${PROJECT_NAME}_perception_test PRIVATE
+add_executable(${PROJECT_NAME}_config_test src/TestFiles/config_test.cpp )
+target_link_libraries(${PROJECT_NAME}_config_test PRIVATE
                       ${PROJECT_NAME}_types_lib
                       ${PROJECT_NAME}_perception_lib
                       ${catkin_LIBRARIES})
-add_dependencies(${PROJECT_NAME}_perception_test overworld_gencpp)
+add_dependencies(${PROJECT_NAME}_config_test overworld_gencpp)

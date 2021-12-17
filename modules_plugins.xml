@@ -1,0 +1,39 @@
+<library path="lib/liboverworld_modules_plugin">
+
+  <class type="owds::PR2JointsPerception" base_class_type="owds::PerceptionModuleBase_<owds::BodyPart>">
+    <description>
+      A robot perception module for a PR2 robot.
+      Possible parameters are: name, min_period,
+      right_hand, left_hand, and head.
+    </description>
+  </class>
+
+  <class type="owds::OptitrackPerceptionModule" base_class_type="owds::PerceptionModuleBase_<owds::BodyPart>">
+    <description>
+      A human perception module using the Optitrack mocap system.
+      Possible parameters are: name, offset_x,
+      offset_y, offset_z.
+    </description>
+  </class>
+
+  <class type="owds::ArTrackPerceptionModule" base_class_type="owds::PerceptionModuleBase_<owds::Object>">
+    <description>
+      An object perception module using the Ar_track_alvar system.
+      Does not take any parameter.
+    </description>
+  </class>
+  <class type="owds::Pr2GripperPerceptionModule" base_class_type="owds::PerceptionModuleBase_<owds::Object>">
+    <description>
+      An object perception module using the Pr2 pressure sensors.
+      Possible parameters are: side (0 left / 1 right),
+      pressure_threshold, distance_threshold, min_period.
+    </description>
+  </class>
+  <class type="owds::StaticObjectsPerceptionModule" base_class_type="owds::PerceptionModuleBase_<owds::Object>">
+    <description>
+      An object perception module providing static objects.
+      Does not take any parameter.
+    </description>
+  </class>
+
+</library>

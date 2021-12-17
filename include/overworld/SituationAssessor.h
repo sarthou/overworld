@@ -9,9 +9,8 @@
 
 #include "overworld/Bullet/PhysicsServers.h"
 
-#include "overworld/Perception/RobotsPerceptionManager.h"
-#include "overworld/Perception/ObjectsPerceptionManager.h"
-#include "overworld/Perception/HumansPerceptionManager.h"
+#include "overworld/Perception/PerceptionManager.h"
+
 #include "overworld/Senders/ROSSender.h"
 #include "overworld/Senders/MotionPlanningPoseSender.h"
 #include "overworld/Senders/Bernie.h"
@@ -45,7 +44,7 @@ struct HumanAssessor_t
 class SituationAssessor
 {
 public:
-  SituationAssessor(const std::string& agent_name, bool is_robot = false);
+  SituationAssessor(const std::string& agent_name, const std::string& config_path, bool is_robot = false);
   ~SituationAssessor();
 
   void run();
@@ -61,6 +60,8 @@ private:
   Agent* myself_agent_;
   bool is_robot_;
 
+  std::string config_path_;
+
   ros::NodeHandle n_;
   ros::CallbackQueue callback_queue_;
   ros::ServiceServer start_modules_service_;
@@ -69,9 +70,7 @@ private:
   std::atomic<bool> run_;
 
   BulletClient* bullet_client_;
-  RobotsPerceptionManager robots_manager_;
-  ObjectsPerceptionManager objects_manager_;
-  HumansPerceptionManager humans_manager_;
+  PerceptionManager perception_manager_;
 
   FactsCalculator facts_calculator_;
   OntologeniusFactsPublisher facts_publisher_;

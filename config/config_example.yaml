@@ -1,0 +1,31 @@
+modules:
+  robot:
+    PR2JointsPerception: pr2_joints
+  humans:
+    OptitrackPerceptionModule: optitrack
+  objects:
+    ArTrackPerceptionModule: ar_track
+    Pr2GripperPerceptionModule:
+      - pr2_left_gripper
+      - pr2_right_gripper
+    StaticObjectsPerceptionModule: static
+
+pr2_joints:
+  name : pr2_robot
+  right_hand : r_gripper_tool_frame
+  left_hand : l_gripper_tool_frame
+  head : head_mount_kinect2_rgb_optical_frame
+
+pr2_left_gripper:
+  side: 0 # = left
+  pressure_threshold: 400
+  distance_threshold: 0.03
+
+pr2_right_gripper:
+  side: 1 # = right
+  distance_threshold: 0.03
+
+optitrack:
+  name: human_0
+  offset_x: 6.4868
+  offset_y: 2.8506

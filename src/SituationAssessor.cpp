@@ -1,12 +1,13 @@
 #include "overworld/SituationAssessor.h"
 
-#include "overworld/Perception/Modalities/ArTrackPerceptionModule.h"
-#include "overworld/Perception/Modalities/PR2JointsPerception.h"
-#include "overworld/Perception/Modalities/Pr2GripperPerceptionModule.h"
-#include "overworld/Perception/Modalities/StaticObjectsPerceptionModule.h"
-#include "overworld/Perception/Modalities/OptitrackPerceptionModule.h"
-#include "overworld/Perception/Modalities/ObjectsEmulatedPerceptionModule.h"
-#include "overworld/Perception/Modalities/HumansEmulatedPerceptionModule.h"
+#include "overworld/Perception/Modules/ObjectsModules/ArTrackPerceptionModule.h"
+#include "overworld/Perception/Modules/ObjectsModules/Pr2GripperPerceptionModule.h"
+#include "overworld/Perception/Modules/ObjectsModules/StaticObjectsPerceptionModule.h"
+#include "overworld/Perception/Modules/ObjectsModules/ObjectsEmulatedPerceptionModule.h"
+#include "overworld/Perception/Modules/RobotsModules/PR2JointsPerception.h"
+#include "overworld/Perception/Modules/HumansModules/OptitrackPerceptionModule.h"
+#include "overworld/Perception/Modules/HumansModules/HumansEmulatedPerceptionModule.h"
+
 #include "overworld/Utility/BulletKeypressHandler.h"
 
 #include <chrono>
@@ -14,10 +15,15 @@
 
 namespace owds {
 
-SituationAssessor::SituationAssessor(const std::string& agent_name, bool is_robot) : facts_publisher_(&n_, agent_name), facts_calculator_(&n_)
+SituationAssessor::SituationAssessor(const std::string& agent_name,
+                                     const std::string& config_path,
+                                     bool is_robot) : facts_publisher_(&n_, agent_name),
+                                                      facts_calculator_(&n_, agent_name),
+                                                      perception_manager_(&n_)
 {
   agent_name_ = agent_name;
   is_robot_ = is_robot;
+  config_path_ = config_path;
 
   n_.setCallbackQueue(&callback_queue_);
 
@@ -35,48 +41,32 @@ SituationAssessor::SituationAssessor(const std::string& agent_name, bool is_robo
   else
       bullet_client_ = PhysicsServers::connectPhysicsServer(owds::CONNECT_DIRECT);
 
-  robots_manager_.setBulletClient(bullet_client_);
-  objects_manager_.setBulletClient(bullet_client_);
-  humans_manager_.setBulletClient(bullet_client_);
+  perception_manager_.setBulletClient(bullet_client_);
 
   /***************************
    * Set perception modules  *
   ***************************/
 
-  auto static_perception = new StaticObjectsPerceptionModule();
-  objects_manager_.addPerceptionModule("static", static_perception);
-
-  auto pr2_joint_perception =  new PR2JointsPerception(&n_, "pr2_robot",  // TODO how to avoid fix name ? 
-                                                         {{"r_gripper_tool_frame", owds::BODY_PART_RIGHT_HAND}, {"l_gripper_tool_frame", owds::BODY_PART_LEFT_HAND}, {"head_mount_kinect2_rgb_optical_frame", owds::BODY_PART_HEAD}},
-                                                         bullet_client_, 0.09);
-  robots_manager_.addPerceptionModule("pr2_joints", pr2_joint_perception);
-
   if(is_robot_)
   {
-    myself_agent_ = robots_manager_.getAgent(agent_name);
-    
-    auto ar_track_perception = new ArTrackPerceptionModule(&n_, myself_agent_);
-    objects_manager_.addPerceptionModule("ar_track", ar_track_perception);
-
-    auto left_gripper_perception = new Pr2GripperPerceptionModule(&n_, PR2_GRIPPER_LEFT, bullet_client_, pr2_joint_perception->getPr2BulletId(), myself_agent_);
-    objects_manager_.addPerceptionModule("pr2_left_gripper", left_gripper_perception);
-    auto right_gripper_perception = new Pr2GripperPerceptionModule(&n_, PR2_GRIPPER_RIGHT, bullet_client_, pr2_joint_perception->getPr2BulletId(), myself_agent_);
-    objects_manager_.addPerceptionModule("pr2_right_gripper", right_gripper_perception);
-
-    auto optitrack_perception = new OptitrackPerceptionModule(&n_, "human_0", {6.4868, 2.8506, 0});
-    humans_manager_.addPerceptionModule("optitrack", optitrack_perception);
+    if(perception_manager_.applyConfigurationRobot(config_path_) == false)
+      throw std::runtime_error("The configuration of overworld has failed. Please look above for more information.");
+    if(perception_manager_.getRobotName() != agent_name)
+      throw std::runtime_error("The robot name provided in the launch file is different from the robot perception module.");
+    myself_agent_ = perception_manager_.robots_manager_.getAgent(agent_name);
   }
   else
   {
-    myself_agent_ = humans_manager_.getAgent(agent_name);
+    perception_manager_.applyConfigurationHuman(config_path_);
+    myself_agent_ = perception_manager_.humans_manager_.getAgent(agent_name);
   }
 
-  objects_manager_.setOwnerAgent(myself_agent_);
+  perception_manager_.objects_manager_.setOwnerAgent(myself_agent_);
 
   ros_sender_ = new ROSSender(&n_);
   if(is_robot_)
   {
-    motion_planning_pose_sender_ = new MotionPlanningPoseSender(&n_, objects_manager_);
+    motion_planning_pose_sender_ = new MotionPlanningPoseSender(&n_, perception_manager_.objects_manager_);
     bernie_sender_ =  new BernieSenders(&n_);
   }
   else
@@ -91,10 +81,6 @@ SituationAssessor::SituationAssessor(const std::string& agent_name, bool is_robo
 
 SituationAssessor::~SituationAssessor()
 {
-  robots_manager_.deleteModules();
-  objects_manager_.deleteModules();
-  humans_manager_.deleteModules();
-  
   if(ros_sender_ != nullptr)
     delete ros_sender_;
   if(motion_planning_pose_sender_ != nullptr)
@@ -134,17 +120,17 @@ void SituationAssessor::run()
 
 void SituationAssessor::addObjectPerceptionModule(const std::string& module_name, PerceptionModuleBase_<Object>* module)
 {
-  objects_manager_.addPerceptionModule(module_name, module);
+  perception_manager_.objects_manager_.addPerceptionModule(module_name, module);
 }
 
 void SituationAssessor::addHumanPerceptionModule(const std::string& module_name, PerceptionModuleBase_<BodyPart>* module)
 {
-  humans_manager_.addPerceptionModule(module_name, module);
+  perception_manager_.humans_manager_.addPerceptionModule(module_name, module);
 }
 
 void SituationAssessor::addRobotPerceptionModule(const std::string& module_name, PerceptionModuleBase_<BodyPart>* module)
 {
-  robots_manager_.addPerceptionModule(module_name, module);
+  perception_manager_.robots_manager_.addPerceptionModule(module_name, module);
 }
 
 void SituationAssessor::assessmentLoop()
@@ -161,7 +147,7 @@ void SituationAssessor::assessmentLoop()
     assess();
 
     if(is_robot_)
-      handleKeypress(bullet_client_, robots_manager_);
+      handleKeypress(bullet_client_, perception_manager_.robots_manager_);
 
     if(ros::ok() && isRunning())
     {
@@ -186,13 +172,11 @@ void SituationAssessor::assess()
 {
   std::map<std::string, std::unordered_set<int>> agents_segmentation_ids;
 
-  robots_manager_.update();
-  objects_manager_.update();
-  humans_manager_.update();
-  auto objects = objects_manager_.getEntities();
-  auto robots = robots_manager_.getAgents();
-  auto humans = humans_manager_.getAgents();
-  auto body_parts = humans_manager_.getEntities();
+  perception_manager_.update();
+  auto objects = perception_manager_.objects_manager_.getEntities();
+  auto robots = perception_manager_.robots_manager_.getAgents();
+  auto humans = perception_manager_.humans_manager_.getAgents();
+  auto body_parts = perception_manager_.humans_manager_.getEntities();
 
   if(is_robot_)
   {
@@ -271,7 +255,7 @@ std::map<std::string, HumanAssessor_t>::iterator SituationAssessor::createHumanA
 {
   auto assessor = humans_assessors_.insert(std::make_pair(human_name, HumanAssessor_t())).first;
 
-  assessor->second.assessor = new SituationAssessor(human_name);
+  assessor->second.assessor = new SituationAssessor(human_name, config_path_);
   assessor->second.objects_module = new ObjectsEmulatedPerceptionModule();
   assessor->second.humans_module = new HumansEmulatedPerceptionModule();
   assessor->second.assessor->addObjectPerceptionModule("emulated_objects", assessor->second.objects_module);
@@ -288,11 +272,11 @@ bool SituationAssessor::startModules(overworld::StartStopModules::Request &req, 
   for (size_t i=0; i < req.modules.size(); i++)
   {
     const std::string& module_name = req.modules[i];
-    if (startModule(objects_manager_, module_name, res.statuses[i]))
+    if (startModule(perception_manager_.objects_manager_, module_name, res.statuses[i]))
       continue;
-    if (startModule(robots_manager_, module_name, res.statuses[i]))
+    if (startModule(perception_manager_.robots_manager_, module_name, res.statuses[i]))
       continue;
-    if (startModule(humans_manager_, module_name, res.statuses[i]))
+    if (startModule(perception_manager_.humans_manager_, module_name, res.statuses[i]))
       continue;
     res.statuses[i] = overworld::StartStopModules::Response::MODULE_NOT_FOUND;
   }
@@ -305,11 +289,11 @@ bool SituationAssessor::stopModules(overworld::StartStopModules::Request &req, o
   for (size_t i=0; i < req.modules.size(); i++)
   {
     const std::string& module_name = req.modules[i];
-    if (stopModule(objects_manager_, module_name, res.statuses[i]))
+    if (stopModule(perception_manager_.objects_manager_, module_name, res.statuses[i]))
       continue;
-    if (stopModule(robots_manager_, module_name, res.statuses[i]))
+    if (stopModule(perception_manager_.robots_manager_, module_name, res.statuses[i]))
       continue;
-    if (stopModule(humans_manager_, module_name, res.statuses[i]))
+    if (stopModule(perception_manager_.humans_manager_, module_name, res.statuses[i]))
       continue;
     res.statuses[i] = overworld::StartStopModules::Response::MODULE_NOT_FOUND;
   }
@@ -318,7 +302,7 @@ bool SituationAssessor::stopModules(overworld::StartStopModules::Request &req, o
 
 bool SituationAssessor::getBoundingBox(overworld::BoundingBox::Request &req, overworld::BoundingBox::Response &res)
 {
-  auto entities = objects_manager_.getEntities();
+  auto entities = perception_manager_.objects_manager_.getEntities();
   auto object = entities.find(req.object_id);
   if(object != entities.end())
   {
