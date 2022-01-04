@@ -26,7 +26,7 @@ void BulletClient::setAdditionalSearchPath(const std::string& path)
 		b3SharedMemoryStatusHandle status_handle = b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
 
         if(additional_path_ != "")
-            ShellDisplay::warning("The previous additional path has been overwritten");
+            ShellDisplay::warning("[Bullet] The previous additional path has been overwritten");
         additional_path_ = path;
 	}
 }
@@ -75,7 +75,7 @@ int BulletClient::createVisualShape(BulletShapeType_e shape_type,
             if(radius > 0)
 			    shape_index = b3CreateVisualShapeAddSphere(command_handle, radius);
             else
-                ShellDisplay::error("Invalid parameters to create sphere visual shape");
+                ShellDisplay::error("[Bullet] Invalid parameters to create sphere visual shape");
 		}
 		else if (shape_type == GEOM_BOX)
 		{
@@ -86,21 +86,21 @@ int BulletClient::createVisualShape(BulletShapeType_e shape_type,
             if(radius > 0 && height >= 0)
 			    shape_index = b3CreateVisualShapeAddCapsule(command_handle, radius, height);
             else
-                ShellDisplay::error("Invalid parameters to create capsule visual shape");
+                ShellDisplay::error("[Bullet] Invalid parameters to create capsule visual shape");
 		}
 		else if (shape_type == GEOM_CYLINDER)
 		{
             if(radius > 0 && height >= 0)
 			    shape_index = b3CreateVisualShapeAddCylinder(command_handle, radius, height);
             else
-                ShellDisplay::error("Invalid parameters to create cylinder visual shape");
+                ShellDisplay::error("[Bullet] Invalid parameters to create cylinder visual shape");
 		}
 		else if (shape_type == GEOM_MESH)
 		{
             if(file_name != "")
 			    shape_index = b3CreateVisualShapeAddMesh(command_handle, file_name.c_str(), &mesh_scale[0]);
 			else
-                ShellDisplay::error("Invalid parameters to create mesh visual shape");
+                ShellDisplay::error("[Bullet] Invalid parameters to create mesh visual shape");
 		}
 
 		if (shape_index >= 0)
@@ -118,7 +118,7 @@ int BulletClient::createVisualShape(BulletShapeType_e shape_type,
 			return b3GetStatusVisualShapeUniqueId(status_handle);
 	}
 	
-    ShellDisplay::error("createVisualShape failed.");
+    ShellDisplay::error("[Bullet] createVisualShape failed.");
 	return -1;
 }
 
@@ -166,7 +166,7 @@ int BulletClient::createCollisionShape(BulletShapeType_e shape_type,
             if(radius > 0)
 			    shape_index = b3CreateCollisionShapeAddSphere(command_handle, radius);
             else
-                ShellDisplay::error("Invalid parameters to create box collision shape");
+                ShellDisplay::error("[Bullet] Invalid parameters to create box collision shape");
 		}
 		else if (shape_type == GEOM_BOX)
 		{
@@ -177,21 +177,21 @@ int BulletClient::createCollisionShape(BulletShapeType_e shape_type,
             if(radius > 0 && height >= 0)
 			    shape_index = b3CreateCollisionShapeAddCapsule(command_handle, radius, height);
             else
-                ShellDisplay::error("Invalid parameters to create capsule collision shape");
+                ShellDisplay::error("[Bullet] Invalid parameters to create capsule collision shape");
 		}
 		else if (shape_type == GEOM_CYLINDER)
 		{
             if(radius > 0 && height >= 0)
 			    shape_index = b3CreateCollisionShapeAddCylinder(command_handle, radius, height);
             else
-                ShellDisplay::error("Invalid parameters to create cylinder collision shape");
+                ShellDisplay::error("[Bullet] Invalid parameters to create cylinder collision shape");
 		}
 		else if (shape_type == GEOM_MESH)
 		{
 			if(file_name != "")
 			    shape_index = b3CreateCollisionShapeAddMesh(command_handle, file_name.c_str(), &mesh_scale[0]);
             else
-                ShellDisplay::error("Invalid parameters to create mesh collision shape");
+                ShellDisplay::error("[Bullet] Invalid parameters to create mesh collision shape");
 		}
 
         b3SharedMemoryStatusHandle status_handle;
@@ -208,7 +208,7 @@ int BulletClient::createCollisionShape(BulletShapeType_e shape_type,
 			return b3GetStatusCollisionShapeUniqueId(status_handle);
 	}
 	
-    ShellDisplay::error("createCollisionShape failed.");
+    ShellDisplay::error("[Bullet] createCollisionShape failed.");
 	return -1;
 }
 
@@ -238,7 +238,7 @@ int BulletClient::createMultiBody(float base_mass,
     if (status_type == CMD_CREATE_MULTI_BODY_COMPLETED)
         return b3GetStatusBodyIndex(status_handle);
 
-	ShellDisplay::error("createMultiBody failed.");
+	ShellDisplay::error("[Bullet] createMultiBody failed.");
 	return -1;
 }
 
@@ -269,14 +269,14 @@ int BulletClient::loadURDF(const std::string& file_name,
 		int status_type = b3GetStatusType(status_handle);
 		if (status_type != CMD_URDF_LOADING_COMPLETED)
 		{
-			ShellDisplay::error("Cannot load URDF file.");
+			ShellDisplay::error("[Bullet] Cannot load URDF file.");
 			return -1;
 		}
 		return b3GetStatusBodyIndex(status_handle);
 	}
 	else
 	{
-		ShellDisplay::error("Empty filename, method expects 1, 4 or 8 arguments.");
+		ShellDisplay::error("[Bullet] Empty filename, method expects 1, 4 or 8 arguments.");
 		return -1;
 	}
 }
@@ -311,7 +311,7 @@ bool BulletClient::resetJointState(int body_id, int joint_index, double target_v
     int nb_joints = b3GetNumJoints(*client_handle_, body_id);
     if ((joint_index >= nb_joints) || (joint_index < 0))
     {
-        ShellDisplay::error("Joint index out-of-range.");
+        ShellDisplay::error("[Bullet] Joint index out-of-range.");
         return false;
     }
 
@@ -411,7 +411,7 @@ long BulletClient::createUserConstraint(int parent_body_id, int parent_link_inde
 	if (status_type == CMD_USER_CONSTRAINT_COMPLETED)
         return b3GetStatusUserConstraintUniqueId(status_handle);
 
-	ShellDisplay::error("createConstraint failed.");
+	ShellDisplay::error("[Bullet] createConstraint failed.");
 	return -1;
 }
 
@@ -573,10 +573,10 @@ struct b3CameraImageData BulletClient::getCameraImage(int width, int height,
             return image_data;
 		}
         else
-            ShellDisplay::error("getCameraImage failed");
+            ShellDisplay::error("[Bullet] getCameraImage failed");
 	}
     else
-        ShellDisplay::error("getCameraImage can not submit the command");
+        ShellDisplay::error("[Bullet] getCameraImage can not submit the command");
 
 	struct b3CameraImageData image_data_empty;
     image_data_empty.m_pixelHeight = 0;
@@ -618,7 +618,7 @@ struct b3VisualShapeInformation BulletClient::getVisualShapeData(int object_id, 
     }
     else
     {
-        ShellDisplay::error("Error receiving visual shape info");
+        ShellDisplay::error("[Bullet] Error receiving visual shape info");
         struct b3VisualShapeInformation visual_shape_info_empty;
         visual_shape_info_empty.m_numVisualShapes = 0;
         visual_shape_info_empty.m_visualShapeData = nullptr;
@@ -633,12 +633,12 @@ struct b3LinkState BulletClient::getLinkState(int body_id, int link_index, bool 
 
     if (body_id < 0)
     {
-        ShellDisplay::error("getLinkState failed; invalid bodyUniqueId");
+        ShellDisplay::error("[Bullet] getLinkState failed; invalid bodyUniqueId");
         return link_state_empty;
     }
     else if (link_index < 0)
     {
-        ShellDisplay::error("getLinkState failed; invalid linkIndex");
+        ShellDisplay::error("[Bullet] getLinkState failed; invalid linkIndex");
         return link_state_empty;
     }
 
@@ -655,7 +655,7 @@ struct b3LinkState BulletClient::getLinkState(int body_id, int link_index, bool 
     int status_type = b3GetStatusType(status_handle);
     if (status_type != CMD_ACTUAL_STATE_UPDATE_COMPLETED)
     {
-        ShellDisplay::error("getLinkState failed.");
+        ShellDisplay::error("[Bullet] getLinkState failed.");
         return link_state_empty;
     }
 
@@ -675,7 +675,7 @@ struct b3JointInfo BulletClient::getJointInfo(int body_id, int joint_index)
         return info;
     else
     {
-        ShellDisplay::error("GetJointInfo failed.");
+        ShellDisplay::error("[Bullet] GetJointInfo failed.");
         return info;
     }
 }
@@ -724,7 +724,7 @@ long BulletClient::addUserDebugLine(const std::array<double, 3>& xyz_from,
         return b3GetDebugItemUniqueId(status_handle);
     else
     {
-        ShellDisplay::error("failed to draw debug line");
+        ShellDisplay::error("[Bullet] failed to draw debug line");
         return -1;
     }
 }
@@ -742,14 +742,14 @@ std::vector<struct b3RayHitInfo> BulletClient::rayTestBatch(const std::vector<st
 
     if (from_poses.size() != to_poses.size())
     {
-        ShellDisplay::error("Size of from_positions need to be equal to size of to_positions.");
+        ShellDisplay::error("[Bullet] Size of from_positions need to be equal to size of to_positions.");
         return raycast_info_res;
     }
     else
     {
         if (from_poses.size() > MAX_RAY_INTERSECTION_BATCH_SIZE_STREAMING)
         {
-            ShellDisplay::error("Number of rays exceed the maximum batch size.");
+            ShellDisplay::error("[Bullet] Number of rays exceed the maximum batch size.");
             return raycast_info_res;
         }
 
@@ -789,7 +789,7 @@ void BulletClient::performCollisionDetection()
     if (b3CanSubmitCommand(*client_handle_))
         b3SubmitClientCommandAndWaitStatus(*client_handle_, b3InitPerformCollisionDetectionCommand(*client_handle_));
     else
-        ShellDisplay::warning("Collisions not updated");
+        ShellDisplay::warning("[Bullet] Collisions not updated");
 }
 
 struct aabb_t BulletClient::getAABB(int body_id, int link_index)
@@ -800,13 +800,13 @@ struct aabb_t BulletClient::getAABB(int body_id, int link_index)
 
     if (body_id < 0)
     {
-        ShellDisplay::error("getAABB failed; invalid body_id");
+        ShellDisplay::error("[Bullet] getAABB failed; invalid body_id");
         return aabb;
     }
 
     if (link_index < -1)
     {
-        ShellDisplay::error("getAABB failed; invalid link_index");
+        ShellDisplay::error("[Bullet] getAABB failed; invalid link_index");
         return aabb;
     }
 
@@ -816,7 +816,7 @@ struct aabb_t BulletClient::getAABB(int body_id, int link_index)
     int status_type = b3GetStatusType(status_handle);
     if (status_type != CMD_REQUEST_COLLISION_INFO_COMPLETED)
     {
-        ShellDisplay::error("getAABB failed.");
+        ShellDisplay::error("[Bullet] getAABB failed.");
         return aabb;
     }
 
