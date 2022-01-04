@@ -92,6 +92,7 @@ public:
     int getNumJoints(int body_id);
     bool resetJointState(int body_id, int joint_index, double target_value, double target_velocity = 0);
     void resetBasePositionAndOrientation(int body_id, const std::array<double, 3>& position, const std::array<double, 4>& orientation);
+    std::pair<std::array<double, 3>, std::array<double, 4>> getBasePositionAndOrientation(int body_id);
     long createUserConstraint(int parent_body_id, int parent_link_index,
                               int child_body_id, int child_link_index,
                               JointType joint_type,
@@ -109,7 +110,12 @@ public:
     struct b3LinkState getLinkState(int body_id, int link_index, bool compute_link_velocity = false, bool compute_forward_kinematics = false);
     struct b3JointInfo getJointInfo(int body_id, int joint_index);
     std::pair<std::unordered_map<std::string, int>, std::unordered_map<std::string, int>> findJointAndLinkIndices(int body_id);
-    void changeDynamicsInfo(int body_id, int link_index, int friction_anchor, int activation_state);
+
+    void setMass(int body_id, int link_index, double mass_kg);
+    void setLateralFriction(int body_id, int link_index, double friction);
+    void setSpinningFriction(int body_id, int link_index, double friction);
+    void setRollingFriction(int body_id, int link_index, double friction);
+    void setRestitution(int body_id, int link_index, double restitution);
 
     std::array<float, 16> computeProjectionMatrix(float fov,
                                                   float aspect,
@@ -169,6 +175,10 @@ public:
     void resetDebugVisualizerCamera(float distance, float yaw, float pitch, const std::array<float,3>& target_pose);
     b3MouseEventsData getMouseEvents();
     b3KeyboardEventsData getKeyboardEvents();
+
+    void setGravity(double grivity_x, double grivity_y, double grivity_z);
+    void setTimeStep(double time_step);
+    void step_simulation();
     
 private:
     b3PhysicsClientHandle* client_handle_;

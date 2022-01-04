@@ -341,6 +341,38 @@ void BulletClient::resetBasePositionAndOrientation(int body_id, const std::array
     b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
 }
 
+std::pair<std::array<double, 3>, std::array<double, 4>> BulletClient::getBasePositionAndOrientation(int body_id)
+{
+    std::array<double, 3> position;
+    std::array<double, 4> orientation;
+
+    std::lock_guard<std::mutex> lock(mutex_);
+    b3SharedMemoryCommandHandle command_handle = b3RequestActualStateCommandInit(*client_handle_, body_id);
+    b3SharedMemoryStatusHandle status_handle = b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+    int status_type = b3GetStatusType(status_handle);
+
+    if (status_type == CMD_ACTUAL_STATE_UPDATE_COMPLETED)
+    {
+        const double* actual_state_Q;
+        b3GetStatusActualState(status_handle, 0 /* body_unique_id */,
+                               0 /* num_degree_of_freedom_q */, 0 /* num_degree_of_freedom_u */,
+                               0 /*root_local_inertial_frame*/, &actual_state_Q,
+                               0 /* actual_state_q_dot */, 0 /* joint_reaction_forces */);
+        
+        position[0] = actual_state_Q[0];
+        position[1] = actual_state_Q[1];
+        position[2] = actual_state_Q[2];
+
+        orientation[0] = actual_state_Q[3];
+        orientation[1] = actual_state_Q[4];
+        orientation[2] = actual_state_Q[5];
+        orientation[3] = actual_state_Q[6];
+    }
+    else
+        ShellDisplay::error("[Bullet] getBasePositionAndOrientation failed.");
+
+}
+
 long BulletClient::createUserConstraint(int parent_body_id, int parent_link_index,
                                         int child_body_id, int child_link_index,
                                         JointType joint_type,
@@ -407,19 +439,49 @@ void BulletClient::changeUserConstraint(int user_constraint_id,
 	b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
 }
 
-// use the enum DynamicsActivationState for the activation_state
-void BulletClient::changeDynamicsInfo(int body_id, int link_index, int friction_anchor, int activation_state)
+void BulletClient::setMass(int body_id, int link_index, double mass_kg)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     b3SharedMemoryCommandHandle command_handle = b3InitChangeDynamicsInfo(*client_handle_);
 
-    if (friction_anchor >= 0)
-        b3ChangeDynamicsInfoSetFrictionAnchor(command_handle, body_id, link_index, friction_anchor);
+    if (mass_kg >= 0)
+        b3ChangeDynamicsInfoSetMass(command_handle, body_id, link_index, mass_kg);
+}
 
-    if (activation_state >= 0)
-        b3ChangeDynamicsInfoSetActivationState(command_handle, body_id, activation_state);        
-            
-    b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+void BulletClient::setLateralFriction(int body_id, int link_index, double friction)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    b3SharedMemoryCommandHandle command_handle = b3InitChangeDynamicsInfo(*client_handle_);
+
+    if (friction >= 0)
+        b3ChangeDynamicsInfoSetLateralFriction(command_handle, body_id, link_index, friction);
+}
+
+void BulletClient::setSpinningFriction(int body_id, int link_index, double friction)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    b3SharedMemoryCommandHandle command_handle = b3InitChangeDynamicsInfo(*client_handle_);
+
+    if (friction >= 0)
+        b3ChangeDynamicsInfoSetSpinningFriction(command_handle, body_id, link_index, friction);
+}
+
+void BulletClient::setRollingFriction(int body_id, int link_index, double friction)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    b3SharedMemoryCommandHandle command_handle = b3InitChangeDynamicsInfo(*client_handle_);
+
+    if (friction >= 0)
+        b3ChangeDynamicsInfoSetRollingFriction(command_handle, body_id, link_index, friction);
+}
+
+void BulletClient::setRestitution(int body_id, int link_index, double restitution)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    b3SharedMemoryCommandHandle command_handle = b3InitChangeDynamicsInfo(*client_handle_);
+
+    if (restitution >= 0)
+        b3ChangeDynamicsInfoSetRestitution(command_handle, body_id, link_index, restitution);
 }
 
 std::array<float, 16> BulletClient::computeProjectionMatrix(float fov,
@@ -804,8 +866,33 @@ b3KeyboardEventsData BulletClient::getKeyboardEvents()
 	struct b3KeyboardEventsData keyboardEvent;
 	b3SharedMemoryCommandHandle command_handle = b3RequestKeyboardEventsCommandInit(*client_handle_);
 	b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
-	b3GetKeyboardEventsData(*client_handle_, &keyboardEvent);
-	return keyboardEvent;
+
+void BulletClient::setGravity(double grivity_x, double grivity_y, double grivity_z)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    b3SharedMemoryCommandHandle command_handle = b3InitPhysicsParamCommand(*client_handle_);
+    b3PhysicsParamSetGravity(command_handle, grivity_x, grivity_y, grivity_z);
+    b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+}
+
+void BulletClient::setTimeStep(double time_step)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    b3SharedMemoryCommandHandle command_handle = b3InitPhysicsParamCommand(*client_handle_);
+    b3PhysicsParamSetTimeStep(command_handle, time_step);
+    b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+}
+
+void BulletClient::step_simulation()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    if(b3CanSubmitCommand(*client_handle_))
+    {
+        b3SharedMemoryCommandHandle command_handle = b3InitStepSimulationCommand(*client_handle_);
+        b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+    }
+    else
+        ShellDisplay::warning("[Bullet] simulation not performed");
 }
 
 } // namespace owds
