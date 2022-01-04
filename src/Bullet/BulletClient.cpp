@@ -843,29 +843,32 @@ struct b3AABBOverlapData BulletClient::getOverlappingObjects(const struct aabb_t
 void BulletClient::resetDebugVisualizerCamera(float distance, float yaw, float pitch, const std::array<float,3>& target_pose)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    b3SharedMemoryCommandHandle commandHandle = b3InitConfigureOpenGLVisualizer(*client_handle_);
+    b3SharedMemoryCommandHandle command_handle = b3InitConfigureOpenGLVisualizer(*client_handle_);
     if (distance >= 0)
-        b3ConfigureOpenGLVisualizerSetViewMatrix(commandHandle, distance, pitch, yaw, &target_pose[0]);
+        b3ConfigureOpenGLVisualizerSetViewMatrix(command_handle, distance, pitch, yaw, &target_pose[0]);
 
-    b3SubmitClientCommandAndWaitStatus(*client_handle_, commandHandle);
+    b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
 }
 
 b3MouseEventsData BulletClient::getMouseEvents()
 {
     std::lock_guard<std::mutex> lock(mutex_);
-	struct b3MouseEventsData mouseEventsData;
+	struct b3MouseEventsData mouse_events_data;
 	b3SharedMemoryCommandHandle command_handle = b3RequestMouseEventsCommandInit(*client_handle_);
 	b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
-	b3GetMouseEventsData(*client_handle_, &mouseEventsData);
-	return mouseEventsData;
+	b3GetMouseEventsData(*client_handle_, &mouse_events_data);
+	return mouse_events_data;
 }
 
 b3KeyboardEventsData BulletClient::getKeyboardEvents()
 {
     std::lock_guard<std::mutex> lock(mutex_);
-	struct b3KeyboardEventsData keyboardEvent;
+	struct b3KeyboardEventsData keyboard_event;
 	b3SharedMemoryCommandHandle command_handle = b3RequestKeyboardEventsCommandInit(*client_handle_);
 	b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+	b3GetKeyboardEventsData(*client_handle_, &keyboard_event);
+	return keyboard_event;
+}
 
 void BulletClient::setGravity(double grivity_x, double grivity_y, double grivity_z)
 {
