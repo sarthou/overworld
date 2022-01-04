@@ -59,13 +59,13 @@ bool PR2JointsPerception::closeInitialization()
 
     auto p = bullet_client_->findJointAndLinkIndices(robot_bullet_id_);
     joint_name_id_ = p.first;
-    link_name_id_ = p.second;
+    links_name_id_ = p.second;
     for (const auto& link_pair : links_to_entity_)
     {
         percepts_.emplace(link_pair.first, link_pair.first);
         percepts_.at(link_pair.first).setAgentName(robot_name_);
         percepts_.at(link_pair.first).setType(link_pair.second);
-        if (link_name_id_.count(link_pair.first) == 0)
+        if (links_name_id_.count(link_pair.first) == 0)
         {
             std::cout << "Error: link name '" << link_pair.first
                       << "' passed as 'link_to_entity_names' of ctor of PR2JointsPerception does not exist in Bullet.";
@@ -75,6 +75,10 @@ bool PR2JointsPerception::closeInitialization()
     percepts_.emplace("base_footprint", BodyPart("base_footprint"));
     percepts_.at("base_footprint").setAgentName(robot_name_);
     percepts_.at("base_footprint").setType(BODY_PART_BASE);
+
+    // We set the links mass to 0 to make them static and not be impacted by the gravity
+    for(auto& link : links_name_id_)
+        bullet_client_->setMass(robot_bullet_id_, link.second, 0);
 
     return true;
 }
@@ -112,7 +116,7 @@ bool PR2JointsPerception::perceptionCallback(const sensor_msgs::JointState& msg)
     }
     for (const auto& link_pair : links_to_entity_)
     {
-        b3LinkState link = bullet_client_->getLinkState(robot_bullet_id_, link_name_id_[link_pair.first]);
+        b3LinkState link = bullet_client_->getLinkState(robot_bullet_id_, links_name_id_[link_pair.first]);
         double* pos = link.m_worldLinkFramePosition;
         double* rot = link.m_worldLinkFrameOrientation;
         percepts_.at(link_pair.first).updatePose({{pos[0], pos[1], pos[2]}}, {{rot[0], rot[1], rot[2], rot[3]}}, msg.header.stamp);

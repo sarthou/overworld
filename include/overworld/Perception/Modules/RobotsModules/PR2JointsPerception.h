@@ -30,7 +30,7 @@ class PR2JointsPerception : public owds::PerceptionModuleRosBase<owds::BodyPart,
     std::string head_ink_;
 
     std::unordered_map<std::string, int> joint_name_id_;
-    std::unordered_map<std::string, int> link_name_id_;
+    std::unordered_map<std::string, int> links_name_id_;
     std::vector<std::pair<std::string, BodyPartType_e>> links_to_entity_;
 
     double min_period_;
