@@ -225,3 +225,10 @@ target_link_libraries(${PROJECT_NAME}_config_test PRIVATE
                       ${PROJECT_NAME}_perception_lib
                       ${catkin_LIBRARIES})
 add_dependencies(${PROJECT_NAME}_config_test overworld_gencpp)
+
+add_executable(${PROJECT_NAME}_gravity_test src/TestFiles/gravity.cpp )
+target_link_libraries(${PROJECT_NAME}_gravity_test PRIVATE
+                      ${PROJECT_NAME}_types_lib
+                      ${PROJECT_NAME}_bullet_lib
+                      ${catkin_LIBRARIES})
+add_dependencies(${PROJECT_NAME}_gravity_test overworld_gencpp)
