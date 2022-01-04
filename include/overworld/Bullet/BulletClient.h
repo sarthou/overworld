@@ -178,7 +178,7 @@ public:
 
     void setGravity(double grivity_x, double grivity_y, double grivity_z);
     void setTimeStep(double time_step);
-    void step_simulation();
+    void stepSimulation();
     
 private:
     b3PhysicsClientHandle* client_handle_;

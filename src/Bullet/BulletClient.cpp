@@ -446,6 +446,7 @@ void BulletClient::setMass(int body_id, int link_index, double mass_kg)
 
     if (mass_kg >= 0)
         b3ChangeDynamicsInfoSetMass(command_handle, body_id, link_index, mass_kg);
+    b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
 }
 
 void BulletClient::setLateralFriction(int body_id, int link_index, double friction)
@@ -455,6 +456,7 @@ void BulletClient::setLateralFriction(int body_id, int link_index, double fricti
 
     if (friction >= 0)
         b3ChangeDynamicsInfoSetLateralFriction(command_handle, body_id, link_index, friction);
+    b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
 }
 
 void BulletClient::setSpinningFriction(int body_id, int link_index, double friction)
@@ -464,6 +466,7 @@ void BulletClient::setSpinningFriction(int body_id, int link_index, double frict
 
     if (friction >= 0)
         b3ChangeDynamicsInfoSetSpinningFriction(command_handle, body_id, link_index, friction);
+    b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
 }
 
 void BulletClient::setRollingFriction(int body_id, int link_index, double friction)
@@ -473,6 +476,7 @@ void BulletClient::setRollingFriction(int body_id, int link_index, double fricti
 
     if (friction >= 0)
         b3ChangeDynamicsInfoSetRollingFriction(command_handle, body_id, link_index, friction);
+    b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
 }
 
 void BulletClient::setRestitution(int body_id, int link_index, double restitution)
@@ -482,6 +486,7 @@ void BulletClient::setRestitution(int body_id, int link_index, double restitutio
 
     if (restitution >= 0)
         b3ChangeDynamicsInfoSetRestitution(command_handle, body_id, link_index, restitution);
+    b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
 }
 
 std::array<float, 16> BulletClient::computeProjectionMatrix(float fov,
@@ -886,7 +891,7 @@ void BulletClient::setTimeStep(double time_step)
     b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
 }
 
-void BulletClient::step_simulation()
+void BulletClient::stepSimulation()
 {
     std::lock_guard<std::mutex> lock(mutex_);
     if(b3CanSubmitCommand(*client_handle_))
