@@ -116,6 +116,8 @@ public:
     void setSpinningFriction(int body_id, int link_index, double friction);
     void setRollingFriction(int body_id, int link_index, double friction);
     void setRestitution(int body_id, int link_index, double restitution);
+    void setFrictionAnchor(int body_id, int link_index, double friction);
+    void setActivationState(int body_id, DynamicsActivationState state);
 
     std::array<float, 16> computeProjectionMatrix(float fov,
                                                   float aspect,

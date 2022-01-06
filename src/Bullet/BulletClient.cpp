@@ -489,6 +489,26 @@ void BulletClient::setRestitution(int body_id, int link_index, double restitutio
     b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
 }
 
+void BulletClient::setFrictionAnchor(int body_id, int link_index, double friction)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    b3SharedMemoryCommandHandle command_handle = b3InitChangeDynamicsInfo(*client_handle_);
+
+    if (friction >= 0)
+        b3ChangeDynamicsInfoSetFrictionAnchor(command_handle, body_id, link_index, friction);
+    b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+}
+
+void BulletClient::setActivationState(int body_id, DynamicsActivationState state)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    b3SharedMemoryCommandHandle command_handle = b3InitChangeDynamicsInfo(*client_handle_);
+
+    if (state >= 0)
+        b3ChangeDynamicsInfoSetActivationState(command_handle, body_id, state);
+    b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+}
+
 std::array<float, 16> BulletClient::computeProjectionMatrix(float fov,
                                                             float aspect,
                                                             float near_value,
@@ -902,5 +922,34 @@ void BulletClient::stepSimulation()
     else
         ShellDisplay::warning("[Bullet] simulation not performed");
 }
+
+/*std::string vhacd(const std::string& file_name)
+{
+    std::string file_out = file_name;
+    std::string file_log = file_name;
+
+	double concavity = 0.0025;          // Maximum allowed concavity
+	double alpha = 0.05;                // Controls the bias toward clipping along symmetry planes
+	double beta = 0.05;                 // Controls the bias toward clipping along revolution axes 
+	double gamma = 0.00125;             // Controls the maximum allowed concavity during the merge stage
+	double min_volume_perCH = 0.0001;   // Controls the adaptive sampling of the generated convex-hulls 
+	int resolution = 100000;            // Maximum number of voxels generated during the voxelization stage
+	int max_num_vertices_perCH = 64;    // Controls the maximum number of triangles per convex-hull 
+	int depth = 20;                     // Maximum number of clipping stages. During each split stage, parts with a concavity higher than the user defined threshold are clipped according the best clipping plane
+	int plane_downsampling = 4;         // Controls the granularity of the search for the "best" clipping plane
+	int convexhull_downsampling = 4;    // Controls the precision of the convex-hull generation process during the clipping plane selection stage
+	int pca = 0;                        // Enable/disable normalizing the mesh before applying the convex decomposition
+	int mode = 0;                       // 0: voxel-based approximate convex decomposition, 1: tetrahedron-based approximate convex decomposition
+	int convexhull_approximation = 1;   // Enable/disable approximation when computing convex-hulls
+
+	double timeOutInSeconds = -1;
+
+	b3VHACD(file_name, file_out, file_log,
+			concavity, alpha, beta, gamma, min_volume_perCH,
+			resolution, max_num_vertices_perCH, depth, plane_downsampling,
+			convexhull_downsampling, pca, mode, convexhull_approximation);
+    
+    return file_out;
+}*/
 
 } // namespace owds
