@@ -18,7 +18,8 @@ enum ShapeType_e
 struct Shape_t
 {
   ShapeType_e type;
-  std::string mesh_resource;
+  std::string visual_mesh_resource;
+  std::string colision_mesh_resource;
   std::array<double, 3> color;
   std::array<double, 3> scale;
 

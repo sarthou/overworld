@@ -190,7 +190,7 @@ bool ArTrackPerceptionModule::createNewEntity(const ar_track_alvar_msgs::AlvarMa
   if(meshs.size())
   {
     shape.type = SHAPE_MESH;
-    shape.mesh_resource = meshs[0].substr(meshs[0].find("#") + 1);
+    shape.visual_mesh_resource = meshs[0].substr(meshs[0].find("#") + 1);
     shape.color = getColor(obj.id());
   }
   else

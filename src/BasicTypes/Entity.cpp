@@ -162,7 +162,7 @@ visualization_msgs::Marker Entity::toMarker(int id, double lifetime, const std::
     {
     case ShapeType_e::SHAPE_MESH:
         marker.type = marker.MESH_RESOURCE;
-        marker.mesh_resource = shape_.mesh_resource;
+        marker.mesh_resource = shape_.visual_mesh_resource;
         marker.mesh_use_embedded_materials = true;
         break;
 

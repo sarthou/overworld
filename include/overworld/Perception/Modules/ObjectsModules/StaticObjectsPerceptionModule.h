@@ -13,7 +13,8 @@ public:
     
 private:
     void addObject(const std::string& name,
-                   const std::string& file,
+                   const std::string& visual_mesh,
+                   const std::string& colision_mesh,
                    const std::array<double,3>& translation,
                    const std::array<double,3>& rotation,
                    const std::array<double,3>& color);

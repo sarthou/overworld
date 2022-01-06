@@ -69,7 +69,7 @@ bool OptitrackPerceptionModule::closeInitialization()
     if (head_meshs.size())
     {
         head_shape.type = SHAPE_MESH;
-        head_shape.mesh_resource = head_meshs[0].substr(head_meshs[0].find("#") + 1);
+        head_shape.visual_mesh_resource = head_meshs[0].substr(head_meshs[0].find("#") + 1);
     }
     else
     {
@@ -85,7 +85,7 @@ bool OptitrackPerceptionModule::closeInitialization()
     if (left_hand_meshs.size())
     {
         left_hand_shape.type = SHAPE_MESH;
-        left_hand_shape.mesh_resource = left_hand_meshs[0].substr(left_hand_meshs[0].find("#") + 1);
+        left_hand_shape.visual_mesh_resource = left_hand_meshs[0].substr(left_hand_meshs[0].find("#") + 1);
     }
     else
     {
@@ -101,7 +101,7 @@ bool OptitrackPerceptionModule::closeInitialization()
     if (right_hand_meshs.size())
     {
         right_hand_shape.type = SHAPE_MESH;
-        right_hand_shape.mesh_resource = right_hand_meshs[0].substr(right_hand_meshs[0].find("#") + 1);
+        right_hand_shape.visual_mesh_resource = right_hand_meshs[0].substr(right_hand_meshs[0].find("#") + 1);
     }
     else
     {
