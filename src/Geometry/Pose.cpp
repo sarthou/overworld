@@ -148,4 +148,15 @@ double Pose::getYaw() const
     return t_.rotation().eulerAngles(0,1,2)[2];
 }
 
+std::ostream& operator<<(std::ostream& os, const Pose& pose)
+{
+    os << pose.getX() << " : " <<
+          pose.getY() << " : " <<
+          pose.getZ() << " --  " <<
+          pose.getRoll() << " : " <<
+          pose.getPitch() << " : " <<
+          pose.getYaw();
+
+}
+
 } // namespace owds
