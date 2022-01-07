@@ -43,8 +43,6 @@ class OptitrackPerceptionModule : public PerceptionModuleBase_<BodyPart>
     ros::Subscriber optitrack_head_sub_;
     ros::Subscriber optitrack_left_hand_sub_;
     ros::Subscriber optitrack_right_hand_sub_;
-
-    ros::NodeHandle* n_;
 };
 
 } // namespace owds
