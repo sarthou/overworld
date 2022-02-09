@@ -1,7 +1,7 @@
 #include "overworld/SituationAssessor.h"
 
 #include "overworld/Perception/Modalities/ArTrackPerceptionModule.h"
-#include "overworld/Perception/Modalities/PR2JointsPerception.h"
+#include "overworld/Perception/Modalities/RobotJointsPerception.h"
 #include "overworld/Perception/Modalities/Pr2GripperPerceptionModule.h"
 #include "overworld/Perception/Modalities/StaticObjectsPerceptionModule.h"
 #include "overworld/Perception/Modalities/OptitrackPerceptionModule.h"

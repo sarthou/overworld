@@ -1,10 +1,10 @@
-#include "overworld/Perception/Modalities/PR2JointsPerception.h"
+#include "overworld/Perception/Modalities/RobotJointsPerception.h"
 
 #include <ros/package.h>
 
 namespace owds {
 
-PR2JointsPerception::PR2JointsPerception(ros::NodeHandle* n,
+RobotJointsPerception::RobotJointsPerception(ros::NodeHandle* n,
                                          const std::string& robot_name,
                                          const std::vector<std::pair<std::string, BodyPartType_e>>& links_to_entity,
                                          BulletClient* robot_world_client,
@@ -16,7 +16,7 @@ PR2JointsPerception::PR2JointsPerception(ros::NodeHandle* n,
                                                             bullet_(robot_world_client),
                                                             min_period_(min_period)
 {
-    loadPr2Model();
+    loadRobotModel();
 
     auto p = bullet_->findJointAndLinkIndices(robot_body_id_);
     joint_name_id_ = p.first;
@@ -29,23 +29,25 @@ PR2JointsPerception::PR2JointsPerception(ros::NodeHandle* n,
         if (link_name_id_.count(link_pair.first) == 0)
         {
             std::cout << "Error: link name '" << link_pair.first
-                      << "' passed as 'link_to_entity_names' of ctor of PR2JointsPerception does not exist in Bullet.";
+                      << "' passed as 'link_to_entity_names' of actor of RobotJointsPerception does not exist in Bullet.";
             throw std::runtime_error("Link name '" + link_pair.first + "' not found in Bullet.");
         }
     }
-    percepts_.emplace("base_footprint", BodyPart("base_footprint"));
-    percepts_.at("base_footprint").setAgentName(robot_name_);
-    percepts_.at("base_footprint").setType(BODY_PART_BASE);
+    //TODO: Define in a YAML file
+    percepts_.emplace("table_middle_link", BodyPart("table_middle_link"));
+    percepts_.at("table_middle_link").setAgentName(robot_name_);
+    percepts_.at("table_middle_link").setType(BODY_PART_BASE);
 }
 
-bool PR2JointsPerception::perceptionCallback(const sensor_msgs::JointState& msg)
+bool RobotJointsPerception::perceptionCallback(const sensor_msgs::JointState& msg)
 {
     if ((ros::Time::now() - last_update_).toSec() < min_period_){
         return false;
     }
     geometry_msgs::TransformStamped robot_base;
     try {
-        robot_base = tf_buffer_.lookupTransform("map", "base_footprint", msg.header.stamp, ros::Duration(1.0));
+        //TODO: Define in a YAML file
+        robot_base = tf_buffer_.lookupTransform("world", "table_middle_link", msg.header.stamp, ros::Duration(1.0));
     }
     catch(...) {
         return false;
@@ -53,7 +55,8 @@ bool PR2JointsPerception::perceptionCallback(const sensor_msgs::JointState& msg)
     bullet_->resetBasePositionAndOrientation(
         robot_body_id_, {robot_base.transform.translation.x, robot_base.transform.translation.y, robot_base.transform.translation.z},
         {robot_base.transform.rotation.x, robot_base.transform.rotation.y, robot_base.transform.rotation.z, robot_base.transform.rotation.w});
-    percepts_.at("base_footprint")
+    //TODO: Define in a YAML file
+    percepts_.at("table_middle_link")
         .updatePose(
             {robot_base.transform.translation.x, robot_base.transform.translation.y, robot_base.transform.translation.z},
             {robot_base.transform.rotation.x, robot_base.transform.rotation.y, robot_base.transform.rotation.z, robot_base.transform.rotation.w});
@@ -78,10 +81,11 @@ bool PR2JointsPerception::perceptionCallback(const sensor_msgs::JointState& msg)
     return true;
 }
 
-void PR2JointsPerception::loadPr2Model()
+void RobotJointsPerception::loadRobotModel()
 {
-    std::string path_pr2_description = ros::package::getPath("pr2_description");
-	path_pr2_description = path_pr2_description.substr(0, path_pr2_description.size() - std::string("/pr2_description").size());
+    //TODO: Define in a YAML file
+    std::string path_robot_description = ros::package::getPath("franka_description");
+	path_robot_description = path_robot_description.substr(0, path_robot_description.size() - std::string("/franka_description").size());
 	std::string path_overworld = ros::package::getPath("overworld");
 	
 	bullet_->setAdditionalSearchPath(path_overworld + "/models");
@@ -89,9 +93,9 @@ void PR2JointsPerception::loadPr2Model()
     std::string urdf = n_->param<std::string>("/robot_description", "");
     if (urdf == "")
     {
-	    robot_body_id_ = bullet_->loadURDF("pr2.urdf", {0,0,0}, {0,0,0,1});
+	   robot_body_id_ = bullet_->loadURDF("dual_pandas.urdf.xacro", {0,0,0}, {0,0,0,1});
     }else{
-        robot_body_id_ = bullet_->loadURDFRaw(urdf, "pr2_tmp.urdf", {0,0,0}, {0,0,0,1});
+       robot_body_id_ = bullet_->loadURDFRaw(urdf, "dual_pandas_tmp.urdf", {0,0,0}, {0,0,0,1});
     }
 }
 

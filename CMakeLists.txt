@@ -139,7 +139,7 @@ add_library(${PROJECT_NAME}_perception_lib STATIC
   src/Perception/RobotsPerceptionManager.cpp
   src/Perception/ObjectsPerceptionManager.cpp
   src/Perception/HumansPerceptionManager.cpp
-  src/Perception/Modalities/PR2JointsPerception.cpp
+  src/Perception/Modalities/RobotJointsPerception.cpp
   src/Perception/Modalities/ArTrackPerceptionModule.cpp
   src/Perception/Modalities/StaticObjectsPerceptionModule.cpp
   src/Perception/Modalities/OptitrackPerceptionModule.cpp

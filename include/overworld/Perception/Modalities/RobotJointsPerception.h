@@ -1,5 +1,5 @@
-#ifndef OWDS_PR2JOINTSPERCEPTION_H
-#define OWDS_PR2JOINTSPERCEPTION_H
+#ifndef OWDS_ROBOTJOINTSPERCEPTION_H
+#define OWDS_ROBOTJOINTSPERCEPTION_H
 
 #include "overworld/BasicTypes/BodyPart.h"
 #include "overworld/Bullet/PhysicsServers.h"
@@ -9,12 +9,12 @@
 
 namespace owds {
 
-class PR2JointsPerception : public owds::PerceptionModuleRosBase<owds::BodyPart, sensor_msgs::JointState>
+class RobotJointsPerception : public owds::PerceptionModuleRosBase<owds::BodyPart, sensor_msgs::JointState>
 {
   public:
     /**
      * 
-     * @brief Construct a new PR2JointsPerception object
+     * @brief Construct a new RobotJointsPerception object
      *
      * @param n
      * @param robotBodyId The Bullet multibody id of the robot (returned after a successful loading of the robot URDF)
@@ -22,14 +22,14 @@ class PR2JointsPerception : public owds::PerceptionModuleRosBase<owds::BodyPart,
      * @param robotWorldClient
      * @param min_period
      */
-    PR2JointsPerception(ros::NodeHandle* n,
+    RobotJointsPerception(ros::NodeHandle* n,
                         const std::string& robot_name_,
                         const std::vector<std::pair<std::string, BodyPartType_e>>& links_to_entity,
                         BulletClient* robot_world_client,
                         double min_period);
-    virtual ~PR2JointsPerception() = default;
+    virtual ~RobotJointsPerception() = default;
 
-    int getPr2BulletId() { return robot_body_id_; }
+    int getRobotBulletId() { return robot_body_id_; }
 
   protected:
     bool perceptionCallback(const sensor_msgs::JointState& msg) override;
@@ -48,9 +48,9 @@ class PR2JointsPerception : public owds::PerceptionModuleRosBase<owds::BodyPart,
 
     BulletClient* bullet_;
 
-    void loadPr2Model();
+    void loadRobotModel();
 };
 
 } // namespace owds
 
-#endif /* OWDS_PR2JOINTSPERCEPTION_H */
+#endif /* OWDS_ROBOTJOINTSPERCEPTION_H */
