@@ -141,7 +141,7 @@ geometry_msgs::TransformStamped Entity::toTfTransform() const
     }
     geometry_msgs::TransformStamped transform;
     transform.header.stamp = ros::Time::now(); //last_poses_.back().stamp; Because tf does not like old transforms
-    transform.header.frame_id = "map";
+    transform.header.frame_id = "world";
     transform.child_frame_id = id_;
     transform.transform = last_poses_.back().pose.toTransformMsg();
     return transform;
@@ -154,7 +154,7 @@ visualization_msgs::Marker Entity::toMarker(int id, double lifetime, const std::
         throw std::runtime_error("Called toMarker on a non located entity: '" + id_ + "'.");
     }
     visualization_msgs::Marker marker;
-    marker.header.frame_id = "map";
+    marker.header.frame_id = "world";
     marker.header.stamp = last_poses_.back().stamp;
     marker.id = id;
     marker.lifetime = ros::Duration(lifetime);

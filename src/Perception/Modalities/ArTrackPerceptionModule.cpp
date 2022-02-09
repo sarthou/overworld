@@ -115,7 +115,7 @@ void ArTrackPerceptionModule::setPointOfInterest(const ar_track_alvar_msgs::Alva
     auto old_pose = visible_marker.pose;
     if(old_pose.header.frame_id[0] == '/')
       old_pose.header.frame_id = old_pose.header.frame_id.substr(1);
-    tf_buffer_.transform(old_pose, map_to_visible_marker_g, "map", ros::Duration(1.0));
+    tf_buffer_.transform(old_pose, map_to_visible_marker_g, "world", ros::Duration(1.0));
     Pose map_to_visible_marker(map_to_visible_marker_g);
     Pose map_to_marked_object = obj_it->second.pose();
 
@@ -159,7 +159,7 @@ void ArTrackPerceptionModule::updateEntities(const ar_track_alvar_msgs::AlvarMar
       std::string frame_id = main_marker.header.frame_id;
       if (frame_id[0] == '/')
           frame_id = frame_id.substr(1);
-      geometry_msgs::TransformStamped to_map = tf_buffer_.lookupTransform("map", frame_id, main_marker.header.stamp, ros::Duration(1.0));
+      geometry_msgs::TransformStamped to_map = tf_buffer_.lookupTransform("world", frame_id, main_marker.header.stamp, ros::Duration(1.0));
       geometry_msgs::PoseStamped marker_in_map;
       tf2::doTransform(main_marker.pose, marker_in_map, to_map);
       it_obj->second.updatePose(marker_in_map);

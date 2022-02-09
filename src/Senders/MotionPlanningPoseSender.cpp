@@ -31,7 +31,7 @@ bool MotionPlanningPoseSender::onGetPoseService(pr2_motion_tasks_msgs::GetPose::
             {
                 pose.pose = obj->pose().toPoseMsg();
                 pose.header.stamp = obj->lastStamp();
-                pose.header.frame_id = "map";
+                pose.header.frame_id = "world";
             }
         }
         res.poses.push_back(pose);
