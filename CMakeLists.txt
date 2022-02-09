@@ -190,12 +190,12 @@ add_dependencies(${PROJECT_NAME}_node overworld_gencpp)
 #  Test files   #
 #################
 
-add_executable(${PROJECT_NAME}_bullet_test src/TestFiles/bullet_test.cpp )
-target_link_libraries(${PROJECT_NAME}_bullet_test PRIVATE
-                      ${PROJECT_NAME}_bullet_lib
-                      ${PROJECT_NAME}_types_lib
-                      ${PROJECT_NAME}_perception_lib
-                      ${catkin_LIBRARIES})
+#add_executable(${PROJECT_NAME}_bullet_test src/TestFiles/bullet_test.cpp )
+#target_link_libraries(${PROJECT_NAME}_bullet_test PRIVATE
+#                      ${PROJECT_NAME}_bullet_lib
+#                      ${PROJECT_NAME}_types_lib
+#                      ${PROJECT_NAME}_perception_lib
+#                      ${catkin_LIBRARIES})
 
 add_executable(${PROJECT_NAME}_multi_server_test src/TestFiles/multi_server_test.cpp )
 target_link_libraries(${PROJECT_NAME}_multi_server_test PRIVATE
