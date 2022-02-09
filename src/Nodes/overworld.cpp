@@ -24,7 +24,8 @@ int main(int argc, char** argv)
   signal(SIGABRT, handler);
   ros::init(argc, argv, "overworld");
 
-  owds::SituationAssessor robot_situation_assessor("pr2_robot", true);
+  //TODO: Define in a YAML file
+  owds::SituationAssessor robot_situation_assessor("dual_pandas", true);
 
   robot_situation_assessor.run();
 
