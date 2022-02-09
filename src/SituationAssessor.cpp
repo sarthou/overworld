@@ -59,16 +59,16 @@ SituationAssessor::SituationAssessor(const std::string& agent_name, bool is_robo
     auto ar_track_perception = new ArTrackPerceptionModule(&n_, myself_agent_);
     objects_manager_.addPerceptionModule("ar_track", ar_track_perception);
 
-    auto robosherlock_perception = new RoboSherlockPerceptionModule(&n_, myself_agent_);
-    objects_manager_.addPerceptionModule("robosherlock", robosherlock_perception);
+    /*auto robosherlock_perception = new RoboSherlockPerceptionModule(&n_, myself_agent_);
+    objects_manager_.addPerceptionModule("robosherlock", robosherlock_perception);*/
 
-    auto left_gripper_perception = new Pr2GripperPerceptionModule(&n_, PR2_GRIPPER_LEFT, bullet_client_, pr2_joint_perception->getPr2BulletId(), myself_agent_);
+    /*auto left_gripper_perception = new Pr2GripperPerceptionModule(&n_, PR2_GRIPPER_LEFT, bullet_client_, pr2_joint_perception->getPr2BulletId(), myself_agent_);
     objects_manager_.addPerceptionModule("pr2_left_gripper", left_gripper_perception);
     auto right_gripper_perception = new Pr2GripperPerceptionModule(&n_, PR2_GRIPPER_RIGHT, bullet_client_, pr2_joint_perception->getPr2BulletId(), myself_agent_);
-    objects_manager_.addPerceptionModule("pr2_right_gripper", right_gripper_perception);
+    objects_manager_.addPerceptionModule("pr2_right_gripper", right_gripper_perception);*/
 
-    auto optitrack_perception = new OptitrackPerceptionModule(&n_, "human_0", {6.4868, 2.8506, 0});
-    humans_manager_.addPerceptionModule("optitrack", optitrack_perception);
+    //auto optitrack_perception = new OptitrackPerceptionModule(&n_, "human_0", {6.4868, 2.8506, 0});
+    //humans_manager_.addPerceptionModule("optitrack", optitrack_perception);
   }
   else
   {

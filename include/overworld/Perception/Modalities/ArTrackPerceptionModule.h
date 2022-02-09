@@ -42,7 +42,7 @@ private:
   bool perceptionCallback(const ar_track_alvar_msgs::AlvarMarkers& markers,
                           const ar_track_alvar_msgs::AlvarVisibleMarkers& visible_markers);
 
-  bool headHasMoved();
+  bool sensorHasMoved();
   bool isInValidArea(const Pose& tag_pose);
 
   void setPointOfInterest(const ar_track_alvar_msgs::AlvarVisibleMarker& visible_marker);

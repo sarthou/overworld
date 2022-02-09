@@ -24,8 +24,8 @@ bool ArTrackPerceptionModule::perceptionCallback(const ar_track_alvar_msgs::Alva
 {
   if(agent_ == nullptr)
     return false;
-  else if(headHasMoved())
-    return false;
+  //else if(sensorHasMoved())
+  //  return false;
 
   std::vector<ar_track_alvar_msgs::AlvarVisibleMarker> valid_visible_markers;
   std::unordered_set<size_t> invalid_main_markers_ids;
@@ -36,11 +36,11 @@ bool ArTrackPerceptionModule::perceptionCallback(const ar_track_alvar_msgs::Alva
       auto old_pose = visible_marker.pose;
       if (old_pose.header.frame_id[0] == '/')
           old_pose.header.frame_id = old_pose.header.frame_id.substr(1);
-      tf_buffer_.transform(old_pose, marker_pose, "map", ros::Duration(1.0));
-      if (isInValidArea(Pose(marker_pose)) && visible_marker.confidence < 0.2)
-          valid_visible_markers.push_back(visible_marker);
-      else
-          invalid_main_markers_ids.insert(visible_marker.main_id);
+      //tf_buffer_.transform(old_pose, marker_pose, "world", ros::Duration(1.0));
+      //if (isInValidArea(Pose(marker_pose)) && visible_marker.confidence < 0.2)
+      valid_visible_markers.push_back(visible_marker);
+      //else
+      //    invalid_main_markers_ids.insert(visible_marker.main_id);
   }
 
   updateEntities(markers, invalid_main_markers_ids);
@@ -69,7 +69,7 @@ bool ArTrackPerceptionModule::perceptionCallback(const ar_track_alvar_msgs::Alva
   return true;
 }
 
-bool ArTrackPerceptionModule::headHasMoved()
+bool ArTrackPerceptionModule::sensorHasMoved()
 {
     if (agent_->getHead() == nullptr)
         return true;
