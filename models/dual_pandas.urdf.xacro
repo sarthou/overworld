@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="dual_pandas">
+  <xacro:arg name="arm_id_1" default="panda_1" />
+  <xacro:arg name="arm_id_2" default="panda_2" />
+
+  <xacro:include filename="$(find franka_description)/robots/panda_arm.xacro"/>
+  <xacro:include filename="$(find franka_description)/robots/hand.xacro"/>
+
+  <link name="table_link">
+    <visual>
+      <geometry>
+        <box size="1.68 0.83 0.768"/>
+      </geometry>
+      <origin rpy="0.0 0.0 0.0" xyz="0 0 0.384"/>
+    </visual>
+    </link> 
+
+    <!--joint name="table_to_$(arg arm_id_1)" type="fixed">
+      <parent link="table_link"/>
+      <child link="$(arg arm_id_1)_link0"/>
+      <origin xyz="-0.558 0.175 0.768"/>
+    </joint-->
+
+  <joint name="table_joint" type="fixed">
+    <origin xyz="0.0 0.0 0.768" rpy="0.0 0.0 0.0"/>
+    <parent link="table_link"/>
+    <child link="table_middle_link"/>
+  </joint>
+
+  <link name="table_middle_link"/>
+  <!-- Should the link be fixed or floating? -->
+  <!-- I think doing this is the equivalent of setting virtual joints in moveit_setup_assistant. -->
+  <!-- If it doesn't work remove base joints and links, and add a virtual fixed one, and attach object -->
+
+  <!-- right arm with gripper -->
+  <xacro:panda_arm arm_id="$(arg arm_id_1)" connected_to="table_middle_link"  xyz="0.565 -0.165 0.01" rpy="0.0 0.0 3.14159"/>
+  <xacro:hand ns="$(arg arm_id_1)" rpy="0 0 ${-pi/4}" connected_to="$(arg arm_id_1)_link8"/>
+
+  <!-- left arm with gripper -->
+  <xacro:panda_arm arm_id="$(arg arm_id_2)" connected_to="table_middle_link"  xyz="-0.532 0.224 0.01"/>
+  <xacro:hand ns="$(arg arm_id_2)" rpy="0 0 ${-pi/4}" connected_to="$(arg arm_id_2)_link8"/>
+
+</robot>
