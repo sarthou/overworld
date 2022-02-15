@@ -99,6 +99,7 @@ void ObjectsPerceptionManager::reasoningOnUpdate()
   }
 
   std::vector<Object*> no_data_objects;
+  std::vector<Object*> objects_to_remove;
   for(auto& object : entities_)
   {
     if(object.second->isStatic() == true)
@@ -123,7 +124,7 @@ void ObjectsPerceptionManager::reasoningOnUpdate()
               it_unseen->second++;
               if(it_unseen->second > 5)
               {
-                removeEntityPose(object.second);
+                objects_to_remove.push_back(object.second);
               }
             }
           }
@@ -146,10 +147,13 @@ void ObjectsPerceptionManager::reasoningOnUpdate()
       for(auto no_data_obj : no_data_objects)
       {
         if(objects_in_camera.find(no_data_obj->bulletId()) != objects_in_camera.end())
-          removeEntityPose(no_data_obj);
+          objects_to_remove.push_back(no_data_obj);
       }
     }
   }
+
+  for(auto obj : objects_to_remove)
+    removeEntityPose(obj);
 }
 
 std::vector<PointOfInterest> ObjectsPerceptionManager::getPoisInFov(Object* object)
