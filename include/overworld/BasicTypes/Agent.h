@@ -9,7 +9,7 @@ namespace owds {
 
 enum AgentType_e
 {
-  PR2_ROBOT = 0,
+  ROBOT = 0,
   HUMAN
 };
 class Agent

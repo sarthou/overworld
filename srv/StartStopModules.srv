@@ -1,0 +1,8 @@
+string[] modules
+---
+int32 OK=0
+int32 MODULE_NOT_FOUND=-1
+int32 ALREADY_ON = 1
+int32 ALREADY_OFF = 2
+
+int32[] statuses

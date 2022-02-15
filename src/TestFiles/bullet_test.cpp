@@ -11,9 +11,6 @@
 
 #include "overworld/Utility/ShellDisplay.h"
 
-#include "overworld/Perception/Modalities/PR2JointsPerception.h"
-#include "overworld/Perception/EntitiesPerceptionManager.h"
-
 using namespace std::chrono_literals;
 
 static volatile std::sig_atomic_t flag;
@@ -76,10 +73,6 @@ int main(int argc, char** argv)
 	obj1.updatePose({{0.0, 0.0, 0.0}}, {{0.0, 0.0, 0.0, 1.0}}, ros::Time(1.0));
 	obj2.updatePose({{3.0, 0.0, 0.0}}, {{0.0, 0.0, 0.0, 1.0}}, ros::Time(3.0));
 	std::cout << "The distance between " << obj1.id() << " and " << obj2.id() << " is: " << obj1.pose().distanceTo(obj2.pose()) << "m." << std::endl;
-
-	owds::PR2JointsPerception joint_perception(&n, "pr2_robot", {{"r_gripper_tool_frame", owds::BODY_PART_RIGHT_HAND}, {"l_gripper_tool_frame", owds::BODY_PART_LEFT_HAND}}, client, 2.0);
-	owds::EntitiesPerceptionManager<owds::BodyPart> entities_manager;
-	entities_manager.addPerceptionModule("PR2_joints", &joint_perception);
 
 	while(flag == false && ros::ok())
 	{

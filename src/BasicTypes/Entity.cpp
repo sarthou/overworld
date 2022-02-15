@@ -65,6 +65,44 @@ bool Entity::hasMoved() const
     return false;
 }
 
+std::array<double, 3> Entity::computeTranslationSpeed() const
+{
+    if (!hasMoved())
+    {
+        return {0.0, 0.0, 0.0};
+    }
+    if (last_poses_.size() < 2)
+    {
+        return {0.0, 0.0, 0.0};
+    }
+    ros::Time now = ros::Time::now();
+    if ((now - last_poses_.back().stamp).toSec() > 0.5)
+    {
+        return {0.0, 0.0, 0.0};
+    }
+
+    PoseStamped_s oldest_pose;
+    size_t oldest_i = 0;
+    for (size_t i = 0; i < last_poses_.size() - 1; i++){
+        if ((now - last_poses_.at(i).stamp).toSec() < 0.5)
+        {
+            oldest_pose = last_poses_.at(i);
+            oldest_i = i;
+            break;
+        }
+    }
+    if (oldest_i >= last_poses_.size() - 2)
+    {
+        // We have less than 2 poses more recent than 2 seconds, we cannot compute a speed
+        return {0.0, 0.0, 0.0};
+    }
+    const PoseStamped_s& last_pose = last_poses_.back();
+    auto pose_diff = last_pose.pose.subtractTranslations(oldest_pose.pose);
+    double dt = (last_pose.stamp - oldest_pose.stamp).toSec();
+    return {pose_diff[0] / dt, pose_diff[1] / dt, pose_diff[2] / dt};
+}
+
+
 void Entity::setId(const std::string& id, bool is_true_id)
 {
     id_ = id;
@@ -102,7 +140,7 @@ geometry_msgs::TransformStamped Entity::toTfTransform() const
         throw std::runtime_error("Called toTfTransform on a non located entity: '" + id_ + "'.");
     }
     geometry_msgs::TransformStamped transform;
-    transform.header.stamp = ros::Time::now(); //last_poses_.back().stamp;
+    transform.header.stamp = ros::Time::now(); //last_poses_.back().stamp; Because tf does not like old transforms
     transform.header.frame_id = "map";
     transform.child_frame_id = id_;
     transform.transform = last_poses_.back().pose.toTransformMsg();

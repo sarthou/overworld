@@ -8,8 +8,6 @@
 #include <geometry_msgs/TransformStamped.h>
 #include <tf2_ros/transform_broadcaster.h>
 
-#include <image_transport/image_transport.h>
-
 #include <unordered_map>
 
 namespace owds {
@@ -29,10 +27,9 @@ class ROSSender
   protected:
     ros::NodeHandle* n_;
     tf2_ros::TransformBroadcaster tf_broadcaster_;
-    image_transport::ImageTransport it_;
 
     std::unordered_map<std::string, ros::Publisher> rviz_publishers_;
-    std::unordered_map<std::string, image_transport::Publisher> image_publishers_;
+    std::unordered_map<std::string, ros::Publisher> image_publishers_;
 };
 
 template<typename T>

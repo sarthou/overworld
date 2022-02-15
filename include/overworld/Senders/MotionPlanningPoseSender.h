@@ -1,7 +1,7 @@
 #ifndef OWDS_MOTIONPLANNINGPOSESENDER_H
 #define OWDS_MOTIONPLANNINGPOSESENDER_H
 
-#include "overworld/Perception/ObjectsPerceptionManager.h"
+#include "overworld/Perception/Managers/ObjectsPerceptionManager.h"
 
 #include <ros/service_server.h>
 #include <pr2_motion_tasks_msgs/GetPose.h>

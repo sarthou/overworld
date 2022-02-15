@@ -15,7 +15,7 @@ namespace owds {
 class FactsCalculator
 {
 public:
-  FactsCalculator(ros::NodeHandle* nh);
+  FactsCalculator(ros::NodeHandle* nh, const std::string& agent_name);
   std::vector<Fact> computeFacts(const std::map<std::string, Object*>& objects,
                                  const std::map<std::string, Agent*>& agents,
                                  const std::map<std::string, std::unordered_set<int>>& segmantation_ids);
@@ -35,6 +35,7 @@ private:
 
   bool isLookingAt(Agent* agent, const std::unordered_set<int>& seen_bullet_ids, const Object* object);
   bool hasInHand(Agent* agent, Object* object);
+  bool isHandMovingTowards(Agent* agent, Object* object);
 };
 
 } // namespace owds
