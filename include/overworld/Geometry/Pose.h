@@ -2,6 +2,7 @@
 #define OWDS_POSE_H
 
 #include <array>
+#include <iostream>
 
 #include <eigen3/Eigen/Geometry>
 #include <geometry_msgs/TransformStamped.h>
@@ -71,6 +72,8 @@ public:
     double getRoll() const;
     double getPitch() const;
     double getYaw() const;
+
+    friend std::ostream& operator<<(std::ostream& os, const Pose& pose);
 
 protected:
     Eigen::Affine3d t_;
