@@ -77,6 +77,11 @@ public:
                         const std::array<double, 4>& base_orientation,
                         int flags = 0);
 
+    int loadTexture(const std::string& file_path);
+    bool changeTexture(int object_id, int joint_index, int texture_id);
+    bool changeRgbaColor(int object_id, int joint_index, const std::array<double, 4>& color);
+    bool changeSpecularColor(int object_id, int joint_index, const std::array<double, 3>& color);
+
     int loadURDF(const std::string& file_name,
                 const std::array<double, 3>& base_position,
                 const std::array<double, 4>& base_orientation,

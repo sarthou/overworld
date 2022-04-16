@@ -74,6 +74,12 @@ int main(int argc, char** argv)
 	obj2.updatePose({{3.0, 0.0, 0.0}}, {{0.0, 0.0, 0.0, 1.0}}, ros::Time(3.0));
 	std::cout << "The distance between " << obj1.id() << " and " << obj2.id() << " is: " << obj1.pose().distanceTo(obj2.pose()) << "m." << std::endl;
 
+	int visual_shape_id = client->createVisualShapeMesh("/home/gsarthou/Robots/Pr2/Semantic/catkin_ws/src/exp_discuter/discuter_resources/mesh/cube_door.obj", {1,1,1}, {1,1,1,0});
+	int colision_shape_id = client->createCollisionShapeMesh("/home/gsarthou/Robots/Pr2/Semantic/catkin_ws/src/exp_discuter/discuter_resources/mesh/cube_door.obj", {1,1,1});
+	int entity_id = client->createMultiBody(1, colision_shape_id, visual_shape_id, {1,1,1}, {0,0,0,1});
+	int texture_id = client->loadTexture("/home/gsarthou/Robots/Pr2/Semantic/catkin_ws/src/exp_discuter/discuter_resources/textures/discuter_house.png");
+	client->changeTexture(entity_id, -1, texture_id);
+
 	while(flag == false && ros::ok())
 	{
 		std::this_thread::sleep_for(100ms);

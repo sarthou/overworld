@@ -242,6 +242,71 @@ int BulletClient::createMultiBody(float base_mass,
 	return -1;
 }
 
+int BulletClient::loadTexture(const std::string& file_path)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+	b3SharedMemoryCommandHandle command_handle = b3InitLoadTexture(*client_handle_, file_path.c_str());
+    b3SharedMemoryStatusHandle status_handle = b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+    int status_type = b3GetStatusType(status_handle);
+    if (status_type == CMD_LOAD_TEXTURE_COMPLETED)
+        return b3GetStatusTextureUniqueId(status_handle);
+
+    ShellDisplay::error("[Bullet] Error loading texture.");
+    return -1;
+}
+
+bool BulletClient::changeTexture(int object_id, int joint_index, int texture_id)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    b3SharedMemoryCommandHandle command_handle = b3InitUpdateVisualShape2(*client_handle_, object_id, joint_index, -1);
+    if (texture_id >= -1)
+		b3UpdateVisualShapeTexture(command_handle, texture_id);
+
+    b3SharedMemoryStatusHandle status_handle = b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+    int status_type = b3GetStatusType(status_handle);
+    if (status_type != CMD_VISUAL_SHAPE_UPDATE_COMPLETED)
+    {
+        ShellDisplay::error("[Bullet] Error changing texture.");
+        return false;
+    }
+    else
+        return true;
+}
+
+bool BulletClient::changeRgbaColor(int object_id, int joint_index, const std::array<double, 4>& color)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    b3SharedMemoryCommandHandle command_handle = b3InitUpdateVisualShape2(*client_handle_, object_id, joint_index, -1);
+	b3UpdateVisualShapeRGBAColor(command_handle, color.data());
+
+    b3SharedMemoryStatusHandle status_handle = b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+    int status_type = b3GetStatusType(status_handle);
+    if (status_type != CMD_VISUAL_SHAPE_UPDATE_COMPLETED)
+    {
+        ShellDisplay::error("[Bullet] Error changing texture.");
+        return false;
+    }
+    else
+        return true;
+}
+
+bool BulletClient::changeSpecularColor(int object_id, int joint_index, const std::array<double, 3>& color)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    b3SharedMemoryCommandHandle command_handle = b3InitUpdateVisualShape2(*client_handle_, object_id, joint_index, -1);
+	b3UpdateVisualShapeSpecularColor(command_handle, color.data());
+
+    b3SharedMemoryStatusHandle status_handle = b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+    int status_type = b3GetStatusType(status_handle);
+    if (status_type != CMD_VISUAL_SHAPE_UPDATE_COMPLETED)
+    {
+        ShellDisplay::error("[Bullet] Error changing texture.");
+        return false;
+    }
+    else
+        return true;
+}
+
 int BulletClient::loadURDF(const std::string& file_name,
                            const std::array<double, 3>& base_position,
                            const std::array<double, 4>& base_orientation,
