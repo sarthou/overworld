@@ -22,6 +22,7 @@ struct Shape_t
   std::string colision_mesh_resource;
   std::array<double, 3> color;
   std::array<double, 3> scale;
+  std::string texture;
 
   Shape_t()
   {

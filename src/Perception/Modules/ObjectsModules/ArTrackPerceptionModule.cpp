@@ -192,11 +192,13 @@ bool ArTrackPerceptionModule::createNewEntity(const ar_track_alvar_msgs::AlvarMa
     shape.type = SHAPE_MESH;
     shape.visual_mesh_resource = meshs[0].substr(meshs[0].find("#") + 1);
     shape.color = getColor(obj.id());
+    shape.texture = getTexture(obj.id());
   }
   else
   {
     shape.type = SHAPE_CUBE;
     shape.color = getColor(obj.id(), {1,0,0});
+    shape.texture = getTexture(obj.id());
     shape.scale = {0.05, 0.05, 0.003};
   }
   obj.setShape(shape);
@@ -226,6 +228,15 @@ std::array<double, 3> ArTrackPerceptionModule::getColor(const std::string& indiv
     return {0.82, 0.42, 0.12};
   else
     return default_value;
+}
+
+std::string ArTrackPerceptionModule::getTexture(const std::string& indiv_name)
+{
+  auto textures = onto_->individuals.getOn(indiv_name, "hasTexture");
+  if(textures.size())
+    return *textures.begin();
+  else
+    return "";
 }
 
 } // namespace owds

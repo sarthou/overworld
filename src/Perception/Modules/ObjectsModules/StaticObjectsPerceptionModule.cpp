@@ -29,7 +29,8 @@ void StaticObjectsPerceptionModule::addObject(const std::string& name,
                                               const std::string& colision_mesh,
                                               const std::array<double,3>& translation,
                                               const std::array<double,3>& rotation,
-                                              const std::array<double,3>& color)
+                                              const std::array<double,3>& color,
+                                              const std::string& texture)
 {
     Object obj(name);
     Shape_t shape;
@@ -37,6 +38,7 @@ void StaticObjectsPerceptionModule::addObject(const std::string& name,
     shape.visual_mesh_resource = visual_mesh;
     shape.colision_mesh_resource = colision_mesh;
     shape.color = color;
+    shape.texture = texture;
     obj.setShape(shape);
     Pose pose(translation, rotation); 
     obj.updatePose(pose);

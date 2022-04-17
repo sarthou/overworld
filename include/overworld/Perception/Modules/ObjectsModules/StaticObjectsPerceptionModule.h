@@ -17,7 +17,8 @@ private:
                    const std::string& colision_mesh,
                    const std::array<double,3>& translation,
                    const std::array<double,3>& rotation,
-                   const std::array<double,3>& color);
+                   const std::array<double,3>& color,
+                   const std::string& texture = "");
 };
 
 } // namespace owds

@@ -263,6 +263,13 @@ void EntitiesPerceptionManager<T>::addToBullet(T* entity)
     {
         auto entity_pose = entity->pose().arrays();
         int obj_id = bullet_client_->createMultiBody(0, collision_id, visual_id, entity_pose.first, entity_pose.second);
+        if(entity->getShape().texture != "")
+        {
+            int texture_id = bullet_client_->loadTexture(entity->getShape().texture);
+	        bullet_client_->changeRgbaColor(obj_id, -1, {1,1,1,1});
+	        bullet_client_->changeTexture(obj_id, -1, texture_id);
+
+        }
         entity->setBulletId(obj_id);
     }
 }
