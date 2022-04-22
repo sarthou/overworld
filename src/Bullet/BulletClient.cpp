@@ -245,13 +245,13 @@ int BulletClient::createMultiBody(float base_mass,
 int BulletClient::loadTexture(const std::string& file_path)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-	b3SharedMemoryCommandHandle command_handle = b3InitLoadTexture(*client_handle_, file_path.c_str());
+	b3SharedMemoryCommandHandle command_handle = b3InitLoadTexture(*client_handle_, getFullPath(file_path).c_str());
     b3SharedMemoryStatusHandle status_handle = b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
     int status_type = b3GetStatusType(status_handle);
     if (status_type == CMD_LOAD_TEXTURE_COMPLETED)
         return b3GetStatusTextureUniqueId(status_handle);
 
-    ShellDisplay::error("[Bullet] Error loading texture.");
+    ShellDisplay::error("[Bullet] Error loading texture \'" + getFullPath(file_path) + "\'");
     return -1;
 }
 
