@@ -4,7 +4,7 @@
 
 namespace owds {
 
-StaticObjectsPerceptionModule::StaticObjectsPerceptionModule()
+StaticObjectsPerceptionModule::StaticObjectsPerceptionModule() : onto_(nullptr)
 {
     addObject("walls", "package://overworld/models/obj/walls.obj",
                 "package://overworld/models/obj/walls_vhacd.obj",
@@ -21,7 +21,19 @@ StaticObjectsPerceptionModule::StaticObjectsPerceptionModule()
                {-0.064,3.914,1.703}, {1.57,0,0}, {0,0,0});
     addObject("appartment", "package://overworld/models/obj/appartment.obj",
                 "package://overworld/models/obj/appartment_vhacd.obj",
-               {5.467,10.399,1.448}, {1.57,0,0}, {1,1,1}); 
+               {5.467,10.399,1.448}, {1.57,0,0}, {1,1,1});
+}
+
+bool StaticObjectsPerceptionModule::closeInitialization()
+{
+  ontologies_manipulator_ = new OntologiesManipulator(n_);
+  ontologies_manipulator_->waitInit();
+  std::string robot_name = robot_agent_->getId();
+  ontologies_manipulator_->add(robot_name);
+  onto_ = ontologies_manipulator_->get(robot_name);
+  onto_->close();
+
+  return true;
 }
 
 void StaticObjectsPerceptionModule::addObject(const std::string& name,
@@ -46,6 +58,34 @@ void StaticObjectsPerceptionModule::addObject(const std::string& name,
     updated_ = true;
 
     percepts_.insert(std::make_pair(obj.id(), obj));
+}
+
+void StaticObjectsPerceptionModule::addObject(const std::string& name,
+                                              const std::array<double,3>& translation,
+                                              const std::array<double,3>& rotation)
+{
+    if(onto_ == nullptr)
+    {
+        ShellDisplay::error("[StaticObjectsPerceptionModule] no ontology defined to add a new entity");
+        return;
+    }
+
+    ShellDisplay::success("[StaticObjectsPerceptionModule] create shape for " + name);
+
+    Object obj(name);
+    Shape_t shape = PerceptionModuleBase_::getEntityShapeFromOntology(onto_, name);
+    if(shape.type == SHAPE_MESH)
+    {
+        obj.setShape(shape);
+        Pose pose(translation, rotation); 
+        obj.updatePose(pose);
+        obj.setStatic();
+        updated_ = true;
+
+        percepts_.insert(std::make_pair(obj.id(), obj));
+    }
+    else
+        ShellDisplay::warning("[StaticObjectsPerceptionModule] No mesh defined in the ontology for entity \'" + name + "\'");    
 }
 
 } //namespace owds
