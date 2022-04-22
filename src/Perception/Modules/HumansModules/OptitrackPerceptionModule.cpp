@@ -57,56 +57,41 @@ bool OptitrackPerceptionModule::closeInitialization()
     left_hand_name_ = left_hand_names.at(0);
     right_hand_name_ = right_hand_names.at(0);
 
-    auto head_meshs = onto_->individuals.getOn(head_name_, "hasMesh");
-    auto left_hand_meshs = onto_->individuals.getOn(left_hand_name_, "hasMesh");
-    auto right_hand_meshs = onto_->individuals.getOn(right_hand_name_, "hasMesh");
+    std::array<double, 3> default_color = {0.976470588, 0.894117647, 0.717647059};;
 
     percepts_.emplace(head_name_, head_name_);
     percepts_.at(head_name_).setAgentName(human_name_);
     percepts_.at(head_name_).setType(BodyPartType_e::BODY_PART_HEAD);
-    Shape_t head_shape, left_hand_shape, right_hand_shape;
-    head_shape.color = {0.976470588, 0.894117647, 0.717647059};
-    if (head_meshs.size())
-    {
-        head_shape.type = SHAPE_MESH;
-        head_shape.visual_mesh_resource = head_meshs[0].substr(head_meshs[0].find("#") + 1);
-    }
-    else
+    Shape_t head_shape = PerceptionModuleBase_::getEntityShapeFromOntology(onto_, head_name_);
+    if(head_shape.type == SHAPE_NONE)
     {
         head_shape.type = SHAPE_SPEHERE;
         head_shape.scale = {0.12, 0.15, 0.2};
+        head_shape.color = PerceptionModuleBase_::getEntityColorFromOntology(onto_, head_name_, default_color);
     }
     percepts_.at(head_name_).setShape(head_shape);
 
     percepts_.emplace(left_hand_name_, left_hand_name_);
     percepts_.at(left_hand_name_).setAgentName(human_name_);
     percepts_.at(left_hand_name_).setType(BodyPartType_e::BODY_PART_LEFT_HAND);
-    left_hand_shape.color = {0.976470588, 0.894117647, 0.717647059};
-    if (left_hand_meshs.size())
-    {
-        left_hand_shape.type = SHAPE_MESH;
-        left_hand_shape.visual_mesh_resource = left_hand_meshs[0].substr(left_hand_meshs[0].find("#") + 1);
-    }
-    else
+    Shape_t left_hand_shape = PerceptionModuleBase_::getEntityShapeFromOntology(onto_, left_hand_name_);
+    if(left_hand_shape.type == SHAPE_NONE)
     {
         left_hand_shape.type = SHAPE_CUBE;
         left_hand_shape.scale = {0.10, 0.03, 0.18};
+        left_hand_shape.color = PerceptionModuleBase_::getEntityColorFromOntology(onto_, left_hand_name_, default_color);
     }
     percepts_.at(left_hand_name_).setShape(left_hand_shape);
 
     percepts_.emplace(right_hand_name_, right_hand_name_);
     percepts_.at(right_hand_name_).setAgentName(human_name_);
     percepts_.at(right_hand_name_).setType(BodyPartType_e::BODY_PART_RIGHT_HAND);
-    right_hand_shape.color = {0.976470588, 0.894117647, 0.717647059};
-    if (right_hand_meshs.size())
-    {
-        right_hand_shape.type = SHAPE_MESH;
-        right_hand_shape.visual_mesh_resource = right_hand_meshs[0].substr(right_hand_meshs[0].find("#") + 1);
-    }
-    else
+    Shape_t right_hand_shape = PerceptionModuleBase_::getEntityShapeFromOntology(onto_, right_hand_name_);
+    if(right_hand_shape.type == SHAPE_NONE)
     {
         right_hand_shape.type = SHAPE_CUBE;
         right_hand_shape.scale = {0.10, 0.03, 0.18};
+        right_hand_shape.color = PerceptionModuleBase_::getEntityColorFromOntology(onto_, right_hand_name_, default_color);
     }
     percepts_.at(right_hand_name_).setShape(right_hand_shape);
 
