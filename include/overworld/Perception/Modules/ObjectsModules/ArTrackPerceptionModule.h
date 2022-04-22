@@ -49,8 +49,6 @@ private:
   void updateEntities(const ar_track_alvar_msgs::AlvarMarkers& main_markers,
                       const std::unordered_set<size_t>& invalid_main_markers_ids);
   bool createNewEntity(const ar_track_alvar_msgs::AlvarMarker& marker);
-  std::array<double, 3> getColor(const std::string& indiv_name, const std::array<double, 3>& default_value = {0,0,0});
-  std::string getTexture(const std::string& indiv_name);
 };
 
 } // namespace owds

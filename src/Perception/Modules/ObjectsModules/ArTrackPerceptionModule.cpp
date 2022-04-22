@@ -185,20 +185,11 @@ bool ArTrackPerceptionModule::createNewEntity(const ar_track_alvar_msgs::AlvarMa
   ids_map_[marker.id] = true_id[0];
   Object obj(true_id[0]);
 
-  Shape_t shape;
-  auto meshs = onto_->individuals.getOn(obj.id(), "hasMesh");
-  if(meshs.size())
-  {
-    shape.type = SHAPE_MESH;
-    shape.visual_mesh_resource = meshs[0].substr(meshs[0].find("#") + 1);
-    shape.color = getColor(obj.id());
-    shape.texture = getTexture(obj.id());
-  }
-  else
+  Shape_t shape = PerceptionModuleBase_::getEntityShapeFromOntology(onto_, obj.id());
+  if(shape.type == SHAPE_NONE)
   {
     shape.type = SHAPE_CUBE;
-    shape.color = getColor(obj.id(), {1,0,0});
-    shape.texture = getTexture(obj.id());
+    shape.color = PerceptionModuleBase_::getEntityColorFromOntology(onto_, obj.id(), {1,0,0});
     shape.scale = {0.05, 0.05, 0.003};
   }
   obj.setShape(shape);
@@ -206,37 +197,6 @@ bool ArTrackPerceptionModule::createNewEntity(const ar_track_alvar_msgs::AlvarMa
   percepts_.insert(std::make_pair(obj.id(), obj));
 
   return true;
-}
-
-std::array<double, 3> ArTrackPerceptionModule::getColor(const std::string& indiv_name, const std::array<double, 3>& default_value)
-{
-  auto color = onto_->individuals.getOn(indiv_name, "hasColor");
-  if(color.size() != 0)
-  {
-    auto hex_value = onto_->individuals.getOn(color.front(), "hexRgbValue");
-    if(hex_value.size())
-    {
-      int hex = 0;
-      sscanf(hex_value[0].substr(hex_value[0].find("#") + 1).c_str(), "%x", &hex);
-      return { ((hex >> 16) & 0xff) / 255., ((hex >> 8) & 0xff) / 255., (hex & 0xff) / 255. };
-    }
-  }
-  
-  if(onto_->individuals.isA(indiv_name, "Cube"))
-    return {0,0,1};
-  else if(onto_->individuals.isA(indiv_name, "Box"))
-    return {0.82, 0.42, 0.12};
-  else
-    return default_value;
-}
-
-std::string ArTrackPerceptionModule::getTexture(const std::string& indiv_name)
-{
-  auto textures = onto_->individuals.getOn(indiv_name, "hasTexture");
-  if(textures.size())
-    return *textures.begin();
-  else
-    return "";
 }
 
 } // namespace owds
