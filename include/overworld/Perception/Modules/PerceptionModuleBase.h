@@ -11,6 +11,8 @@
 #include <message_filters/synchronizer.h>
 #include <message_filters/sync_policies/approximate_time.h>
 
+#include "ontologenius/OntologiesManipulator.h"
+
 #include "overworld/BasicTypes/Entity.h"
 #include "overworld/BasicTypes/Agent.h"
 
@@ -64,6 +66,52 @@ public:
     if(need_access_to_external_entities_)
       mutex_access_.unlock();
     mutex_perception_.unlock();
+  }
+
+  static std::array<double, 3> getEntityColorFromOntology(OntologyManipulator* onto, const std::string& indiv_name, const std::array<double, 3>& default_value = {0.8,0.8,0.8})
+  {
+    auto color = onto->individuals.getOn(indiv_name, "hasColor");
+    if(color.size() != 0)
+    {
+      auto hex_value = onto->individuals.getOn(color.front(), "hexRgbValue");
+      if(hex_value.size())
+      {
+        int hex = 0;
+        sscanf(hex_value[0].substr(hex_value[0].find("#") + 1).c_str(), "%x", &hex);
+        return { ((hex >> 16) & 0xff) / 255., ((hex >> 8) & 0xff) / 255., (hex & 0xff) / 255. };
+      }
+    }
+    
+    return default_value;
+  }
+
+  static Shape_t getEntityShapeFromOntology(OntologyManipulator* onto, const std::string& indiv_name)
+  {
+    auto visual_meshes = onto->individuals.getOn(indiv_name, "hasVisualMesh");
+    auto colision_meshes = onto->individuals.getOn(indiv_name, "hasColisionMesh");
+    auto meshes = onto->individuals.getOn(indiv_name, "hasMesh");
+    auto textures = onto->individuals.getOn(indiv_name, "hasTexture");
+
+    Shape_t shape;
+    if(meshes.size())
+    {
+      shape.type = SHAPE_MESH;
+      if(visual_meshes.size())
+          shape.visual_mesh_resource = visual_meshes.front().substr(visual_meshes.front().find("#") + 1);
+      else
+          shape.visual_mesh_resource = meshes.front().substr(meshes.front().find("#") + 1);
+      if(colision_meshes.size())
+          shape.colision_mesh_resource = colision_meshes.front().substr(colision_meshes.front().find("#") + 1);
+      else
+          shape.colision_mesh_resource = meshes.front().substr(meshes.front().find("#") + 1);
+      shape.color = getEntityColorFromOntology(onto, indiv_name);
+      if(textures.size())
+          shape.texture = textures.front().substr(textures.front().find("#") + 1);
+    }
+    else
+      shape.type = SHAPE_NONE;
+
+    return shape;
   }
 
 protected:
