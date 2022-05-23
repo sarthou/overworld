@@ -168,7 +168,7 @@ target_link_libraries(${PROJECT_NAME}_facts_lib PUBLIC
            
 add_library(${PROJECT_NAME}_sender_lib STATIC
   src/Senders/ROSSender.cpp
-  src/Senders/MotionPlanningPoseSender.cpp
+  src/Senders/PoseSender.cpp
   src/Senders/Bernie.cpp
 )
 target_link_libraries(${PROJECT_NAME}_sender_lib PUBLIC

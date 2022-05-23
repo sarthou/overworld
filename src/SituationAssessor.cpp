@@ -66,7 +66,7 @@ SituationAssessor::SituationAssessor(const std::string& agent_name,
   ros_sender_ = new ROSSender(&n_);
   if(is_robot_)
   {
-    motion_planning_pose_sender_ = new MotionPlanningPoseSender(&n_, perception_manager_.objects_manager_);
+    motion_planning_pose_sender_ = new PoseSender(&n_, perception_manager_.objects_manager_);
     bernie_sender_ =  new BernieSenders(&n_);
   }
   else

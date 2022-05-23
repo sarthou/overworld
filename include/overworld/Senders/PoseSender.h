@@ -1,5 +1,5 @@
-#ifndef OWDS_MOTIONPLANNINGPOSESENDER_H
-#define OWDS_MOTIONPLANNINGPOSESENDER_H
+#ifndef OWDS_PoseSender_H
+#define OWDS_PoseSender_H
 
 #include "overworld/Perception/Managers/ObjectsPerceptionManager.h"
 
@@ -9,9 +9,9 @@
 namespace owds
 {
 
-class MotionPlanningPoseSender{
+class PoseSender{
 public:
-    MotionPlanningPoseSender(ros::NodeHandle* nh_, ObjectsPerceptionManager& object_perception_manager);
+    PoseSender(ros::NodeHandle* nh_, ObjectsPerceptionManager& object_perception_manager);
 
     bool onGetPoseService(overworld::GetPose::Request& req, overworld::GetPose::Response& res);
 protected:
@@ -22,4 +22,4 @@ ObjectsPerceptionManager& object_perception_manager_;
 
 } // namespace owds
 
-#endif /* OWDS_MOTIONPLANNINGPOSESENDER_H */
+#endif /* OWDS_PoseSender_H */

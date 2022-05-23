@@ -1,16 +1,16 @@
-#include "overworld/Senders/MotionPlanningPoseSender.h"
+#include "overworld/Senders/PoseSender.h"
 
 #include <geometry_msgs/PoseStamped.h>
 
 namespace owds {
 
-MotionPlanningPoseSender::MotionPlanningPoseSender(ros::NodeHandle* nh_, ObjectsPerceptionManager& object_perception_manager)
+PoseSender::PoseSender(ros::NodeHandle* nh_, ObjectsPerceptionManager& object_perception_manager)
     : object_perception_manager_(object_perception_manager)
 {
-    get_pose_service_ = nh_->advertiseService("/overworld/getPose", &MotionPlanningPoseSender::onGetPoseService, this);  //TODO: Change for a private node handle
+    get_pose_service_ = nh_->advertiseService("/overworld/getPose", &PoseSender::onGetPoseService, this);  //TODO: Change for a private node handle
 }
 
-bool MotionPlanningPoseSender::onGetPoseService(overworld::GetPose::Request& req, overworld::GetPose::Response& res)
+bool PoseSender::onGetPoseService(overworld::GetPose::Request& req, overworld::GetPose::Response& res)
 {
     const auto objects = object_perception_manager_.getEntities();
     for (const std::string& id : req.ids)
