@@ -15,7 +15,7 @@ You can install it where you want on your computer but avoid installing it in yo
 ```
 git clone git@github.com:bulletphysics/bullet3.git
 cd bullet3
-mkdir build & mkdir install
+mkdir build && mkdir install
 export BULLET_PATH=$(pwd)
 cd build
 cmake .. -DCMAKE_INSTALL_PREFIX=$BULLET_PATH/install -DBUILD_SHARED_LIBS=ON
