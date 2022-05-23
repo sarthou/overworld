@@ -24,7 +24,7 @@ find_package(catkin REQUIRED COMPONENTS
   ar_track_alvar_msgs
   sensor_msgs
   visualization_msgs
-  pr2_motion_tasks_msgs
+  geometry_msgs
   cv_bridge
   pluginlib
 )
@@ -73,11 +73,13 @@ add_service_files(
   FILES
   StartStopModules.srv
   BoundingBox.srv
+  GetPose.srv
 )
 
 generate_messages(
   DEPENDENCIES
   std_msgs
+  geometry_msgs
 )
 
 ###################################
