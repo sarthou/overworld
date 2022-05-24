@@ -77,6 +77,6 @@ jobs:
           cd ~/catkin_ws/src
           ln -s ~/work
           cd ..
-          export BULLET_INSTALL_PATH=~/dependencie/bullet3/install
+          export BULLET_INSTALL_PATH=~/dependencies/bullet3/install
           export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$BULLET_INSTALL_PATH/lib
           catkin_make
