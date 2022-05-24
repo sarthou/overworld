@@ -34,7 +34,7 @@ jobs:
             sudo apt install dpkg
             sudo apt install -y ros-$ROS_DISTRO-desktop qtbase5-dev qtdeclarative5-dev
             sudo apt install -y libcppunit-dev
-            sudo apt install ros-$ROS_DISTRO-pcl-ros
+            sudo apt install ros-$ROS_DISTRO-pcl-ros ros-$ROS_DISTRO-tf2-geometry-msgs
             if [ $ROS_DISTRO != noetic ]
             then
                     sudo apt-get install python-rosdep
