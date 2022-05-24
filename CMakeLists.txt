@@ -25,6 +25,7 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   visualization_msgs
   geometry_msgs
+  optitrack_msgs
   cv_bridge
   pluginlib
 )
@@ -57,8 +58,6 @@ foreach(lib_name ${BULLET_LIB_NAMES})
   list(APPEND BULLET_LIBS ${LIB_PATH})
   unset(LIB_PATH CACHE)
 endforeach()
-
-find_package(optitrack_ros REQUIRED)
 
 ################################################
 ## Declare ROS messages, services and actions ##
@@ -106,7 +105,6 @@ include_directories(
   include
   ${EIGEN3_INCLUDE_DIRS}
   ${catkin_INCLUDE_DIRS}
-  ${optitrack_ros_INCLUDE_DIRS}
   ${CURL_INCLUDE_DIRS}
 )
 add_definitions( ${EIGEN3_DEFINITIONS} )

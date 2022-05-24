@@ -134,17 +134,17 @@ bool OptitrackPerceptionModule::perceptionCallback(const BodyPartOptitrackPose& 
     return false;
 }
 
-void OptitrackPerceptionModule::headRosCallback(const optitrack_ros::or_pose_estimator_state& msg)
+void OptitrackPerceptionModule::headRosCallback(const optitrack_msgs::or_pose_estimator_state& msg)
 {
     privatePerceptionCallback(std::make_pair(BodyPartType_e::BODY_PART_HEAD, msg));
 }
 
-void OptitrackPerceptionModule::leftHandRosCallback(const optitrack_ros::or_pose_estimator_state& msg)
+void OptitrackPerceptionModule::leftHandRosCallback(const optitrack_msgs::or_pose_estimator_state& msg)
 {
     privatePerceptionCallback(std::make_pair(BodyPartType_e::BODY_PART_LEFT_HAND, msg));
 }
 
-void OptitrackPerceptionModule::rightHandRosCallback(const optitrack_ros::or_pose_estimator_state& msg)
+void OptitrackPerceptionModule::rightHandRosCallback(const optitrack_msgs::or_pose_estimator_state& msg)
 {
     privatePerceptionCallback(std::make_pair(BodyPartType_e::BODY_PART_RIGHT_HAND, msg));
 }
