@@ -436,6 +436,7 @@ std::pair<std::array<double, 3>, std::array<double, 4>> BulletClient::getBasePos
     else
         ShellDisplay::error("[Bullet] getBasePositionAndOrientation failed.");
 
+    return std::make_pair(position, orientation);
 }
 
 long BulletClient::createUserConstraint(int parent_body_id, int parent_link_index,
