@@ -65,7 +65,12 @@ jobs:
           cd ~/work
           git clone https://github.com/sarthou/ontologenius.git
           git clone https://github.com/RIS-WITH/optitrack_msgs.git
-          git clone https://github.com/sarthou/ar_track_alvar.git
+          if [ $ROS_DISTRO != noetic ]
+          then
+            git clone https://github.com/sarthou/ar_track_alvar.git
+          else
+            git clone -b noetic-devel https://github.com/sarthou/ar_track_alvar.git
+          fi
 
       - name: build
         run: |
