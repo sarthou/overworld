@@ -5,6 +5,8 @@
 [![Dependency Status][Ontologenius-Dependency-Image]][Ontologenius-Dependency-Url]
 [![Dependency Status][Bullet-Dependency-Image]][Bullet-Dependency-Url]
 
+[![Build Status][Build-Status-Image]][Build-Status-Url]
+
 ## Installation
 
 ### Bullet
@@ -76,3 +78,6 @@ More information about this link and tutorials to show its use will come soon.
 [Ontologenius-Dependency-Url]: https://github.com/sarthou/ontologenius
 [Bullet-Dependency-Image]: https://img.shields.io/badge/dependencies-bullet3-yellow
 [Bullet-Dependency-Url]: https://github.com/bulletphysics/bullet3
+
+[Build-Status-Image]: https://github.com/sarthou/overworld/actions/workflows/main.yml/badge.svg
+[Build-Status-Url]: https://github.com/sarthou/overworld/actions
