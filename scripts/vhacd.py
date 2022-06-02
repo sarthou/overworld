@@ -10,6 +10,6 @@ if len(sys.argv) is 3:
   obj_name = sys.argv[2]
 
   p.connect(p.DIRECT)
-  p.vhacd(path + "/" + obj_name + ".obj", path + "/" + obj_name + "_vhacd.obj", path + "/log.txt", alpha=0.04,resolution=50000 )
+  p.vhacd(path + "/" + obj_name + ".obj", path + "/" + obj_name + "_vhacd.obj", path + "/log.txt", resolution=16000000, depth=32, maxNumVerticesPerCH=1024)#, alpha=0.01, beta=-0.01, gamma=0.000125 )
 else:
   print("provide the mesh path and its name in argument of this script")
