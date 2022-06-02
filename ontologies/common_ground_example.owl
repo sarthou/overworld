@@ -1,0 +1,1264 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="https://github.com/sarthou/overworld/blob/master/dt_resources/ontologies/common_ground"
+     xml:base="https://github.com/sarthou/overworld/blob/master/dt_resources/ontologies/common_ground#"
+     xmlns:common_ground="https://github.com/sarthou/overworld/blob/master/dt_resources/ontologies/common_ground#"
+     xmlns:onto="ontologenius"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+    <owl:Ontology rdf:about="https://github.com/sarthou/overworld/blob/master/dt_resources/ontologies/common_ground"/>
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Annotation properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- common_ground#hasMesh -->
+
+    <owl:AnnotationProperty rdf:about="common_ground#hasMesh"/>
+    
+
+
+    <!-- common_ground#hexRgbValue -->
+
+    <owl:AnnotationProperty rdf:about="common_ground#hexRgbValue">
+        <rdfs:domain rdf:resource="common_ground#Color"/>
+    </owl:AnnotationProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Datatypes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- common_ground#hexrbg -->
+
+    <rdfs:Datatype rdf:about="common_ground#hexrbg"/>
+    
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- common_ground#DisplayableRelation -->
+
+    <owl:ObjectProperty rdf:about="common_ground#DisplayableRelation">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- common_ground#GeometricalRelation -->
+
+    <owl:ObjectProperty rdf:about="common_ground#GeometricalRelation">
+        <rdfs:subPropertyOf rdf:resource="common_ground#VisualRelation"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- common_ground#PointableRelation -->
+
+    <owl:ObjectProperty rdf:about="common_ground#PointableRelation">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- common_ground#VisualRelation -->
+
+    <owl:ObjectProperty rdf:about="common_ground#VisualRelation">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- common_ground#atLeftOf -->
+
+    <owl:ObjectProperty rdf:about="common_ground#atLeftOf">
+        <rdfs:subPropertyOf rdf:resource="common_ground#GeometricalRelation"/>
+        <owl:inverseOf rdf:resource="common_ground#atRightOf"/>
+        <rdfs:domain rdf:resource="common_ground#Entity"/>
+        <rdfs:range rdf:resource="common_ground#Entity"/>
+        <rdfs:label xml:lang="fr">a gauche de</rdfs:label>
+        <rdfs:label xml:lang="en">to the left of</rdfs:label>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- common_ground#atRightOf -->
+
+    <owl:ObjectProperty rdf:about="common_ground#atRightOf">
+        <rdfs:subPropertyOf rdf:resource="common_ground#GeometricalRelation"/>
+        <rdfs:domain rdf:resource="common_ground#Entity"/>
+        <rdfs:range rdf:resource="common_ground#Entity"/>
+        <rdfs:label xml:lang="fr">a droite de</rdfs:label>
+        <rdfs:label xml:lang="en">to the right of</rdfs:label>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- common_ground#behind -->
+
+    <owl:ObjectProperty rdf:about="common_ground#behind">
+        <rdfs:subPropertyOf rdf:resource="common_ground#GeometricalRelation"/>
+        <owl:inverseOf rdf:resource="common_ground#inFrontOf"/>
+        <rdfs:domain rdf:resource="common_ground#Entity"/>
+        <rdfs:range rdf:resource="common_ground#Entity"/>
+        <rdfs:label xml:lang="en">behind</rdfs:label>
+        <rdfs:label xml:lang="fr">derriere</rdfs:label>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- common_ground#canSee -->
+
+    <owl:ObjectProperty rdf:about="common_ground#canSee">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="common_ground#Agent"/>
+        <rdfs:range rdf:resource="common_ground#Entity"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- common_ground#containerHasIn -->
+
+    <owl:ObjectProperty rdf:about="common_ground#containerHasIn">
+        <rdfs:subPropertyOf rdf:resource="common_ground#hasIn"/>
+        <owl:inverseOf rdf:resource="common_ground#isInContainer"/>
+        <rdfs:domain rdf:resource="common_ground#Container"/>
+        <rdfs:range rdf:resource="common_ground#Object"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- common_ground#hasBorder -->
+
+    <owl:ObjectProperty rdf:about="common_ground#hasBorder">
+        <rdfs:subPropertyOf rdf:resource="common_ground#hasGraphicElement"/>
+        <rdfs:domain rdf:resource="common_ground#Object"/>
+        <rdfs:range rdf:resource="common_ground#Border"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- common_ground#hasColor -->
+
+    <owl:ObjectProperty rdf:about="common_ground#hasColor">
+        <rdfs:subPropertyOf rdf:resource="common_ground#VisualRelation"/>
+        <rdfs:range rdf:resource="common_ground#Color"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- common_ground#hasConnectionFrom -->
+
+    <owl:ObjectProperty rdf:about="common_ground#hasConnectionFrom">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <owl:inverseOf rdf:resource="common_ground#isConnectedTo"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- common_ground#hasFigure -->
+
+    <owl:ObjectProperty rdf:about="common_ground#hasFigure">
+        <rdfs:subPropertyOf rdf:resource="common_ground#hasGraphicElement"/>
+        <rdfs:domain rdf:resource="common_ground#Object"/>
+        <rdfs:range rdf:resource="common_ground#Figure"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- common_ground#hasGraphicElement -->
+
+    <owl:ObjectProperty rdf:about="common_ground#hasGraphicElement">
+        <rdfs:subPropertyOf rdf:resource="common_ground#VisualRelation"/>
+        <rdfs:domain rdf:resource="common_ground#Object"/>
+        <rdfs:range rdf:resource="common_ground#GraphicElement"/>
+        <rdfs:label xml:lang="fr">avec un</rdfs:label>
+        <rdfs:label xml:lang="en">with a</rdfs:label>
+        <onto:label xml:lang="en">with the</onto:label>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- common_ground#hasIn -->
+
+    <owl:ObjectProperty rdf:about="common_ground#hasIn">
+        <rdfs:subPropertyOf rdf:resource="common_ground#GeometricalRelation"/>
+        <owl:inverseOf rdf:resource="common_ground#isIn"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
+        <rdfs:range rdf:resource="common_ground#Entity"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- common_ground#hasInLeftHand -->
+
+    <owl:ObjectProperty rdf:about="common_ground#hasInLeftHand">
+        <rdfs:subPropertyOf rdf:resource="common_ground#isHolding"/>
+        <owl:inverseOf rdf:resource="common_ground#isInLeftHandOf"/>
+        <rdfs:domain rdf:resource="common_ground#Agent"/>
+        <rdfs:range rdf:resource="common_ground#Pickable"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- common_ground#hasInReach -->
+
+    <owl:ObjectProperty rdf:about="common_ground#hasInReach">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <owl:inverseOf rdf:resource="common_ground#isReachableBy"/>
+        <rdfs:domain rdf:resource="common_ground#Agent"/>
+        <rdfs:range rdf:resource="common_ground#Object"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- common_ground#hasInRightHand -->
+
+    <owl:ObjectProperty rdf:about="common_ground#hasInRightHand">
+        <rdfs:subPropertyOf rdf:resource="common_ground#isHolding"/>
+        <owl:inverseOf rdf:resource="common_ground#isInRightHandOf"/>
+        <rdfs:domain rdf:resource="common_ground#Agent"/>
+        <rdfs:range rdf:resource="common_ground#Pickable"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- common_ground#hasPose -->
+
+    <owl:ObjectProperty rdf:about="common_ground#hasPose">
+        <rdfs:subPropertyOf rdf:resource="common_ground#PointableRelation"/>
+        <rdfs:subPropertyOf rdf:resource="common_ground#VisualRelation"/>
+        <rdfs:domain rdf:resource="common_ground#Entity"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- common_ground#hasShape -->
+
+    <owl:ObjectProperty rdf:about="common_ground#hasShape">
+        <rdfs:subPropertyOf rdf:resource="common_ground#VisualRelation"/>
+        <rdfs:domain rdf:resource="common_ground#Object"/>
+        <rdfs:range rdf:resource="common_ground#Shape"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- common_ground#hasSize -->
+
+    <owl:ObjectProperty rdf:about="common_ground#hasSize">
+        <rdfs:subPropertyOf rdf:resource="common_ground#VisualRelation"/>
+        <rdfs:domain rdf:resource="common_ground#Object"/>
+        <rdfs:range rdf:resource="common_ground#Size"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- common_ground#hasVolume -->
+
+    <owl:ObjectProperty rdf:about="common_ground#hasVolume">
+        <rdfs:subPropertyOf rdf:resource="common_ground#VisualRelation"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- common_ground#inFrontOf -->
+
+    <owl:ObjectProperty rdf:about="common_ground#inFrontOf">
+        <rdfs:subPropertyOf rdf:resource="common_ground#GeometricalRelation"/>
+        <rdfs:domain rdf:resource="common_ground#Entity"/>
+        <rdfs:range rdf:resource="common_ground#Entity"/>
+        <rdfs:label xml:lang="fr">devant</rdfs:label>
+        <rdfs:label xml:lang="en">in front of</rdfs:label>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- common_ground#isAbove -->
+
+    <owl:ObjectProperty rdf:about="common_ground#isAbove">
+        <rdfs:subPropertyOf rdf:resource="common_ground#GeometricalRelation"/>
+        <owl:inverseOf rdf:resource="common_ground#isBelow"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
+        <rdfs:domain rdf:resource="common_ground#Object"/>
+        <rdfs:range rdf:resource="common_ground#Support"/>
+        <owl:propertyChainAxiom rdf:parseType="Collection">
+            <rdf:Description rdf:about="common_ground#isAbove"/>
+            <rdf:Description rdf:about="common_ground#isAbove"/>
+        </owl:propertyChainAxiom>
+        <owl:propertyChainAxiom rdf:parseType="Collection">
+            <rdf:Description rdf:about="common_ground#isIn"/>
+            <rdf:Description rdf:about="common_ground#isAbove"/>
+        </owl:propertyChainAxiom>
+        <rdfs:label xml:lang="fr">qui est au dessus</rdfs:label>
+        <rdfs:label xml:lang="en">that is above</rdfs:label>
+        <onto:label xml:lang="en">above</onto:label>
+        <onto:label xml:lang="fr">au dessus</onto:label>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- common_ground#isBelow -->
+
+    <owl:ObjectProperty rdf:about="common_ground#isBelow">
+        <rdfs:subPropertyOf rdf:resource="common_ground#GeometricalRelation"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
+        <rdfs:domain rdf:resource="common_ground#Support"/>
+        <rdfs:range rdf:resource="common_ground#Object"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- common_ground#isConnectedTo -->
+
+    <owl:ObjectProperty rdf:about="common_ground#isConnectedTo">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- common_ground#isHeldBy -->
+
+    <owl:ObjectProperty rdf:about="common_ground#isHeldBy">
+        <rdfs:subPropertyOf rdf:resource="common_ground#GeometricalRelation"/>
+        <owl:inverseOf rdf:resource="common_ground#isHolding"/>
+        <rdfs:domain rdf:resource="common_ground#Pickable"/>
+        <rdfs:range rdf:resource="common_ground#Agent"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- common_ground#isHolding -->
+
+    <owl:ObjectProperty rdf:about="common_ground#isHolding">
+        <rdfs:subPropertyOf rdf:resource="common_ground#GeometricalRelation"/>
+        <rdfs:domain rdf:resource="common_ground#Agent"/>
+        <rdfs:range rdf:resource="common_ground#Pickable"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- common_ground#isIn -->
+
+    <owl:ObjectProperty rdf:about="common_ground#isIn">
+        <rdfs:subPropertyOf rdf:resource="common_ground#GeometricalRelation"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
+        <rdfs:domain rdf:resource="common_ground#Entity"/>
+        <rdfs:label xml:lang="fr">dans</rdfs:label>
+        <rdfs:label xml:lang="en">in</rdfs:label>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- common_ground#isInContainer -->
+
+    <owl:ObjectProperty rdf:about="common_ground#isInContainer">
+        <rdfs:subPropertyOf rdf:resource="common_ground#isIn"/>
+        <rdfs:domain rdf:resource="common_ground#Object"/>
+        <rdfs:range rdf:resource="common_ground#Container"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- common_ground#isInLeftHandOf -->
+
+    <owl:ObjectProperty rdf:about="common_ground#isInLeftHandOf">
+        <rdfs:subPropertyOf rdf:resource="common_ground#isHeldBy"/>
+        <rdfs:domain rdf:resource="common_ground#Pickable"/>
+        <rdfs:range rdf:resource="common_ground#Agent"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- common_ground#isInRightHandOf -->
+
+    <owl:ObjectProperty rdf:about="common_ground#isInRightHandOf">
+        <rdfs:subPropertyOf rdf:resource="common_ground#isHeldBy"/>
+        <rdfs:domain rdf:resource="common_ground#Pickable"/>
+        <rdfs:range rdf:resource="common_ground#Agent"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- common_ground#isInRoom -->
+
+    <owl:ObjectProperty rdf:about="common_ground#isInRoom">
+        <rdfs:subPropertyOf rdf:resource="common_ground#isIn"/>
+        <owl:inverseOf rdf:resource="common_ground#roomHasIn"/>
+        <rdfs:range rdf:resource="common_ground#Room"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- common_ground#isOnTopOf -->
+
+    <owl:ObjectProperty rdf:about="common_ground#isOnTopOf">
+        <rdfs:subPropertyOf rdf:resource="common_ground#isAbove"/>
+        <owl:inverseOf rdf:resource="common_ground#isUnder"/>
+        <rdfs:domain rdf:resource="common_ground#Object"/>
+        <rdfs:range rdf:resource="common_ground#Support"/>
+        <rdfs:label xml:lang="fr">qui est sur</rdfs:label>
+        <rdfs:label xml:lang="en">that is on</rdfs:label>
+        <onto:label xml:lang="en">on</onto:label>
+        <onto:label xml:lang="fr">sur</onto:label>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- common_ground#isReachableBy -->
+
+    <owl:ObjectProperty rdf:about="common_ground#isReachableBy">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="common_ground#Object"/>
+        <rdfs:range rdf:resource="common_ground#Agent"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- common_ground#isSeeing -->
+
+    <owl:ObjectProperty rdf:about="common_ground#isSeeing">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <owl:inverseOf rdf:resource="common_ground#isSeenBy"/>
+        <rdfs:domain rdf:resource="common_ground#Agent"/>
+        <rdfs:range rdf:resource="common_ground#Object"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- common_ground#isSeenBy -->
+
+    <owl:ObjectProperty rdf:about="common_ground#isSeenBy">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="common_ground#Object"/>
+        <rdfs:range rdf:resource="common_ground#Agent"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- common_ground#isUnder -->
+
+    <owl:ObjectProperty rdf:about="common_ground#isUnder">
+        <rdfs:subPropertyOf rdf:resource="common_ground#isBelow"/>
+        <rdfs:domain rdf:resource="common_ground#Support"/>
+        <rdfs:range rdf:resource="common_ground#Object"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- common_ground#isVisibleBy -->
+
+    <owl:ObjectProperty rdf:about="common_ground#isVisibleBy">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="common_ground#Object"/>
+        <rdfs:range rdf:resource="common_ground#Agent"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- common_ground#roomHasIn -->
+
+    <owl:ObjectProperty rdf:about="common_ground#roomHasIn">
+        <rdfs:subPropertyOf rdf:resource="common_ground#hasIn"/>
+        <rdfs:domain rdf:resource="common_ground#Room"/>
+        <rdfs:range rdf:resource="common_ground#Entity"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Data properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- common_ground#DisplayableRelation -->
+
+    <owl:DatatypeProperty rdf:about="common_ground#DisplayableRelation">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- common_ground#VisualRelation -->
+
+    <owl:DatatypeProperty rdf:about="common_ground#VisualRelation">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- common_ground#hasArId -->
+
+    <owl:DatatypeProperty rdf:about="common_ground#hasArId">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- common_ground#hasMesh -->
+
+    <owl:DatatypeProperty rdf:about="common_ground#hasMesh">
+        <rdfs:subPropertyOf rdf:resource="common_ground#DisplayableRelation"/>
+        <rdfs:subPropertyOf rdf:resource="common_ground#VisualRelation"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- common_ground#hasVisualMesh -->
+
+    <owl:DatatypeProperty rdf:about="common_ground#hasVisualMesh">
+        <rdfs:subPropertyOf rdf:resource="common_ground#hasMesh"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- common_ground#hasCollisionlMesh -->
+
+    <owl:DatatypeProperty rdf:about="common_ground#hasCollisionlMesh">
+        <rdfs:subPropertyOf rdf:resource="common_ground#hasMesh"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- common_ground#hasUnreallMesh -->
+
+    <owl:DatatypeProperty rdf:about="common_ground#hasUnreallMesh">
+        <rdfs:subPropertyOf rdf:resource="common_ground#hasMesh"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- common_ground#hasTexture -->
+
+    <owl:DatatypeProperty rdf:about="common_ground#hasTexture">
+        <rdfs:subPropertyOf rdf:resource="common_ground#DisplayableRelation"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- common_ground#hexRgbValue -->
+
+    <owl:DatatypeProperty rdf:about="common_ground#hexRgbValue">
+        <rdfs:subPropertyOf rdf:resource="common_ground#DisplayableRelation"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- common_ground#Agent -->
+
+    <owl:Class rdf:about="common_ground#Agent">
+        <rdfs:subClassOf rdf:resource="common_ground#Entity"/>
+        <rdfs:subClassOf rdf:resource="common_ground#frMaleGender"/>
+        <owl:disjointWith rdf:resource="common_ground#Object"/>
+        <rdfs:label xml:lang="en">agent</rdfs:label>
+        <rdfs:label xml:lang="fr">agent</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- common_ground#Area -->
+
+    <owl:Class rdf:about="common_ground#Area">
+        <rdfs:subClassOf rdf:resource="common_ground#frFemaleGender"/>
+        <rdfs:label xml:lang="en">area</rdfs:label>
+        <rdfs:label xml:lang="fr">zone</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- common_ground#Bedroom -->
+
+    <owl:Class rdf:about="common_ground#Bedroom">
+        <rdfs:subClassOf rdf:resource="common_ground#Room"/>
+        <rdfs:label xml:lang="en">bedroom</rdfs:label>
+        <rdfs:label xml:lang="fr">chambre</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- common_ground#Border -->
+
+    <owl:Class rdf:about="common_ground#Border">
+        <rdfs:subClassOf rdf:resource="common_ground#GraphicElement"/>
+        <rdfs:label xml:lang="fr">bodure</rdfs:label>
+        <rdfs:label xml:lang="en">border</rdfs:label>
+        <rdfs:label xml:lang="fr">contour</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- common_ground#Box -->
+
+    <owl:Class rdf:about="common_ground#Box">
+        <rdfs:subClassOf rdf:resource="common_ground#Container"/>
+        <rdfs:subClassOf rdf:resource="common_ground#frFemaleGender"/>
+        <rdfs:label xml:lang="fr">boite</rdfs:label>
+        <rdfs:label xml:lang="en">box</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- common_ground#Circle -->
+
+    <owl:Class rdf:about="common_ground#Circle">
+        <rdfs:subClassOf rdf:resource="common_ground#Figure"/>
+        <rdfs:label xml:lang="fr">cercle</rdfs:label>
+        <rdfs:label xml:lang="en">circle</rdfs:label>
+        <rdfs:label xml:lang="fr">rond</rdfs:label>
+        <onto:label xml:lang="fr">disque</onto:label>
+    </owl:Class>
+    
+
+
+    <!-- common_ground#Color -->
+
+    <owl:Class rdf:about="common_ground#Color">
+        <rdfs:subClassOf rdf:resource="common_ground#frFemaleGender"/>
+        <rdfs:label xml:lang="en">color</rdfs:label>
+        <rdfs:label xml:lang="fr">couleur</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- common_ground#ConsoleTable -->
+
+    <owl:Class rdf:about="common_ground#ConsoleTable">
+        <rdfs:subClassOf rdf:resource="common_ground#Furniture"/>
+        <rdfs:subClassOf rdf:resource="common_ground#Support"/>
+        <rdfs:subClassOf rdf:resource="common_ground#frFemaleGender"/>
+        <hasMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://dt_resources/mesh/furnitures/ikea_console.stl</hasMesh>
+        <rdfs:label xml:lang="fr">console</rdfs:label>
+        <rdfs:label xml:lang="en">console table</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- common_ground#Container -->
+
+    <owl:Class rdf:about="common_ground#Container">
+        <rdfs:subClassOf rdf:resource="common_ground#Object"/>
+        <rdfs:subClassOf rdf:resource="common_ground#frMaleGender"/>
+        <rdfs:label xml:lang="en">container</rdfs:label>
+        <rdfs:label xml:lang="fr">conteneur</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- common_ground#Cube -->
+
+    <owl:Class rdf:about="common_ground#Cube">
+        <rdfs:subClassOf rdf:resource="common_ground#Pickable"/>
+        <rdfs:subClassOf rdf:resource="common_ground#Support"/>
+        <rdfs:subClassOf rdf:resource="common_ground#frMaleGender"/>
+        <hasMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://dt_resources/mesh/furnitures/cube.stl</hasMesh>
+        <rdfs:label xml:lang="en">block</rdfs:label>
+        <rdfs:label xml:lang="fr">cube</rdfs:label>
+        <onto:label xml:lang="en">cube</onto:label>
+    </owl:Class>
+    
+
+
+    <!-- common_ground#Drawer -->
+
+    <owl:Class rdf:about="common_ground#Drawer">
+        <rdfs:subClassOf rdf:resource="common_ground#Container"/>
+        <rdfs:subClassOf rdf:resource="common_ground#Furniture"/>
+        <rdfs:subClassOf rdf:resource="common_ground#Support"/>
+        <rdfs:subClassOf rdf:resource="common_ground#frMaleGender"/>
+        <rdfs:label xml:lang="en">drawer</rdfs:label>
+        <rdfs:label xml:lang="fr">tiroir</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- common_ground#Entity -->
+
+    <owl:Class rdf:about="common_ground#Entity"/>
+    
+
+
+    <!-- common_ground#Fan -->
+
+    <owl:Class rdf:about="common_ground#Fan">
+        <rdfs:subClassOf rdf:resource="common_ground#Furniture"/>
+        <rdfs:subClassOf rdf:resource="common_ground#frMaleGender"/>
+        <rdfs:label xml:lang="en">fan</rdfs:label>
+        <rdfs:label xml:lang="fr">ventilateur</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- common_ground#Figure -->
+
+    <owl:Class rdf:about="common_ground#Figure">
+        <rdfs:subClassOf rdf:resource="common_ground#GraphicElement"/>
+        <rdfs:label xml:lang="en">figure</rdfs:label>
+        <rdfs:label xml:lang="fr">forme</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- common_ground#Furniture -->
+
+    <owl:Class rdf:about="common_ground#Furniture">
+        <rdfs:subClassOf rdf:resource="common_ground#Object"/>
+        <rdfs:subClassOf rdf:resource="common_ground#frMaleGender"/>
+        <rdfs:label xml:lang="en">furniture</rdfs:label>
+        <rdfs:label xml:lang="fr">meuble</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- common_ground#GraphicElement -->
+
+    <owl:Class rdf:about="common_ground#GraphicElement">
+        <rdfs:subClassOf rdf:resource="common_ground#Entity"/>
+    </owl:Class>
+    
+
+
+    <!-- common_ground#Human -->
+
+    <owl:Class rdf:about="common_ground#Human">
+        <rdfs:subClassOf rdf:resource="common_ground#Agent"/>
+        <rdfs:subClassOf rdf:resource="common_ground#frMaleGender"/>
+        <owl:disjointWith rdf:resource="common_ground#Robot"/>
+        <rdfs:label xml:lang="fr">humain</rdfs:label>
+        <rdfs:label xml:lang="en">human</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- common_ground#LowTable -->
+
+    <owl:Class rdf:about="common_ground#LowTable">
+        <rdfs:subClassOf rdf:resource="common_ground#Table"/>
+        <hasMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://dt_resources/mesh/furnitures/ikea_low_table_lack.stl</hasMesh>
+        <rdfs:label xml:lang="en">low table</rdfs:label>
+        <rdfs:label xml:lang="fr">low table</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- common_ground#Mug -->
+
+    <owl:Class rdf:about="common_ground#Mug">
+        <rdfs:subClassOf rdf:resource="common_ground#Container"/>
+        <rdfs:subClassOf rdf:resource="common_ground#Pickable"/>
+        <rdfs:subClassOf rdf:resource="common_ground#frFemaleGender"/>
+        <rdfs:label xml:lang="en">mug</rdfs:label>
+        <rdfs:label xml:lang="fr">tasse</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- common_ground#Object -->
+
+    <owl:Class rdf:about="common_ground#Object">
+        <rdfs:subClassOf rdf:resource="common_ground#Entity"/>
+        <rdfs:subClassOf rdf:resource="common_ground#frMaleGender"/>
+        <rdfs:label xml:lang="en">object</rdfs:label>
+        <rdfs:label xml:lang="fr">objet</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- common_ground#Pickable -->
+
+    <owl:Class rdf:about="common_ground#Pickable">
+        <rdfs:subClassOf rdf:resource="common_ground#Object"/>
+    </owl:Class>
+    
+
+
+    <!-- common_ground#PostIt -->
+
+    <owl:Class rdf:about="common_ground#PostIt">
+        <rdfs:subClassOf rdf:resource="common_ground#Pickable"/>
+        <rdfs:subClassOf rdf:resource="common_ground#frMaleGender"/>
+        <rdfs:label xml:lang="en">post-it</rdfs:label>
+        <rdfs:label xml:lang="fr">post-it</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- common_ground#Robot -->
+
+    <owl:Class rdf:about="common_ground#Robot">
+        <rdfs:subClassOf rdf:resource="common_ground#Agent"/>
+        <rdfs:subClassOf rdf:resource="common_ground#frMaleGender"/>
+        <rdfs:label xml:lang="en">robot</rdfs:label>
+        <rdfs:label xml:lang="fr">robot</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- common_ground#Room -->
+
+    <owl:Class rdf:about="common_ground#Room">
+        <rdfs:subClassOf rdf:resource="common_ground#Area"/>
+        <rdfs:subClassOf rdf:resource="common_ground#frFemaleGender"/>
+        <rdfs:label xml:lang="en">room</rdfs:label>
+        <rdfs:label xml:lang="fr">salle</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- common_ground#RoundTable -->
+
+    <owl:Class rdf:about="common_ground#RoundTable">
+        <rdfs:subClassOf rdf:resource="common_ground#Table"/>
+        <hasMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://dt_resources/mesh/furnitures/round_table.stl</hasMesh>
+    </owl:Class>
+    
+
+
+    <!-- common_ground#KallaxTable -->
+
+    <owl:Class rdf:about="common_ground#KallaxTable">
+        <rdfs:subClassOf rdf:resource="common_ground#Table"/>
+        <hasMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://dt_resources/mesh/furnitures/ikea_kallax.stl</hasMesh>
+    </owl:Class>
+    
+
+
+    <!-- common_ground#Shape -->
+
+    <owl:Class rdf:about="common_ground#Shape">
+        <rdfs:subClassOf rdf:resource="common_ground#frFemaleGender"/>
+        <rdfs:label xml:lang="fr">forme</rdfs:label>
+        <rdfs:label xml:lang="en">shape</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- common_ground#Shelf -->
+
+    <owl:Class rdf:about="common_ground#Shelf">
+        <rdfs:subClassOf rdf:resource="common_ground#Container"/>
+        <rdfs:subClassOf rdf:resource="common_ground#Furniture"/>
+        <rdfs:subClassOf rdf:resource="common_ground#frFemaleGender"/>
+        <rdfs:label xml:lang="fr">etagere</rdfs:label>
+        <rdfs:label xml:lang="en">shelf</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- common_ground#Size -->
+
+    <owl:Class rdf:about="common_ground#Size"/>
+    
+
+
+    <!-- common_ground#Spot -->
+
+    <owl:Class rdf:about="common_ground#Spot">
+        <rdfs:subClassOf rdf:resource="common_ground#Area"/>
+        <rdfs:subClassOf rdf:resource="common_ground#frMaleGender"/>
+        <rdfs:label xml:lang="fr">endroit</rdfs:label>
+        <rdfs:label xml:lang="en">spot</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- common_ground#Square -->
+
+    <owl:Class rdf:about="common_ground#Square">
+        <rdfs:subClassOf rdf:resource="common_ground#Figure"/>
+        <rdfs:label xml:lang="fr">carré</rdfs:label>
+        <rdfs:label xml:lang="en">square</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- common_ground#StorageArea -->
+
+    <owl:Class rdf:about="common_ground#StorageArea">
+        <rdfs:subClassOf rdf:resource="common_ground#Area"/>
+        <rdfs:label xml:lang="en">storage area</rdfs:label>
+        <rdfs:label xml:lang="fr">zone de stockage</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- common_ground#StorageBox -->
+
+    <owl:Class rdf:about="common_ground#StorageBox">
+        <rdfs:subClassOf rdf:resource="common_ground#Box"/>
+        <rdfs:subClassOf rdf:resource="common_ground#frFemaleGender"/>
+        <rdfs:label xml:lang="fr">boite de rangement</rdfs:label>
+        <rdfs:label xml:lang="en">storage box</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- common_ground#Support -->
+
+    <owl:Class rdf:about="common_ground#Support">
+        <rdfs:subClassOf rdf:resource="common_ground#Object"/>
+        <rdfs:subClassOf rdf:resource="common_ground#frMaleGender"/>
+    </owl:Class>
+    
+
+
+    <!-- common_ground#TV -->
+
+    <owl:Class rdf:about="common_ground#TV">
+        <rdfs:subClassOf rdf:resource="common_ground#Furniture"/>
+        <rdfs:subClassOf rdf:resource="common_ground#frFemaleGender"/>
+        <rdfs:label xml:lang="fr">tele</rdfs:label>
+        <rdfs:label xml:lang="en">tv</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- common_ground#Table -->
+
+    <owl:Class rdf:about="common_ground#Table">
+        <rdfs:subClassOf rdf:resource="common_ground#Furniture"/>
+        <rdfs:subClassOf rdf:resource="common_ground#Support"/>
+        <rdfs:subClassOf rdf:resource="common_ground#frFemaleGender"/>
+        <hasMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://dt_resources/mesh/furnitures/ikea_table.dae</hasMesh>
+        <rdfs:label xml:lang="en">table</rdfs:label>
+        <rdfs:label xml:lang="fr">table</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- common_ground#Triangle -->
+
+    <owl:Class rdf:about="common_ground#Triangle">
+        <rdfs:subClassOf rdf:resource="common_ground#Figure"/>
+        <rdfs:label xml:lang="en">triangle</rdfs:label>
+        <rdfs:label xml:lang="fr">triangle</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- common_ground#frFemaleGender -->
+
+    <owl:Class rdf:about="common_ground#frFemaleGender"/>
+    
+
+
+    <!-- common_ground#frMaleGender -->
+
+    <owl:Class rdf:about="common_ground#frMaleGender"/>
+    
+
+
+    <!-- common_ground#BuildingPart -->
+
+    <owl:Class rdf:about="common_ground#BuildingPart">
+        <rdfs:subClassOf rdf:resource="common_ground#Container"/>
+        <rdfs:subClassOf rdf:resource="common_ground#frFemaleGender"/>
+    </owl:Class>
+    
+
+
+    <!-- common_ground#Wall -->
+
+    <owl:Class rdf:about="common_ground#Wall">
+        <rdfs:subClassOf rdf:resource="common_ground#BuildingPart"/>
+    </owl:Class>
+    
+
+
+    <!-- common_ground#Floor -->
+
+    <owl:Class rdf:about="common_ground#Floor">
+        <rdfs:subClassOf rdf:resource="common_ground#BuildingPart"/>
+    </owl:Class>
+    
+
+
+    <!-- common_ground#Window -->
+
+    <owl:Class rdf:about="common_ground#Window">
+        <rdfs:subClassOf rdf:resource="common_ground#BuildingPart"/>
+    </owl:Class>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- common_ground#black -->
+
+    <owl:NamedIndividual rdf:about="common_ground#black">
+        <rdf:type rdf:resource="common_ground#Color"/>
+        <hexRgbValue rdf:datatype="common_ground#hexrbg">0x101010</hexRgbValue>
+        <rdfs:label xml:lang="en">black</rdfs:label>
+        <rdfs:label xml:lang="fr">noir</rdfs:label>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- common_ground#blue -->
+
+    <owl:NamedIndividual rdf:about="common_ground#blue">
+        <rdf:type rdf:resource="common_ground#Color"/>
+        <hexRgbValue rdf:datatype="common_ground#hexrbg">0x1E90FF</hexRgbValue>
+        <rdfs:label xml:lang="fr">bleu</rdfs:label>
+        <rdfs:label xml:lang="en">blue</rdfs:label>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- common_ground#box -->
+
+    <owl:NamedIndividual rdf:about="common_ground#box">
+        <rdf:type rdf:resource="common_ground#Shape"/>
+        <rdfs:label xml:lang="fr">rectangulaire</rdfs:label>
+        <rdfs:label xml:lang="en">rectangular</rdfs:label>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- common_ground#cyan -->
+
+    <owl:NamedIndividual rdf:about="common_ground#cyan">
+        <rdf:type rdf:resource="common_ground#Color"/>
+        <hexRgbValue rdf:datatype="common_ground#hexrbg">0x40E0D0</hexRgbValue>
+        <rdfs:label xml:lang="fr">bleu clair</rdfs:label>
+        <rdfs:label xml:lang="en">light blue</rdfs:label>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- common_ground#green -->
+
+    <owl:NamedIndividual rdf:about="common_ground#green">
+        <rdf:type rdf:resource="common_ground#Color"/>
+        <hexRgbValue rdf:datatype="common_ground#hexrbg">0x3CB371</hexRgbValue>
+        <rdfs:label xml:lang="en">green</rdfs:label>
+        <rdfs:label xml:lang="fr">vert</rdfs:label>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- common_ground#grey -->
+
+    <owl:NamedIndividual rdf:about="common_ground#grey">
+        <rdf:type rdf:resource="common_ground#Color"/>
+        <hexRgbValue rdf:datatype="common_ground#hexrbg">0xCCCCCC</hexRgbValue>
+        <rdfs:label xml:lang="en">green</rdfs:label>
+        <rdfs:label xml:lang="fr">vert</rdfs:label>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- common_ground#large -->
+
+    <owl:NamedIndividual rdf:about="common_ground#large">
+        <rdf:type rdf:resource="common_ground#Size"/>
+        <rdfs:label xml:lang="fr">grand</rdfs:label>
+        <rdfs:label xml:lang="en">large</rdfs:label>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- common_ground#magenta -->
+
+    <owl:NamedIndividual rdf:about="common_ground#magenta">
+        <rdf:type rdf:resource="common_ground#Color"/>
+        <hexRgbValue rdf:datatype="common_ground#hexrbg">0xDC143C</hexRgbValue>
+        <rdfs:label xml:lang="en">pink</rdfs:label>
+        <rdfs:label xml:lang="fr">rose</rdfs:label>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- common_ground#medium -->
+
+    <owl:NamedIndividual rdf:about="common_ground#medium">
+        <rdf:type rdf:resource="common_ground#Size"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- common_ground#red -->
+
+    <owl:NamedIndividual rdf:about="common_ground#red">
+        <rdf:type rdf:resource="common_ground#Color"/>
+        <hexRgbValue rdf:datatype="common_ground#hexrbg">0xDC143C</hexRgbValue>
+        <rdfs:label xml:lang="en">red</rdfs:label>
+        <rdfs:label xml:lang="fr">rouge</rdfs:label>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- common_ground#skin_color -->
+
+    <owl:NamedIndividual rdf:about="common_ground#skin_color">
+        <rdf:type rdf:resource="common_ground#Color"/>
+        <hexRgbValue rdf:datatype="common_ground#hexrbg">0xF9E4B7</hexRgbValue>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- common_ground#round -->
+
+    <owl:NamedIndividual rdf:about="common_ground#round">
+        <rdf:type rdf:resource="common_ground#Shape"/>
+        <rdfs:label xml:lang="fr">circulaire</rdfs:label>
+        <rdfs:label xml:lang="en">circular</rdfs:label>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- common_ground#small -->
+
+    <owl:NamedIndividual rdf:about="common_ground#small">
+        <rdf:type rdf:resource="common_ground#Size"/>
+        <rdfs:label xml:lang="fr">petit</rdfs:label>
+        <rdfs:label xml:lang="en">small</rdfs:label>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- common_ground#white -->
+
+    <owl:NamedIndividual rdf:about="common_ground#white">
+        <rdf:type rdf:resource="common_ground#Color"/>
+        <hexRgbValue rdf:datatype="common_ground#hexrbg">0xFFFAFA</hexRgbValue>
+        <rdfs:label xml:lang="fr">blanc</rdfs:label>
+        <rdfs:label xml:lang="en">white</rdfs:label>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- common_ground#yellow -->
+
+    <owl:NamedIndividual rdf:about="common_ground#yellow">
+        <rdf:type rdf:resource="common_ground#Color"/>
+        <hexRgbValue rdf:datatype="common_ground#hexrbg">0xFFD700</hexRgbValue>
+        <rdfs:label xml:lang="fr">jaune</rdfs:label>
+        <rdfs:label xml:lang="en">yellow</rdfs:label>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // General axioms
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    <rdf:Description>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AllDisjointClasses"/>
+        <owl:members rdf:parseType="Collection">
+            <rdf:Description rdf:about="common_ground#Area"/>
+            <rdf:Description rdf:about="common_ground#Color"/>
+            <rdf:Description rdf:about="common_ground#Entity"/>
+            <rdf:Description rdf:about="common_ground#Shape"/>
+        </owl:members>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AllDisjointClasses"/>
+        <owl:members rdf:parseType="Collection">
+            <rdf:Description rdf:about="common_ground#Box"/>
+            <rdf:Description rdf:about="common_ground#Cube"/>
+            <rdf:Description rdf:about="common_ground#Drawer"/>
+            <rdf:Description rdf:about="common_ground#Mug"/>
+        </owl:members>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AllDisjointClasses"/>
+        <owl:members rdf:parseType="Collection">
+            <rdf:Description rdf:about="common_ground#Box"/>
+            <rdf:Description rdf:about="common_ground#Drawer"/>
+            <rdf:Description rdf:about="common_ground#Mug"/>
+            <rdf:Description rdf:about="common_ground#Shelf"/>
+        </owl:members>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AllDisjointClasses"/>
+        <owl:members rdf:parseType="Collection">
+            <rdf:Description rdf:about="common_ground#ConsoleTable"/>
+            <rdf:Description rdf:about="common_ground#Cube"/>
+            <rdf:Description rdf:about="common_ground#Drawer"/>
+            <rdf:Description rdf:about="common_ground#Table"/>
+        </owl:members>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AllDisjointClasses"/>
+        <owl:members rdf:parseType="Collection">
+            <rdf:Description rdf:about="common_ground#ConsoleTable"/>
+            <rdf:Description rdf:about="common_ground#Drawer"/>
+            <rdf:Description rdf:about="common_ground#Fan"/>
+            <rdf:Description rdf:about="common_ground#Shelf"/>
+            <rdf:Description rdf:about="common_ground#TV"/>
+            <rdf:Description rdf:about="common_ground#Table"/>
+        </owl:members>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AllDisjointClasses"/>
+        <owl:members rdf:parseType="Collection">
+            <rdf:Description rdf:about="common_ground#RoundTable"/>
+            <rdf:Description rdf:about="common_ground#LowTable"/>
+            <rdf:Description rdf:about="common_ground#KallaxTable"/>
+        </owl:members>
+    </rdf:Description>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 4.2.8.20170104-2310) https://github.com/owlcs/owlapi -->
+

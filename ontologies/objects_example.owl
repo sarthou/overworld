@@ -1,0 +1,230 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="https://github.com/sarthou/overworld/blob/master/dt_resources/ontologies/dt_objects#"
+     xml:base="https://github.com/sarthou/overworld/blob/master/dt_resources/ontologies/dt_objects#"
+     xmlns:dt_objects="https://github.com/sarthou/overworld/blob/master/dt_resources/ontologies/dt_objects#"
+     xmlns:common_ground="https://github.com/sarthou/overworld/blob/master/dt_resources/ontologies/common_ground#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+    <owl:Ontology rdf:about="https://github.com/sarthou/overworld/blob/master/dt_resources/ontologies/dt_objects">
+      <owl:imports rdf:resource="https://github.com/sarthou/overworld/blob/master/dt_resources/ontologies/common_ground"/>
+    </owl:Ontology>
+
+
+
+    <!--
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- common_ground#DoorOneHalf -->
+
+    <owl:Class rdf:about="common_ground#DoorOneHalf">
+        <rdfs:subClassOf rdf:resource="common_ground#Door"/>
+        <common_ground:hasMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/adream/door_one_half.obj</common_ground:hasMesh>
+        <common_ground:hasTexture rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/textures/door_one_half_texture.png</common_ground:hasTexture>
+    </owl:Class>
+
+    
+
+
+    <!-- common_ground#DoorSingle -->
+
+    <owl:Class rdf:about="common_ground#DoorSingle">
+        <rdfs:subClassOf rdf:resource="common_ground#Door"/>
+        <common_ground:hasMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/adream/door_single.obj</common_ground:hasMesh>
+        <common_ground:hasTexture rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/textures/door_single_texture.png</common_ground:hasTexture>
+    </owl:Class>
+
+
+    <!--
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+
+
+    <!--
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Data properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+
+
+
+    <!--
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+
+
+    <!-- dt_objects#adream_walls -->
+
+    <owl:NamedIndividual rdf:about="dt_objects#adream_walls">
+        <rdf:type rdf:resource="common_ground#Wall"/>
+        <common_ground:hasVisualMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/adream/walls.obj</common_ground:hasVisualMesh>
+        <common_ground:hasCollisionMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/adream/walls_vhacd.obj</common_ground:hasCollisionMesh>
+        <common_ground:hasTexture rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/textures/adream_wall_texture.png</common_ground:hasTexture>
+        <common_ground:hasColor rdf:resource="common_ground#grey"/>
+    </owl:NamedIndividual>
+
+
+
+    <!-- dt_objects#adream_floor -->
+
+    <owl:NamedIndividual rdf:about="dt_objects#adream_floor">
+        <rdf:type rdf:resource="common_ground#Floor"/>
+        <common_ground:hasMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/adream/floor.obj</common_ground:hasMesh>
+        <common_ground:hasTexture rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/textures/adream_floor_texture.png</common_ground:hasTexture>
+        <common_ground:hasColor rdf:resource="common_ground#grey"/>
+    </owl:NamedIndividual>
+
+
+
+    <!-- dt_objects#adream_window_h10_1 -->
+
+    <owl:NamedIndividual rdf:about="dt_objects#adream_window_h10_1">
+        <rdf:type rdf:resource="common_ground#Window"/>
+        <common_ground:hasMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/adream/window_h10_1.obj</common_ground:hasMesh>
+        <common_ground:hasColor rdf:resource="common_ground#black"/>
+    </owl:NamedIndividual>
+
+
+
+    <!-- dt_objects#adream_window_h10_1 -->
+
+    <owl:NamedIndividual rdf:about="dt_objects#adream_window_h10_2">
+        <rdf:type rdf:resource="common_ground#Window"/>
+        <common_ground:hasMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/adream/window_h10_2.obj</common_ground:hasMesh>
+        <common_ground:hasColor rdf:resource="common_ground#black"/>
+    </owl:NamedIndividual>
+
+
+
+    <!-- dt_objects#adream_window_h20_1 -->
+
+    <owl:NamedIndividual rdf:about="dt_objects#adream_window_h20_1">
+        <rdf:type rdf:resource="common_ground#Window"/>
+        <common_ground:hasMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/adream/window_h20_1.obj</common_ground:hasMesh>
+        <common_ground:hasColor rdf:resource="common_ground#black"/>
+    </owl:NamedIndividual>
+
+
+
+    <!-- dt_objects#adream_window_h20_2 -->
+
+    <owl:NamedIndividual rdf:about="dt_objects#adream_window_h20_2">
+        <rdf:type rdf:resource="common_ground#Window"/>
+        <common_ground:hasMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/adream/window_h20_2.obj</common_ground:hasMesh>
+        <common_ground:hasColor rdf:resource="common_ground#black"/>
+    </owl:NamedIndividual>
+
+
+
+    <!-- dt_objects#adream_window_h20_3 -->
+
+    <owl:NamedIndividual rdf:about="dt_objects#adream_window_h20_3">
+        <rdf:type rdf:resource="common_ground#Window"/>
+        <common_ground:hasMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/adream/window_h20_3.obj</common_ground:hasMesh>
+        <common_ground:hasColor rdf:resource="common_ground#white"/>
+    </owl:NamedIndividual>
+
+
+
+    <!-- dt_objects#adream_appartment -->
+
+    <owl:NamedIndividual rdf:about="dt_objects#adream_appartment">
+        <rdf:type rdf:resource="common_ground#Wall"/>
+        <common_ground:hasVisualMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/adream/appartment.obj</common_ground:hasVisualMesh>
+        <common_ground:hasCollisionMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/adream/appartment_vhacd.obj</common_ground:hasCollisionMesh>
+        <common_ground:hasColor rdf:resource="common_ground#white"/>
+    </owl:NamedIndividual>
+
+
+
+    <!-- dt_objects#adream_door_h21_1 -->
+
+    <owl:NamedIndividual rdf:about="dt_objects#adream_door_h21_1">
+        <rdf:type rdf:resource="common_ground#DoorOneHalf"/>
+    </owl:NamedIndividual>
+
+
+
+    <!-- dt_objects#adream_door_h21_2 -->
+
+    <owl:NamedIndividual rdf:about="dt_objects#adream_door_h21_2">
+        <rdf:type rdf:resource="common_ground#DoorOneHalf"/>
+    </owl:NamedIndividual>
+
+
+
+    <!-- dt_objects#adream_door_h21_3 -->
+
+    <owl:NamedIndividual rdf:about="dt_objects#adream_door_h21_3">
+        <rdf:type rdf:resource="common_ground#DoorOneHalf"/>
+    </owl:NamedIndividual>
+
+
+
+    <!-- dt_objects#adream_door_h16 -->
+
+    <owl:NamedIndividual rdf:about="dt_objects#adream_door_h16">
+        <rdf:type rdf:resource="common_ground#DoorOneHalf"/>
+    </owl:NamedIndividual>
+
+
+
+    <!-- dt_objects#adream_door_h12 -->
+
+    <owl:NamedIndividual rdf:about="dt_objects#adream_door_h12">
+        <rdf:type rdf:resource="common_ground#DoorOneHalf"/>
+    </owl:NamedIndividual>
+
+
+
+    <!-- dt_objects#adream_door_h14 -->
+
+    <owl:NamedIndividual rdf:about="dt_objects#adream_door_h14">
+        <rdf:type rdf:resource="common_ground#DoorSingle"/>
+    </owl:NamedIndividual>
+
+
+
+    <!-- dt_objects#adream_door_h13 -->
+
+    <owl:NamedIndividual rdf:about="dt_objects#adream_door_h13">
+        <rdf:type rdf:resource="common_ground#DoorSingle"/>
+    </owl:NamedIndividual>
+
+
+
+    <!-- dt_objects#adream_door_h11 -->
+
+    <owl:NamedIndividual rdf:about="dt_objects#adream_door_h11">
+        <rdf:type rdf:resource="common_ground#DoorSingle"/>
+    </owl:NamedIndividual>
+
+
+</rdf:RDF>
+
+
+
+<!-- Generated by the dt_objects https://sarthou.github.io/dt_objects/ -->
