@@ -270,6 +270,9 @@ void EntitiesPerceptionManager<T>::addToBullet(T* entity)
 	        bullet_client_->changeTexture(obj_id, -1, texture_id);
 
         }
+        bullet_client_->setMass(obj_id, -1, 0); // We force the mass to zero to not have gravity effect
+        bullet_client_->setRestitution(obj_id, -1, 0.001);
+        bullet_client_->setFrictionAnchor(obj_id, -1, 1);
         entity->setBulletId(obj_id);
     }
 }
