@@ -68,6 +68,7 @@ private:
   ros::ServiceServer stop_modules_service_;
   ros::ServiceServer bounding_box_service_;
   std::atomic<bool> run_;
+  double time_step_; // in second
 
   BulletClient* bullet_client_;
   PerceptionManager perception_manager_;
