@@ -114,6 +114,19 @@ public:
     return shape;
   }
 
+  static double getEntityMassFromOntology(OntologyManipulator* onto, const std::string& indiv_name)
+  {
+    auto masses = onto->individuals.getOn(indiv_name, "hasMass");
+
+    if(masses.size())
+    {
+      auto mass_str = masses.front().substr(masses.front().find("#") + 1);
+      return std::stod(mass_str);
+    }
+    else
+      return 0;
+  }
+
 protected:
   std::map<std::string, T> percepts_;
   std::atomic<bool> is_activated_;

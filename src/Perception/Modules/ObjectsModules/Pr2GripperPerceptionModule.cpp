@@ -112,6 +112,7 @@ bool Pr2GripperPerceptionModule::perceptionCallback(const pr2_msgs::PressureStat
           shape.type = SHAPE_CUBE;
           shape.scale.fill(dist);
           percept.setShape(shape);
+          // we can not take the mass from the ontology since the object does not exist in (fake id)
           percept.setSeen();
 
           percepts_.insert(std::make_pair(percept.id(), percept));

@@ -5,7 +5,10 @@
 
 namespace owds {
 
-Object::Object(const std::string& id, bool is_true_id): Entity(id, is_true_id), is_static_(false), hand_in_(nullptr)
+Object::Object(const std::string& id, bool is_true_id): Entity(id, is_true_id),
+                                                        is_static_(false),
+                                                        hand_in_(nullptr),
+                                                        mass_(0)
 {}
 
 void Object::setPointsOfInterest(const std::vector<PointOfInterest>& points_of_interest)
@@ -54,6 +57,29 @@ void Object::merge(Object* other)
         auto hand = other->getHandIn();
         other->removeFromHand();
         hand->putInHand(this);
+    }
+}
+
+void Object::setDefaultMass(double density)
+{
+    switch (shape_.type)
+    {
+    case ShapeType_e::SHAPE_MESH:
+        mass_ = getAabbVolume() * density;
+        break;
+
+    case ShapeType_e::SHAPE_SPEHERE:
+        mass_ = 4.0*M_PI* std::pow(shape_.scale[0], 3) / 3.0;
+        break;
+    case ShapeType_e::SHAPE_CUBE:
+        mass_ = (shape_.scale[0] * shape_.scale[1] * shape_.scale[2]) * density;
+        break;
+    case ShapeType_e::SHAPE_CYLINDER:
+        mass_ = M_PI* std::pow((std::min(shape_.scale[0], shape_.scale[1]) / 2.), 2) * shape_.scale[2];
+        break;
+    default:
+        throw std::runtime_error("setDefaultMass has been called on entity '" + id_ + "' + but its ShapeType is not defined.");
+        break;
     }
 }
 

@@ -24,6 +24,7 @@ std::map<std::string,Object>::iterator ObjectsEmulatedPerceptionModule::createNe
   Object percept(object->id());
   Shape_t shape = object->getShape();
   percept.setShape(shape);
+  percept.setMass(object->getMass());
 
   return percepts_.insert(std::make_pair(percept.id(), percept)).first;
 }

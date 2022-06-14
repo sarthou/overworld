@@ -23,6 +23,7 @@ private:
   std::map<std::string, std::string> merged_ids_;
 
   void getPercepts( std::map<std::string, Object>& percepts) override;
+  bool souldBeReasonedOn(Object* object);
   void reasoningOnUpdate() override;
 
   std::vector<PointOfInterest> getPoisInFov(Object* object);

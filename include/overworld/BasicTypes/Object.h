@@ -33,11 +33,16 @@ public:
     void setBoundingBox(const std::array<double, 3>& bb) { bounding_box_ = bb; }
     std::array<double, 3> getBoundingBox() { return bounding_box_; }
 
+    void setMass(double mass) { mass_ = mass; }
+    void setDefaultMass(double density = 500.0); // shape and aabb should exist to compute the default mass
+    double getMass() { return mass_; }
+
 protected:
     std::vector<PointOfInterest> points_of_interest_;
     bool is_static_;
     Hand* hand_in_;
     std::array<double, 3> bounding_box_;
+    double mass_;
 };
 
 } // namespace owds

@@ -45,6 +45,8 @@ void ObjectsPerceptionManager::getPercepts( std::map<std::string, Object>& perce
             addToBullet(it->second);
 
             getObjectBoundingBox(it->second);
+            if(it->second->getMass() == 0)
+              it->second->setDefaultMass();
         }
 
         if(merged_ids_.find(percept.first) != merged_ids_.end())
@@ -84,6 +86,20 @@ void ObjectsPerceptionManager::getPercepts( std::map<std::string, Object>& perce
     }
 }
 
+bool ObjectsPerceptionManager::souldBeReasonedOn(Object* object)
+{
+  if(object->isStatic() == true)
+    return false;
+  else if (object->isLocated() == false)
+    return false;
+  else if (object->isInHand() == true)
+    return false;
+  else if (object->isInHand() == true)
+    return false;
+  else
+    return true;
+}
+
 void ObjectsPerceptionManager::reasoningOnUpdate()
 {
   bullet_client_->performCollisionDetection();
@@ -102,40 +118,28 @@ void ObjectsPerceptionManager::reasoningOnUpdate()
   std::vector<Object*> objects_to_remove;
   for(auto& object : entities_)
   {
-    if(object.second->isStatic() == true)
+    if(souldBeReasonedOn(object.second) == false)
       continue;
-    else if (object.second->isLocated() == false)
-      continue;
-    
-    if(object.second->isInHand() == false)
+
+    if(object.second->getPointsOfInterest().size() != 0)
     {
-      if(object.second->getNbFrameUnseen() >= 5)
+      auto pois_in_fov = getPoisInFov(object.second);
+      if(pois_in_fov.size() != 0)
       {
-        if(object.second->getPointsOfInterest().size() != 0)
+        if(shouldBeSeen(object.second, pois_in_fov))
         {
-          auto pois_in_fov = getPoisInFov(object.second);
-          if(pois_in_fov.size() != 0)
-          {
-            if(shouldBeSeen(object.second, pois_in_fov))
-            {
-              auto it_unseen = lost_objects_nb_frames_.find(object.first);
-              if(it_unseen == lost_objects_nb_frames_.end())
-                it_unseen = lost_objects_nb_frames_.insert(std::make_pair<std::string, size_t>(object.second->id(), size_t(0))).first;
-              it_unseen->second++;
-              if(it_unseen->second > 5)
-              {
-                objects_to_remove.push_back(object.second);
-              }
-            }
-          }
-        }
-        else
-        {
-          // Object has no poi
-          no_data_objects.push_back(object.second);
+          auto it_unseen = lost_objects_nb_frames_.find(object.first);
+          if(it_unseen == lost_objects_nb_frames_.end())
+            it_unseen = lost_objects_nb_frames_.insert(std::make_pair<std::string, size_t>(object.second->id(), size_t(0))).first;
+
+          it_unseen->second++;
+          if(it_unseen->second > 5)
+            objects_to_remove.push_back(object.second);
         }
       }
     }
+    else // Object has no poi
+      no_data_objects.push_back(object.second);
   }
 
   if(no_data_objects.size())
@@ -151,6 +155,9 @@ void ObjectsPerceptionManager::reasoningOnUpdate()
       }
     }
   }
+
+  // From there, objects to be removed are in the agent Fov but we don't have
+  // any information about them neither any explanation
 
   for(auto obj : objects_to_remove)
     removeEntityPose(obj);

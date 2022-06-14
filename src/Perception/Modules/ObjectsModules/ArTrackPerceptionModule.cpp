@@ -193,6 +193,7 @@ bool ArTrackPerceptionModule::createNewEntity(const ar_track_alvar_msgs::AlvarMa
     shape.scale = {0.05, 0.05, 0.003};
   }
   obj.setShape(shape);
+  obj.setMass(PerceptionModuleBase_::getEntityMassFromOntology(onto_, obj.id()));
 
   percepts_.insert(std::make_pair(obj.id(), obj));
 

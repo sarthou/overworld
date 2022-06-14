@@ -54,6 +54,7 @@ void StaticObjectsPerceptionModule::addObject(const std::string& name,
     shape.color = color;
     shape.texture = texture;
     obj.setShape(shape);
+    // We do not set the mass since these objects are static
     Pose pose(translation, rotation); 
     obj.updatePose(pose);
     obj.setStatic();
