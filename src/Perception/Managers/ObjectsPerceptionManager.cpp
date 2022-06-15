@@ -4,6 +4,10 @@
 
 #define TO_HALF_RAD M_PI / 180. / 2.
 
+#define MAX_UNSEEN 3
+#define MAX_SIMULATED 4
+#define IN_HAND_DISTANCE 0.30 // meters
+
 namespace owds {
 
 std::map<std::string, Object*> ObjectsPerceptionManager::getEntities()
@@ -23,67 +27,79 @@ std::map<std::string, Object*> ObjectsPerceptionManager::getEntities()
   }
 }
 
-void ObjectsPerceptionManager::getPercepts( std::map<std::string, Object>& percepts)
+std::map<std::string, Object*>::iterator ObjectsPerceptionManager::createFromPercept(const Object& percept)
+{
+  std::map<std::string, Object*>::iterator it = entities_.end();
+  auto new_object = new Object(percept);
+  new_object->setInHand(nullptr);
+  it = entities_.insert(std::pair<std::string, Object*>(percept.id(), new_object)).first;
+  addToBullet(it->second);
+
+  getObjectBoundingBox(it->second);
+  if(it->second->getMass() == 0)
+    it->second->setDefaultMass();
+
+  return it;
+}
+
+void ObjectsPerceptionManager::getPercepts(std::map<std::string, Object>& percepts)
 {
   for(auto& percept : percepts)
-    {
-        if(percept.second.isTrueId() == false)
+  {
+      if(percept.second.isTrueId() == false)
+      {
+        if(merged_ids_.find(percept.first) == merged_ids_.end())
+          false_ids_to_be_merged_.insert(percept.first);
+      }
+
+      auto it = entities_.find(percept.second.id());
+      if(it == entities_.end())
+      {
+          if(percept.second.isLocated() == false)
+            continue;
+
+          it = createFromPercept(percept.second);
+      }
+
+      if(merged_ids_.find(percept.first) != merged_ids_.end())
+        continue;
+
+      if(percept.second.isInHand() && (it->second->isInHand() == false))
+      {
+        // this is a big shit, I know that
+        auto hand = percept.second.getHandIn();
+        percept.second.removeFromHand();
+        hand->putInHand(it->second);
+        percept.second.setInHand(hand);
+        stopSimulation(it->second);
+      }
+      
+      if(it->second->isInHand())
+      {
+        if(it->second->getHandIn()->isInHand(it->first) == false)
         {
-          if(merged_ids_.find(percept.first) == merged_ids_.end())
-            false_ids_to_be_merged_.insert(percept.first);
+          it->second->removeFromHand();
         }
-
-        auto it = entities_.find(percept.second.id());
-        if(it == entities_.end())
+        else if (percept.second.hasBeenSeen() && it->second->getHandIn()->pose().distanceTo(percept.second.pose()) >= IN_HAND_DISTANCE)
         {
-            if(percept.second.isLocated() == false)
-              continue;
-
-            auto new_object = new Object(percept.second);
-            new_object->setInHand(nullptr);
-            it = entities_.insert(std::pair<std::string, Object*>(percept.second.id(), new_object)).first;
-            addToBullet(it->second);
-
-            getObjectBoundingBox(it->second);
-            if(it->second->getMass() == 0)
-              it->second->setDefaultMass();
-        }
-
-        if(merged_ids_.find(percept.first) != merged_ids_.end())
-          continue;
-
-        if(percept.second.isInHand() && (it->second->isInHand() == false))
-        {
-          // this is a big shit, I know that
-          auto hand = percept.second.getHandIn();
-          percept.second.removeFromHand();
-          hand->putInHand(it->second);
-          percept.second.setInHand(hand);
-        }
-        
-        if(it->second->isInHand())
-        {
-          if(it->second->getHandIn()->isInHand(it->first) == false)
-          {
-            it->second->removeFromHand();
-          }
-          else if (percept.second.hasBeenSeen() && it->second->getHandIn()->pose().distanceTo(percept.second.pose()) >= 0.30)
-          {
-            it->second->removeFromHand();
-            updateEntityPose(it->second, percept.second.pose(), percept.second.lastStamp());
-          }
-          else if(percept.second.isLocated() == false)
-          {
-            it->second->removeFromHand();
-          }
-          else
-          {
-            updateEntityPose(it->second, it->second->getHandIn()->pose(), ros::Time::now());
-          }
-        }
-        else if (percept.second.hasBeenSeen())
+          it->second->removeFromHand();
           updateEntityPose(it->second, percept.second.pose(), percept.second.lastStamp());
-    }
+        }
+        else if(percept.second.isLocated() == false)
+        {
+          it->second->removeFromHand();
+        }
+        else
+        {
+          updateEntityPose(it->second, it->second->getHandIn()->pose(), ros::Time::now());
+        }
+      }
+      else if (percept.second.hasBeenSeen())
+      {
+        stopSimulation(it->second);
+        updateEntityPose(it->second, percept.second.pose(), percept.second.lastStamp());
+      }
+  }
 }
 
 bool ObjectsPerceptionManager::souldBeReasonedOn(Object* object)
@@ -133,7 +149,7 @@ void ObjectsPerceptionManager::reasoningOnUpdate()
             it_unseen = lost_objects_nb_frames_.insert(std::make_pair<std::string, size_t>(object.second->id(), size_t(0))).first;
 
           it_unseen->second++;
-          if(it_unseen->second > 5)
+          if(it_unseen->second > MAX_UNSEEN)
             objects_to_remove.push_back(object.second);
         }
       }
@@ -158,9 +174,57 @@ void ObjectsPerceptionManager::reasoningOnUpdate()
 
   // From there, objects to be removed are in the agent Fov but we don't have
   // any information about them neither any explanation
+  objects_to_remove = simulatePhysics(objects_to_remove);
 
   for(auto obj : objects_to_remove)
     removeEntityPose(obj);
+}
+
+std::vector<Object*> ObjectsPerceptionManager::simulatePhysics(const std::vector<Object*>& lost_objects)
+{
+  std::unordered_set<std::string> lost_ids;
+  for(auto& object : lost_objects)
+  {
+    lost_ids.insert(object->id());
+    auto it = simulated_objects_.find(object->id());
+    if(it == simulated_objects_.end())
+      startSimulation(object);
+  }
+
+  std::vector<Object*> objects_to_remove;
+  for(auto& simulated_object : simulated_objects_)
+  {
+    if(lost_ids.find(simulated_object.first) == lost_ids.end())
+      simulated_object.second = 0;
+    else
+    {
+      simulated_object.second++;
+      if(simulated_object.second > MAX_SIMULATED)
+      {
+        auto entity = entities_[simulated_object.first];
+        stopSimulation(entity);
+        objects_to_remove.push_back(entity);
+      }
+    }
+  }
+
+  return objects_to_remove;
+}
+
+void ObjectsPerceptionManager::startSimulation(Object* object)
+{
+  bullet_client_->setMass(object->bulletId(), -1, object->getMass());
+  simulated_objects_.insert({object->id(), 0});
+}
+
+void ObjectsPerceptionManager::stopSimulation(Object* object)
+{
+  auto it = simulated_objects_.find(object->id());
+  if(it != simulated_objects_.end())
+  {
+    bullet_client_->setMass(object->bulletId(), -1, 0);
+    simulated_objects_.erase(it);
+  }
 }
 
 std::vector<PointOfInterest> ObjectsPerceptionManager::getPoisInFov(Object* object)

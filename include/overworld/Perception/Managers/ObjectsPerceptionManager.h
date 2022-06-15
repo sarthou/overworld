@@ -18,13 +18,20 @@ public:
 private:
   Agent* myself_agent_;
   std::map<std::string, size_t> lost_objects_nb_frames_;
+  std::map<std::string, size_t> simulated_objects_;
 
   std::unordered_set<std::string> false_ids_to_be_merged_;
   std::map<std::string, std::string> merged_ids_;
 
-  void getPercepts( std::map<std::string, Object>& percepts) override;
+  std::map<std::string, Object*>::iterator createFromPercept(const Object& percept);
+
+  void getPercepts(std::map<std::string, Object>& percepts) override;
   bool souldBeReasonedOn(Object* object);
   void reasoningOnUpdate() override;
+
+  std::vector<Object*> simulatePhysics(const std::vector<Object*>& objects);
+  void startSimulation(Object* object);
+  void stopSimulation(Object* object);
 
   std::vector<PointOfInterest> getPoisInFov(Object* object);
   bool isObjectsInFovAabb(std::vector<Object*> objects);
