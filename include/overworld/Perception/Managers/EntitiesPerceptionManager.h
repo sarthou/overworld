@@ -25,13 +25,13 @@ public:
     void setBulletClient(BulletClient* client) { bullet_client_ = client; }
 
     void addPerceptionModule(const std::string& module_name, PerceptionModuleBase_<T>* perception_module);
-    PerceptionModuleBase_<T>* getPerceptionModule(const std::string& module_name);
-    std::vector<std::string> getModulesList();
-    std::vector<std::string> getActivatedModulesList();
-    std::string getModulesListStr();
-    std::string getActivatedModulesListStr();
+    PerceptionModuleBase_<T>* getPerceptionModule(const std::string& module_name) const;
+    std::vector<std::string> getModulesList() const;
+    std::vector<std::string> getActivatedModulesList() const;
+    std::string getModulesListStr() const;
+    std::string getActivatedModulesListStr() const;
     void deleteModules();
-    std::map<std::string, T*> getEntities() { return entities_; }
+    const std::map<std::string, T*>& getEntities() const { return entities_; }
 
     bool update();
 
@@ -71,16 +71,16 @@ void EntitiesPerceptionManager<T>::addPerceptionModule(const std::string& module
 }
 
 template<typename T>
-PerceptionModuleBase_<T>* EntitiesPerceptionManager<T>::getPerceptionModule(const std::string& module_name)
+PerceptionModuleBase_<T>* EntitiesPerceptionManager<T>::getPerceptionModule(const std::string& module_name) const
 {
     if(perception_modules_.find(module_name) != perception_modules_.end())
-        return perception_modules_[module_name];
+        return perception_modules_.at(module_name);
     else
         return nullptr;
 }
 
 template<typename T>
-std::vector<std::string> EntitiesPerceptionManager<T>::getModulesList()
+std::vector<std::string> EntitiesPerceptionManager<T>::getModulesList() const
 {
     std::vector<std::string> modules_name;
     for(const auto& module : perception_modules_)
@@ -89,7 +89,7 @@ std::vector<std::string> EntitiesPerceptionManager<T>::getModulesList()
 }
 
 template<typename T>
-std::vector<std::string> EntitiesPerceptionManager<T>::getActivatedModulesList()
+std::vector<std::string> EntitiesPerceptionManager<T>::getActivatedModulesList() const
 {
     std::vector<std::string> modules_name;
     for(const auto& module : perception_modules_)
@@ -101,7 +101,7 @@ std::vector<std::string> EntitiesPerceptionManager<T>::getActivatedModulesList()
 }
 
 template<typename T>
-std::string EntitiesPerceptionManager<T>::getModulesListStr()
+std::string EntitiesPerceptionManager<T>::getModulesListStr() const
 {
     std::string modules_name;
     for(const auto& module : perception_modules_)
@@ -114,7 +114,7 @@ std::string EntitiesPerceptionManager<T>::getModulesListStr()
 }
 
 template<typename T>
-std::string EntitiesPerceptionManager<T>::getActivatedModulesListStr()
+std::string EntitiesPerceptionManager<T>::getActivatedModulesListStr() const
 {
     std::string modules_name;
     for(const auto& module : perception_modules_)

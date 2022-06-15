@@ -10,7 +10,7 @@
 
 namespace owds {
 
-std::map<std::string, Object*> ObjectsPerceptionManager::getEntities()
+std::map<std::string, Object*> ObjectsPerceptionManager::getEntities() const
 {
   if(merged_ids_.size() == 0)
     return entities_;
@@ -146,7 +146,7 @@ void ObjectsPerceptionManager::reasoningOnUpdate()
         {
           auto it_unseen = lost_objects_nb_frames_.find(object.first);
           if(it_unseen == lost_objects_nb_frames_.end())
-            it_unseen = lost_objects_nb_frames_.insert(std::make_pair<std::string, size_t>(object.second->id(), size_t(0))).first;
+            it_unseen = lost_objects_nb_frames_.insert({object.second->id(), 0}).first;
 
           it_unseen->second++;
           if(it_unseen->second > MAX_UNSEEN)

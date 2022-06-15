@@ -13,7 +13,7 @@ class PointOfInterest
 public:
     PointOfInterest(const std::string& id) { id_ = id; }
 
-    std::string getId() const { return id_; }
+    const std::string& getId() const { return id_; }
 
     void addPoint(const Pose& point) { points_.push_back(point); }
     const std::vector<Pose>& getPoints() const { return points_; }

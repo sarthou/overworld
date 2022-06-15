@@ -14,7 +14,7 @@ public:
   ~RobotsPerceptionManager();
 
   Agent* getAgent(const std::string& agent_name);
-  std::map<std::string, Agent*> getAgents() { return agents_; }
+  std::map<std::string, Agent*> getAgents() const { return agents_; }
 
 private:
   std::map<std::string, Agent*> agents_;

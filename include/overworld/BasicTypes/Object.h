@@ -31,11 +31,11 @@ public:
     void merge(Object* other);
 
     void setBoundingBox(const std::array<double, 3>& bb) { bounding_box_ = bb; }
-    std::array<double, 3> getBoundingBox() { return bounding_box_; }
+    const std::array<double, 3>& getBoundingBox() const { return bounding_box_; }
 
     void setMass(double mass) { mass_ = mass; }
     void setDefaultMass(double density = 500.0); // shape and aabb should exist to compute the default mass
-    double getMass() { return mass_; }
+    double getMass() const { return mass_; }
 
 protected:
     std::vector<PointOfInterest> points_of_interest_;

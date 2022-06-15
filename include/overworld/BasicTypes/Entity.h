@@ -40,11 +40,11 @@ public:
     std::array<double, 3> computeTranslationSpeed() const;
 
     void setId(const std::string& id, bool is_true_id = true);
-    std::string id() const { return id_; }
+    const std::string& id() const { return id_; }
     bool isTrueId() const { return is_true_id_; }
 
     void addFalseId(const std::string& false_id) { false_ids_.insert(false_id); }
-    std::unordered_set<std::string> getFalseIds() { return false_ids_; }
+    std::unordered_set<std::string> getFalseIds() const { return false_ids_; }
  
     void setBulletId(int bullet_id) { bullet_id_ = bullet_id; }
     int bulletId() const { return bullet_id_; }

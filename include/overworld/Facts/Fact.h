@@ -18,12 +18,12 @@ public:
     hash_ = std::hash<std::string>{}(toString());
   }
 
-  std::string getSubject() const { return subject_; }
-  std::string getPredicate() const { return predicate_; }
-  std::string getObject() const { return object_; }
+  const std::string& getSubject() const { return subject_; }
+  const std::string& getPredicate() const { return predicate_; }
+  const std::string& getObject() const { return object_; }
 
   size_t getHash() const { return hash_; }
-  bool operator==(const Fact& other)
+  bool operator==(const Fact& other) const
   {
     return hash_ == other.hash_;
   }
