@@ -44,11 +44,11 @@ int main(int argc, char** argv)
     int large_box_collision_id = client->createCollisionShapeMesh(meshes_path + "large_box_vhacd.obj", {1,1,1});
     int large_box_obj_id = client->createMultiBody(0, large_box_collision_id, large_box_visual_id, {0,0,1}, {0,0,0,1});
 
-    meshes_path = ros::package::getPath("overworld") + "/models/obj/";
+    meshes_path = ros::package::getPath("overworld") + "/models/adream/";
 
-    int floor_visual_id = client->createVisualShapeMesh(meshes_path + "adream_floor.obj", {1,1,1});
-    int floor_collision_id = client->createCollisionShapeMesh(meshes_path + "adream_floor.obj", {1,1,1});
-    int floor_obj_id = client->createMultiBody(0, floor_collision_id, floor_visual_id, {-1,0,0}, {0.707,0,0,0.707});
+    int floor_visual_id = client->createVisualShapeMesh(meshes_path + "floor.obj", {1,1,1});
+    int floor_collision_id = client->createCollisionShapeMesh(meshes_path + "floor.obj", {1,1,1});
+    int floor_obj_id = client->createMultiBody(0, floor_collision_id, floor_visual_id, {-1,0,0}, {0,0,0,1});
 
     std::cout << "-----" << floor_obj_id << "-----------" << std::endl;
 
