@@ -60,12 +60,17 @@ void Object::merge(Object* other)
     }
 }
 
+double Object::getBbVolume() const
+{
+    return (bounding_box_[0] * bounding_box_[1] * bounding_box_[2]);
+}
+
 void Object::setDefaultMass(double density)
 {
     switch (shape_.type)
     {
     case ShapeType_e::SHAPE_MESH:
-        mass_ = getAabbVolume() * density;
+        mass_ = getBbVolume() * density;
         break;
 
     case ShapeType_e::SHAPE_SPEHERE:

@@ -32,6 +32,7 @@ public:
 
     void setBoundingBox(const std::array<double, 3>& bb) { bounding_box_ = bb; }
     const std::array<double, 3>& getBoundingBox() const { return bounding_box_; }
+    double getBbVolume() const;
 
     void setMass(double mass) { mass_ = mass; }
     void setDefaultMass(double density = 500.0); // shape and aabb should exist to compute the default mass
