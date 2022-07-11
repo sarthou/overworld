@@ -96,6 +96,7 @@ public:
 
     int getNumJoints(int body_id);
     bool resetJointState(int body_id, int joint_index, double target_value, double target_velocity = 0);
+    void resetBaseVelocity(int body_id, const std::array<double, 3>& linear_velocity, const std::array<double, 3>& angular_velocity);
     void resetBasePositionAndOrientation(int body_id, const std::array<double, 3>& position, const std::array<double, 4>& orientation);
     std::pair<std::array<double, 3>, std::array<double, 4>> getBasePositionAndOrientation(int body_id);
     long createUserConstraint(int parent_body_id, int parent_link_index,
@@ -178,6 +179,7 @@ public:
 
     struct aabb_t getAABB(int body_id, int link_index = -1);
     struct b3AABBOverlapData getOverlappingObjects(const struct aabb_t& aabb);
+    struct b3ContactInformation getContactPoints(int body_id_A, int body_id_B = -1, int link_index_A = -2, int link_index_B = -2);
 
     void resetDebugVisualizerCamera(float distance, float yaw, float pitch, const std::array<float,3>& target_pose);
     b3MouseEventsData getMouseEvents();

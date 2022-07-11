@@ -208,7 +208,10 @@ int BulletClient::createCollisionShape(BulletShapeType_e shape_type,
 			return b3GetStatusCollisionShapeUniqueId(status_handle);
 	}
 	
-    ShellDisplay::error("[Bullet] createCollisionShape failed.");
+    std::string error_content = "Type: " + std::to_string(shape_type);
+    if(shape_type == GEOM_MESH)
+        error_content += " with mesh " + file_name;
+    ShellDisplay::error("[Bullet] createCollisionShape failed. " + error_content);
 	return -1;
 }
 
@@ -390,6 +393,17 @@ bool BulletClient::resetJointState(int body_id, int joint_index, double target_v
 
     b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
     return true;
+}
+
+void BulletClient::resetBaseVelocity(int body_id, const std::array<double, 3>& linear_velocity, const std::array<double, 3>& angular_velocity)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+	b3SharedMemoryCommandHandle command_handle = b3CreatePoseCommandInit(*client_handle_, body_id);
+
+    b3CreatePoseCommandSetBaseLinearVelocity(command_handle, linear_velocity.data());
+    b3CreatePoseCommandSetBaseAngularVelocity(command_handle, angular_velocity.data());
+
+    b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
 }
 
 // Reset the position and orientation of the base/root link, position [x,y,z]
@@ -891,13 +905,13 @@ struct aabb_t BulletClient::getAABB(int body_id, int link_index)
 
     if (body_id < 0)
     {
-        ShellDisplay::error("[Bullet] getAABB failed; invalid body_id");
+        ShellDisplay::error("[Bullet] getAABB failed; invalid body_id " + std::to_string(body_id));
         return aabb;
     }
 
     if (link_index < -1)
     {
-        ShellDisplay::error("[Bullet] getAABB failed; invalid link_index");
+        ShellDisplay::error("[Bullet] getAABB failed; invalid link_index " + std::to_string(link_index));
         return aabb;
     }
 
@@ -929,6 +943,31 @@ struct b3AABBOverlapData BulletClient::getOverlappingObjects(const struct aabb_t
 	b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
 	b3GetAABBOverlapResults(*client_handle_, &overlap_data);
     return overlap_data;
+}
+
+struct b3ContactInformation BulletClient::getContactPoints(int body_id_A, int body_id_B, int link_index_A, int link_index_B)
+{
+    struct b3ContactInformation contact_point_data;
+
+	b3SharedMemoryCommandHandle command_handle = b3InitRequestContactPointInformation(*client_handle_);
+	if (body_id_A >= 0)
+		b3SetContactFilterBodyA(command_handle, body_id_A);
+	
+	if (body_id_B >= 0)
+		b3SetContactFilterBodyB(command_handle, body_id_B);
+
+	if (link_index_A >= -1)
+		b3SetContactFilterLinkA(command_handle, link_index_A);
+	
+	if (link_index_B >= -1)
+		b3SetContactFilterLinkB(command_handle, link_index_B);
+	
+	b3SharedMemoryStatusHandle status_handle = b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+	int status_type = b3GetStatusType(status_handle);
+	if (status_type == CMD_CONTACT_POINT_INFORMATION_COMPLETED)
+		b3GetContactPointInformation(*client_handle_, &contact_point_data);
+
+	return contact_point_data;
 }
 
 void BulletClient::resetDebugVisualizerCamera(float distance, float yaw, float pitch, const std::array<float,3>& target_pose)
