@@ -37,6 +37,7 @@ public:
 
 protected:
     std::map<std::string, T*> entities_;
+    std::unordered_set<std::string> black_listed_entities_;
     std::map<std::string, PerceptionModuleBase_<T>* > perception_modules_;
     BulletClient* bullet_client_;
 
@@ -203,6 +204,9 @@ void EntitiesPerceptionManager<T>::removeEntityPose(T* entity)
 template<typename T>
 void EntitiesPerceptionManager<T>::addToBullet(T* entity)
 {
+    if(black_listed_entities_.find(entity->id()) != black_listed_entities_.end())
+        return;
+
     int visual_id = -1;
     int collision_id = -1;
 
@@ -273,7 +277,13 @@ void EntitiesPerceptionManager<T>::addToBullet(T* entity)
         bullet_client_->setMass(obj_id, -1, 0); // We force the mass to zero to not have gravity effect
         bullet_client_->setRestitution(obj_id, -1, 0.001);
         bullet_client_->setFrictionAnchor(obj_id, -1, 1);
+        bullet_client_->setActivationState(obj_id, eActivationStateDisableSleeping);
         entity->setBulletId(obj_id);
+    }
+    else
+    {
+        black_listed_entities_.insert(entity->id());
+        ShellDisplay::warning("Entity " + entity->id() + " has been black listed from body creation to prevent future errors");
     }
 }
 
