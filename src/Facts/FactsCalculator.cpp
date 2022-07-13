@@ -315,7 +315,7 @@ bool FactsCalculator::isHandMovingTowards(Agent* agent, Object* object)
       }
     }
   }
-  return false;
+  return ret;
 }
 
 } // namespace owds

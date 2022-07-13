@@ -226,12 +226,13 @@ int BulletClient::createMultiBody(float base_mass,
     b3SharedMemoryCommandHandle command_handle = b3CreateMultiBodyCommandInit(*client_handle_);
     double base_inertial_frame_position[3] = {0, 0, 0};
     double base_inertial_frame_orientation[4] = {0, 0, 0, 1};
-    int baseIndex;
+    int base_index;
 
-    baseIndex = b3CreateMultiBodyBase(command_handle, base_mass,
+    base_index = b3CreateMultiBodyBase(command_handle, base_mass,
                                       base_collision_shape_index, base_visual_shape_index,
                                       &base_position[0], &base_orientation[0],
                                       base_inertial_frame_position, base_inertial_frame_orientation);
+    (void)base_index;
     if (flags > 0)
     {
         b3CreateMultiBodySetFlags(command_handle, flags);

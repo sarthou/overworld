@@ -50,7 +50,7 @@ template <typename T, std::size_t capacity> class CircularBuffer
     {
         lastIndex_ = firstIndex_ = 0;
         size_ = 0;
-        buffer_.empty();
+        (void)buffer_.empty();
     }
 
   protected:

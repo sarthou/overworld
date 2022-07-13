@@ -15,7 +15,7 @@ enum AgentType_e
 class Agent
 {
 public:
-  Agent(const std::string id, const FieldOfView& field_of_view, const AgentType_e type) : id_(id), field_of_view_(field_of_view), type_(type)
+  Agent(const std::string& id, const FieldOfView& field_of_view, const AgentType_e type) : id_(id), field_of_view_(field_of_view), type_(type)
   {
     head_ = nullptr;
     left_hand_ = nullptr;

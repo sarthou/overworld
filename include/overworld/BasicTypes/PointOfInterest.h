@@ -11,7 +11,7 @@ namespace owds {
 class PointOfInterest
 {
 public:
-    PointOfInterest(const std::string& id) { id_ = id; }
+    explicit PointOfInterest(const std::string& id) : id_(id), nb_unseen_frames_(0) {}
 
     const std::string& getId() const { return id_; }
 

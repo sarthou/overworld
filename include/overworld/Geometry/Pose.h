@@ -15,7 +15,7 @@ class Pose
 public:
     Pose();
     Pose(const Pose& pose);
-    Pose(const Eigen::Affine3d& pose) { t_ = pose; }
+    explicit Pose(const Eigen::Affine3d& pose) { t_ = pose; }
 
     /**
      * @brief Construct a new Pose object
@@ -33,8 +33,8 @@ public:
      */
     Pose(const std::array<double, 3>& translation, const std::array<double, 3>& rotation_euler);
 
-    Pose(const geometry_msgs::TransformStamped& transform);
-    Pose(const geometry_msgs::PoseStamped& pose);
+    explicit Pose(const geometry_msgs::TransformStamped& transform);
+    explicit Pose(const geometry_msgs::PoseStamped& pose);
 
     double distanceSqTo(const Pose& pose) const;
     double distanceTo(const Pose& pose) const;

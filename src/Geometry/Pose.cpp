@@ -78,7 +78,7 @@ double Pose::getOriginPan() const
 
 Pose Pose::transformIn(const Pose& new_frame) const 
 {
-    return new_frame.t_.inverse() * t_;
+    return Pose(new_frame.t_.inverse() * t_);
 }
 
 Pose Pose::operator*(const Pose& b) const

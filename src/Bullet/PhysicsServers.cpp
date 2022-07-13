@@ -108,7 +108,6 @@ BulletClient* PhysicsServers::connectPhysicsServer(BulletConnectionMothod_e meth
 			{
 				b3SharedMemoryCommandHandle command;
 				b3SharedMemoryStatusHandle status_handle;
-				int status_type;
 
 				clients_handles[free_index] = sm;
 				clients_method[free_index] = method;
@@ -118,7 +117,7 @@ BulletClient* PhysicsServers::connectPhysicsServer(BulletConnectionMothod_e meth
 				{
 					command = b3InitSyncBodyInfoCommand(sm);
 					status_handle = b3SubmitClientCommandAndWaitStatus(sm, command);
-					status_type = b3GetStatusType(status_handle);
+					int status_type = b3GetStatusType(status_handle);
 
 					if (status_type != CMD_SYNC_BODY_INFO_COMPLETED)
 					{

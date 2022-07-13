@@ -88,7 +88,7 @@ protected:
 class UnlocatedEntityError: public std::runtime_error
 {
 public:
-    inline UnlocatedEntityError(const std::string& entity_name): 
+    inline explicit UnlocatedEntityError(const std::string& entity_name): 
         std::runtime_error("Entity '" + entity_name + "' is not located, but its pose has been asked.")
     {}
 };

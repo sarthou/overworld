@@ -27,12 +27,16 @@ class PerceptionModuleBase_
 {
   static_assert(std::is_base_of<Entity,T>::value, "T must be derived from Entity");
 public:
-  PerceptionModuleBase_(bool need_access_to_external_entities = false)
-  {
-    need_access_to_external_entities_ = need_access_to_external_entities;
-    is_activated_ = true;
-    updated_ = false;
-  }
+  explicit PerceptionModuleBase_(bool need_access_to_external_entities = false):
+                                is_activated_(true),
+                                updated_(false),
+                                need_access_to_external_entities_(need_access_to_external_entities),
+                                n_(nullptr),
+                                bullet_client_(nullptr),
+                                robot_bullet_id_(-1),
+                                robot_agent_(nullptr)
+                                
+  {}
   virtual ~PerceptionModuleBase_() = default;
 
   virtual void initialize(ros::NodeHandle* n,
@@ -76,7 +80,7 @@ public:
       auto hex_value = onto->individuals.getOn(color.front(), "hexRgbValue");
       if(hex_value.size())
       {
-        int hex = 0;
+        unsigned int hex = 0;
         sscanf(hex_value[0].substr(hex_value[0].find("#") + 1).c_str(), "%x", &hex);
         return { ((hex >> 16) & 0xff) / 255., ((hex >> 8) & 0xff) / 255., (hex & 0xff) / 255. };
       }
@@ -154,7 +158,7 @@ template<typename T, class M>
 class PerceptionModuleBase : public PerceptionModuleBase_<T>
 {
 public:
-  PerceptionModuleBase(bool need_access_to_external_entities = false) : PerceptionModuleBase_<T>(need_access_to_external_entities) {}
+  explicit PerceptionModuleBase(bool need_access_to_external_entities = false) : PerceptionModuleBase_<T>(need_access_to_external_entities) {}
   virtual ~PerceptionModuleBase() = default;
 
   void sendPerception(const M& msg) { privatePerceptionCallback(msg); }
@@ -191,10 +195,10 @@ template<typename T, class M>
 class PerceptionModuleRosBase : public PerceptionModuleBase_<T>
 {
 public:
-  PerceptionModuleRosBase(const std::string& topic_name, bool need_access_to_external_entities = false) : PerceptionModuleBase_<T>(need_access_to_external_entities)
-  {
-    topic_name_ = topic_name;
-  }
+  PerceptionModuleRosBase(const std::string& topic_name, bool need_access_to_external_entities = false) : 
+                          PerceptionModuleBase_<T>(need_access_to_external_entities),
+                          topic_name_(topic_name)
+  {}
   virtual ~PerceptionModuleRosBase() = default;
 
   virtual void initialize(ros::NodeHandle* n,
@@ -257,11 +261,11 @@ class PerceptionModuleRosSyncBase : public PerceptionModuleBase_<T>
 public:
   PerceptionModuleRosSyncBase(const std::string& first_topic_name,
                               const std::string& second_topic_name,
-                              bool need_access_to_external_entities = false): PerceptionModuleBase_<T>(need_access_to_external_entities)
-  {
-    first_topic_name_ = first_topic_name;
-    second_topic_name_ = second_topic_name;
-  }
+                              bool need_access_to_external_entities = false): 
+                              PerceptionModuleBase_<T>(need_access_to_external_entities),
+                              first_topic_name_(first_topic_name),
+                              second_topic_name_(second_topic_name)
+  {}
   virtual ~PerceptionModuleRosSyncBase() = default;
 
   virtual void initialize(ros::NodeHandle* n,

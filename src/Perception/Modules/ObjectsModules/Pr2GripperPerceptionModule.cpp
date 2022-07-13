@@ -17,7 +17,9 @@ Pr2GripperPerceptionModule::Pr2GripperPerceptionModule() : PerceptionModuleRosBa
 
   is_init_ = false;
   left_tip_pressure_ = 0;
+  left_tip_pressure_prev_ = 0;
   right_tip_pressure_ = 0;
+  right_tip_pressure_prev_ = 0;
 
   has_picked_ = false;
   obj_id_ = 0;

@@ -4,7 +4,8 @@
 
 namespace owds {
 
-StaticObjectsPerceptionModule::StaticObjectsPerceptionModule() : onto_(nullptr)
+StaticObjectsPerceptionModule::StaticObjectsPerceptionModule() : ontologies_manipulator_(nullptr),
+                                                                 onto_(nullptr)
 {
 
 }

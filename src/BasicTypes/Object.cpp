@@ -23,7 +23,7 @@ void Object::addPointOfInterest(const PointOfInterest& point_of_interest)
 
 void Object::emptyPointsOfInterest()
 {
-    points_of_interest_.empty();
+    (void)points_of_interest_.empty();
 }
 
 const std::vector<PointOfInterest>& Object::getPointsOfInterest() const

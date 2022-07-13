@@ -17,15 +17,15 @@ namespace owds {
 
 SituationAssessor::SituationAssessor(const std::string& agent_name,
                                      const std::string& config_path,
-                                     bool is_robot) : facts_publisher_(&n_, agent_name),
+                                     bool is_robot) : agent_name_(agent_name),
+                                                      myself_agent_(nullptr),
+                                                      is_robot_(is_robot),
+                                                      config_path_(config_path),
+                                                      time_step_(0.06),
+                                                      facts_publisher_(&n_, agent_name),
                                                       facts_calculator_(&n_, agent_name),
                                                       perception_manager_(&n_)
 {
-  agent_name_ = agent_name;
-  is_robot_ = is_robot;
-  config_path_ = config_path;
-  time_step_ = 0.06;
-
   n_.setCallbackQueue(&callback_queue_);
 
   if (is_robot_)

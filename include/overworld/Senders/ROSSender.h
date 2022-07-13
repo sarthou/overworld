@@ -14,7 +14,7 @@ namespace owds {
 class ROSSender
 {
   public:
-    ROSSender(ros::NodeHandle* n);
+    explicit ROSSender(ros::NodeHandle* n);
 
     template<typename T> void sendEntitiesToTF(const std::vector<T*>& entities);
     template<typename T> void sendEntitiesToRViz(const std::string& topic_name, const std::vector<T*>& entities);

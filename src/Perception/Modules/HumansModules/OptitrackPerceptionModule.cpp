@@ -6,7 +6,8 @@
 
 namespace owds {
 
-OptitrackPerceptionModule::OptitrackPerceptionModule()
+OptitrackPerceptionModule::OptitrackPerceptionModule() : ontologies_manipulator_(nullptr),
+                                                         onto_(nullptr)
 {
     offset_x_ = 0;
     offset_y_ = 0;
