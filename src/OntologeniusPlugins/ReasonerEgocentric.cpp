@@ -3,6 +3,8 @@
 
 #include <pluginlib/class_list_macros.h>
 
+#include <algorithm>
+
 namespace ontologenius {
 
 void ReasonerEgocentric::initialize()
@@ -24,22 +26,49 @@ void ReasonerEgocentric::preReason(const QueryInfo_t& query_info)
      (query_info.query_type == query_relation))
   {
     ObjectPropertyBranch_t* property_ptr = nullptr;
+    std::set<ObjectPropertyBranch_t*> to_compute_properties;
     if(query_info.predicate != "")
     {
-      auto property_ptr = isComputableProperty(query_info.predicate);
+      property_ptr = isComputableProperty(query_info.predicate);
       if(property_ptr == nullptr)
         return;
     }
 
     if(query_info.subject != "")
-      if(isInDomain(query_info.subject, property_ptr) == false)
+    {
+      std::set<ObjectPropertyBranch_t*> valid_properties = isInDomain(query_info.subject, property_ptr);
+      if(valid_properties.size() == 0)
         return;
+      to_compute_properties = valid_properties;
+    }
+      
 
     if(query_info.object != "")
-      if(isInRange(query_info.object, property_ptr) == false)
+    {
+      std::set<ObjectPropertyBranch_t*> valid_properties = isInRange(query_info.object, property_ptr);
+      if(valid_properties.size() == 0)
         return;
 
-    std::cout << "[ReasonerEgocentric] Should reason on " << query_info.subject << " : " << query_info.predicate << " : " << query_info.object << std::endl;
+      if(to_compute_properties.size() == 0)
+        to_compute_properties = valid_properties;
+      else
+      {
+        std::set<ObjectPropertyBranch_t*> intersection;
+        std::set_intersection(to_compute_properties.begin(), to_compute_properties.end(),
+                              valid_properties.begin(), valid_properties.end(),
+                              std::inserter(intersection, intersection.begin()));
+        to_compute_properties = intersection;
+      }
+
+      if(to_compute_properties.size() == 0)
+        return;
+    }
+
+    if(to_compute_properties.size() == 0)
+      to_compute_properties.insert(property_ptr);
+
+    for(auto prop : to_compute_properties)
+      std::cout << "[ReasonerEgocentric] Should reason on " << query_info.subject << " : " << prop->value() << " : " << query_info.object << std::endl;
   }
 }
 
@@ -68,70 +97,82 @@ ObjectPropertyBranch_t* ReasonerEgocentric::isComputableProperty(const std::stri
   return nullptr;
 }
 
-bool ReasonerEgocentric::isInRange(const std::string& indiv, ObjectPropertyBranch_t* property)
+std::set<ObjectPropertyBranch_t*> ReasonerEgocentric::isInRange(const std::string& indiv, ObjectPropertyBranch_t* property)
 {
   auto indiv_ptr = ontology_->individual_graph_.findBranch(indiv);
   if(indiv_ptr == nullptr)
-    return false;
+    return {};
 
   std::unordered_set<ClassBranch_t*> types;
   ontology_->individual_graph_.getUpPtr(indiv_ptr, types);
   if(property != nullptr)
   {
     if(property->ranges_.size() == 0)
-      return true;
+      return {property};
 
     for(auto range : property->ranges_)
       if(types.find(range.elem) != types.end())
-        return true;
+        return {property};
+
+    return {};
   }
   else
   {
+    std::set<ObjectPropertyBranch_t*> res;
     for(auto computable_property : computable_properties_)
     {
       if(computable_property->ranges_.size() == 0)
-        return true;
+        res.insert(computable_property);
 
       for(auto range : computable_property->ranges_)
         if(types.find(range.elem) != types.end())
-          return true;
+        {
+          res.insert(computable_property);
+          break;
+        }
     }
-  }
 
-  return false;
+    return res;
+  }
 }
 
-bool ReasonerEgocentric::isInDomain(const std::string& indiv, ObjectPropertyBranch_t* property)
+std::set<ObjectPropertyBranch_t*> ReasonerEgocentric::isInDomain(const std::string& indiv, ObjectPropertyBranch_t* property)
 {
   auto indiv_ptr = ontology_->individual_graph_.findBranch(indiv);
   if(indiv_ptr == nullptr)
-    return false;
+    return {};
 
   std::unordered_set<ClassBranch_t*> types;
   ontology_->individual_graph_.getUpPtr(indiv_ptr, types);
   if(property != nullptr)
   {
     if(property->domains_.size() == 0)
-      return true;
+      return {property};
 
     for(auto domain : property->domains_)
       if(types.find(domain.elem) != types.end())
-        return true;
+        return {property};
+
+    return {};
   }
   else
   {
+    std::set<ObjectPropertyBranch_t*> res;
     for(auto computable_property : computable_properties_)
     {
       if(computable_property->domains_.size() == 0)
-        return true;
+        res.insert(computable_property);
 
       for(auto domain : computable_property->domains_)
         if(types.find(domain.elem) != types.end())
-          return true;
+        {
+          res.insert(computable_property);
+          break;
+        }
     }
-  }
 
-  return false;
+    return res;
+  }
 }
 
 PLUGINLIB_EXPORT_CLASS(ReasonerEgocentric, ReasonerInterface)

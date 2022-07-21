@@ -23,8 +23,8 @@ private:
   std::unordered_set<ObjectPropertyBranch_t*> computable_properties_;
 
   ObjectPropertyBranch_t* isComputableProperty(const std::string& property);
-  bool isInRange(const std::string& indiv, ObjectPropertyBranch_t* property);
-  bool isInDomain(const std::string& indiv, ObjectPropertyBranch_t* property);
+  std::set<ObjectPropertyBranch_t*> isInRange(const std::string& indiv, ObjectPropertyBranch_t* property);
+  std::set<ObjectPropertyBranch_t*> isInDomain(const std::string& indiv, ObjectPropertyBranch_t* property);
 };
 
 } // namespace ontologenius
