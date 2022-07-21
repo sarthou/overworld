@@ -1,0 +1,5 @@
+string origin_id # should be a unique id related to your program
+Triplet[] patterns
+---
+Triplet[] to_add
+Triplet[] to_delete

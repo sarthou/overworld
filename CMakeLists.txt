@@ -65,7 +65,7 @@ endforeach()
 
 add_message_files(
   FILES
-  StampedStringTest.msg
+  Triplet.msg
 )
 
 add_service_files(
@@ -73,6 +73,7 @@ add_service_files(
   StartStopModules.srv
   BoundingBox.srv
   GetPose.srv
+  GetRelations.srv
 )
 
 generate_messages(
@@ -194,6 +195,7 @@ target_link_libraries(overworld_modules_plugin PUBLIC
 add_library(overworld_reasoner_plugin
   src/OntologeniusPlugins/ReasonerEgocentric.cpp
 )
+add_dependencies(overworld_reasoner_plugin overworld_gencpp)
 target_link_libraries(overworld_reasoner_plugin PUBLIC
                       ${catkin_LIBRARIES}
                       ${ontologenius_LIBRARIES})
