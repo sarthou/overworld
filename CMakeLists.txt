@@ -191,6 +191,13 @@ target_link_libraries(overworld_modules_plugin PUBLIC
                       ${PROJECT_NAME}_bullet_lib
                       ${PROJECT_NAME}_types_lib)
 
+add_library(overworld_reasoner_plugin
+  src/OntologeniusPlugins/ReasonerEgocentric.cpp
+)
+target_link_libraries(overworld_reasoner_plugin PUBLIC
+                      ${catkin_LIBRARIES}
+                      ${ontologenius_LIBRARIES})
+                                          
 #################
 #     Nodes     #
 #################

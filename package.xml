@@ -73,5 +73,6 @@
   <export>
     <!-- Other tools can request additional information be placed here -->
     <overworld plugin="${prefix}/modules_plugins.xml" />
+    <ontologenius plugin="${prefix}/reasoners_plugins.xml" />
   </export>
 </package>
