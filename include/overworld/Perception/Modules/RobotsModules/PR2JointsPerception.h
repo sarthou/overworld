@@ -27,7 +27,8 @@ class PR2JointsPerception : public owds::PerceptionModuleRosBase<owds::BodyPart,
 
     std::string right_hand_link_;
     std::string left_hand_link_;
-    std::string head_ink_;
+    std::string head_link_;
+    std::string base_link_;
 
     std::unordered_map<std::string, int> joint_name_id_;
     std::unordered_map<std::string, int> links_name_id_;

@@ -7,7 +7,8 @@
 namespace owds {
 
 PR2JointsPerception::PR2JointsPerception(): PerceptionModuleRosBase("/joint_states"),
-                                            tf2_listener_(tf_buffer_)
+                                            tf2_listener_(tf_buffer_),
+                                            base_link_("base_footprint")
 {
     min_period_ = 0.9;
 }
@@ -23,7 +24,9 @@ void PR2JointsPerception::setParameter(const std::string& parameter_name, const 
     else if(parameter_name == "left_hand")
         left_hand_link_ = parameter_value;
     else if(parameter_name == "head")
-        head_ink_ = parameter_value;
+        head_link_ = parameter_value;
+    else if(parameter_name == "base")
+        base_link_ = parameter_value;
     else
         ShellDisplay::warning("[PR2JointsPerception] Unkown parameter " + parameter_name);
 }
@@ -45,7 +48,7 @@ bool PR2JointsPerception::closeInitialization()
         ShellDisplay::error("[PR2JointsPerception] No left hand link has been defined");
         return false;
     }
-    if(head_ink_ == "")
+    if(head_link_ == "")
     {
         ShellDisplay::error("[PR2JointsPerception] No head link has been defined");
         return false;
@@ -53,7 +56,7 @@ bool PR2JointsPerception::closeInitialization()
 
     links_to_entity_ = {{right_hand_link_, owds::BODY_PART_RIGHT_HAND},
                         {left_hand_link_, owds::BODY_PART_LEFT_HAND},
-                        {head_ink_, owds::BODY_PART_HEAD}};
+                        {head_link_, owds::BODY_PART_HEAD}};
 
     loadPr2Model();
 
@@ -72,9 +75,9 @@ bool PR2JointsPerception::closeInitialization()
             throw std::runtime_error("Link name '" + link_pair.first + "' not found in Bullet.");
         }
     }
-    percepts_.emplace("base_footprint", BodyPart("base_footprint"));
-    percepts_.at("base_footprint").setAgentName(robot_name_);
-    percepts_.at("base_footprint").setType(BODY_PART_BASE);
+    percepts_.emplace(base_link_, BodyPart(base_link_));
+    percepts_.at(base_link_).setAgentName(robot_name_);
+    percepts_.at(base_link_).setType(BODY_PART_BASE);
 
     // We set the links mass to 0 to make them static and not be impacted by the gravity
     for(auto& link : links_name_id_)
@@ -90,7 +93,7 @@ bool PR2JointsPerception::perceptionCallback(const sensor_msgs::JointState& msg)
     
     geometry_msgs::TransformStamped robot_base;
     try {
-        robot_base = tf_buffer_.lookupTransform("map", "base_footprint", msg.header.stamp, ros::Duration(1.0));
+        robot_base = tf_buffer_.lookupTransform("map", base_link_, msg.header.stamp, ros::Duration(1.0));
     }
     catch(...) {
         return false;
@@ -99,7 +102,7 @@ bool PR2JointsPerception::perceptionCallback(const sensor_msgs::JointState& msg)
     bullet_client_->resetBasePositionAndOrientation(
         robot_bullet_id_, {robot_base.transform.translation.x, robot_base.transform.translation.y, robot_base.transform.translation.z},
         {robot_base.transform.rotation.x, robot_base.transform.rotation.y, robot_base.transform.rotation.z, robot_base.transform.rotation.w});
-    percepts_.at("base_footprint")
+    percepts_.at(base_link_)
         .updatePose(
             {robot_base.transform.translation.x, robot_base.transform.translation.y, robot_base.transform.translation.z},
             {robot_base.transform.rotation.x, robot_base.transform.rotation.y, robot_base.transform.rotation.z, robot_base.transform.rotation.w});
@@ -127,17 +130,15 @@ bool PR2JointsPerception::perceptionCallback(const sensor_msgs::JointState& msg)
 
 void PR2JointsPerception::loadPr2Model()
 {
-    std::string path_pr2_description = ros::package::getPath("pr2_description");
-	path_pr2_description = path_pr2_description.substr(0, path_pr2_description.size() - std::string("/pr2_description").size());
 	std::string path_overworld = ros::package::getPath("overworld");
 	
 	bullet_client_->setAdditionalSearchPath(path_overworld + "/models");
 
     std::string urdf = n_->param<std::string>("/robot_description", "");
     if (urdf == "")
-	    robot_bullet_id_ = bullet_client_->loadURDF("pr2.urdf", {0,0,0}, {0,0,0,1});
+	    robot_bullet_id_ = bullet_client_->loadURDF(robot_name_ + ".urdf", {0,0,0}, {0,0,0,1});
     else
-        robot_bullet_id_ = bullet_client_->loadURDFRaw(urdf, "pr2_tmp.urdf", {0,0,0}, {0,0,0,1});
+        robot_bullet_id_ = bullet_client_->loadURDFRaw(urdf, robot_name_ + "_tmp.urdf", {0,0,0}, {0,0,0,1});
 }
 
 } // namespace owds
