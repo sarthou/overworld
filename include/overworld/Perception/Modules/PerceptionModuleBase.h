@@ -92,7 +92,7 @@ public:
   static Shape_t getEntityShapeFromOntology(OntologyManipulator* onto, const std::string& indiv_name)
   {
     auto visual_meshes = onto->individuals.getOn(indiv_name, "hasVisualMesh");
-    auto colision_meshes = onto->individuals.getOn(indiv_name, "hasColisionMesh");
+    auto collision_meshes = onto->individuals.getOn(indiv_name, "hasCollisionMesh");
     auto meshes = onto->individuals.getOn(indiv_name, "hasMesh");
     auto textures = onto->individuals.getOn(indiv_name, "hasTexture");
 
@@ -104,8 +104,8 @@ public:
           shape.visual_mesh_resource = visual_meshes.front().substr(visual_meshes.front().find("#") + 1);
       else
           shape.visual_mesh_resource = meshes.front().substr(meshes.front().find("#") + 1);
-      if(colision_meshes.size())
-          shape.colision_mesh_resource = colision_meshes.front().substr(colision_meshes.front().find("#") + 1);
+      if(collision_meshes.size())
+          shape.colision_mesh_resource = collision_meshes.front().substr(collision_meshes.front().find("#") + 1);
       else
           shape.colision_mesh_resource = meshes.front().substr(meshes.front().find("#") + 1);
       shape.color = getEntityColorFromOntology(onto, indiv_name);
@@ -195,7 +195,7 @@ template<typename T, class M>
 class PerceptionModuleRosBase : public PerceptionModuleBase_<T>
 {
 public:
-  PerceptionModuleRosBase(const std::string& topic_name, bool need_access_to_external_entities = false) : 
+  explicit PerceptionModuleRosBase(const std::string& topic_name, bool need_access_to_external_entities = false) : 
                           PerceptionModuleBase_<T>(need_access_to_external_entities),
                           topic_name_(topic_name)
   {}
@@ -204,7 +204,7 @@ public:
   virtual void initialize(ros::NodeHandle* n,
                           BulletClient* bullet_client,
                           int robot_bullet_id,
-                          Agent* robot_agent)
+                          Agent* robot_agent) override
   {
     PerceptionModuleBase_<T>::initialize(n, bullet_client, robot_bullet_id, robot_agent);
     if(topic_name_ != "")
@@ -271,7 +271,7 @@ public:
   virtual void initialize(ros::NodeHandle* n,
                           BulletClient* bullet_client,
                           int robot_bullet_id,
-                          Agent* robot_agent)
+                          Agent* robot_agent) override
   {
     PerceptionModuleBase_<T>::initialize(n, bullet_client, robot_bullet_id, robot_agent);
     sub_0_.subscribe(*n, first_topic_name_, 1);
