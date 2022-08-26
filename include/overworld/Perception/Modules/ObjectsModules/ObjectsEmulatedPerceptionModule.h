@@ -13,7 +13,7 @@ class ObjectsEmulatedPerceptionModule : public PerceptionModuleBase<Object, std:
 public:
   ObjectsEmulatedPerceptionModule() = default;
 private:
-  bool perceptionCallback(const std::vector<Object*>& msg);
+  virtual bool perceptionCallback(const std::vector<Object*>& msg) override;
 
   std::map<std::string,Object>::iterator createNewPercept(Object* object);
 };

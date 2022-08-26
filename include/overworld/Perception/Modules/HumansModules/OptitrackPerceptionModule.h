@@ -17,8 +17,8 @@ class OptitrackPerceptionModule : public PerceptionModuleBase_<BodyPart>
   public:
     OptitrackPerceptionModule();
 
-    void setParameter(const std::string& parameter_name, const std::string& parameter_value);
-    bool closeInitialization();
+    virtual void setParameter(const std::string& parameter_name, const std::string& parameter_value) override;
+    virtual bool closeInitialization() override;
 
   private:
     void headRosCallback(const optitrack_msgs::or_pose_estimator_state& msg);

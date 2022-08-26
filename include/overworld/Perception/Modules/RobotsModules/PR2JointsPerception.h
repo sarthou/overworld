@@ -15,11 +15,11 @@ class PR2JointsPerception : public owds::PerceptionModuleRosBase<owds::BodyPart,
     PR2JointsPerception();
     virtual ~PR2JointsPerception() = default;
 
-    void setParameter(const std::string& parameter_name, const std::string& parameter_value);
-    bool closeInitialization();
+    virtual void setParameter(const std::string& parameter_name, const std::string& parameter_value) override;
+    virtual bool closeInitialization() override;
 
-    std::string getAgentName() { return robot_name_; } 
-    int getAgentBulletId() { return robot_bullet_id_; }
+    virtual std::string getAgentName() override { return robot_name_; } 
+    virtual int getAgentBulletId() override { return robot_bullet_id_; }
 
   protected:
     bool perceptionCallback(const sensor_msgs::JointState& msg) override;

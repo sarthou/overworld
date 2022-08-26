@@ -13,7 +13,7 @@ class StaticObjectsPerceptionModule : public PerceptionModuleBase_<Object>
 public:
     StaticObjectsPerceptionModule();
 
-    bool closeInitialization();
+    virtual bool closeInitialization() override;
     
 private:
     OntologiesManipulator* ontologies_manipulator_;
