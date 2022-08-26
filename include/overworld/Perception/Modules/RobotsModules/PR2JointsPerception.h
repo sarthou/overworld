@@ -41,6 +41,7 @@ class PR2JointsPerception : public owds::PerceptionModuleRosBase<owds::BodyPart,
     tf2_ros::Buffer tf_buffer_;
     tf2_ros::TransformListener tf2_listener_;
 
+    bool updateBasePose(const ros::Time& stamp = ros::Time(0));
     void loadPr2Model();
 };
 

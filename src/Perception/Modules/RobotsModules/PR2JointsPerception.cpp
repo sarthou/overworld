@@ -78,6 +78,10 @@ bool PR2JointsPerception::closeInitialization()
     percepts_.emplace(base_link_, BodyPart(base_link_));
     percepts_.at(base_link_).setAgentName(robot_name_);
     percepts_.at(base_link_).setType(BODY_PART_BASE);
+    if(updateBasePose() == false)
+        ShellDisplay::warning("[PR2JointsPerception] Pr2 base has no position in tf");
+    else
+        updated_ = true;
 
     // We set the links mass to 0 to make them static and not be impacted by the gravity
     for(auto& link : links_name_id_)
@@ -91,21 +95,8 @@ bool PR2JointsPerception::perceptionCallback(const sensor_msgs::JointState& msg)
     if ((ros::Time::now() - last_update_).toSec() < min_period_)
         return false;
     
-    geometry_msgs::TransformStamped robot_base;
-    try {
-        robot_base = tf_buffer_.lookupTransform("map", base_link_, msg.header.stamp, ros::Duration(1.0));
-    }
-    catch(...) {
+    if(updateBasePose(msg.header.stamp) == false)
         return false;
-    }
-
-    bullet_client_->resetBasePositionAndOrientation(
-        robot_bullet_id_, {robot_base.transform.translation.x, robot_base.transform.translation.y, robot_base.transform.translation.z},
-        {robot_base.transform.rotation.x, robot_base.transform.rotation.y, robot_base.transform.rotation.z, robot_base.transform.rotation.w});
-    percepts_.at(base_link_)
-        .updatePose(
-            {robot_base.transform.translation.x, robot_base.transform.translation.y, robot_base.transform.translation.z},
-            {robot_base.transform.rotation.x, robot_base.transform.rotation.y, robot_base.transform.rotation.z, robot_base.transform.rotation.w});
     
     for (size_t i = 0; i < msg.name.size(); i++)
     {
@@ -125,6 +116,30 @@ bool PR2JointsPerception::perceptionCallback(const sensor_msgs::JointState& msg)
         percepts_.at(link_pair.first).updatePose({{pos[0], pos[1], pos[2]}}, {{rot[0], rot[1], rot[2], rot[3]}}, msg.header.stamp);
     }
     last_update_ = ros::Time::now();
+    return true;
+}
+
+bool PR2JointsPerception::updateBasePose(const ros::Time& stamp)
+{
+    geometry_msgs::TransformStamped robot_base;
+    try {
+        robot_base = tf_buffer_.lookupTransform("map", base_link_, stamp, ros::Duration(1.0));
+    }
+    catch (const tf2::TransformException& ex){
+      ShellDisplay::error("[PR2JointsPerception]" + std::string(ex.what()));
+    }
+    catch(...) {
+        return false;
+    }
+
+    bullet_client_->resetBasePositionAndOrientation(
+        robot_bullet_id_, {robot_base.transform.translation.x, robot_base.transform.translation.y, robot_base.transform.translation.z},
+        {robot_base.transform.rotation.x, robot_base.transform.rotation.y, robot_base.transform.rotation.z, robot_base.transform.rotation.w});
+    percepts_.at(base_link_)
+        .updatePose(
+            {robot_base.transform.translation.x, robot_base.transform.translation.y, robot_base.transform.translation.z},
+            {robot_base.transform.rotation.x, robot_base.transform.rotation.y, robot_base.transform.rotation.z, robot_base.transform.rotation.w});
+
     return true;
 }
 
