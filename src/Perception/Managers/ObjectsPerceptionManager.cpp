@@ -110,7 +110,7 @@ bool ObjectsPerceptionManager::souldBeReasonedOn(Object* object)
     return false;
   else if (object->isInHand() == true)
     return false;
-  else if (object->isInHand() == true)
+  else if (object->getNbFrameUnseen() < MAX_UNSEEN)
     return false;
   else
     return true;
