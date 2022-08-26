@@ -19,7 +19,7 @@ public:
     const std::vector<PointOfInterest>& getPointsOfInterest() const;
     void setAllPoiUnseen();
 
-    void setStatic() { is_static_ = true; }
+    void setStatic(bool is_static = true) { is_static_ = is_static; }
     bool isStatic() const { return is_static_; }
 
     // should be setted in hand through the hand
