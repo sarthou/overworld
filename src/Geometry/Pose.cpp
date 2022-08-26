@@ -156,7 +156,7 @@ std::ostream& operator<<(std::ostream& os, const Pose& pose)
           pose.getRoll() << " : " <<
           pose.getPitch() << " : " <<
           pose.getYaw();
-
+    return os;
 }
 
 } // namespace owds
