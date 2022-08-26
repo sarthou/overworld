@@ -25,7 +25,7 @@ struct PoseStamped_s
 class Entity
 {
 public:
-    Entity(const std::string& id, bool is_true_id = true);
+    explicit Entity(const std::string& id, bool is_true_id = true);
 
     void updatePose(const Pose& pose, ros::Time stamp = ros::Time::now());
     void updatePose(const std::array<double, 3>& translation, const std::array<double, 4>& rotation);

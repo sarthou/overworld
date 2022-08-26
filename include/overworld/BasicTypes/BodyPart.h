@@ -18,7 +18,7 @@ enum BodyPartType_e
 class BodyPart: public Entity
 {
 public:
-    BodyPart(const std::string& id, bool is_true_id = true);
+    explicit BodyPart(const std::string& id, bool is_true_id = true);
 
     const std::string& getFrameName() const { return frame_name_; }
     void setFrameName(const std::string& frame_name) { frame_name_ = frame_name; }

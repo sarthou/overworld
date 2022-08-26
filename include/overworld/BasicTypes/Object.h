@@ -11,7 +11,7 @@ class Hand;
 class Object: public Entity
 {
 public:
-    Object(const std::string& id, bool is_true_id = true);
+    explicit Object(const std::string& id, bool is_true_id = true);
 
     void setPointsOfInterest(const std::vector<PointOfInterest>& points_of_interest);
     void addPointOfInterest(const PointOfInterest& point_of_interest);

@@ -15,7 +15,7 @@ class Pose
 public:
     Pose();
     Pose(const Pose& pose);
-    explicit Pose(const Eigen::Affine3d& pose) { t_ = pose; }
+    explicit Pose(const Eigen::Affine3d& pose) : t_(pose) {}
 
     /**
      * @brief Construct a new Pose object
@@ -40,7 +40,8 @@ public:
     double distanceTo(const Pose& pose) const;
 
     /**
-     * @brief Returns the difference in angle between two poses. It does NOT return the angle from one pose to the origin of the other one.
+     * @brief Returns the difference in angle between two poses.
+     * It does NOT return the angle from one pose to the origin of the other one.
      * 
      * @param pose 
      * @return double 
