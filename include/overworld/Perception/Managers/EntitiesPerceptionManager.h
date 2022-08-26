@@ -50,6 +50,7 @@ protected:
 
     void addToBullet(T* entity);
     void updateToBullet(T* entity);
+    T* getEntityFromBulletId(int bullet_id);
 
     void UpdateAabbs();
 };
@@ -304,6 +305,17 @@ void EntitiesPerceptionManager<T>::updateToBullet(T* entity)
                                                             {0.0, 0.0, -100.0},
                                                             {0.0, 0.0, 0.0, 1.0});
     }
+}
+
+template<typename T>
+T* EntitiesPerceptionManager<T>::getEntityFromBulletId(int bullet_id)
+{
+    for(auto entity : entities_)
+    {
+        if(entity.second->bulletId() == bullet_id)
+            return entity.second;
+    }
+    return nullptr;
 }
 
 template<typename T>
