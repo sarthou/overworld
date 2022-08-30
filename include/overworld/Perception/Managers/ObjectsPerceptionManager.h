@@ -31,7 +31,7 @@ private:
 
   std::vector<Object*> simulatePhysics(const std::vector<Object*>& objects);
   void startSimulation(Object* object);
-  void stopSimulation(Object* object);
+  void stopSimulation(Object* object, bool erase = true);
 
   std::vector<PointOfInterest> getPoisInFov(Object* object);
   bool isObjectsInFovAabb(std::vector<Object*> objects);

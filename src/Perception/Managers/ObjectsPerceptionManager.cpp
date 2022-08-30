@@ -217,13 +217,14 @@ void ObjectsPerceptionManager::startSimulation(Object* object)
   simulated_objects_.insert({object->id(), 0});
 }
 
-void ObjectsPerceptionManager::stopSimulation(Object* object)
+void ObjectsPerceptionManager::stopSimulation(Object* object, bool erase)
 {
   auto it = simulated_objects_.find(object->id());
   if(it != simulated_objects_.end())
   {
     bullet_client_->setMass(object->bulletId(), -1, 0);
-    simulated_objects_.erase(it);
+    if(erase)
+      simulated_objects_.erase(object->id());
   }
 }
 
