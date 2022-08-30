@@ -135,7 +135,11 @@ void ObjectsPerceptionManager::reasoningOnUpdate()
   for(auto& object : entities_)
   {
     if(souldBeReasonedOn(object.second) == false)
+    {
+      if(object.second->isStatic() == false)
+        lost_objects_nb_frames_.erase(object.first);
       continue;
+    }
 
     if(object.second->getPointsOfInterest().size() != 0)
     {
