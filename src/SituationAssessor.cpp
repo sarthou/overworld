@@ -31,6 +31,7 @@ SituationAssessor::SituationAssessor(const std::string& agent_name,
   if (is_robot_)
   {
       bullet_client_ = PhysicsServers::connectPhysicsServer(owds::CONNECT_GUI);
+      bullet_client_->configureDebugVisualizer(COV_ENABLE_GUI, false);
       bullet_client_->configureDebugVisualizer(COV_ENABLE_DEPTH_BUFFER_PREVIEW, false);
       bullet_client_->configureDebugVisualizer(COV_ENABLE_SHADOWS, false);
       bullet_client_->configureDebugVisualizer(COV_ENABLE_PLANAR_REFLECTION, false);
