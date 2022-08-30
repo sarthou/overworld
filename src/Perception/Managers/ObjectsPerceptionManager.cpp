@@ -132,6 +132,7 @@ void ObjectsPerceptionManager::reasoningOnUpdate()
 
   std::vector<Object*> no_data_objects;
   std::vector<Object*> objects_to_remove;
+  std::vector<Object*> objects_to_simulate;
   for(auto& object : entities_)
   {
     if(souldBeReasonedOn(object.second) == false)
@@ -156,6 +157,8 @@ void ObjectsPerceptionManager::reasoningOnUpdate()
           if(it_unseen->second > MAX_UNSEEN)
             objects_to_remove.push_back(object.second);
         }
+        else
+          objects_to_simulate.push_back(object.second);
       }
     }
     else // Object has no poi
@@ -172,6 +175,8 @@ void ObjectsPerceptionManager::reasoningOnUpdate()
       {
         if(objects_in_camera.find(no_data_obj->bulletId()) != objects_in_camera.end())
           objects_to_remove.push_back(no_data_obj);
+        else
+          objects_to_simulate.push_back(no_data_obj);
       }
     }
   }
