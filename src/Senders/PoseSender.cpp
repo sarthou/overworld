@@ -7,7 +7,7 @@ namespace owds {
 PoseSender::PoseSender(ros::NodeHandle* nh_, ObjectsPerceptionManager& object_perception_manager)
     : object_perception_manager_(object_perception_manager)
 {
-    get_pose_service_ = nh_->advertiseService("/overworld/getPose", &PoseSender::onGetPoseService, this);  //TODO: Change for a private node handle
+    get_pose_service_ = nh_->advertiseService("/overworld/getPose", &PoseSender::onGetPoseService, this);
 }
 
 bool PoseSender::onGetPoseService(overworld::GetPose::Request& req, overworld::GetPose::Response& res)
