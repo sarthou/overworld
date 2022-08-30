@@ -54,7 +54,7 @@ bool Pr2GripperPerceptionModule::closeInitialization()
   setTopicName("pressure/" + std::string((side_ == PR2_GRIPPER_LEFT) ? "l" : "r") + "_gripper_motor");
 
   auto p = bullet_client_->findJointAndLinkIndices(robot_bullet_id_);
-  auto joint_name_id = p.first;
+  //auto joint_name_id = p.first;
   auto link_name_id = p.second;
 
   std::string left_finger_link = std::string((side_ == PR2_GRIPPER_LEFT) ? "l" : "r") + "_gripper_l_finger_tip_link";
