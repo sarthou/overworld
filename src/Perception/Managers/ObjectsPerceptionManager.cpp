@@ -211,11 +211,15 @@ std::vector<Object*> ObjectsPerceptionManager::simulatePhysics(const std::vector
       if(simulated_object.second > MAX_SIMULATED)
       {
         auto entity = entities_[simulated_object.first];
-        stopSimulation(entity);
+        stopSimulation(entity, false);
         objects_to_remove.push_back(entity);
       }
     }
   }
+
+  // We remove them in a second time as we loop on them previously
+  for(auto entity : objects_to_remove)
+    simulated_objects_.erase(entity->id());
 
   return objects_to_remove;
 }
