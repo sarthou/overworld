@@ -15,6 +15,8 @@ public:
 
   std::map<std::string, Object*> getEntities() const;
 
+  bool needSimulation() { return simulated_objects_.size() != 0; }
+
 private:
   Agent* myself_agent_;
   std::map<std::string, size_t> lost_objects_nb_frames_;
