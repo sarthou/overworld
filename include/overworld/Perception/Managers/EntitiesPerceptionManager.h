@@ -50,6 +50,7 @@ protected:
 
     void addToBullet(T* entity);
     void updateToBullet(T* entity);
+    void undoInBullet(T* entity);
     T* getEntityFromBulletId(int bullet_id);
 
     void UpdateAabbs();
@@ -304,6 +305,21 @@ void EntitiesPerceptionManager<T>::updateToBullet(T* entity)
             bullet_client_->resetBasePositionAndOrientation(entity->bulletId(),
                                                             {0.0, 0.0, -100.0},
                                                             {0.0, 0.0, 0.0, 1.0});
+    }
+}
+
+template<typename T>
+void EntitiesPerceptionManager<T>::undoInBullet(T* entity)
+{
+    if(entity->bulletId() != -1)
+    {
+        if(entity->isLocated() == true)
+        {
+            auto entity_pose = entity->pose(1).arrays();
+            bullet_client_->resetBasePositionAndOrientation(entity->bulletId(),
+                                                            entity_pose.first,
+                                                            entity_pose.second);
+        }
     }
 }
 
