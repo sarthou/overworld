@@ -2,6 +2,7 @@
 #define OWDS_POSE_H
 
 #include <array>
+#include <iostream>
 
 #include <eigen3/Eigen/Geometry>
 #include <geometry_msgs/TransformStamped.h>
@@ -14,7 +15,7 @@ class Pose
 public:
     Pose();
     Pose(const Pose& pose);
-    Pose(const Eigen::Affine3d& pose) { t_ = pose; }
+    explicit Pose(const Eigen::Affine3d& pose) : t_(pose) {}
 
     /**
      * @brief Construct a new Pose object
@@ -32,14 +33,18 @@ public:
      */
     Pose(const std::array<double, 3>& translation, const std::array<double, 3>& rotation_euler);
 
-    Pose(const geometry_msgs::TransformStamped& transform);
-    Pose(const geometry_msgs::PoseStamped& pose);
+    explicit Pose(const geometry_msgs::TransformStamped& transform);
+    explicit Pose(const geometry_msgs::PoseStamped& pose);
+
+    bool operator==(const Pose& other) const { return t_.isApprox(other.t_); }
+    bool operator!=(const Pose& other) const { return !t_.isApprox(other.t_); }
 
     double distanceSqTo(const Pose& pose) const;
     double distanceTo(const Pose& pose) const;
 
     /**
-     * @brief Returns the difference in angle between two poses. It does NOT return the angle from one pose to the origin of the other one.
+     * @brief Returns the difference in angle between two poses.
+     * It does NOT return the angle from one pose to the origin of the other one.
      * 
      * @param pose 
      * @return double 
@@ -51,6 +56,8 @@ public:
     std::pair<std::array<double, 3>, std::array<double, 4>> arrays() const;
     double getOriginTilt() const;
     double getOriginPan() const;
+
+    bool similarTo(const Pose& other, double translation_delta = 0.01, double angular_delta = 0.0872665) const; // default values are 1 cm and 5 degrees
 
     /**
      * @brief Compute the transform of this pose in "new_frame"
@@ -71,6 +78,10 @@ public:
     double getRoll() const;
     double getPitch() const;
     double getYaw() const;
+
+    Pose lerpTo(const Pose& goal, double alpha) const;
+
+    friend std::ostream& operator<<(std::ostream& os, const Pose& pose);
 
 protected:
     Eigen::Affine3d t_;

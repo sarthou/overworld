@@ -13,23 +13,27 @@
 #include <chrono>
 #include <thread>
 
+#define SIMU_STEP 0.015
+
 namespace owds {
 
 SituationAssessor::SituationAssessor(const std::string& agent_name,
                                      const std::string& config_path,
-                                     bool is_robot) : facts_publisher_(&n_, agent_name),
+                                     bool is_robot) : agent_name_(agent_name),
+                                                      myself_agent_(nullptr),
+                                                      is_robot_(is_robot),
+                                                      config_path_(config_path),
+                                                      time_step_(0.06),
+                                                      facts_publisher_(&n_, agent_name),
                                                       facts_calculator_(&n_, agent_name),
                                                       perception_manager_(&n_)
 {
-  agent_name_ = agent_name;
-  is_robot_ = is_robot;
-  config_path_ = config_path;
-
   n_.setCallbackQueue(&callback_queue_);
 
   if (is_robot_)
   {
       bullet_client_ = PhysicsServers::connectPhysicsServer(owds::CONNECT_GUI);
+      bullet_client_->configureDebugVisualizer(COV_ENABLE_GUI, false);
       bullet_client_->configureDebugVisualizer(COV_ENABLE_DEPTH_BUFFER_PREVIEW, false);
       bullet_client_->configureDebugVisualizer(COV_ENABLE_SHADOWS, false);
       bullet_client_->configureDebugVisualizer(COV_ENABLE_PLANAR_REFLECTION, false);
@@ -40,6 +44,9 @@ SituationAssessor::SituationAssessor(const std::string& agent_name,
   }
   else
       bullet_client_ = PhysicsServers::connectPhysicsServer(owds::CONNECT_DIRECT);
+
+  bullet_client_->setGravity(0, 0, -9.81);
+  bullet_client_->setTimeStep(SIMU_STEP);
 
   perception_manager_.setBulletClient(bullet_client_);
 
@@ -66,7 +73,7 @@ SituationAssessor::SituationAssessor(const std::string& agent_name,
   ros_sender_ = new ROSSender(&n_);
   if(is_robot_)
   {
-    motion_planning_pose_sender_ = new MotionPlanningPoseSender(&n_, perception_manager_.objects_manager_);
+    motion_planning_pose_sender_ = new PoseSender(&n_, perception_manager_.objects_manager_);
     bernie_sender_ =  new BernieSenders(&n_);
   }
   else
@@ -135,7 +142,7 @@ void SituationAssessor::addRobotPerceptionModule(const std::string& module_name,
 
 void SituationAssessor::assessmentLoop()
 {
-  std::chrono::milliseconds interval(60);
+  std::chrono::milliseconds interval(int(time_step_ * 1000));
 
   std::chrono::high_resolution_clock::time_point start_time(std::chrono::high_resolution_clock::now());
   std::chrono::high_resolution_clock::time_point next_start_time(start_time);
@@ -151,14 +158,33 @@ void SituationAssessor::assessmentLoop()
 
     if(ros::ok() && isRunning())
     {
-      if(start_time + interval < std::chrono::high_resolution_clock::now())
+      next_start_time = start_time + interval;
+
+      if(perception_manager_.objects_manager_.needSimulation())
+      {
+        perception_manager_.objects_manager_.initLerp();
+
+        double time_interval_sec = time_step_;
+        if(next_start_time < std::chrono::high_resolution_clock::now())
+          time_interval_sec = (std::chrono::high_resolution_clock::now() - start_time).count() / 1000000000.;
+
+        unsigned int nb_step = time_interval_sec / SIMU_STEP;
+        for(int i = 0; i < nb_step; i++)
+        {
+          bullet_client_->stepSimulation();
+          perception_manager_.objects_manager_.stepLerp((double)((i+1) / (double)nb_step));
+        }
+
+        perception_manager_.objects_manager_.updateSimulatedPoses();
+      }
+      
+      if(next_start_time < std::chrono::high_resolution_clock::now())
       {
         auto delta = std::chrono::high_resolution_clock::now() - (start_time + interval);
         ShellDisplay::warning("[SituationAssessor] [" + agent_name_ + "] The main loop is late of " + std::to_string(delta.count() / 1000000.) + " ms");
       }
       else
       {
-        next_start_time = start_time + interval;
         //auto delta = next_start_time - std::chrono::high_resolution_clock::now();
         //ShellDisplay::info("sleep for " + std::to_string(delta.count() / 1000000.) + " ms");
         std::this_thread::sleep_until(next_start_time);

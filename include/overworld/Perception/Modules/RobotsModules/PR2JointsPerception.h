@@ -15,11 +15,11 @@ class PR2JointsPerception : public owds::PerceptionModuleRosBase<owds::BodyPart,
     PR2JointsPerception();
     virtual ~PR2JointsPerception() = default;
 
-    void setParameter(const std::string& parameter_name, const std::string& parameter_value);
-    bool closeInitialization();
+    virtual void setParameter(const std::string& parameter_name, const std::string& parameter_value) override;
+    virtual bool closeInitialization() override;
 
-    std::string getAgentName() { return robot_name_; } 
-    int getAgentBulletId() { return robot_bullet_id_; }
+    virtual std::string getAgentName() override { return robot_name_; } 
+    virtual int getAgentBulletId() override { return robot_bullet_id_; }
 
   protected:
     bool perceptionCallback(const sensor_msgs::JointState& msg) override;
@@ -27,10 +27,11 @@ class PR2JointsPerception : public owds::PerceptionModuleRosBase<owds::BodyPart,
 
     std::string right_hand_link_;
     std::string left_hand_link_;
-    std::string head_ink_;
+    std::string head_link_;
+    std::string base_link_;
 
     std::unordered_map<std::string, int> joint_name_id_;
-    std::unordered_map<std::string, int> link_name_id_;
+    std::unordered_map<std::string, int> links_name_id_;
     std::vector<std::pair<std::string, BodyPartType_e>> links_to_entity_;
 
     double min_period_;
@@ -40,6 +41,7 @@ class PR2JointsPerception : public owds::PerceptionModuleRosBase<owds::BodyPart,
     tf2_ros::Buffer tf_buffer_;
     tf2_ros::TransformListener tf2_listener_;
 
+    bool updateBasePose(const ros::Time& stamp = ros::Time(0));
     void loadPr2Model();
 };
 

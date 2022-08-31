@@ -1,0 +1,7 @@
+flow:
+  - ReasonerChain
+  - ReasonerDictionary
+  - ReasonerInverseOf
+  - ReasonerRangeDomain
+  - ReasonerSymetric
+  - ReasonerEgocentric

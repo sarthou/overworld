@@ -21,9 +21,7 @@ void Hand::putInHand(Object* object)
 
 void Hand::removeFromHand(const std::string& object_name)
 {
-  if(has_in_.find(object_name) != has_in_.end())
-    has_in_.erase(object_name);
-  else
+  if(has_in_.erase(object_name) == 0)
   {
     Object* obj_true = nullptr;
     for(auto& obj : has_in_)

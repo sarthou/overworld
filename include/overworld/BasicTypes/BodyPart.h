@@ -18,12 +18,12 @@ enum BodyPartType_e
 class BodyPart: public Entity
 {
 public:
-    BodyPart(const std::string& id, bool is_true_id = true);
+    explicit BodyPart(const std::string& id, bool is_true_id = true);
 
-    std::string getFrameName() const { return frame_name_; }
+    const std::string& getFrameName() const { return frame_name_; }
     void setFrameName(const std::string& frame_name) { frame_name_ = frame_name; }
 
-    std::string getAgentName() const { return agent_name_; }
+    const std::string& getAgentName() const { return agent_name_; }
     void setAgentName(const std::string& name) { agent_name_ = name; }
     bool isAgentKnown() const { return (agent_name_ != ""); }
 

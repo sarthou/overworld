@@ -41,7 +41,8 @@ void RobotsPerceptionManager::getPercepts( std::map<std::string, BodyPart>& perc
             UpdateAgent(it->second);
         }
         
-        updateEntityPose(it->second, percept.second.pose(), percept.second.lastStamp());
+        if(percept.second.isLocated())
+          updateEntityPose(it->second, percept.second.pose(), percept.second.lastStamp());
     }
 }
 

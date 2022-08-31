@@ -26,7 +26,7 @@ void BulletClient::setAdditionalSearchPath(const std::string& path)
 		b3SharedMemoryStatusHandle status_handle = b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
 
         if(additional_path_ != "")
-            ShellDisplay::warning("The previous additional path has been overwritten");
+            ShellDisplay::warning("[Bullet] The previous additional path has been overwritten");
         additional_path_ = path;
 	}
 }
@@ -75,7 +75,7 @@ int BulletClient::createVisualShape(BulletShapeType_e shape_type,
             if(radius > 0)
 			    shape_index = b3CreateVisualShapeAddSphere(command_handle, radius);
             else
-                ShellDisplay::error("Invalid parameters to create sphere visual shape");
+                ShellDisplay::error("[Bullet] Invalid parameters to create sphere visual shape");
 		}
 		else if (shape_type == GEOM_BOX)
 		{
@@ -86,21 +86,21 @@ int BulletClient::createVisualShape(BulletShapeType_e shape_type,
             if(radius > 0 && height >= 0)
 			    shape_index = b3CreateVisualShapeAddCapsule(command_handle, radius, height);
             else
-                ShellDisplay::error("Invalid parameters to create capsule visual shape");
+                ShellDisplay::error("[Bullet] Invalid parameters to create capsule visual shape");
 		}
 		else if (shape_type == GEOM_CYLINDER)
 		{
             if(radius > 0 && height >= 0)
 			    shape_index = b3CreateVisualShapeAddCylinder(command_handle, radius, height);
             else
-                ShellDisplay::error("Invalid parameters to create cylinder visual shape");
+                ShellDisplay::error("[Bullet] Invalid parameters to create cylinder visual shape");
 		}
 		else if (shape_type == GEOM_MESH)
 		{
             if(file_name != "")
 			    shape_index = b3CreateVisualShapeAddMesh(command_handle, file_name.c_str(), &mesh_scale[0]);
 			else
-                ShellDisplay::error("Invalid parameters to create mesh visual shape");
+                ShellDisplay::error("[Bullet] Invalid parameters to create mesh visual shape");
 		}
 
 		if (shape_index >= 0)
@@ -118,7 +118,7 @@ int BulletClient::createVisualShape(BulletShapeType_e shape_type,
 			return b3GetStatusVisualShapeUniqueId(status_handle);
 	}
 	
-    ShellDisplay::error("createVisualShape failed.");
+    ShellDisplay::error("[Bullet] createVisualShape failed.");
 	return -1;
 }
 
@@ -166,7 +166,7 @@ int BulletClient::createCollisionShape(BulletShapeType_e shape_type,
             if(radius > 0)
 			    shape_index = b3CreateCollisionShapeAddSphere(command_handle, radius);
             else
-                ShellDisplay::error("Invalid parameters to create box collision shape");
+                ShellDisplay::error("[Bullet] Invalid parameters to create box collision shape");
 		}
 		else if (shape_type == GEOM_BOX)
 		{
@@ -177,21 +177,21 @@ int BulletClient::createCollisionShape(BulletShapeType_e shape_type,
             if(radius > 0 && height >= 0)
 			    shape_index = b3CreateCollisionShapeAddCapsule(command_handle, radius, height);
             else
-                ShellDisplay::error("Invalid parameters to create capsule collision shape");
+                ShellDisplay::error("[Bullet] Invalid parameters to create capsule collision shape");
 		}
 		else if (shape_type == GEOM_CYLINDER)
 		{
             if(radius > 0 && height >= 0)
 			    shape_index = b3CreateCollisionShapeAddCylinder(command_handle, radius, height);
             else
-                ShellDisplay::error("Invalid parameters to create cylinder collision shape");
+                ShellDisplay::error("[Bullet] Invalid parameters to create cylinder collision shape");
 		}
 		else if (shape_type == GEOM_MESH)
 		{
 			if(file_name != "")
 			    shape_index = b3CreateCollisionShapeAddMesh(command_handle, file_name.c_str(), &mesh_scale[0]);
             else
-                ShellDisplay::error("Invalid parameters to create mesh collision shape");
+                ShellDisplay::error("[Bullet] Invalid parameters to create mesh collision shape");
 		}
 
         b3SharedMemoryStatusHandle status_handle;
@@ -208,7 +208,10 @@ int BulletClient::createCollisionShape(BulletShapeType_e shape_type,
 			return b3GetStatusCollisionShapeUniqueId(status_handle);
 	}
 	
-    ShellDisplay::error("createCollisionShape failed.");
+    std::string error_content = "Type: " + std::to_string(shape_type);
+    if(shape_type == GEOM_MESH)
+        error_content += " with mesh " + file_name;
+    ShellDisplay::error("[Bullet] createCollisionShape failed. " + error_content);
 	return -1;
 }
 
@@ -223,12 +226,13 @@ int BulletClient::createMultiBody(float base_mass,
     b3SharedMemoryCommandHandle command_handle = b3CreateMultiBodyCommandInit(*client_handle_);
     double base_inertial_frame_position[3] = {0, 0, 0};
     double base_inertial_frame_orientation[4] = {0, 0, 0, 1};
-    int baseIndex;
+    int base_index;
 
-    baseIndex = b3CreateMultiBodyBase(command_handle, base_mass,
+    base_index = b3CreateMultiBodyBase(command_handle, base_mass,
                                       base_collision_shape_index, base_visual_shape_index,
                                       &base_position[0], &base_orientation[0],
                                       base_inertial_frame_position, base_inertial_frame_orientation);
+    (void)base_index;
     if (flags > 0)
     {
         b3CreateMultiBodySetFlags(command_handle, flags);
@@ -238,8 +242,73 @@ int BulletClient::createMultiBody(float base_mass,
     if (status_type == CMD_CREATE_MULTI_BODY_COMPLETED)
         return b3GetStatusBodyIndex(status_handle);
 
-	ShellDisplay::error("createMultiBody failed.");
+	ShellDisplay::error("[Bullet] createMultiBody failed.");
 	return -1;
+}
+
+int BulletClient::loadTexture(const std::string& file_path)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+	b3SharedMemoryCommandHandle command_handle = b3InitLoadTexture(*client_handle_, getFullPath(file_path).c_str());
+    b3SharedMemoryStatusHandle status_handle = b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+    int status_type = b3GetStatusType(status_handle);
+    if (status_type == CMD_LOAD_TEXTURE_COMPLETED)
+        return b3GetStatusTextureUniqueId(status_handle);
+
+    ShellDisplay::error("[Bullet] Error loading texture \'" + getFullPath(file_path) + "\'");
+    return -1;
+}
+
+bool BulletClient::changeTexture(int object_id, int joint_index, int texture_id)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    b3SharedMemoryCommandHandle command_handle = b3InitUpdateVisualShape2(*client_handle_, object_id, joint_index, -1);
+    if (texture_id >= -1)
+		b3UpdateVisualShapeTexture(command_handle, texture_id);
+
+    b3SharedMemoryStatusHandle status_handle = b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+    int status_type = b3GetStatusType(status_handle);
+    if (status_type != CMD_VISUAL_SHAPE_UPDATE_COMPLETED)
+    {
+        ShellDisplay::error("[Bullet] Error changing texture.");
+        return false;
+    }
+    else
+        return true;
+}
+
+bool BulletClient::changeRgbaColor(int object_id, int joint_index, const std::array<double, 4>& color)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    b3SharedMemoryCommandHandle command_handle = b3InitUpdateVisualShape2(*client_handle_, object_id, joint_index, -1);
+	b3UpdateVisualShapeRGBAColor(command_handle, color.data());
+
+    b3SharedMemoryStatusHandle status_handle = b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+    int status_type = b3GetStatusType(status_handle);
+    if (status_type != CMD_VISUAL_SHAPE_UPDATE_COMPLETED)
+    {
+        ShellDisplay::error("[Bullet] Error changing texture.");
+        return false;
+    }
+    else
+        return true;
+}
+
+bool BulletClient::changeSpecularColor(int object_id, int joint_index, const std::array<double, 3>& color)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    b3SharedMemoryCommandHandle command_handle = b3InitUpdateVisualShape2(*client_handle_, object_id, joint_index, -1);
+	b3UpdateVisualShapeSpecularColor(command_handle, color.data());
+
+    b3SharedMemoryStatusHandle status_handle = b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+    int status_type = b3GetStatusType(status_handle);
+    if (status_type != CMD_VISUAL_SHAPE_UPDATE_COMPLETED)
+    {
+        ShellDisplay::error("[Bullet] Error changing texture.");
+        return false;
+    }
+    else
+        return true;
 }
 
 int BulletClient::loadURDF(const std::string& file_name,
@@ -269,14 +338,14 @@ int BulletClient::loadURDF(const std::string& file_name,
 		int status_type = b3GetStatusType(status_handle);
 		if (status_type != CMD_URDF_LOADING_COMPLETED)
 		{
-			ShellDisplay::error("Cannot load URDF file.");
+			ShellDisplay::error("[Bullet] Cannot load URDF file.");
 			return -1;
 		}
 		return b3GetStatusBodyIndex(status_handle);
 	}
 	else
 	{
-		ShellDisplay::error("Empty filename, method expects 1, 4 or 8 arguments.");
+		ShellDisplay::error("[Bullet] Empty filename, method expects 1, 4 or 8 arguments.");
 		return -1;
 	}
 }
@@ -311,7 +380,7 @@ bool BulletClient::resetJointState(int body_id, int joint_index, double target_v
     int nb_joints = b3GetNumJoints(*client_handle_, body_id);
     if ((joint_index >= nb_joints) || (joint_index < 0))
     {
-        ShellDisplay::error("Joint index out-of-range.");
+        ShellDisplay::error("[Bullet] Joint index out-of-range.");
         return false;
     }
 
@@ -327,6 +396,17 @@ bool BulletClient::resetJointState(int body_id, int joint_index, double target_v
     return true;
 }
 
+void BulletClient::resetBaseVelocity(int body_id, const std::array<double, 3>& linear_velocity, const std::array<double, 3>& angular_velocity)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+	b3SharedMemoryCommandHandle command_handle = b3CreatePoseCommandInit(*client_handle_, body_id);
+
+    b3CreatePoseCommandSetBaseLinearVelocity(command_handle, linear_velocity.data());
+    b3CreatePoseCommandSetBaseAngularVelocity(command_handle, angular_velocity.data());
+
+    b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+}
+
 // Reset the position and orientation of the base/root link, position [x,y,z]
 // and orientation quaternion [x,y,z,w]
 void BulletClient::resetBasePositionAndOrientation(int body_id, const std::array<double, 3>& position, const std::array<double, 4>& orientation)
@@ -339,6 +419,39 @@ void BulletClient::resetBasePositionAndOrientation(int body_id, const std::array
                                           orientation[2], orientation[3]);
 
     b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+}
+
+std::pair<std::array<double, 3>, std::array<double, 4>> BulletClient::getBasePositionAndOrientation(int body_id)
+{
+    std::array<double, 3> position;
+    std::array<double, 4> orientation;
+
+    std::lock_guard<std::mutex> lock(mutex_);
+    b3SharedMemoryCommandHandle command_handle = b3RequestActualStateCommandInit(*client_handle_, body_id);
+    b3SharedMemoryStatusHandle status_handle = b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+    int status_type = b3GetStatusType(status_handle);
+
+    if (status_type == CMD_ACTUAL_STATE_UPDATE_COMPLETED)
+    {
+        const double* actual_state_Q;
+        b3GetStatusActualState(status_handle, 0 /* body_unique_id */,
+                               0 /* num_degree_of_freedom_q */, 0 /* num_degree_of_freedom_u */,
+                               0 /*root_local_inertial_frame*/, &actual_state_Q,
+                               0 /* actual_state_q_dot */, 0 /* joint_reaction_forces */);
+        
+        position[0] = actual_state_Q[0];
+        position[1] = actual_state_Q[1];
+        position[2] = actual_state_Q[2];
+
+        orientation[0] = actual_state_Q[3];
+        orientation[1] = actual_state_Q[4];
+        orientation[2] = actual_state_Q[5];
+        orientation[3] = actual_state_Q[6];
+    }
+    else
+        ShellDisplay::error("[Bullet] getBasePositionAndOrientation failed.");
+
+    return std::make_pair(position, orientation);
 }
 
 long BulletClient::createUserConstraint(int parent_body_id, int parent_link_index,
@@ -379,7 +492,7 @@ long BulletClient::createUserConstraint(int parent_body_id, int parent_link_inde
 	if (status_type == CMD_USER_CONSTRAINT_COMPLETED)
         return b3GetStatusUserConstraintUniqueId(status_handle);
 
-	ShellDisplay::error("createConstraint failed.");
+	ShellDisplay::error("[Bullet] createConstraint failed.");
 	return -1;
 }
 
@@ -407,18 +520,73 @@ void BulletClient::changeUserConstraint(int user_constraint_id,
 	b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
 }
 
-// use the enum DynamicsActivationState for the activation_state
-void BulletClient::changeDynamicsInfo(int body_id, int link_index, int friction_anchor, int activation_state)
+void BulletClient::setMass(int body_id, int link_index, double mass_kg)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     b3SharedMemoryCommandHandle command_handle = b3InitChangeDynamicsInfo(*client_handle_);
 
-    if (friction_anchor >= 0)
-        b3ChangeDynamicsInfoSetFrictionAnchor(command_handle, body_id, link_index, friction_anchor);
+    if (mass_kg >= 0)
+        b3ChangeDynamicsInfoSetMass(command_handle, body_id, link_index, mass_kg);
+    b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+}
 
-    if (activation_state >= 0)
-        b3ChangeDynamicsInfoSetActivationState(command_handle, body_id, activation_state);        
-            
+void BulletClient::setLateralFriction(int body_id, int link_index, double friction)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    b3SharedMemoryCommandHandle command_handle = b3InitChangeDynamicsInfo(*client_handle_);
+
+    if (friction >= 0)
+        b3ChangeDynamicsInfoSetLateralFriction(command_handle, body_id, link_index, friction);
+    b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+}
+
+void BulletClient::setSpinningFriction(int body_id, int link_index, double friction)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    b3SharedMemoryCommandHandle command_handle = b3InitChangeDynamicsInfo(*client_handle_);
+
+    if (friction >= 0)
+        b3ChangeDynamicsInfoSetSpinningFriction(command_handle, body_id, link_index, friction);
+    b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+}
+
+void BulletClient::setRollingFriction(int body_id, int link_index, double friction)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    b3SharedMemoryCommandHandle command_handle = b3InitChangeDynamicsInfo(*client_handle_);
+
+    if (friction >= 0)
+        b3ChangeDynamicsInfoSetRollingFriction(command_handle, body_id, link_index, friction);
+    b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+}
+
+void BulletClient::setRestitution(int body_id, int link_index, double restitution)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    b3SharedMemoryCommandHandle command_handle = b3InitChangeDynamicsInfo(*client_handle_);
+
+    if (restitution >= 0)
+        b3ChangeDynamicsInfoSetRestitution(command_handle, body_id, link_index, restitution);
+    b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+}
+
+void BulletClient::setFrictionAnchor(int body_id, int link_index, double friction)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    b3SharedMemoryCommandHandle command_handle = b3InitChangeDynamicsInfo(*client_handle_);
+
+    if (friction >= 0)
+        b3ChangeDynamicsInfoSetFrictionAnchor(command_handle, body_id, link_index, friction);
+    b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+}
+
+void BulletClient::setActivationState(int body_id, DynamicsActivationState state)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    b3SharedMemoryCommandHandle command_handle = b3InitChangeDynamicsInfo(*client_handle_);
+
+    if (state >= 0)
+        b3ChangeDynamicsInfoSetActivationState(command_handle, body_id, state);
     b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
 }
 
@@ -511,10 +679,10 @@ struct b3CameraImageData BulletClient::getCameraImage(int width, int height,
             return image_data;
 		}
         else
-            ShellDisplay::error("getCameraImage failed");
+            ShellDisplay::error("[Bullet] getCameraImage failed");
 	}
     else
-        ShellDisplay::error("getCameraImage can not submit the command");
+        ShellDisplay::error("[Bullet] getCameraImage can not submit the command");
 
 	struct b3CameraImageData image_data_empty;
     image_data_empty.m_pixelHeight = 0;
@@ -556,7 +724,7 @@ struct b3VisualShapeInformation BulletClient::getVisualShapeData(int object_id, 
     }
     else
     {
-        ShellDisplay::error("Error receiving visual shape info");
+        ShellDisplay::error("[Bullet] Error receiving visual shape info");
         struct b3VisualShapeInformation visual_shape_info_empty;
         visual_shape_info_empty.m_numVisualShapes = 0;
         visual_shape_info_empty.m_visualShapeData = nullptr;
@@ -571,12 +739,12 @@ struct b3LinkState BulletClient::getLinkState(int body_id, int link_index, bool 
 
     if (body_id < 0)
     {
-        ShellDisplay::error("getLinkState failed; invalid bodyUniqueId");
+        ShellDisplay::error("[Bullet] getLinkState failed; invalid bodyUniqueId");
         return link_state_empty;
     }
     else if (link_index < 0)
     {
-        ShellDisplay::error("getLinkState failed; invalid linkIndex");
+        ShellDisplay::error("[Bullet] getLinkState failed; invalid linkIndex");
         return link_state_empty;
     }
 
@@ -593,7 +761,7 @@ struct b3LinkState BulletClient::getLinkState(int body_id, int link_index, bool 
     int status_type = b3GetStatusType(status_handle);
     if (status_type != CMD_ACTUAL_STATE_UPDATE_COMPLETED)
     {
-        ShellDisplay::error("getLinkState failed.");
+        ShellDisplay::error("[Bullet] getLinkState failed.");
         return link_state_empty;
     }
 
@@ -613,7 +781,7 @@ struct b3JointInfo BulletClient::getJointInfo(int body_id, int joint_index)
         return info;
     else
     {
-        ShellDisplay::error("GetJointInfo failed.");
+        ShellDisplay::error("[Bullet] GetJointInfo failed.");
         return info;
     }
 }
@@ -662,7 +830,7 @@ long BulletClient::addUserDebugLine(const std::array<double, 3>& xyz_from,
         return b3GetDebugItemUniqueId(status_handle);
     else
     {
-        ShellDisplay::error("failed to draw debug line");
+        ShellDisplay::error("[Bullet] failed to draw debug line");
         return -1;
     }
 }
@@ -680,14 +848,14 @@ std::vector<struct b3RayHitInfo> BulletClient::rayTestBatch(const std::vector<st
 
     if (from_poses.size() != to_poses.size())
     {
-        ShellDisplay::error("Size of from_positions need to be equal to size of to_positions.");
+        ShellDisplay::error("[Bullet] Size of from_positions need to be equal to size of to_positions.");
         return raycast_info_res;
     }
     else
     {
         if (from_poses.size() > MAX_RAY_INTERSECTION_BATCH_SIZE_STREAMING)
         {
-            ShellDisplay::error("Number of rays exceed the maximum batch size.");
+            ShellDisplay::error("[Bullet] Number of rays exceed the maximum batch size.");
             return raycast_info_res;
         }
 
@@ -727,7 +895,7 @@ void BulletClient::performCollisionDetection()
     if (b3CanSubmitCommand(*client_handle_))
         b3SubmitClientCommandAndWaitStatus(*client_handle_, b3InitPerformCollisionDetectionCommand(*client_handle_));
     else
-        ShellDisplay::warning("Collisions not updated");
+        ShellDisplay::warning("[Bullet] Collisions not updated");
 }
 
 struct aabb_t BulletClient::getAABB(int body_id, int link_index)
@@ -738,13 +906,13 @@ struct aabb_t BulletClient::getAABB(int body_id, int link_index)
 
     if (body_id < 0)
     {
-        ShellDisplay::error("getAABB failed; invalid body_id");
+        ShellDisplay::error("[Bullet] getAABB failed; invalid body_id " + std::to_string(body_id));
         return aabb;
     }
 
     if (link_index < -1)
     {
-        ShellDisplay::error("getAABB failed; invalid link_index");
+        ShellDisplay::error("[Bullet] getAABB failed; invalid link_index " + std::to_string(link_index));
         return aabb;
     }
 
@@ -754,7 +922,7 @@ struct aabb_t BulletClient::getAABB(int body_id, int link_index)
     int status_type = b3GetStatusType(status_handle);
     if (status_type != CMD_REQUEST_COLLISION_INFO_COMPLETED)
     {
-        ShellDisplay::error("getAABB failed.");
+        ShellDisplay::error("[Bullet] getAABB failed.");
         return aabb;
     }
 
@@ -778,34 +946,116 @@ struct b3AABBOverlapData BulletClient::getOverlappingObjects(const struct aabb_t
     return overlap_data;
 }
 
+struct b3ContactInformation BulletClient::getContactPoints(int body_id_A, int body_id_B, int link_index_A, int link_index_B)
+{
+    struct b3ContactInformation contact_point_data;
+
+	b3SharedMemoryCommandHandle command_handle = b3InitRequestContactPointInformation(*client_handle_);
+	if (body_id_A >= 0)
+		b3SetContactFilterBodyA(command_handle, body_id_A);
+	
+	if (body_id_B >= 0)
+		b3SetContactFilterBodyB(command_handle, body_id_B);
+
+	if (link_index_A >= -1)
+		b3SetContactFilterLinkA(command_handle, link_index_A);
+	
+	if (link_index_B >= -1)
+		b3SetContactFilterLinkB(command_handle, link_index_B);
+	
+	b3SharedMemoryStatusHandle status_handle = b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+	int status_type = b3GetStatusType(status_handle);
+	if (status_type == CMD_CONTACT_POINT_INFORMATION_COMPLETED)
+		b3GetContactPointInformation(*client_handle_, &contact_point_data);
+
+	return contact_point_data;
+}
+
 void BulletClient::resetDebugVisualizerCamera(float distance, float yaw, float pitch, const std::array<float,3>& target_pose)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    b3SharedMemoryCommandHandle commandHandle = b3InitConfigureOpenGLVisualizer(*client_handle_);
+    b3SharedMemoryCommandHandle command_handle = b3InitConfigureOpenGLVisualizer(*client_handle_);
     if (distance >= 0)
-        b3ConfigureOpenGLVisualizerSetViewMatrix(commandHandle, distance, pitch, yaw, &target_pose[0]);
+        b3ConfigureOpenGLVisualizerSetViewMatrix(command_handle, distance, pitch, yaw, &target_pose[0]);
 
-    b3SubmitClientCommandAndWaitStatus(*client_handle_, commandHandle);
+    b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
 }
 
 b3MouseEventsData BulletClient::getMouseEvents()
 {
     std::lock_guard<std::mutex> lock(mutex_);
-	struct b3MouseEventsData mouseEventsData;
+	struct b3MouseEventsData mouse_events_data;
 	b3SharedMemoryCommandHandle command_handle = b3RequestMouseEventsCommandInit(*client_handle_);
 	b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
-	b3GetMouseEventsData(*client_handle_, &mouseEventsData);
-	return mouseEventsData;
+	b3GetMouseEventsData(*client_handle_, &mouse_events_data);
+	return mouse_events_data;
 }
 
 b3KeyboardEventsData BulletClient::getKeyboardEvents()
 {
     std::lock_guard<std::mutex> lock(mutex_);
-	struct b3KeyboardEventsData keyboardEvent;
+	struct b3KeyboardEventsData keyboard_event;
 	b3SharedMemoryCommandHandle command_handle = b3RequestKeyboardEventsCommandInit(*client_handle_);
 	b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
-	b3GetKeyboardEventsData(*client_handle_, &keyboardEvent);
-	return keyboardEvent;
+	b3GetKeyboardEventsData(*client_handle_, &keyboard_event);
+	return keyboard_event;
 }
+
+void BulletClient::setGravity(double grivity_x, double grivity_y, double grivity_z)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    b3SharedMemoryCommandHandle command_handle = b3InitPhysicsParamCommand(*client_handle_);
+    b3PhysicsParamSetGravity(command_handle, grivity_x, grivity_y, grivity_z);
+    b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+}
+
+void BulletClient::setTimeStep(double time_step)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    b3SharedMemoryCommandHandle command_handle = b3InitPhysicsParamCommand(*client_handle_);
+    b3PhysicsParamSetTimeStep(command_handle, time_step);
+    b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+}
+
+void BulletClient::stepSimulation()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    if(b3CanSubmitCommand(*client_handle_))
+    {
+        b3SharedMemoryCommandHandle command_handle = b3InitStepSimulationCommand(*client_handle_);
+        b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+    }
+    else
+        ShellDisplay::warning("[Bullet] simulation not performed");
+}
+
+/*std::string vhacd(const std::string& file_name)
+{
+    std::string file_out = file_name;
+    std::string file_log = file_name;
+
+	double concavity = 0.0025;          // Maximum allowed concavity
+	double alpha = 0.05;                // Controls the bias toward clipping along symmetry planes
+	double beta = 0.05;                 // Controls the bias toward clipping along revolution axes 
+	double gamma = 0.00125;             // Controls the maximum allowed concavity during the merge stage
+	double min_volume_perCH = 0.0001;   // Controls the adaptive sampling of the generated convex-hulls 
+	int resolution = 100000;            // Maximum number of voxels generated during the voxelization stage
+	int max_num_vertices_perCH = 64;    // Controls the maximum number of triangles per convex-hull 
+	int depth = 20;                     // Maximum number of clipping stages. During each split stage, parts with a concavity higher than the user defined threshold are clipped according the best clipping plane
+	int plane_downsampling = 4;         // Controls the granularity of the search for the "best" clipping plane
+	int convexhull_downsampling = 4;    // Controls the precision of the convex-hull generation process during the clipping plane selection stage
+	int pca = 0;                        // Enable/disable normalizing the mesh before applying the convex decomposition
+	int mode = 0;                       // 0: voxel-based approximate convex decomposition, 1: tetrahedron-based approximate convex decomposition
+	int convexhull_approximation = 1;   // Enable/disable approximation when computing convex-hulls
+
+	double timeOutInSeconds = -1;
+
+	b3VHACD(file_name, file_out, file_log,
+			concavity, alpha, beta, gamma, min_volume_perCH,
+			resolution, max_num_vertices_perCH, depth, plane_downsampling,
+			convexhull_downsampling, pca, mode, convexhull_approximation);
+    
+    return file_out;
+}*/
 
 } // namespace owds

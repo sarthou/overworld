@@ -11,6 +11,8 @@
 #include <message_filters/synchronizer.h>
 #include <message_filters/sync_policies/approximate_time.h>
 
+#include "ontologenius/OntologiesManipulator.h"
+
 #include "overworld/BasicTypes/Entity.h"
 #include "overworld/BasicTypes/Agent.h"
 
@@ -25,12 +27,16 @@ class PerceptionModuleBase_
 {
   static_assert(std::is_base_of<Entity,T>::value, "T must be derived from Entity");
 public:
-  PerceptionModuleBase_(bool need_access_to_external_entities = false)
-  {
-    need_access_to_external_entities_ = need_access_to_external_entities;
-    is_activated_ = true;
-    updated_ = false;
-  }
+  explicit PerceptionModuleBase_(bool need_access_to_external_entities = false):
+                                is_activated_(true),
+                                updated_(false),
+                                need_access_to_external_entities_(need_access_to_external_entities),
+                                n_(nullptr),
+                                bullet_client_(nullptr),
+                                robot_bullet_id_(-1),
+                                robot_agent_(nullptr)
+                                
+  {}
   virtual ~PerceptionModuleBase_() = default;
 
   virtual void initialize(ros::NodeHandle* n,
@@ -66,6 +72,65 @@ public:
     mutex_perception_.unlock();
   }
 
+  static std::array<double, 3> getEntityColorFromOntology(OntologyManipulator* onto, const std::string& indiv_name, const std::array<double, 3>& default_value = {0.8,0.8,0.8})
+  {
+    auto color = onto->individuals.getOn(indiv_name, "hasColor");
+    if(color.size() != 0)
+    {
+      auto hex_value = onto->individuals.getOn(color.front(), "hexRgbValue");
+      if(hex_value.size())
+      {
+        unsigned int hex = 0;
+        sscanf(hex_value[0].substr(hex_value[0].find("#") + 1).c_str(), "%x", &hex);
+        return { ((hex >> 16) & 0xff) / 255., ((hex >> 8) & 0xff) / 255., (hex & 0xff) / 255. };
+      }
+    }
+    
+    return default_value;
+  }
+
+  static Shape_t getEntityShapeFromOntology(OntologyManipulator* onto, const std::string& indiv_name)
+  {
+    auto visual_meshes = onto->individuals.getOn(indiv_name, "hasVisualMesh");
+    auto collision_meshes = onto->individuals.getOn(indiv_name, "hasCollisionMesh");
+    auto meshes = onto->individuals.getOn(indiv_name, "hasMesh");
+    auto textures = onto->individuals.getOn(indiv_name, "hasTexture");
+
+    Shape_t shape;
+    if(meshes.size())
+    {
+      shape.type = SHAPE_MESH;
+      if(visual_meshes.size())
+          shape.visual_mesh_resource = visual_meshes.front().substr(visual_meshes.front().find("#") + 1);
+      else
+          shape.visual_mesh_resource = meshes.front().substr(meshes.front().find("#") + 1);
+      if(collision_meshes.size())
+          shape.colision_mesh_resource = collision_meshes.front().substr(collision_meshes.front().find("#") + 1);
+      else
+          shape.colision_mesh_resource = meshes.front().substr(meshes.front().find("#") + 1);
+      shape.color = getEntityColorFromOntology(onto, indiv_name);
+      if(textures.size())
+          shape.texture = textures.front().substr(textures.front().find("#") + 1);
+    }
+    else
+      shape.type = SHAPE_NONE;
+
+    return shape;
+  }
+
+  static double getEntityMassFromOntology(OntologyManipulator* onto, const std::string& indiv_name)
+  {
+    auto masses = onto->individuals.getOn(indiv_name, "hasMass");
+
+    if(masses.size())
+    {
+      auto mass_str = masses.front().substr(masses.front().find("#") + 1);
+      return std::stod(mass_str);
+    }
+    else
+      return 0;
+  }
+
 protected:
   std::map<std::string, T> percepts_;
   std::atomic<bool> is_activated_;
@@ -93,7 +158,7 @@ template<typename T, class M>
 class PerceptionModuleBase : public PerceptionModuleBase_<T>
 {
 public:
-  PerceptionModuleBase(bool need_access_to_external_entities = false) : PerceptionModuleBase_<T>(need_access_to_external_entities) {}
+  explicit PerceptionModuleBase(bool need_access_to_external_entities = false) : PerceptionModuleBase_<T>(need_access_to_external_entities) {}
   virtual ~PerceptionModuleBase() = default;
 
   void sendPerception(const M& msg) { privatePerceptionCallback(msg); }
@@ -130,16 +195,16 @@ template<typename T, class M>
 class PerceptionModuleRosBase : public PerceptionModuleBase_<T>
 {
 public:
-  PerceptionModuleRosBase(const std::string& topic_name, bool need_access_to_external_entities = false) : PerceptionModuleBase_<T>(need_access_to_external_entities)
-  {
-    topic_name_ = topic_name;
-  }
+  explicit PerceptionModuleRosBase(const std::string& topic_name, bool need_access_to_external_entities = false) : 
+                          PerceptionModuleBase_<T>(need_access_to_external_entities),
+                          topic_name_(topic_name)
+  {}
   virtual ~PerceptionModuleRosBase() = default;
 
   virtual void initialize(ros::NodeHandle* n,
                           BulletClient* bullet_client,
                           int robot_bullet_id,
-                          Agent* robot_agent)
+                          Agent* robot_agent) override
   {
     PerceptionModuleBase_<T>::initialize(n, bullet_client, robot_bullet_id, robot_agent);
     if(topic_name_ != "")
@@ -196,17 +261,17 @@ class PerceptionModuleRosSyncBase : public PerceptionModuleBase_<T>
 public:
   PerceptionModuleRosSyncBase(const std::string& first_topic_name,
                               const std::string& second_topic_name,
-                              bool need_access_to_external_entities = false): PerceptionModuleBase_<T>(need_access_to_external_entities)
-  {
-    first_topic_name_ = first_topic_name;
-    second_topic_name_ = second_topic_name;
-  }
+                              bool need_access_to_external_entities = false): 
+                              PerceptionModuleBase_<T>(need_access_to_external_entities),
+                              first_topic_name_(first_topic_name),
+                              second_topic_name_(second_topic_name)
+  {}
   virtual ~PerceptionModuleRosSyncBase() = default;
 
   virtual void initialize(ros::NodeHandle* n,
                           BulletClient* bullet_client,
                           int robot_bullet_id,
-                          Agent* robot_agent)
+                          Agent* robot_agent) override
   {
     PerceptionModuleBase_<T>::initialize(n, bullet_client, robot_bullet_id, robot_agent);
     sub_0_.subscribe(*n, first_topic_name_, 1);
