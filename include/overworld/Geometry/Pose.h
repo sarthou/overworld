@@ -36,6 +36,9 @@ public:
     explicit Pose(const geometry_msgs::TransformStamped& transform);
     explicit Pose(const geometry_msgs::PoseStamped& pose);
 
+    bool operator==(const Pose& other) const { return t_.isApprox(other.t_); }
+    bool operator!=(const Pose& other) const { return !t_.isApprox(other.t_); }
+
     double distanceSqTo(const Pose& pose) const;
     double distanceTo(const Pose& pose) const;
 
@@ -53,6 +56,8 @@ public:
     std::pair<std::array<double, 3>, std::array<double, 4>> arrays() const;
     double getOriginTilt() const;
     double getOriginPan() const;
+
+    bool similarTo(const Pose& other, double translation_delta = 0.01, double angular_delta = 0.0872665) const; // default values are 1 cm and 5 degrees
 
     /**
      * @brief Compute the transform of this pose in "new_frame"
@@ -73,6 +78,8 @@ public:
     double getRoll() const;
     double getPitch() const;
     double getYaw() const;
+
+    Pose lerpTo(const Pose& goal, double alpha) const;
 
     friend std::ostream& operator<<(std::ostream& os, const Pose& pose);
 
