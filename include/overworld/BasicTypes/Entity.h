@@ -31,9 +31,11 @@ public:
     void updatePose(const std::array<double, 3>& translation, const std::array<double, 4>& rotation);
     void updatePose(const std::array<double, 3>& translation, const std::array<double, 4>& rotation, ros::Time stamp);
     void updatePose(const geometry_msgs::PoseStamped& pose);
+    void replacePose(const Pose& pose);
     void unsetPose() { is_located_ = false; }
     bool isLocated() const { return is_located_; }
     const Pose& pose() const;
+    const Pose& pose(unsigned int id) const;
     ros::Time lastStamp() const { return last_poses_.back().stamp; }
     bool hasMoved() const;
 
