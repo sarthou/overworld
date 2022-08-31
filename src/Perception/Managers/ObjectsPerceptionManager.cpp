@@ -4,8 +4,8 @@
 
 #define TO_HALF_RAD M_PI / 180. / 2.
 
-#define MAX_UNSEEN 3
-#define MAX_SIMULATED 4
+#define MAX_UNSEEN 2
+#define MAX_SIMULATED 10
 #define IN_HAND_DISTANCE 0.30 // meters
 
 namespace owds {
@@ -24,6 +24,50 @@ std::map<std::string, Object*> ObjectsPerceptionManager::getEntities() const
     }
 
     return res;
+  }
+}
+
+void ObjectsPerceptionManager::updateSimulatedPoses()
+{
+  for(auto& simulated_object : simulated_objects_)
+  {
+    auto pose = bullet_client_->getBasePositionAndOrientation(entities_[simulated_object.first]->bulletId());
+    entities_[simulated_object.first]->updatePose(pose.first, pose.second);
+  }
+}
+
+void ObjectsPerceptionManager::initLerp()
+{
+  goal_poses_.clear();
+  for(auto& object : entities_)
+  {
+    if(object.second->isStatic() == false)
+    {
+      if(object.second->isLocated())
+      {
+        if(simulated_objects_.find(object.second->id()) == simulated_objects_.end())
+        {
+          if(object.second->pose() != object.second->pose(1))
+          {
+            //if(object.second->pose().similarTo(object.second->pose(1)) == false)
+            {
+              goal_poses_.insert({object.second, object.second->pose()});
+              undoInBullet(object.second); // set to the previous pose
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+void ObjectsPerceptionManager::stepLerp(double alpha)
+{
+  for(auto& goal_it : goal_poses_)
+  {
+    Pose new_pose = goal_it.first->pose(1).lerpTo(goal_it.second, alpha);
+    goal_it.first->replacePose(new_pose);
+    updateToBullet(goal_it.first);
   }
 }
 
@@ -94,10 +138,17 @@ void ObjectsPerceptionManager::getPercepts(std::map<std::string, Object>& percep
           updateEntityPose(it->second, it->second->getHandIn()->pose(), ros::Time::now());
         }
       }
+      // TODO : The following assume that an entity is perceive by only one module
+      // A true merging algorithm has to be applied
       else if (percept.second.hasBeenSeen())
       {
         stopSimulation(it->second);
         updateEntityPose(it->second, percept.second.pose(), percept.second.lastStamp());
+      }
+      else
+      {
+        if(it->second->isLocated())
+          it->second->updatePose(it->second->pose(), ros::Time::now());
       }
   }
 }
@@ -183,18 +234,26 @@ void ObjectsPerceptionManager::reasoningOnUpdate()
 
   // From there, objects to be removed are in the agent Fov but we don't have
   // any information about them neither any explanation
-  objects_to_remove = simulatePhysics(objects_to_remove);
+  objects_to_remove = simulatePhysics(objects_to_remove, objects_to_simulate);
 
   for(auto obj : objects_to_remove)
     removeEntityPose(obj);
 }
 
-std::vector<Object*> ObjectsPerceptionManager::simulatePhysics(const std::vector<Object*>& lost_objects)
+std::vector<Object*> ObjectsPerceptionManager::simulatePhysics(const std::vector<Object*>& lost_objects, const std::vector<Object*>& to_simulate_objetcs)
 {
   std::unordered_set<std::string> lost_ids;
+  lost_ids.reserve(lost_objects.size());
   for(auto& object : lost_objects)
   {
     lost_ids.insert(object->id());
+    auto it = simulated_objects_.find(object->id());
+    if(it == simulated_objects_.end())
+      startSimulation(object);
+  }
+
+  for(auto& object : to_simulate_objetcs)
+  {
     auto it = simulated_objects_.find(object->id());
     if(it == simulated_objects_.end())
       startSimulation(object);
@@ -226,8 +285,22 @@ std::vector<Object*> ObjectsPerceptionManager::simulatePhysics(const std::vector
 
 void ObjectsPerceptionManager::startSimulation(Object* object)
 {
+  std::cout << "--start simulation for " << object->id() << " with a mass of " << object->getMass() << std::endl;
   bullet_client_->setMass(object->bulletId(), -1, object->getMass());
+  bullet_client_->resetBaseVelocity(object->bulletId(), {0,0,0}, {0,0,0});
+
   simulated_objects_.insert({object->id(), 0});
+
+  /*bullet_client_->performCollisionDetection();
+  auto contact_points = bullet_client_->getContactPoints(object->bulletId());
+  std::cout << "==> " << contact_points.m_numContactPoints << " CPs" << std::endl;
+  for(size_t i = 0; i < contact_points.m_numContactPoints; i++)
+  {
+    auto point = contact_points.m_contactPointData[i];
+    auto contact_entity = getEntityFromBulletId(point.m_bodyUniqueIdB);
+    if(contact_entity != nullptr)
+      std::cout << "====> contact with " << contact_entity->id() << " on dist " << point.m_contactDistance << std::endl;
+  }*/
 }
 
 void ObjectsPerceptionManager::stopSimulation(Object* object, bool erase)
@@ -235,6 +308,7 @@ void ObjectsPerceptionManager::stopSimulation(Object* object, bool erase)
   auto it = simulated_objects_.find(object->id());
   if(it != simulated_objects_.end())
   {
+    std::cout << "--stop simulation for " << object->id() << std::endl;
     bullet_client_->setMass(object->bulletId(), -1, 0);
     if(erase)
       simulated_objects_.erase(object->id());

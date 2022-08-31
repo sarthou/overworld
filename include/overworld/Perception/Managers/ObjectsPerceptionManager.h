@@ -15,12 +15,17 @@ public:
 
   std::map<std::string, Object*> getEntities() const;
 
-  bool needSimulation() { return simulated_objects_.size() != 0; }
+  bool needSimulation() const { return simulated_objects_.size() != 0; }
+  void updateSimulatedPoses();
+  
+  void initLerp();
+  void stepLerp(double alpha);
 
 private:
   Agent* myself_agent_;
   std::map<std::string, size_t> lost_objects_nb_frames_;
   std::map<std::string, size_t> simulated_objects_;
+  std::map<Object*, Pose> goal_poses_;
 
   std::unordered_set<std::string> false_ids_to_be_merged_;
   std::map<std::string, std::string> merged_ids_;
@@ -31,7 +36,7 @@ private:
   bool souldBeReasonedOn(Object* object);
   void reasoningOnUpdate() override;
 
-  std::vector<Object*> simulatePhysics(const std::vector<Object*>& objects);
+  std::vector<Object*> simulatePhysics(const std::vector<Object*>& objects, const std::vector<Object*>& to_simulate_objetcs);
   void startSimulation(Object* object);
   void stopSimulation(Object* object, bool erase = true);
 
