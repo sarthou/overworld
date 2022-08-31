@@ -76,6 +76,16 @@ double Pose::getOriginPan() const
     return std::acos(origin.z() / std::hypot(origin.x(), origin.z()));
 }
 
+bool Pose::similarTo(const Pose& other, double translation_delta, double angular_delta) const
+{
+    if(distanceTo(other) > translation_delta)
+        return false;
+    else if(angularDistance(other) > angular_delta)
+        return false;
+    else
+        return true;
+}
+
 Pose Pose::transformIn(const Pose& new_frame) const 
 {
     return Pose(new_frame.t_.inverse() * t_);
@@ -146,6 +156,21 @@ double Pose::getPitch() const
 double Pose::getYaw() const
 {
     return t_.rotation().eulerAngles(0,1,2)[2];
+}
+
+Pose Pose::lerpTo(const Pose& goal, double alpha) const
+{
+    Eigen::Quaternion<double> rot1(t_.linear());
+    Eigen::Quaternion<double> rot2(goal.t_.linear());
+
+    Eigen::Vector3d trans1 = t_.translation();
+    Eigen::Vector3d trans2 = goal.t_.translation();
+
+    Eigen::Affine3d result;
+    result.translation() = (1.0 - alpha) * trans1 + alpha * trans2;
+    result.linear()      = rot1.slerp(alpha, rot2).toRotationMatrix();
+
+    return Pose(result);
 }
 
 std::ostream& operator<<(std::ostream& os, const Pose& pose)
