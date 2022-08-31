@@ -92,7 +92,8 @@
 
     <owl:NamedIndividual rdf:about="dt_objects#adream_floor">
         <rdf:type rdf:resource="common_ground#Floor"/>
-        <common_ground:hasMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/adream/floor.obj</common_ground:hasMesh>
+        <common_ground:hasVisualMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/adream/floor.obj</common_ground:hasVisualMesh>
+        <common_ground:hasCollisionMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/adream/floor_collisions.obj</common_ground:hasCollisionMesh>
         <common_ground:hasTexture rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/textures/adream_floor_texture.png</common_ground:hasTexture>
         <common_ground:hasColor rdf:resource="common_ground#grey"/>
     </owl:NamedIndividual>
