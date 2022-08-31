@@ -7,7 +7,7 @@ namespace owds {
 template <typename T, std::size_t capacity> class CircularBuffer
 {
   public:
-    inline CircularBuffer() : firstIndex_(0), lastIndex_(0), size_(0) {}
+    inline CircularBuffer() : firstIndex_(0), lastIndex_(0), current_index_(0), size_(0) {}
 
     inline const T& at(std::size_t i) const
     {
@@ -41,7 +41,13 @@ template <typename T, std::size_t capacity> class CircularBuffer
             size_++;
         }
         buffer_[lastIndex_] = element;
+        current_index_ = lastIndex_;
         lastIndex_ = (lastIndex_ + 1) % capacity;
+    }
+
+    inline void replace_back(const T& element)
+    {
+        buffer_[current_index_] = element;
     }
 
     inline size_t size() const { return size_; }
@@ -56,6 +62,7 @@ template <typename T, std::size_t capacity> class CircularBuffer
   protected:
     std::size_t firstIndex_;
     std::size_t lastIndex_;
+    std::size_t current_index_;
     std::size_t size_;
     std::array<T, capacity> buffer_;
 };
