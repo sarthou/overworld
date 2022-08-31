@@ -49,11 +49,8 @@ void ObjectsPerceptionManager::initLerp()
         {
           if(object.second->pose() != object.second->pose(1))
           {
-            //if(object.second->pose().similarTo(object.second->pose(1)) == false)
-            {
               goal_poses_.insert({object.second, object.second->pose()});
               undoInBullet(object.second); // set to the previous pose
-            }
           }
         }
       }
@@ -73,10 +70,9 @@ void ObjectsPerceptionManager::stepLerp(double alpha)
 
 std::map<std::string, Object*>::iterator ObjectsPerceptionManager::createFromPercept(const Object& percept)
 {
-  std::map<std::string, Object*>::iterator it = entities_.end();
   auto new_object = new Object(percept);
   new_object->setInHand(nullptr);
-  it = entities_.insert(std::pair<std::string, Object*>(percept.id(), new_object)).first;
+  auto it = entities_.insert(std::pair<std::string, Object*>(percept.id(), new_object)).first;
   addToBullet(it->second);
 
   getObjectBoundingBox(it->second);
