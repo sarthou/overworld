@@ -63,7 +63,7 @@ jobs:
           cmake .. -DCMAKE_INSTALL_PREFIX=$BULLET_PATH/install -DBUILD_SHARED_LIBS=ON
           make install
           cd ~/work
-          git clone https://github.com/sarthou/ontologenius.git
+          git clone -b dev https://github.com/sarthou/ontologenius.git
           git clone https://github.com/RIS-WITH/optitrack_msgs.git
           if [ $ROS_DISTRO != noetic ]
           then
