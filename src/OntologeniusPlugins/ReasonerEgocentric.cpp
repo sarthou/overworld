@@ -9,7 +9,8 @@ namespace ontologenius {
 
 void ReasonerEgocentric::initialize()
 {
-  std::vector<std::string> computable_properties = {"egocentricGeometricalRelation"};
+  overworld_client_ = n_.serviceClient<overworld::GetRelations>("/overworld/get_relations/" + agent_name_, true);
+  std::vector<std::string> computable_properties = {"egocentricGeometricalProperty"};
   for(auto& property : computable_properties)
   {
     auto property_ptr = ontology_->object_property_graph_.findBranch(property);
@@ -67,8 +68,13 @@ void ReasonerEgocentric::preReason(const QueryInfo_t& query_info)
     if(to_compute_properties.size() == 0)
       to_compute_properties.insert(property_ptr);
 
+    auto srv = createRequest(query_info.subject, to_compute_properties, query_info.object);
+
     for(auto prop : to_compute_properties)
       std::cout << "[ReasonerEgocentric] Should reason on " << query_info.subject << " : " << prop->value() << " : " << query_info.object << std::endl;
+
+    if(call(srv))
+      updateOntology(srv.response.to_add, srv.response.to_delete);
   }
 }
 
@@ -172,6 +178,56 @@ std::set<ObjectPropertyBranch_t*> ReasonerEgocentric::isInDomain(const std::stri
     }
 
     return res;
+  }
+}
+
+overworld::GetRelations ReasonerEgocentric::createRequest(const std::string& subject, const std::set<ObjectPropertyBranch_t*>& predicates, const std::string& object)
+{
+  overworld::GetRelations srv;
+
+  srv.request.origin_id = "ReasonerEgocentric";
+  for(auto predicate : predicates)
+  {
+    overworld::Triplet pattern;
+    pattern.subject = subject;
+    pattern.predicate = predicate->value();
+    pattern.object = object;
+    srv.request.patterns.push_back(pattern);
+  }
+
+  return srv;
+}
+
+bool ReasonerEgocentric::call(overworld::GetRelations& srv)
+{
+  if(overworld_client_.call(srv))
+    return true;
+  else
+  {
+    overworld_client_ = n_.serviceClient<overworld::GetRelations>("/overworld/get_relations/" + agent_name_, true);
+    if(overworld_client_.call(srv))
+      return true;
+    else
+      return false;
+  }
+}
+
+void ReasonerEgocentric::updateOntology(const std::vector<overworld::Triplet>& to_add, const std::vector<overworld::Triplet>& to_delete)
+{
+  for(auto& triplet : to_delete)
+  {
+    ontology_->individual_graph_.removeRelation(triplet.subject, triplet.predicate, triplet.object);
+    nb_update_++;
+  }
+
+  for(auto& triplet : to_add)
+  {
+    auto branch = ontology_->individual_graph_.findBranch(triplet.subject);
+    if(branch != nullptr)
+    {
+      ontology_->individual_graph_.addRelation(branch, triplet.predicate, triplet.object);
+      nb_update_++;
+    }
   }
 }
 
