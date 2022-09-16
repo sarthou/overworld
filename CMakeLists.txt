@@ -186,6 +186,7 @@ add_library(overworld_modules_plugin MODULE
   src/Perception/Modules/ObjectsModules/Pr2GripperPerceptionModule.cpp
   src/Perception/Modules/RobotsModules/PR2JointsPerception.cpp
   src/Perception/Modules/HumansModules/OptitrackPerceptionModule.cpp
+  src/Perception/Modules/HumansModules/StampedPosePerceptionModule.cpp
 )
 target_link_libraries(overworld_modules_plugin PUBLIC
                       ${catkin_LIBRARIES}
@@ -195,7 +196,7 @@ target_link_libraries(overworld_modules_plugin PUBLIC
 add_library(overworld_reasoner_plugin
   src/OntologeniusPlugins/ReasonerEgocentric.cpp
 )
-add_dependencies(overworld_reasoner_plugin overworld_gencpp)
+add_dependencies(overworld_reasoner_plugin overworld_gencpp ${catkin_EXPORTED_TARGETS})
 target_link_libraries(overworld_reasoner_plugin PUBLIC
                       ${catkin_LIBRARIES}
                       ${ontologenius_LIBRARIES})
