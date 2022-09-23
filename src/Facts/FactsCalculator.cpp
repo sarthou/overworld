@@ -80,11 +80,13 @@ std::vector<Fact> FactsCalculator::computeFacts(const std::map<std::string, Obje
 
 bool FactsCalculator::isOnTopfOf(Object* object_under, Object* object_on)
 {
-  if((object_under->isAabbValid() == false) || (object_on->isAabbValid() == false))
+  if(onto_->individuals.isA(object_under->id(), "Support") == false)
+    return false;
+  else if((object_under->isAabbValid() == false) || (object_on->isAabbValid() == false))
     return false;
   else if(overlapXY(object_under->getAabb(), object_on->getAabb()) == false)
     return false;
-  else if(std::abs(object_under->getAabb().max[2] - object_on->getAabb().min[2]) > 0.04)
+  else if(std::abs(object_under->getAabb().max[2] - object_on->getAabb().min[2]) > 0.08)
     return false;
   else
   {
@@ -95,7 +97,9 @@ bool FactsCalculator::isOnTopfOf(Object* object_under, Object* object_on)
 
 bool FactsCalculator::isInContainer(Object* object_around, Object* object_in)
 {
-  if((object_around->isAabbValid() == false) || (object_in->isAabbValid() == false))
+  if(onto_->individuals.isA(object_around->id(), "Container") == false)
+    return false;
+  else if((object_around->isAabbValid() == false) || (object_in->isAabbValid() == false))
     return false;
   else if(object_in->getAabb().min[2] < object_around->getAabb().min[2] - 0.06)
     return false;
@@ -316,6 +320,14 @@ bool FactsCalculator::isHandMovingTowards(Agent* agent, Object* object)
     }
   }
   return ret;
+}
+
+bool FactsCalculator::isValid(Object* object)
+{
+  if(object->isStatic())
+    return false;
+  else
+    return object->isLocated();
 }
 
 } // namespace owds
