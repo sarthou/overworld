@@ -26,7 +26,7 @@
   <class type="owds::ArTrackPerceptionModule" base_class_type="owds::PerceptionModuleBase_<owds::Object>">
     <description>
       An object perception module using the Ar_track_alvar system.
-      Does not take any parameter.
+      Possible parameters are: min_track_err.
     </description>
   </class>
   <class type="owds::Pr2GripperPerceptionModule" base_class_type="owds::PerceptionModuleBase_<owds::Object>">

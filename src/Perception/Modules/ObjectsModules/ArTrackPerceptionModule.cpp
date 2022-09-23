@@ -24,7 +24,17 @@ bool ArTrackPerceptionModule::closeInitialization()
   onto_ = ontologies_manipulator_->get(robot_name);
   onto_->close();
 
+  min_track_err_ = 0.2; // 20 cm shift
+
   return true;
+}
+
+void ArTrackPerceptionModule::setParameter(const std::string& parameter_name, const std::string& parameter_value)
+{
+  if(parameter_name == "min_track_err")
+    min_track_err_ = std::stod(parameter_value);
+  else
+      ShellDisplay::warning("[Pr2GripperPerceptionModule] Unkown parameter " + parameter_name);
 }
 
 bool ArTrackPerceptionModule::perceptionCallback(const ar_track_alvar_msgs::AlvarMarkers& markers,
@@ -37,7 +47,6 @@ bool ArTrackPerceptionModule::perceptionCallback(const ar_track_alvar_msgs::Alva
 
   std::vector<ar_track_alvar_msgs::AlvarVisibleMarker> valid_visible_markers;
   std::unordered_set<size_t> invalid_main_markers_ids;
-  std::unordered_map<size_t, double> main_marker_id_max_confidence;
   for (const auto& visible_marker : visible_markers.markers)
   {
       geometry_msgs::PoseStamped marker_pose;
@@ -45,7 +54,7 @@ bool ArTrackPerceptionModule::perceptionCallback(const ar_track_alvar_msgs::Alva
       if (old_pose.header.frame_id[0] == '/')
           old_pose.header.frame_id = old_pose.header.frame_id.substr(1);
       tf_buffer_.transform(old_pose, marker_pose, "map", ros::Duration(1.0));
-      if (isInValidArea(Pose(marker_pose)) && visible_marker.confidence < 0.2)
+      if (isInValidArea(Pose(marker_pose)) && visible_marker.confidence < min_track_err_)
           valid_visible_markers.push_back(visible_marker);
       else
           invalid_main_markers_ids.insert(visible_marker.main_id);

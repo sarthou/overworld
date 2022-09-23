@@ -38,6 +38,8 @@ private:
   tf2_ros::Buffer tf_buffer_;
   tf2_ros::TransformListener tf2_listener_;
 
+  double min_track_err_;
+
   bool perceptionCallback(const ar_track_alvar_msgs::AlvarMarkers& markers,
                           const ar_track_alvar_msgs::AlvarVisibleMarkers& visible_markers) override;
 
