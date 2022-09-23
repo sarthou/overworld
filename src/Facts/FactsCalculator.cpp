@@ -21,7 +21,7 @@ std::vector<Fact> FactsCalculator::computeFacts(const std::map<std::string, Obje
   {
     if(obj_from.second->isInHand())
       continue;
-    else if(obj_from.second->isStatic())
+    else if(isValid(obj_from.second) == false)
       continue;
 
     bool is_in = false;
@@ -30,7 +30,7 @@ std::vector<Fact> FactsCalculator::computeFacts(const std::map<std::string, Obje
     {
       if(obj_to.second->isInHand())
         continue;
-      else if(obj_to.second->isStatic())
+      else if(isValid(obj_to.second) == false)
         continue;
 
       if(obj_from.first != obj_to.first)
@@ -42,7 +42,7 @@ std::vector<Fact> FactsCalculator::computeFacts(const std::map<std::string, Obje
       {
         if(obj_to.second->isInHand())
           continue;
-        else if(obj_to.second->isStatic())
+        else if(isValid(obj_to.second) == false)
           continue;
 
         if(obj_from.first != obj_to.first)
@@ -55,7 +55,7 @@ std::vector<Fact> FactsCalculator::computeFacts(const std::map<std::string, Obje
     isInHand(agent_from.second);
     for (auto& obj: objects)
     {
-      if(obj.second->isStatic())
+      if(isValid(obj.second) == false)
         continue;
 
       if (agent_from.second->getType() == AgentType_e::HUMAN){

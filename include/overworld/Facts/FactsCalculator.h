@@ -36,6 +36,8 @@ private:
   bool isLookingAt(Agent* agent, const std::unordered_set<int>& seen_bullet_ids, const Object* object);
   bool hasInHand(Agent* agent, Object* object);
   bool isHandMovingTowards(Agent* agent, Object* object);
+
+  bool isValid(Object* object);
 };
 
 } // namespace owds
