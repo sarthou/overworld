@@ -4,7 +4,7 @@ namespace owds {
 
 void FactsPublisher::publish(const std::vector<Fact>& facts)
 {
-  std::unordered_set<size_t> done_facts_;
+  std::unordered_set<size_t> done_facts;
   std::vector<Fact> to_insert;
 
   for(auto& fact : facts)
@@ -17,7 +17,7 @@ void FactsPublisher::publish(const std::vector<Fact>& facts)
         to_insert.push_back(fact);
       }
     }
-    else if((fact.getPredicate() == "place") && (fact.getPredicate() == "release"))
+    else if((fact.getPredicate() == "place") || (fact.getPredicate() == "release"))
     {
       if(held_by_.find(fact.getObject()) != held_by_.end())
       {
@@ -33,14 +33,14 @@ void FactsPublisher::publish(const std::vector<Fact>& facts)
         to_insert.push_back(fact);
       }
 
-      done_facts_.insert(fact.getHash());
+      done_facts.insert(fact.getHash());
     }
   }
 
   std::unordered_set<size_t> to_remove;
   for(auto fact_it : pending_facts_)
   {
-    if(done_facts_.find(fact_it.first) == done_facts_.end())
+    if(done_facts.find(fact_it.first) == done_facts.end())
       to_remove.insert(fact_it.first);
   }
 
@@ -50,7 +50,7 @@ void FactsPublisher::publish(const std::vector<Fact>& facts)
     pending_facts_.erase(hash);
   }
 
-  for(auto fact : to_insert)
+  for(const auto& fact : to_insert)
     addToKb(fact);
 }
 
