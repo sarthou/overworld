@@ -56,6 +56,28 @@ const Pose& Entity::pose(unsigned int id) const
     return last_poses_.at(last_poses_.size() - id - 1).pose;
 }
 
+const Pose& Entity::pose(const ros::Time& stamp) const
+{
+    if (!is_located_)
+        throw UnlocatedEntityError(id_);
+
+    ros::Duration min_err = stamp - last_poses_.back().stamp;
+
+    for(size_t i = last_poses_.size() - 2; i >= 0; i--)
+    {
+        auto delta = stamp - last_poses_.at(i).stamp;
+        if(delta < min_err)
+        {
+            min_err = delta;
+            std::cout << "take pose at -" << i << std::endl;
+        }
+        else
+            return last_poses_.at(i + 1).pose;
+    }
+
+    return last_poses_.back().pose;
+}
+
 bool Entity::hasMoved() const
 {
     if (!is_located_)

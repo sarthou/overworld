@@ -36,6 +36,7 @@ public:
     bool isLocated() const { return is_located_; }
     const Pose& pose() const;
     const Pose& pose(unsigned int id) const;
+    const Pose& pose(const ros::Time& stamp) const;
     ros::Time lastStamp() const { return last_poses_.back().stamp; }
     bool hasMoved() const;
 
