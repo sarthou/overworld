@@ -104,6 +104,10 @@ void ObjectsPerceptionManager::getPercepts(std::map<std::string, Object>& percep
       if(merged_ids_.find(percept.first) != merged_ids_.end())
         continue;
 
+      // reset lost_objects_nb_frames_
+      if(percept.second.hasBeenSeen())
+        lost_objects_nb_frames_.erase(percept.first);
+
       if(percept.second.isInHand() && (it->second->isInHand() == false))
       {
         // this is a big shit, I know that
