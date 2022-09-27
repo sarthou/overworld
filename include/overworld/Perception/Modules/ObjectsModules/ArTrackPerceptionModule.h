@@ -23,6 +23,7 @@ class ArTrackPerceptionModule : public PerceptionModuleRosSyncBase<Object, ar_tr
 public:
   ArTrackPerceptionModule();
 
+  virtual void setParameter(const std::string& parameter_name, const std::string& parameter_value) override;
   virtual bool closeInitialization() override;
 
 private:
