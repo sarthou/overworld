@@ -151,9 +151,9 @@ void PR2JointsPerception::loadPr2Model()
 
     std::string urdf = n_->param<std::string>("/robot_description", "");
     if (urdf == "")
-	    robot_bullet_id_ = bullet_client_->loadURDF(robot_name_ + ".urdf", {0,0,0}, {0,0,0,1});
+	    robot_bullet_id_ = bullet_client_->loadURDF(robot_name_ + ".urdf", {0,0,0}, {0,0,0,1}, true);
     else
-        robot_bullet_id_ = bullet_client_->loadURDFRaw(urdf, robot_name_ + "_tmp.urdf", {0,0,0}, {0,0,0,1});
+        robot_bullet_id_ = bullet_client_->loadURDFRaw(urdf, robot_name_ + "_tmp.urdf", {0,0,0}, {0,0,0,1}, true);
 }
 
 } // namespace owds
