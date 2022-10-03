@@ -28,6 +28,11 @@ public:
     return hash_ == other.hash_;
   }
 
+  bool operator<(const Fact& other) const
+  {
+    return hash_ < other.hash_;
+  }
+
   std::string toString(const std::string& delim = " ") const
   {
     return subject_ + delim + predicate_ + delim + object_;
@@ -41,5 +46,17 @@ private:
 };
 
 } // namespace owds
+
+namespace std {
+
+template <>
+struct hash<owds::Fact>
+{
+  std::size_t operator()(const owds::Fact& fact) const
+  {
+    return fact.getHash();
+  }
+};
+} // namespace std 
 
 #endif // OWDS_FACT_H
