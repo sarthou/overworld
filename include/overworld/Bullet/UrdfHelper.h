@@ -27,10 +27,6 @@ std::string createLocalUrdf(std::string urdf_path, const std::string& urdf_folde
         std::string package_name = urdf_str.substr(pose + package_pattern.size(), pose_end_of_name - pose - package_pattern.size());
         std::string package_path = ros::package::getPath(package_name);
 
-        std::cout << "full_package = " << full_package << std::endl;
-        std::cout << "package_name = " << package_name << std::endl;
-        std::cout << "package_path = " << package_path << std::endl;
-
         size_t pattern_pose = std::string::npos;
         while((pattern_pose = urdf_str.find(full_package)) != std::string::npos)
         {
@@ -38,6 +34,17 @@ std::string createLocalUrdf(std::string urdf_path, const std::string& urdf_folde
         }
     }
 
+    std::string mass_pattern_begin = "<mass ";
+    std::string mass_pattern_end = "/>";
+    size_t search_pose = 0;
+    while(urdf_str.find(mass_pattern_begin, search_pose) != std::string::npos)
+    {
+        size_t pose = urdf_str.find(mass_pattern_begin, search_pose);
+        size_t pose_end = urdf_str.find(mass_pattern_end, pose + mass_pattern_begin.size());
+        search_pose = pose_end + mass_pattern_end.size();
+
+        urdf_str.replace(pose, pose_end + mass_pattern_end.size() - pose, "<mass value=\"0.0\"/>");
+    }
 
     size_t last = urdf_path.find_last_of("/");
     std::string urdf_name = urdf_path.substr(last + 1);
@@ -45,6 +52,8 @@ std::string createLocalUrdf(std::string urdf_path, const std::string& urdf_folde
     out_file.open(urdf_folder + "/" + urdf_name + ".owds");
     out_file << urdf_str;
     out_file.close();
+
+    std::cout << "create " << urdf_name << ".owds file" << std::endl;
 
     return urdf_folder + "/" + urdf_name + ".owds";
 }

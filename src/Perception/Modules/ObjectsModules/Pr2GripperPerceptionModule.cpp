@@ -17,7 +17,9 @@ Pr2GripperPerceptionModule::Pr2GripperPerceptionModule() : PerceptionModuleRosBa
 
   is_init_ = false;
   left_tip_pressure_ = 0;
+  left_tip_pressure_prev_ = 0;
   right_tip_pressure_ = 0;
+  right_tip_pressure_prev_ = 0;
 
   has_picked_ = false;
   obj_id_ = 0;
@@ -52,7 +54,7 @@ bool Pr2GripperPerceptionModule::closeInitialization()
   setTopicName("pressure/" + std::string((side_ == PR2_GRIPPER_LEFT) ? "l" : "r") + "_gripper_motor");
 
   auto p = bullet_client_->findJointAndLinkIndices(robot_bullet_id_);
-  auto joint_name_id = p.first;
+  //auto joint_name_id = p.first;
   auto link_name_id = p.second;
 
   std::string left_finger_link = std::string((side_ == PR2_GRIPPER_LEFT) ? "l" : "r") + "_gripper_l_finger_tip_link";
@@ -112,6 +114,7 @@ bool Pr2GripperPerceptionModule::perceptionCallback(const pr2_msgs::PressureStat
           shape.type = SHAPE_CUBE;
           shape.scale.fill(dist);
           percept.setShape(shape);
+          // we can not take the mass from the ontology since the object does not exist in (fake id)
           percept.setSeen();
 
           percepts_.insert(std::make_pair(percept.id(), percept));

@@ -9,7 +9,7 @@ namespace owds {
 class BernieSenders
 {
   public:
-    BernieSenders(ros::NodeHandle* nh);
+    explicit BernieSenders(ros::NodeHandle* nh);
     void sendBernie();
 
   private:

@@ -23,7 +23,7 @@ class ArTrackPerceptionModule : public PerceptionModuleRosSyncBase<Object, ar_tr
 public:
   ArTrackPerceptionModule();
 
-  bool closeInitialization();
+  virtual bool closeInitialization() override;
 
 private:
   Pose last_head_pose_;
@@ -39,7 +39,7 @@ private:
   tf2_ros::TransformListener tf2_listener_;
 
   bool perceptionCallback(const ar_track_alvar_msgs::AlvarMarkers& markers,
-                          const ar_track_alvar_msgs::AlvarVisibleMarkers& visible_markers);
+                          const ar_track_alvar_msgs::AlvarVisibleMarkers& visible_markers) override;
 
   bool headHasMoved();
   bool isInValidArea(const Pose& tag_pose);
@@ -49,7 +49,6 @@ private:
   void updateEntities(const ar_track_alvar_msgs::AlvarMarkers& main_markers,
                       const std::unordered_set<size_t>& invalid_main_markers_ids);
   bool createNewEntity(const ar_track_alvar_msgs::AlvarMarker& marker);
-  std::array<double, 3> getColor(const std::string& indiv_name, const std::array<double, 3>& default_value = {0,0,0});
 };
 
 } // namespace owds

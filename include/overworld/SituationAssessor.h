@@ -12,7 +12,7 @@
 #include "overworld/Perception/PerceptionManager.h"
 
 #include "overworld/Senders/ROSSender.h"
-#include "overworld/Senders/MotionPlanningPoseSender.h"
+#include "overworld/Senders/PoseSender.h"
 #include "overworld/Senders/Bernie.h"
 #include "overworld/Facts/FactsCalculator.h"
 #include "overworld/Facts/Publisher/OntologeniusFactsPublisher.h"
@@ -45,6 +45,7 @@ class SituationAssessor
 {
 public:
   SituationAssessor(const std::string& agent_name, const std::string& config_path, bool is_robot = false);
+  SituationAssessor(const SituationAssessor& other) = delete;
   ~SituationAssessor();
 
   void run();
@@ -68,6 +69,7 @@ private:
   ros::ServiceServer stop_modules_service_;
   ros::ServiceServer bounding_box_service_;
   std::atomic<bool> run_;
+  double time_step_; // in second
 
   BulletClient* bullet_client_;
   PerceptionManager perception_manager_;
@@ -76,7 +78,7 @@ private:
   OntologeniusFactsPublisher facts_publisher_;
 
   ROSSender* ros_sender_;
-  MotionPlanningPoseSender* motion_planning_pose_sender_;
+  PoseSender* motion_planning_pose_sender_;
   BernieSenders* bernie_sender_;
 
   std::map<std::string, HumanAssessor_t> humans_assessors_;

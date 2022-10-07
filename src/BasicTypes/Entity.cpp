@@ -12,7 +12,6 @@ Entity::Entity(const std::string& id, bool is_true_id): id_(id),
 
 void Entity::updatePose(const Pose& pose, ros::Time stamp)
 {
-
     last_poses_.push_back({pose, stamp});
     is_located_ = true;
 }
@@ -36,12 +35,25 @@ void Entity::updatePose(const geometry_msgs::PoseStamped& pose)
     last_poses_.push_back(pose_stamped);
 }
 
+void Entity::replacePose(const Pose& pose)
+{
+    last_poses_.replace_back({pose, lastStamp()});
+}
+
 const Pose& Entity::pose() const
 {
     if (!is_located_){
         throw UnlocatedEntityError(id_);
     }
     return last_poses_.back().pose;
+}
+
+const Pose& Entity::pose(unsigned int id) const
+{
+    if (!is_located_)
+        throw UnlocatedEntityError(id_);
+    
+    return last_poses_.at(last_poses_.size() - id - 1).pose;
 }
 
 bool Entity::hasMoved() const
@@ -54,11 +66,11 @@ bool Entity::hasMoved() const
     {
         return true;
     }
-    if (pose().distanceTo(last_poses_.at(last_poses_.size() - 2).pose) > 0.001)
+    if (pose().distanceTo(last_poses_.at(last_poses_.size() - 2).pose) > 0.005) // 5mm
     {
         return true;
     }
-    if (pose().angularDistance(last_poses_.at(last_poses_.size() - 2).pose) > 0.001)
+    if (pose().angularDistance(last_poses_.at(last_poses_.size() - 2).pose) > 0.0174533) // 1degree
     {
         return true;
     }
@@ -162,7 +174,7 @@ visualization_msgs::Marker Entity::toMarker(int id, double lifetime, const std::
     {
     case ShapeType_e::SHAPE_MESH:
         marker.type = marker.MESH_RESOURCE;
-        marker.mesh_resource = shape_.mesh_resource;
+        marker.mesh_resource = shape_.visual_mesh_resource;
         marker.mesh_use_embedded_materials = true;
         break;
 

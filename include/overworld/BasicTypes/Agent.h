@@ -15,7 +15,7 @@ enum AgentType_e
 class Agent
 {
 public:
-  Agent(const std::string id, const FieldOfView& field_of_view, const AgentType_e type) : id_(id), field_of_view_(field_of_view), type_(type)
+  Agent(const std::string& id, const FieldOfView& field_of_view, const AgentType_e type) : id_(id), field_of_view_(field_of_view), type_(type)
   {
     head_ = nullptr;
     left_hand_ = nullptr;
@@ -24,9 +24,9 @@ public:
     torso_ = nullptr;
   }
 
-  std::string getId() { return id_; }
-  const FieldOfView& getFieldOfView() { return field_of_view_; }
-  const AgentType_e getType() { return type_;}
+  const std::string& getId() const { return id_; }
+  const FieldOfView& getFieldOfView() const { return field_of_view_; }
+  const AgentType_e getType() const { return type_;}
   
   void setHead(BodyPart* head) { head_ = head; }
   void setLeftHand(Hand* hand) { left_hand_ = hand; }
@@ -34,11 +34,11 @@ public:
   void setBase(BodyPart* base) { base_ = base; }
   void setTorso(BodyPart* torso) { torso_ = torso; }
 
-  BodyPart* getHead() { return head_; }
-  Hand* getLeftHand() { return left_hand_; }
-  Hand* getRightHand() { return right_hand_; }
-  BodyPart* getBase() { return base_; }
-  BodyPart* getTorso() { return torso_; }
+  BodyPart* getHead() const { return head_; }
+  Hand* getLeftHand() const { return left_hand_; }
+  Hand* getRightHand() const { return right_hand_; }
+  BodyPart* getBase() const { return base_; }
+  BodyPart* getTorso() const { return torso_; }
 
 private:
   std::string id_;

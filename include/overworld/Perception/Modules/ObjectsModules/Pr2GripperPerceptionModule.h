@@ -22,8 +22,8 @@ class Pr2GripperPerceptionModule : public PerceptionModuleRosBase<Object, pr2_ms
 public:
   Pr2GripperPerceptionModule();
 
-  void setParameter(const std::string& parameter_name, const std::string& parameter_value);
-  bool closeInitialization();
+  virtual void setParameter(const std::string& parameter_name, const std::string& parameter_value) override;
+  virtual bool closeInitialization() override;
 
 private:
   Pr2GripperSide_e side_;
@@ -45,7 +45,7 @@ private:
   double min_period_;
   ros::Time last_update_;
 
-  bool perceptionCallback(const pr2_msgs::PressureState& msg);
+  virtual bool perceptionCallback(const pr2_msgs::PressureState& msg) override;
   double getGripperDistance();
 };
 

@@ -6,11 +6,11 @@
 
 namespace owds {
 
-PerceptionManager::PerceptionManager(ros::NodeHandle* n, BulletClient* bullet_client)
-{
-    n_ = n;
-    bullet_client_ = bullet_client;
-}
+PerceptionManager::PerceptionManager(ros::NodeHandle* n, BulletClient* bullet_client) : n_(n),
+                                                                                        bullet_client_(bullet_client),
+                                                                                        robot_bullet_id_(-1),
+                                                                                        robot_agent_(nullptr)
+{}
 
 PerceptionManager::~PerceptionManager()
 {

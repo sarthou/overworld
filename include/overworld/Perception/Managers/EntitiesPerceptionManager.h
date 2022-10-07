@@ -25,18 +25,19 @@ public:
     void setBulletClient(BulletClient* client) { bullet_client_ = client; }
 
     void addPerceptionModule(const std::string& module_name, PerceptionModuleBase_<T>* perception_module);
-    PerceptionModuleBase_<T>* getPerceptionModule(const std::string& module_name);
-    std::vector<std::string> getModulesList();
-    std::vector<std::string> getActivatedModulesList();
-    std::string getModulesListStr();
-    std::string getActivatedModulesListStr();
+    PerceptionModuleBase_<T>* getPerceptionModule(const std::string& module_name) const;
+    std::vector<std::string> getModulesList() const;
+    std::vector<std::string> getActivatedModulesList() const;
+    std::string getModulesListStr() const;
+    std::string getActivatedModulesListStr() const;
     void deleteModules();
-    std::map<std::string, T*> getEntities() { return entities_; }
+    const std::map<std::string, T*>& getEntities() const { return entities_; }
 
     bool update();
 
 protected:
     std::map<std::string, T*> entities_;
+    std::unordered_set<std::string> black_listed_entities_;
     std::map<std::string, PerceptionModuleBase_<T>* > perception_modules_;
     BulletClient* bullet_client_;
 
@@ -49,6 +50,8 @@ protected:
 
     void addToBullet(T* entity);
     void updateToBullet(T* entity);
+    void undoInBullet(T* entity);
+    T* getEntityFromBulletId(int bullet_id);
 
     void UpdateAabbs();
 };
@@ -71,16 +74,16 @@ void EntitiesPerceptionManager<T>::addPerceptionModule(const std::string& module
 }
 
 template<typename T>
-PerceptionModuleBase_<T>* EntitiesPerceptionManager<T>::getPerceptionModule(const std::string& module_name)
+PerceptionModuleBase_<T>* EntitiesPerceptionManager<T>::getPerceptionModule(const std::string& module_name) const
 {
     if(perception_modules_.find(module_name) != perception_modules_.end())
-        return perception_modules_[module_name];
+        return perception_modules_.at(module_name);
     else
         return nullptr;
 }
 
 template<typename T>
-std::vector<std::string> EntitiesPerceptionManager<T>::getModulesList()
+std::vector<std::string> EntitiesPerceptionManager<T>::getModulesList() const
 {
     std::vector<std::string> modules_name;
     for(const auto& module : perception_modules_)
@@ -89,7 +92,7 @@ std::vector<std::string> EntitiesPerceptionManager<T>::getModulesList()
 }
 
 template<typename T>
-std::vector<std::string> EntitiesPerceptionManager<T>::getActivatedModulesList()
+std::vector<std::string> EntitiesPerceptionManager<T>::getActivatedModulesList() const
 {
     std::vector<std::string> modules_name;
     for(const auto& module : perception_modules_)
@@ -101,7 +104,7 @@ std::vector<std::string> EntitiesPerceptionManager<T>::getActivatedModulesList()
 }
 
 template<typename T>
-std::string EntitiesPerceptionManager<T>::getModulesListStr()
+std::string EntitiesPerceptionManager<T>::getModulesListStr() const
 {
     std::string modules_name;
     for(const auto& module : perception_modules_)
@@ -114,7 +117,7 @@ std::string EntitiesPerceptionManager<T>::getModulesListStr()
 }
 
 template<typename T>
-std::string EntitiesPerceptionManager<T>::getActivatedModulesListStr()
+std::string EntitiesPerceptionManager<T>::getActivatedModulesListStr() const
 {
     std::string modules_name;
     for(const auto& module : perception_modules_)
@@ -203,6 +206,9 @@ void EntitiesPerceptionManager<T>::removeEntityPose(T* entity)
 template<typename T>
 void EntitiesPerceptionManager<T>::addToBullet(T* entity)
 {
+    if(black_listed_entities_.find(entity->id()) != black_listed_entities_.end())
+        return;
+
     int visual_id = -1;
     int collision_id = -1;
 
@@ -244,13 +250,16 @@ void EntitiesPerceptionManager<T>::addToBullet(T* entity)
         }
         case SHAPE_MESH:
         {
-            visual_id = bullet_client_->createVisualShapeMesh(entity->getShape().mesh_resource,
+            visual_id = bullet_client_->createVisualShapeMesh(entity->getShape().visual_mesh_resource,
                                                               entity->getShape().scale,
                                                               {entity->getShape().color[0],
                                                                entity->getShape().color[1],
                                                                entity->getShape().color[2],
                                                                1});
-            collision_id = bullet_client_->createCollisionShapeMesh(entity->getShape().mesh_resource,
+            std::string colision_mesh = entity->getShape().colision_mesh_resource;
+            if(colision_mesh == "")
+                colision_mesh = entity->getShape().visual_mesh_resource;
+            collision_id = bullet_client_->createCollisionShapeMesh(colision_mesh,
                                                                     entity->getShape().scale);
             break;
         }
@@ -260,7 +269,23 @@ void EntitiesPerceptionManager<T>::addToBullet(T* entity)
     {
         auto entity_pose = entity->pose().arrays();
         int obj_id = bullet_client_->createMultiBody(0, collision_id, visual_id, entity_pose.first, entity_pose.second);
+        if(entity->getShape().texture != "")
+        {
+            int texture_id = bullet_client_->loadTexture(entity->getShape().texture);
+	        bullet_client_->changeRgbaColor(obj_id, -1, {1,1,1,1});
+	        bullet_client_->changeTexture(obj_id, -1, texture_id);
+
+        }
+        bullet_client_->setMass(obj_id, -1, 0); // We force the mass to zero to not have gravity effect
+        bullet_client_->setRestitution(obj_id, -1, 0.001);
+        bullet_client_->setFrictionAnchor(obj_id, -1, 1);
+        bullet_client_->setActivationState(obj_id, eActivationStateDisableSleeping);
         entity->setBulletId(obj_id);
+    }
+    else
+    {
+        black_listed_entities_.insert(entity->id());
+        ShellDisplay::warning("Entity " + entity->id() + " has been black listed from body creation to prevent future errors");
     }
 }
 
@@ -269,7 +294,8 @@ void EntitiesPerceptionManager<T>::updateToBullet(T* entity)
 {
     if(entity->bulletId() != -1)
     {
-        if(entity->isLocated() == true){
+        if(entity->isLocated() == true)
+        {
             auto entity_pose = entity->pose().arrays();
             bullet_client_->resetBasePositionAndOrientation(entity->bulletId(),
                                                             entity_pose.first,
@@ -280,6 +306,32 @@ void EntitiesPerceptionManager<T>::updateToBullet(T* entity)
                                                             {0.0, 0.0, -100.0},
                                                             {0.0, 0.0, 0.0, 1.0});
     }
+}
+
+template<typename T>
+void EntitiesPerceptionManager<T>::undoInBullet(T* entity)
+{
+    if(entity->bulletId() != -1)
+    {
+        if(entity->isLocated() == true)
+        {
+            auto entity_pose = entity->pose(1).arrays();
+            bullet_client_->resetBasePositionAndOrientation(entity->bulletId(),
+                                                            entity_pose.first,
+                                                            entity_pose.second);
+        }
+    }
+}
+
+template<typename T>
+T* EntitiesPerceptionManager<T>::getEntityFromBulletId(int bullet_id)
+{
+    for(auto entity : entities_)
+    {
+        if(entity.second->bulletId() == bullet_id)
+            return entity.second;
+    }
+    return nullptr;
 }
 
 template<typename T>

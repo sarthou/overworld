@@ -24,7 +24,8 @@ find_package(catkin REQUIRED COMPONENTS
   ar_track_alvar_msgs
   sensor_msgs
   visualization_msgs
-  pr2_motion_tasks_msgs
+  geometry_msgs
+  optitrack_msgs
   cv_bridge
   pluginlib
 )
@@ -58,26 +59,27 @@ foreach(lib_name ${BULLET_LIB_NAMES})
   unset(LIB_PATH CACHE)
 endforeach()
 
-find_package(optitrack_ros REQUIRED)
-
 ################################################
 ## Declare ROS messages, services and actions ##
 ################################################
 
 add_message_files(
   FILES
-  StampedStringTest.msg
+  Triplet.msg
 )
 
 add_service_files(
   FILES
   StartStopModules.srv
   BoundingBox.srv
+  GetPose.srv
+  GetRelations.srv
 )
 
 generate_messages(
   DEPENDENCIES
   std_msgs
+  geometry_msgs
 )
 
 ###################################
@@ -104,7 +106,6 @@ include_directories(
   include
   ${EIGEN3_INCLUDE_DIRS}
   ${catkin_INCLUDE_DIRS}
-  ${optitrack_ros_INCLUDE_DIRS}
   ${CURL_INCLUDE_DIRS}
 )
 add_definitions( ${EIGEN3_DEFINITIONS} )
@@ -166,7 +167,7 @@ target_link_libraries(${PROJECT_NAME}_facts_lib PUBLIC
            
 add_library(${PROJECT_NAME}_sender_lib STATIC
   src/Senders/ROSSender.cpp
-  src/Senders/MotionPlanningPoseSender.cpp
+  src/Senders/PoseSender.cpp
   src/Senders/Bernie.cpp
 )
 target_link_libraries(${PROJECT_NAME}_sender_lib PUBLIC
@@ -191,6 +192,14 @@ target_link_libraries(overworld_modules_plugin PUBLIC
                       ${PROJECT_NAME}_bullet_lib
                       ${PROJECT_NAME}_types_lib)
 
+add_library(overworld_reasoner_plugin
+  src/OntologeniusPlugins/ReasonerEgocentric.cpp
+)
+add_dependencies(overworld_reasoner_plugin overworld_gencpp)
+target_link_libraries(overworld_reasoner_plugin PUBLIC
+                      ${catkin_LIBRARIES}
+                      ${ontologenius_LIBRARIES})
+                                          
 #################
 #     Nodes     #
 #################
@@ -225,3 +234,10 @@ target_link_libraries(${PROJECT_NAME}_config_test PRIVATE
                       ${PROJECT_NAME}_perception_lib
                       ${catkin_LIBRARIES})
 add_dependencies(${PROJECT_NAME}_config_test overworld_gencpp)
+
+add_executable(${PROJECT_NAME}_gravity_test src/TestFiles/gravity.cpp )
+target_link_libraries(${PROJECT_NAME}_gravity_test PRIVATE
+                      ${PROJECT_NAME}_types_lib
+                      ${PROJECT_NAME}_bullet_lib
+                      ${catkin_LIBRARIES})
+add_dependencies(${PROJECT_NAME}_gravity_test overworld_gencpp)

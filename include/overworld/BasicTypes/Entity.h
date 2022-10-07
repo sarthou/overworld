@@ -25,26 +25,28 @@ struct PoseStamped_s
 class Entity
 {
 public:
-    Entity(const std::string& id, bool is_true_id = true);
+    explicit Entity(const std::string& id, bool is_true_id = true);
 
     void updatePose(const Pose& pose, ros::Time stamp = ros::Time::now());
     void updatePose(const std::array<double, 3>& translation, const std::array<double, 4>& rotation);
     void updatePose(const std::array<double, 3>& translation, const std::array<double, 4>& rotation, ros::Time stamp);
     void updatePose(const geometry_msgs::PoseStamped& pose);
+    void replacePose(const Pose& pose);
     void unsetPose() { is_located_ = false; }
     bool isLocated() const { return is_located_; }
     const Pose& pose() const;
+    const Pose& pose(unsigned int id) const;
     ros::Time lastStamp() const { return last_poses_.back().stamp; }
     bool hasMoved() const;
 
     std::array<double, 3> computeTranslationSpeed() const;
 
     void setId(const std::string& id, bool is_true_id = true);
-    std::string id() const { return id_; }
+    const std::string& id() const { return id_; }
     bool isTrueId() const { return is_true_id_; }
 
     void addFalseId(const std::string& false_id) { false_ids_.insert(false_id); }
-    std::unordered_set<std::string> getFalseIds() { return false_ids_; }
+    std::unordered_set<std::string> getFalseIds() const { return false_ids_; }
  
     void setBulletId(int bullet_id) { bullet_id_ = bullet_id; }
     int bulletId() const { return bullet_id_; }
@@ -88,7 +90,7 @@ protected:
 class UnlocatedEntityError: public std::runtime_error
 {
 public:
-    inline UnlocatedEntityError(const std::string& entity_name): 
+    inline explicit UnlocatedEntityError(const std::string& entity_name): 
         std::runtime_error("Entity '" + entity_name + "' is not located, but its pose has been asked.")
     {}
 };

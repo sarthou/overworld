@@ -14,7 +14,7 @@ namespace owds {
 class ROSSender
 {
   public:
-    ROSSender(ros::NodeHandle* n);
+    explicit ROSSender(ros::NodeHandle* n);
 
     template<typename T> void sendEntitiesToTF(const std::vector<T*>& entities);
     template<typename T> void sendEntitiesToRViz(const std::string& topic_name, const std::vector<T*>& entities);
@@ -40,9 +40,7 @@ void ROSSender::sendEntitiesToTF(const std::vector<T*>& entities)
     for (const auto& entity : entities)
     {
         if (entity->isLocated())
-        {
             transforms.push_back(entity->toTfTransform());
-        }
     }
     tf_broadcaster_.sendTransform(transforms);
 }
@@ -60,9 +58,7 @@ void ROSSender::sendEntitiesToRViz(const std::string& topic_name, const std::vec
     for (const auto& entity : entities)
     {
         if (entity->isLocated())
-        {
             markers.markers.push_back(entity->toMarker(id++, 1.0, "marker"));
-        }
     }
     pub_it->second.publish(markers);
 }
@@ -98,9 +94,7 @@ void ROSSender::sendEntitiesToTF(const std::map<std::string, T*>& entities)
     for (const auto& entity : entities)
     {
         if (entity.second->isLocated())
-        {
             transforms.push_back(entity.second->toTfTransform());
-        }
     }
     tf_broadcaster_.sendTransform(transforms);
 }
@@ -118,9 +112,7 @@ void ROSSender::sendEntitiesToRViz(const std::string& topic_name, const std::map
     for (const auto& entity : entities)
     {
         if (entity.second->isLocated())
-        {
             markers.markers.push_back(entity.second->toMarker(id++, 1.0, "marker"));
-        }
     }
     pub_it->second.publish(markers);
 }
