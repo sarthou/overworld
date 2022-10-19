@@ -88,4 +88,15 @@ void Object::setDefaultMass(double density)
     }
 }
 
+void Object::setTypes(const std::vector<std::string>& types)
+{
+    for(auto& type : types)
+        types_.insert(type);
+}
+
+bool Object::isA(const std::string& type)
+{
+    return (types_.find(type) != types_.end());
+}
+
 } // namespace owds

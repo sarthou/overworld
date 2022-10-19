@@ -38,12 +38,17 @@ public:
     void setDefaultMass(double density = 500.0); // shape and aabb should exist to compute the default mass
     double getMass() const { return mass_; }
 
+    void setTypes(const std::vector<std::string>& types);
+    bool isA(const std::string& type);
+
 protected:
     std::vector<PointOfInterest> points_of_interest_;
     bool is_static_;
     Hand* hand_in_;
     std::array<double, 3> bounding_box_;
     double mass_;
+
+    std::unordered_set<std::string> types_;
 };
 
 } // namespace owds
