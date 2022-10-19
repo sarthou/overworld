@@ -26,24 +26,24 @@ Agent* RobotsPerceptionManager::getAgent(const std::string& agent_name)
 
 void RobotsPerceptionManager::getPercepts( std::map<std::string, BodyPart>& percepts)
 {
-    for(auto& percept : percepts)
+  for(auto& percept : percepts)
+  {
+    auto it = entities_.find(percept.second.id());
+    if(it == entities_.end())
     {
-        auto it = entities_.find(percept.second.id());
-        if(it == entities_.end())
-        {
-            BodyPart* new_body_part = nullptr;
-            if((percept.second.getType() == BODY_PART_LEFT_HAND) || (percept.second.getType() == BODY_PART_RIGHT_HAND))
-              new_body_part = new Hand(percept.second);
-            else
-              new_body_part = new BodyPart(percept.second);
-            it = entities_.insert(std::pair<std::string, BodyPart*>(percept.second.id(), new_body_part)).first;
-            addToBullet(it->second);
-            UpdateAgent(it->second);
-        }
-        
-        if(percept.second.isLocated())
-          updateEntityPose(it->second, percept.second.pose(), percept.second.lastStamp());
+      BodyPart* new_body_part = nullptr;
+      if((percept.second.getType() == BODY_PART_LEFT_HAND) || (percept.second.getType() == BODY_PART_RIGHT_HAND))
+        new_body_part = new Hand(percept.second);
+      else
+        new_body_part = new BodyPart(percept.second);
+      it = entities_.insert(std::pair<std::string, BodyPart*>(percept.second.id(), new_body_part)).first;
+      addToBullet(it->second);
+      UpdateAgent(it->second);
     }
+    
+    if(percept.second.isLocated())
+      updateEntityPose(it->second, percept.second.pose(), percept.second.lastStamp());
+  }
 }
 
 void RobotsPerceptionManager::UpdateAgent(BodyPart* body_part)
