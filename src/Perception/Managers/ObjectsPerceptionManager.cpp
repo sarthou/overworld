@@ -10,6 +10,15 @@
 
 namespace owds {
 
+void ObjectsPerceptionManager::setOwnerAgent(Agent* agent)
+{
+  myself_agent_ = agent;
+  ontos_.waitInit();
+  ontos_.add(myself_agent_->getId());
+  onto_ = ontos_.get(myself_agent_->getId());
+  onto_->close();
+}
+
 std::map<std::string, Object*> ObjectsPerceptionManager::getEntities() const
 {
   if(merged_ids_.size() == 0)
@@ -78,6 +87,8 @@ std::map<std::string, Object*>::iterator ObjectsPerceptionManager::createFromPer
   getObjectBoundingBox(it->second);
   if(it->second->getMass() == 0)
     it->second->setDefaultMass();
+
+  it->second->setTypes(onto_->individuals.getUp(it->first));
 
   return it;
 }
