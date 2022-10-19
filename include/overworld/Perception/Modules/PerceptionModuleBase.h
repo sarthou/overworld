@@ -29,7 +29,7 @@ class PerceptionModuleBase_
 public:
   explicit PerceptionModuleBase_(bool need_access_to_external_entities = false):
                                 is_activated_(true),
-                                updated_(false),
+                                updated_(true),
                                 need_access_to_external_entities_(need_access_to_external_entities),
                                 n_(nullptr),
                                 bullet_client_(nullptr),
@@ -51,7 +51,7 @@ public:
   }
 
   virtual void setParameter(const std::string& parameter_name, const std::string& parameter_value) {}
-  virtual bool closeInitialization() { return true; }
+  virtual bool closeInitialization() { updated_ = false; return true; }
 
   virtual std::string getAgentName() { return ""; } 
   virtual int getAgentBulletId() { return -1; }
