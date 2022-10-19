@@ -66,6 +66,9 @@ endforeach()
 add_message_files(
   FILES
   Triplet.msg
+  EntityPose.msg
+  EntitiesPoses.msg
+  AgentPose.msg
 )
 
 add_service_files(
