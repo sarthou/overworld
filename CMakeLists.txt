@@ -186,10 +186,13 @@ target_link_libraries(${PROJECT_NAME}_sender_lib PUBLIC
 add_library(overworld_modules_plugin MODULE
   src/Perception/Modules/ObjectsModules/ArTrackPerceptionModule.cpp
   src/Perception/Modules/ObjectsModules/StaticObjectsPerceptionModule.cpp
+  src/Perception/Modules/ObjectsModules/FakeObjectPerceptionModule.cpp
   src/Perception/Modules/ObjectsModules/Pr2GripperPerceptionModule.cpp
   src/Perception/Modules/RobotsModules/PR2JointsPerception.cpp
+  src/Perception/Modules/RobotsModules/FakeRobotPerceptionModule.cpp
   src/Perception/Modules/HumansModules/OptitrackPerceptionModule.cpp
   src/Perception/Modules/HumansModules/StampedPosePerceptionModule.cpp
+  src/Perception/Modules/HumansModules/FakeHumanPerceptionModule.cpp
 )
 target_link_libraries(overworld_modules_plugin PUBLIC
                       ${catkin_LIBRARIES}

@@ -7,6 +7,13 @@
       right_hand, left_hand, and head.
     </description>
   </class>
+  <class type="owds::FakeRobotPerceptionModule" base_class_type="owds::PerceptionModuleBase_<owds::BodyPart>">
+    <description>
+      A robot perception module providing fake body parts from a ROS topic.
+      Possible parameters are: name, head, base
+      head_pose, and base_pose.
+    </description>
+  </class>
 
   <class type="owds::OptitrackPerceptionModule" base_class_type="owds::PerceptionModuleBase_<owds::BodyPart>">
     <description>
@@ -20,6 +27,12 @@
       A human perception module using a poseStamped ROS message.
       Possible parameters are: name.
       The module subscribe to "/peopleTrack". Remap your topic if needed.
+    </description>
+  </class>
+  <class type="owds::FakeHumanPerceptionModule" base_class_type="owds::PerceptionModuleBase_<owds::BodyPart>">
+    <description>
+      A human perception module providing fake body parts from a ROS topic.
+      Does not take any parameter.
     </description>
   </class>
 
@@ -39,6 +52,12 @@
   <class type="owds::StaticObjectsPerceptionModule" base_class_type="owds::PerceptionModuleBase_<owds::Object>">
     <description>
       An object perception module providing static objects.
+      Does not take any parameter.
+    </description>
+  </class>
+  <class type="owds::FakeObjectPerceptionModule" base_class_type="owds::PerceptionModuleBase_<owds::Object>">
+    <description>
+      An object perception module providing fake objects from a ROS topic.
       Does not take any parameter.
     </description>
   </class>
