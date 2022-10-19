@@ -2,14 +2,8 @@
 
 namespace owds {
 
-FactsCalculator::FactsCalculator(ros::NodeHandle* nh, const std::string& agent_name): ontos_(OntologiesManipulator(nh))
-{
-  ontos_.waitInit();
-  ontos_.add(agent_name);
-  onto_ = ontos_.get(agent_name);
-  onto_->close();
-
-}
+FactsCalculator::FactsCalculator(const std::string& agent_name)
+{}
 
 std::vector<Fact> FactsCalculator::computeFacts(const std::map<std::string, Object*>& objects,
                                                 const std::map<std::string, Agent*>& agents,
@@ -80,7 +74,7 @@ std::vector<Fact> FactsCalculator::computeFacts(const std::map<std::string, Obje
 
 bool FactsCalculator::isOnTopfOf(Object* object_under, Object* object_on)
 {
-  if(onto_->individuals.isA(object_under->id(), "Support") == false)
+  if(object_under->isA("Support") == false)
     return false;
   else if((object_under->isAabbValid() == false) || (object_on->isAabbValid() == false))
     return false;
@@ -97,7 +91,7 @@ bool FactsCalculator::isOnTopfOf(Object* object_under, Object* object_on)
 
 bool FactsCalculator::isInContainer(Object* object_around, Object* object_in)
 {
-  if(onto_->individuals.isA(object_around->id(), "Container") == false)
+  if(object_around->isA("Container") == false)
     return false;
   else if((object_around->isAabbValid() == false) || (object_in->isAabbValid() == false))
     return false;
@@ -220,8 +214,7 @@ bool FactsCalculator::hasInHand(Agent* agent, Object* object)
     {
       if (leftHand->pose().distanceTo(object->pose()) < 0.08)
       {
-        std::vector<std::string> types = onto_->individuals.getUp(object->id());
-        if (std::find(types.begin(), types.end(), "Pickable") != types.end())
+        if(object->isA("Pickable"))
         {
           object->setInHand(leftHand);
           leftHand->putInHand(object);
@@ -244,8 +237,7 @@ bool FactsCalculator::hasInHand(Agent* agent, Object* object)
     {
       if (rightHand->pose().distanceTo(object->pose()) < 0.08)
       {
-        std::vector<std::string> types = onto_->individuals.getUp(object->id());
-        if (std::find(types.begin(), types.end(), "Pickable") != types.end())
+        if(object->isA("Pickable"))
         {
           object->setInHand(rightHand);
           rightHand->putInHand(object);

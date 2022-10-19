@@ -25,7 +25,7 @@ SituationAssessor::SituationAssessor(const std::string& agent_name,
                                                       config_path_(config_path),
                                                       time_step_(0.06),
                                                       facts_publisher_(&n_, agent_name),
-                                                      facts_calculator_(&n_, agent_name),
+                                                      facts_calculator_(agent_name),
                                                       perception_manager_(&n_)
 {
   n_.setCallbackQueue(&callback_queue_);
