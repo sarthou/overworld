@@ -3,6 +3,8 @@
 #include "overworld/BasicTypes/Hand.h"
 #include "overworld/Utility/ShellDisplay.h"
 
+#include <limits>
+
 namespace owds {
 
 Object::Object(const std::string& id, bool is_true_id): Entity(id, is_true_id),
@@ -72,7 +74,6 @@ void Object::setDefaultMass(double density)
     case ShapeType_e::SHAPE_MESH:
         mass_ = getBbVolume() * density;
         break;
-
     case ShapeType_e::SHAPE_SPEHERE:
         mass_ = 4.0*M_PI* std::pow(shape_.scale[0], 3) / 3.0;
         break;
@@ -86,6 +87,47 @@ void Object::setDefaultMass(double density)
         throw std::runtime_error("setDefaultMass has been called on entity '" + id_ + "' + but its ShapeType is not defined.");
         break;
     }
+}
+
+void Object::computeCorners()
+{
+    double min_x = origin_offset_[0] - bounding_box_[0] / 2.;
+    double max_x = origin_offset_[0] + bounding_box_[0] / 2.;
+    double min_y = origin_offset_[1] - bounding_box_[1] / 2.;
+    double max_y = origin_offset_[1] + bounding_box_[1] / 2.;
+    double min_z = origin_offset_[2] - bounding_box_[2] / 2.;
+    double max_z = origin_offset_[2] + bounding_box_[2] / 2.;
+    corners_ = { {{min_x, min_y, min_z}, {0.0, 0.0, 0.0, 1.0}},
+                 {{max_x, min_y, min_z}, {0.0, 0.0, 0.0, 1.0}},
+                 {{min_x, max_y, min_z}, {0.0, 0.0, 0.0, 1.0}},
+                 {{max_x, max_y, min_z}, {0.0, 0.0, 0.0, 1.0}},
+                 {{min_x, min_y, max_z}, {0.0, 0.0, 0.0, 1.0}},
+                 {{max_x, min_y, max_z}, {0.0, 0.0, 0.0, 1.0}},
+                 {{min_x, max_y, max_z}, {0.0, 0.0, 0.0, 1.0}},
+                 {{max_x, max_y, max_z}, {0.0, 0.0, 0.0, 1.0}} };
+}
+
+double Object::getMinDistanceTo(const Object& other)
+{
+    std::vector<Pose> other_corners = other.getCorners();
+    double min_dist = std::numeric_limits<double>::max();
+
+    for(auto& c_a : other_corners)
+    {
+        std::cout << "In " << other.id() << " : " << c_a << std::endl;
+        Pose map_to_corner = other.pose() * c_a;
+        Pose in_b = map_to_corner.transformIn(pose());
+        std::cout << "In " << id() << " : " << in_b << std::endl;
+        for(auto& c_b : corners_)
+        {
+            double dist = in_b.distanceSqTo(c_b);
+            if(dist < min_dist)
+                min_dist = dist;
+        }
+    }
+    
+    std::cout << "Min dist between " << id() << " and " << other.id() << " is " << sqrt(min_dist) << std::endl;
+    return sqrt(min_dist);
 }
 
 void Object::setTypes(const std::vector<std::string>& types)
