@@ -515,6 +515,10 @@ void ObjectsPerceptionManager::getObjectBoundingBox(Object* object)
   updateEntityPose(object, tmp_pose, ros::Time::now());
 
   object->setBoundingBox({bb.max[0] - bb.min[0], bb.max[1] - bb.min[1], bb.max[2] - bb.min[2]});
+  object->setOriginOffset({(bb.max[0] - bb.min[0]) / 2. + bb.min[0],
+                           (bb.max[1] - bb.min[1]) / 2. + bb.min[1],
+                           (bb.max[2] - bb.min[2]) / 2. + bb.min[2]});
+  object->computeCorners();
 }
 
 } // namespace owds
