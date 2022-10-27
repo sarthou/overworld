@@ -172,6 +172,7 @@ add_library(${PROJECT_NAME}_sender_lib STATIC
   src/Senders/ROSSender.cpp
   src/Senders/PoseSender.cpp
   src/Senders/Bernie.cpp
+  src/Senders/RelationsSender.cpp
 )
 target_link_libraries(${PROJECT_NAME}_sender_lib PUBLIC
                       ${catkin_LIBRARIES}
