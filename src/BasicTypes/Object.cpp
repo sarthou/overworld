@@ -114,10 +114,8 @@ double Object::getMinDistanceTo(const Object& other)
 
     for(auto& c_a : other_corners)
     {
-        std::cout << "In " << other.id() << " : " << c_a << std::endl;
         Pose map_to_corner = other.pose() * c_a;
         Pose in_b = map_to_corner.transformIn(pose());
-        std::cout << "In " << id() << " : " << in_b << std::endl;
         for(auto& c_b : corners_)
         {
             double dist = in_b.distanceSqTo(c_b);
@@ -126,7 +124,6 @@ double Object::getMinDistanceTo(const Object& other)
         }
     }
     
-    std::cout << "Min dist between " << id() << " and " << other.id() << " is " << sqrt(min_dist) << std::endl;
     return sqrt(min_dist);
 }
 
