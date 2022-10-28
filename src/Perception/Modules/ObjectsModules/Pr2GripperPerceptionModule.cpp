@@ -47,7 +47,7 @@ bool Pr2GripperPerceptionModule::closeInitialization()
 {
   if(side_ == PR2_GRIPER_UNDEFINED)
   {
-    ShellDisplay::error("[Pr2GripperPerceptionModule] No gripper side has been defined");
+    ShellDisplay::error("[" + module_name_ + "] No gripper side has been defined");
     return false;
   }
 
@@ -63,12 +63,12 @@ bool Pr2GripperPerceptionModule::closeInitialization()
   if(link_name_id.find(left_finger_link) != link_name_id.end())
     pr2_left_tip_bullet_id_ = link_name_id.at(left_finger_link);
   else
-    throw std::runtime_error("[Pr2GripperPerceptionModule] link " + left_finger_link + " does not exist");
+    throw std::runtime_error("[" + module_name_ + "] link " + left_finger_link + " does not exist");
 
   if(link_name_id.find(right_finger_link) != link_name_id.end())
     pr2_right_tip_bullet_id_ = link_name_id.at(right_finger_link);
   else
-    throw std::runtime_error("[Pr2GripperPerceptionModule] link " + left_finger_link + " does not exist");
+    throw std::runtime_error("[" + module_name_ + "] link " + left_finger_link + " does not exist");
 
   return true;
 }
