@@ -35,12 +35,18 @@ bool FakeObjectPerceptionModule::perceptionCallback(const overworld::EntitiesPos
 
     std::string frame_id = obj.pose.header.frame_id;
     if (frame_id[0] == '/')
-        frame_id = frame_id.substr(1);
-    geometry_msgs::TransformStamped to_map = tf_buffer_.lookupTransform("map", frame_id, ros::Time::now(), ros::Duration(1.0));
-    geometry_msgs::PoseStamped obj_in_map;
-    tf2::doTransform(obj.pose, obj_in_map, to_map);
-    it_percept->second.updatePose(obj_in_map);
-    it_percept->second.setSeen();
+      frame_id = frame_id.substr(1);
+
+    try {
+      geometry_msgs::TransformStamped to_map = tf_buffer_.lookupTransform("map", frame_id, ros::Time::now(), ros::Duration(1.0));
+      geometry_msgs::PoseStamped obj_in_map;
+      tf2::doTransform(obj.pose, obj_in_map, to_map);
+      it_percept->second.updatePose(obj_in_map);
+      it_percept->second.setSeen();
+    }
+    catch (const tf2::TransformException& ex) {
+      ShellDisplay::error("[FakeObjectPerceptionModule]" + std::string(ex.what()));
+    }
   }
 
   return true;

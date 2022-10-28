@@ -175,11 +175,17 @@ void ArTrackPerceptionModule::updateEntities(const ar_track_alvar_msgs::AlvarMar
       auto it_obj = percepts_.find(ids_map_[main_marker.id]);
       std::string frame_id = main_marker.header.frame_id;
       if (frame_id[0] == '/')
-          frame_id = frame_id.substr(1);
-      geometry_msgs::TransformStamped to_map = tf_buffer_.lookupTransform("map", frame_id, main_marker.header.stamp, ros::Duration(1.0));
-      geometry_msgs::PoseStamped marker_in_map;
-      tf2::doTransform(main_marker.pose, marker_in_map, to_map);
-      it_obj->second.updatePose(marker_in_map);
+        frame_id = frame_id.substr(1);
+
+      try {
+        geometry_msgs::TransformStamped to_map = tf_buffer_.lookupTransform("map", frame_id, main_marker.header.stamp, ros::Duration(1.0));
+        geometry_msgs::PoseStamped marker_in_map;
+        tf2::doTransform(main_marker.pose, marker_in_map, to_map);
+        it_obj->second.updatePose(marker_in_map);
+      }
+      catch (const tf2::TransformException& ex) {
+        ShellDisplay::error("[ArTrackPerceptionModule]" + std::string(ex.what()));
+      }
   }
 }
 

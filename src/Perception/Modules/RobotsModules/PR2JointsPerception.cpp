@@ -126,7 +126,7 @@ bool PR2JointsPerception::updateBasePose(const ros::Time& stamp)
         robot_base = tf_buffer_.lookupTransform("map", base_link_, stamp, ros::Duration(1.0));
     }
     catch (const tf2::TransformException& ex){
-      ShellDisplay::error("[PR2JointsPerception]" + std::string(ex.what()));
+        ShellDisplay::error("[PR2JointsPerception]" + std::string(ex.what()));
     }
     catch(...) {
         return false;
