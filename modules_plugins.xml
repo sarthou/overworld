@@ -1,8 +1,8 @@
 <library path="lib/liboverworld_modules_plugin">
 
-  <class type="owds::PR2JointsPerception" base_class_type="owds::PerceptionModuleBase_<owds::BodyPart>">
+  <class type="owds::JointStatePerceptionModule" base_class_type="owds::PerceptionModuleBase_<owds::BodyPart>">
     <description>
-      A robot perception module for a PR2 robot.
+      A robot perception module using robot joint state.
       Possible parameters are: name, min_period,
       right_hand, left_hand, and head.
     </description>

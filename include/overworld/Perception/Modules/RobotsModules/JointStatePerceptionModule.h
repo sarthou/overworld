@@ -1,5 +1,5 @@
-#ifndef OWDS_PR2JOINTSPERCEPTION_H
-#define OWDS_PR2JOINTSPERCEPTION_H
+#ifndef OWDS_JOINTSTATEPERCEPTIONMODULE_H
+#define OWDS_JOINTSTATEPERCEPTIONMODULE_H
 
 #include "overworld/BasicTypes/BodyPart.h"
 #include "overworld/Bullet/PhysicsServers.h"
@@ -9,11 +9,11 @@
 
 namespace owds {
 
-class PR2JointsPerception : public owds::PerceptionModuleRosBase<owds::BodyPart, sensor_msgs::JointState>
+class JointStatePerceptionModule : public owds::PerceptionModuleRosBase<owds::BodyPart, sensor_msgs::JointState>
 {
   public:
-    PR2JointsPerception();
-    virtual ~PR2JointsPerception() = default;
+    JointStatePerceptionModule();
+    virtual ~JointStatePerceptionModule() = default;
 
     virtual void setParameter(const std::string& parameter_name, const std::string& parameter_value) override;
     virtual bool closeInitialization() override;
@@ -47,4 +47,4 @@ class PR2JointsPerception : public owds::PerceptionModuleRosBase<owds::BodyPart,
 
 } // namespace owds
 
-#endif /* OWDS_PR2JOINTSPERCEPTION_H */
+#endif /* OWDS_JOINTSTATEPERCEPTIONMODULE_H */

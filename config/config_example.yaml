@@ -1,6 +1,6 @@
 modules:
   robot:
-    PR2JointsPerception: pr2_joints
+    JointStatePerceptionModule: robot_joints
   humans:
     OptitrackPerceptionModule: optitrack
   objects:
@@ -10,7 +10,7 @@ modules:
       - pr2_right_gripper
     StaticObjectsPerceptionModule: static
 
-pr2_joints:
+robot_joints:
   name : pr2
   right_hand : r_gripper_tool_frame
   left_hand : l_gripper_tool_frame
