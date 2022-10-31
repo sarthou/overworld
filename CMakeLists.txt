@@ -24,7 +24,6 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   visualization_msgs
   geometry_msgs
-  optitrack_msgs
   cv_bridge
   pluginlib
 )
@@ -189,7 +188,6 @@ add_library(overworld_modules_plugin MODULE
   src/Perception/Modules/ObjectsModules/Pr2GripperPerceptionModule.cpp
   src/Perception/Modules/RobotsModules/JointStatePerceptionModule.cpp
   src/Perception/Modules/RobotsModules/FakeRobotPerceptionModule.cpp
-  src/Perception/Modules/HumansModules/OptitrackPerceptionModule.cpp
   src/Perception/Modules/HumansModules/StampedPosePerceptionModule.cpp
   src/Perception/Modules/HumansModules/FakeHumanPerceptionModule.cpp
 )

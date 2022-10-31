@@ -26,7 +26,6 @@
   <build_depend>sensor_msgs</build_depend>
   <build_depend>visualization_msgs</build_depend>
   <build_depend>geometry_msgs</build_depend>
-  <build_depend>optitrack_msgs</build_depend>
   <build_depend>cv_bridge</build_depend>
   <build_depend>pluginlib</build_depend>
 
@@ -44,7 +43,7 @@
   <build_export_depend>sensor_msgs</build_export_depend>
   <build_export_depend>visualization_msgs</build_export_depend>
   <build_export_depend>geometry_msgs</build_export_depend>
-  <build_export_depend>optitrack_msgs</build_export_depend>
+  <build_export_depend>optitrack_mss</build_export_depend>
   <build_export_depend>cv_bridge</build_export_depend>
 
 
@@ -62,7 +61,6 @@
   <exec_depend>sensor_msgs</exec_depend>
   <exec_depend>visualization_msgs</exec_depend>
   <exec_depend>geometry_msgs</exec_depend>
-  <exec_depend>optitrack_msgs</exec_depend>
   <exec_depend>cv_bridge</exec_depend>
   <exec_depend>pluginlib</exec_depend>
 

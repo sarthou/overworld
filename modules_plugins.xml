@@ -15,13 +15,6 @@
     </description>
   </class>
 
-  <class type="owds::OptitrackPerceptionModule" base_class_type="owds::PerceptionModuleBase_<owds::BodyPart>">
-    <description>
-      A human perception module using the Optitrack mocap system.
-      Possible parameters are: name, offset_x,
-      offset_y, offset_z.
-    </description>
-  </class>
   <class type="owds::StampedPosePerceptionModule" base_class_type="owds::PerceptionModuleBase_<owds::BodyPart>">
     <description>
       A human perception module using a poseStamped ROS message.
