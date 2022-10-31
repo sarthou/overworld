@@ -29,13 +29,6 @@
     </description>
   </class>
 
-  <class type="owds::Pr2GripperPerceptionModule" base_class_type="owds::PerceptionModuleBase_<owds::Object>">
-    <description>
-      An object perception module using the Pr2 pressure sensors.
-      Possible parameters are: side (0 left / 1 right),
-      pressure_threshold, distance_threshold, min_period.
-    </description>
-  </class>
   <class type="owds::StaticObjectsPerceptionModule" base_class_type="owds::PerceptionModuleBase_<owds::Object>">
     <description>
       An object perception module providing static objects.
