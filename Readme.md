@@ -71,8 +71,8 @@ The knowledge base Ontologenius can be used as a source of information for Overw
 
 More information about this link and tutorials to show its use will come soon.
 
-[Release-Url]: https://github.com/sarthou/overworld/releases/tag/v0.1.1
-[Release-Image]: http://img.shields.io/badge/release-v0.1.1-blue
+[Release-Url]: https://github.com/sarthou/overworld/releases/tag/v0.1.2
+[Release-Image]: http://img.shields.io/badge/release-v0.1.2-blue
 
 [Ontologenius-Dependency-Image]: https://img.shields.io/badge/dependencies-ontologenius-yellow
 [Ontologenius-Dependency-Url]: https://github.com/sarthou/ontologenius
