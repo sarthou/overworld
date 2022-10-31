@@ -94,9 +94,9 @@ generate_messages(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES overworld
-   CATKIN_DEPENDS ontologenius roscpp std_msgs tf2 tf2_ros roslib
+  INCLUDE_DIRS include
+  LIBRARIES ${PROJECT_NAME}_bullet_lib ${PROJECT_NAME}_types_lib
+  CATKIN_DEPENDS ontologenius roscpp std_msgs tf2 tf2_ros roslib
 #  DEPENDS system_lib
 )
 
