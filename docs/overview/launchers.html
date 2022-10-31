@@ -85,7 +85,7 @@
 
         <h1 class="title">Launchers</h1>
 
-        <p>Overworld is quite easy to launch as it consists of only one executable and only needs two arguments. However, Overworld uses the Ontologenius knowledge base. Here we explain the minimal setup to launch both software.</p>
+        <p>Overworld is quite easy to launch as it consists of only one executable and only has two mandotory arguments. However, Overworld uses the Ontologenius knowledge base. Here we explain the minimal setup to launch both software.</p>
 
         <h2><i class="fas fa-angle-right"></i> Overworld launcher</h2>
 
@@ -95,13 +95,15 @@
           <div class="terminal_line">  &lt;<span class="xml_tag">launch</span>&gt;</div>
           <div class="terminal_line">    &lt;<span class="xml_tag">arg</span> <span class="xml_param">name</span>=<span class="xml_string">&quot;configuration_file&quot;</span> <span class="xml_param">default</span>=<span class="xml_string">&quot;$(find overworld)/config/config_example.yaml&quot;</span>/&gt;</div>
           <div class="terminal_line">    &lt;<span class="xml_tag">arg</span> <span class="xml_param">name</span>=<span class="xml_string">&quot;robot_name&quot;</span> <span class="xml_param">default</span>=<span class="xml_string">&quot;pr2&quot;</span>/&gt;</div>
-          <div class="terminal_line">    &lt;<span class="xml_tag">node</span> <span class="xml_param">name</span>=<span class="xml_string">&quot;overworld&quot;</span> <span class="xml_param">pkg</span>=<span class="xml_string">&quot;overworld&quot;</span> <span class="xml_param">type</span>=<span class="xml_string">&quot;overworld_node&quot;</span> <span class="xml_param">output</span>=<span class="xml_string">&quot;screen&quot;</span> <span class="xml_param">args</span>=<span class="xml_string">&quot;$(arg configuration_file) $(arg robot_name)&quot;</span>&gt; &lt;/<span class="xml_tag">node</span>&gt;</div>
+          <div class="terminal_line">    &lt;<span class="xml_tag">node</span> <span class="xml_param">name</span>=<span class="xml_string">&quot;overworld&quot;</span> <span class="xml_param">pkg</span>=<span class="xml_string">&quot;overworld&quot;</span> <span class="xml_param">type</span>=<span class="xml_string">&quot;overworld_node&quot;</span> <span class="xml_param">output</span>=<span class="xml_string">&quot;screen&quot;</span> <span class="xml_param">args</span>=<span class="xml_string">&quot;-c $(arg configuration_file) -n $(arg robot_name)&quot;</span>&gt; &lt;/<span class="xml_tag">node</span>&gt;</div>
           <div class="terminal_line">  &lt;/<span class="xml_tag">launch</span>&gt;</div>
         </div>
 
-        <p>The <b>configuration_file</b> parameter is used to defined the perception modules to be loaded and to parametrized them. See the <a href="Configuration.html">configuration page</a> to setup your file.</p>
+        <p>The <b>configuration_file</b> (-c or --config) parameter is used to defined the perception modules to be loaded and to parametrized them. See the <a href="Configuration.html">configuration page</a> to setup your file.</p>
 
-        <p>The <b>robot_name</b> parameter is (quite logically) the identifier of your robot. This parameter should be the same as the one defined in the configuration file.</p>
+        <p>The <b>robot_name</b> (-n or --name) parameter is (quite logically) the identifier of your robot. This parameter should be the same as the one defined in the configuration file.</p>
+
+        <p>The <b>simulate</b> (-s or --simulate) is an optional boolean ("true" or "false") parameter. It can be set to activate or deactivate the physics simulation in the reasoning process. By default, this parameter is set to true.</p>
 
         <h2><i class="fas fa-angle-right"></i> Ontologenius launcher</h2>
 
