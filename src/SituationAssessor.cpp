@@ -1,11 +1,6 @@
 #include "overworld/SituationAssessor.h"
 
-#include "overworld/Perception/Modules/ObjectsModules/ArTrackPerceptionModule.h"
-#include "overworld/Perception/Modules/ObjectsModules/Pr2GripperPerceptionModule.h"
-#include "overworld/Perception/Modules/ObjectsModules/StaticObjectsPerceptionModule.h"
 #include "overworld/Perception/Modules/ObjectsModules/ObjectsEmulatedPerceptionModule.h"
-#include "overworld/Perception/Modules/RobotsModules/PR2JointsPerception.h"
-#include "overworld/Perception/Modules/HumansModules/OptitrackPerceptionModule.h"
 #include "overworld/Perception/Modules/HumansModules/HumansEmulatedPerceptionModule.h"
 
 #include "overworld/Utility/BulletKeypressHandler.h"
