@@ -21,7 +21,6 @@ find_package(catkin REQUIRED COMPONENTS
   tf2_geometry_msgs
   roslib
   message_filters
-  ar_track_alvar_msgs
   sensor_msgs
   visualization_msgs
   geometry_msgs
@@ -185,7 +184,6 @@ target_link_libraries(${PROJECT_NAME}_sender_lib PUBLIC
 #################
 
 add_library(overworld_modules_plugin MODULE
-  src/Perception/Modules/ObjectsModules/ArTrackPerceptionModule.cpp
   src/Perception/Modules/ObjectsModules/StaticObjectsPerceptionModule.cpp
   src/Perception/Modules/ObjectsModules/FakeObjectPerceptionModule.cpp
   src/Perception/Modules/ObjectsModules/Pr2GripperPerceptionModule.cpp
