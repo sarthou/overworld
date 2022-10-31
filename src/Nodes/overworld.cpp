@@ -1,6 +1,7 @@
 #include <overworld/SituationAssessor.h>
 
 #include "overworld/Utility/ShellDisplay.h"
+#include "overworld/Utility/Parameters.h"
 
 #include <stdio.h>
 #include <execinfo.h>
@@ -26,16 +27,23 @@ int main(int argc, char** argv)
   signal(SIGABRT, handler);
   ros::init(argc, argv, "overworld");
 
-  if(argc < 3)
+  owds::Parameters params;
+  params.insert(owds::Parameter("config_path", {"-c", "--config"}));
+  params.insert(owds::Parameter("robot_name", {"-n", "--name"}));
+  params.insert(owds::Parameter("simulate", {"-s", "--simulate"}, {"true"}));
+
+  bool valid_parameters = params.set(argc, argv);
+  params.display();
+  if(valid_parameters == false)
   {
-    owds::ShellDisplay::error("A configuration file and the robot name should be provided");
+    owds::ShellDisplay::error("Some parameters have not been setted. Overworld will shutdown.");
     return -1;
   }
 
-  std::string config_path = std::string(argv[1]);
-  std::string robot_name = std::string(argv[2]);
-
-  owds::SituationAssessor robot_situation_assessor(robot_name, config_path, true);
+  owds::SituationAssessor robot_situation_assessor(params.at("robot_name").getFirst(),
+                                                   params.at("config_path").getFirst(),
+                                                   params.at("simulate").getFirst() == "true",
+                                                   true);
 
   robot_situation_assessor.run();
 

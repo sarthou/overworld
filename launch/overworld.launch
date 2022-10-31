@@ -1,5 +1,7 @@
 <launch>
   <arg name="configuration_file" default="$(find overworld)/config/config_example.yaml"/>
   <arg name="robot_name" default="pr2"/>
-  <node name="overworld" pkg="overworld" type="overworld_node" output="screen" args="$(arg configuration_file) $(arg robot_name)"/>
+  <arg name="simulate" default="true"/>
+
+  <node name="overworld" pkg="overworld" type="overworld_node" output="screen" args="-c $(arg configuration_file) -n $(arg robot_name) -s $(arg simulate)"/>
 </launch>

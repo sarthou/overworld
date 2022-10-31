@@ -14,10 +14,12 @@ namespace owds {
 
 SituationAssessor::SituationAssessor(const std::string& agent_name,
                                      const std::string& config_path,
+                                     bool simulate,
                                      bool is_robot) : agent_name_(agent_name),
                                                       myself_agent_(nullptr),
                                                       is_robot_(is_robot),
                                                       config_path_(config_path),
+                                                      simulate_(simulate),
                                                       time_step_(0.06),
                                                       facts_publisher_(&n_, agent_name),
                                                       facts_calculator_(agent_name),
@@ -155,7 +157,7 @@ void SituationAssessor::assessmentLoop()
     {
       next_start_time = start_time + interval;
 
-      if(perception_manager_.objects_manager_.needSimulation())
+      if(simulate_ && perception_manager_.objects_manager_.needSimulation())
       {
         perception_manager_.objects_manager_.initLerp();
 
@@ -276,7 +278,7 @@ std::map<std::string, HumanAssessor_t>::iterator SituationAssessor::createHumanA
 {
   auto assessor = humans_assessors_.insert(std::make_pair(human_name, HumanAssessor_t())).first;
 
-  assessor->second.assessor = new SituationAssessor(human_name, config_path_);
+  assessor->second.assessor = new SituationAssessor(human_name, config_path_, simulate_);
   assessor->second.objects_module = new ObjectsEmulatedPerceptionModule();
   assessor->second.humans_module = new HumansEmulatedPerceptionModule();
   assessor->second.assessor->addObjectPerceptionModule("emulated_objects", assessor->second.objects_module);
