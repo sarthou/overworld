@@ -695,10 +695,7 @@ struct b3CameraImageData BulletClient::getCameraImage(int width, int height,
 
 std::unordered_set<int> BulletClient::getSegmentationIds(const b3CameraImageData& image)
 {
-  std::unordered_set<int> segmentation_ids;
-  for(size_t i = 0; i < image.m_pixelHeight*image.m_pixelWidth; i++)
-    segmentation_ids.insert(image.m_segmentationMaskValues[i]);
-
+  std::unordered_set<int> segmentation_ids(image.m_segmentationMaskValues, image.m_segmentationMaskValues+image.m_pixelHeight*image.m_pixelWidth);
   return segmentation_ids;
 }
 
