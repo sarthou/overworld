@@ -3,7 +3,7 @@
 
 #include "overworld/Facts/Fact.h"
 
-#include <map>
+#include <unordered_map>
 #include <vector>
 #include <unordered_set>
 #include <unordered_map>
@@ -22,7 +22,7 @@ protected:
   virtual void removeFromKb(const Fact& fact) = 0;
 
 private:
-  std::map<size_t, Fact> pending_facts_;
+  std::unordered_map<size_t, Fact> pending_facts_;
   std::unordered_set<std::string> held_by_;
 
   std::unordered_map<Fact, int> facts_buffer_;

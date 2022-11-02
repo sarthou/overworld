@@ -14,7 +14,7 @@ void FactsPublisher::publish(const std::vector<Fact>& facts)
 
   for(auto& fact : filtered_facts)
   {
-    if(fact.getPredicate() == "pick")
+    /*if(fact.getPredicate() == "pick")
     {
       if(held_by_.find(fact.getObject()) == held_by_.end())
       {
@@ -30,11 +30,11 @@ void FactsPublisher::publish(const std::vector<Fact>& facts)
         removeFromKb(fact);
       }
     }
-    else
+    else*/
     {
       if(pending_facts_.find(fact.getHash()) == pending_facts_.end())
       {
-        pending_facts_.insert(std::make_pair(fact.getHash(), fact));
+        pending_facts_.emplace(fact.getHash(), fact);
         to_insert.push_back(fact);
       }
 
@@ -78,9 +78,9 @@ std::vector<Fact> FactsPublisher::filterIncomingFacts(const std::vector<Fact>& f
   {
     auto buf_it = facts_buffer_.find(fact);
     if(buf_it == facts_buffer_.end())
-      facts_buffer_.insert({fact, 0});
+      facts_buffer_.emplace(fact, 0);
     else if(buf_it->second == 3)
-      stable_facts.push_back(fact);
+      stable_facts.emplace_back(fact);
     else
       buf_it->second++;
   }
@@ -106,7 +106,7 @@ std::unordered_set<size_t> FactsPublisher::filterOutgoingFacts(const std::unorde
   {
     auto buf_it = rmv_buffer_.find(fact);
     if(buf_it == rmv_buffer_.end())
-      rmv_buffer_.insert({fact, 0});
+      rmv_buffer_.emplace(fact, 0);
     else if(buf_it->second == 3)
     {
       stable_facts.insert(fact);
