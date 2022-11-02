@@ -2,6 +2,8 @@
 
 #include <ros/ros.h>
 
+#include <functional>
+
 namespace owds {
     
 Entity::Entity(const std::string& id, bool is_true_id): id_(id), 
@@ -181,49 +183,51 @@ geometry_msgs::TransformStamped Entity::toTfTransform() const
     return transform;
 }
 
-visualization_msgs::Marker Entity::toMarker(int id, double lifetime, const std::string& ns) const
+const visualization_msgs::Marker& Entity::toMarker(int id, double lifetime, const std::string& ns)
 {
     if (!isLocated())
     {
         throw std::runtime_error("Called toMarker on a non located entity: '" + id_ + "'.");
     }
-    visualization_msgs::Marker marker;
-    marker.header.frame_id = "map";
-    marker.header.stamp = last_poses_.back().stamp;
-    marker.id = id;
-    marker.lifetime = ros::Duration(lifetime);
+    marker_.lifetime = ros::Duration(lifetime);
+    marker_.header.stamp = last_poses_.back().stamp;
+    marker_.pose = last_poses_.back().pose.toPoseMsg();
+    marker_.ns = ns;
+    return marker_;
+}
+
+void Entity::updateMarker()
+{
+    marker_.header.frame_id = "map";
+    marker_.id = std::hash<std::string>{}(id_);
     switch (shape_.type)
     {
     case ShapeType_e::SHAPE_MESH:
-        marker.type = marker.MESH_RESOURCE;
-        marker.mesh_resource = shape_.visual_mesh_resource;
-        marker.mesh_use_embedded_materials = true;
+        marker_.type = marker_.MESH_RESOURCE;
+        marker_.mesh_resource = shape_.visual_mesh_resource;
+        marker_.mesh_use_embedded_materials = true;
         break;
 
     case ShapeType_e::SHAPE_SPEHERE:
-        marker.type = marker.SPHERE;
+        marker_.type = marker_.SPHERE;
         break;
     case ShapeType_e::SHAPE_CUBE:
-        marker.type = marker.CUBE;
+        marker_.type = marker_.CUBE;
         break;
     case ShapeType_e::SHAPE_CYLINDER:
-        marker.type = marker.CYLINDER;
+        marker_.type = marker_.CYLINDER;
         break;
     default:
-        throw std::runtime_error("toMarker has been called on entity '" + id_ + "' + but its ShapeType is not defined.");
         break;
     }
-    marker.scale.x = shape_.scale[0];
-    marker.scale.y = shape_.scale[1];
-    marker.scale.z = shape_.scale[2];
-    marker.color.r = shape_.color[0];
-    marker.color.g = shape_.color[1];
-    marker.color.b = shape_.color[2];
-    marker.color.a = 1.0;
-    marker.ns = ns;
-    marker.action = marker.ADD;
-    marker.pose = last_poses_.back().pose.toPoseMsg();
-    return marker;
+    marker_.scale.x = shape_.scale[0];
+    marker_.scale.y = shape_.scale[1];
+    marker_.scale.z = shape_.scale[2];
+    marker_.color.r = shape_.color[0];
+    marker_.color.g = shape_.color[1];
+    marker_.color.b = shape_.color[2];
+    marker_.color.a = 1.0;
+    marker_.action = marker_.ADD;
 }
 
 void Entity::computeFeature()

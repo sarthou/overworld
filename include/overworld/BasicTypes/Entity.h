@@ -57,7 +57,7 @@ public:
     double getAabbVolume() const;
     bool isAabbValid() const { return aabb_.is_valid; }
 
-    void setShape(const Shape_t& shape) { shape_ = shape; }
+    void setShape(const Shape_t& shape) { shape_ = shape; updateMarker(); }
     const Shape_t& getShape() const { return shape_; }
     bool hasShape() const { return (shape_.type != SHAPE_NONE); }
 
@@ -69,7 +69,7 @@ public:
     void merge(const Entity* other);
 
     geometry_msgs::TransformStamped toTfTransform() const;
-    visualization_msgs::Marker toMarker(int id, double lifetime, const std::string& ns) const;
+    const visualization_msgs::Marker& toMarker(int id, double lifetime, const std::string& ns);
 
     void computeFeature();
 
@@ -85,7 +85,12 @@ protected:
     size_t nb_frame_unseen_;
     struct aabb_t aabb_;
 
+    visualization_msgs::Marker marker_;
+
     void* feature_;
+
+private:
+    void updateMarker();
 };
 
 class UnlocatedEntityError: public std::runtime_error
