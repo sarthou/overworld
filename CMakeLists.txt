@@ -215,6 +215,10 @@ target_link_libraries(${PROJECT_NAME}_node PRIVATE
                       ${catkin_LIBRARIES})
 add_dependencies(${PROJECT_NAME}_node overworld_gencpp)
 
+add_executable(plugins src/Nodes/plugins.cpp)
+target_link_libraries(plugins ${catkin_LIBRARIES}
+                      ${PROJECT_NAME}_bullet_lib)
+
 #################
 #  Test files   #
 #################
