@@ -195,6 +195,9 @@ private:
     std::mutex mutex_;
 
     std::string additional_path_;
+    std::unordered_map<size_t, int> loaded_textures_;
+    std::unordered_map<size_t, int> loaded_visual_meshes_;
+    std::unordered_map<size_t, int> loaded_collision_meshes_;
 
     int createVisualShape(BulletShapeType_e shape_type, 
                             float radius,
