@@ -87,6 +87,7 @@ private:
   void assessmentLoop();
   void assess();
 
+  void processHumans(std::map<std::string, std::unordered_set<int>>& agents_segmentation_ids);
   void updateHumansPerspective(const std::string& human_name,
                                const std::map<std::string, Object*>& objects,
                                const std::map<std::string, BodyPart*>& humans,

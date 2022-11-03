@@ -201,38 +201,15 @@ void SituationAssessor::assess()
   auto humans = perception_manager_.humans_manager_.getAgents();
   auto body_parts = perception_manager_.humans_manager_.getEntities();
 
+  std::thread humans_process;
+
   if(is_robot_)
-  {
-    for(auto human : humans)
-    {
-      if(human.second->getHead() == nullptr)
-        continue;
-      else if(human.second->getHead()->isLocated() == false)
-        continue;
-
-      auto proj_matrix = bullet_client_->computeProjectionMatrix(human.second->getFieldOfView().getHeight(),
-                                                                 human.second->getFieldOfView().getRatio(),
-                                                                 human.second->getFieldOfView().getClipNear(),
-                                                                 human.second->getFieldOfView().getClipFar());
-      Pose target_pose = human.second->getHead()->pose() * Pose({1,0,0}, {0,0,0,1});
-      auto head_pose_trans = human.second->getHead()->pose().arrays().first;
-      auto target_pose_trans = target_pose.arrays().first;
-      auto view_matrix = bullet_client_->computeViewMatrix({(float)head_pose_trans[0], (float)head_pose_trans[1], (float)head_pose_trans[2]},
-                                                           {(float)target_pose_trans[0], (float)target_pose_trans[1], (float)target_pose_trans[2]},
-                                                           {0.,0.,1.});
-      auto images = bullet_client_->getCameraImage(175*human.second->getFieldOfView().getRatio(), 175, view_matrix, proj_matrix, owds::BULLET_HARDWARE_OPENGL);
-
-      ros_sender_->sendImage(human.first + "/view", images);
-      agents_segmentation_ids[human.first] = bullet_client_->getSegmentationIds(images);
-      updateHumansPerspective(human.first, objects, body_parts, agents_segmentation_ids[human.first]);
-    }
-  }
+    humans_process = std::thread(&SituationAssessor::processHumans, this, std::ref(agents_segmentation_ids));
 
   auto agents = humans;
   agents.insert(robots.begin(), robots.end());
 
-  auto facts = facts_calculator_.computeFacts(objects, agents, agents_segmentation_ids);
-  facts_publisher_.publish(facts);
+  facts_calculator_.computeObjectsFacts(objects, true);
 
   if(is_robot_)
   {
@@ -242,6 +219,43 @@ void SituationAssessor::assess()
   else
     ros_sender_->sendEntitiesToRViz(myself_agent_->getId() + "/objects_markers", objects);
   ros_sender_->sendEntitiesToRViz(myself_agent_->getId() + "/humans_markers", body_parts);
+
+  if(is_robot_)
+    humans_process.join();
+
+  auto facts = facts_calculator_.computeAgentsFacts(objects, agents, agents_segmentation_ids, false);
+  facts_publisher_.publish(facts);
+}
+
+void SituationAssessor::processHumans(std::map<std::string, std::unordered_set<int>>& agents_segmentation_ids)
+{
+  auto objects = perception_manager_.objects_manager_.getEntities();
+  auto humans = perception_manager_.humans_manager_.getAgents();
+  auto body_parts = perception_manager_.humans_manager_.getEntities();
+
+  for(auto human : humans)
+  {
+    if(human.second->getHead() == nullptr)
+      continue;
+    else if(human.second->getHead()->isLocated() == false)
+      continue;
+
+    auto proj_matrix = bullet_client_->computeProjectionMatrix(human.second->getFieldOfView().getHeight(),
+                                                                human.second->getFieldOfView().getRatio(),
+                                                                human.second->getFieldOfView().getClipNear(),
+                                                                human.second->getFieldOfView().getClipFar());
+    Pose target_pose = human.second->getHead()->pose() * Pose({1,0,0}, {0,0,0,1});
+    auto head_pose_trans = human.second->getHead()->pose().arrays().first;
+    auto target_pose_trans = target_pose.arrays().first;
+    auto view_matrix = bullet_client_->computeViewMatrix({(float)head_pose_trans[0], (float)head_pose_trans[1], (float)head_pose_trans[2]},
+                                                          {(float)target_pose_trans[0], (float)target_pose_trans[1], (float)target_pose_trans[2]},
+                                                          {0.,0.,1.});
+    auto images = bullet_client_->getCameraImage(175*human.second->getFieldOfView().getRatio(), 175, view_matrix, proj_matrix, owds::BULLET_HARDWARE_OPENGL);
+
+    ros_sender_->sendImage(human.first + "/view", images);
+    agents_segmentation_ids[human.first] = bullet_client_->getSegmentationIds(images);
+    updateHumansPerspective(human.first, objects, body_parts, agents_segmentation_ids[human.first]);
+  }
 }
 
 void SituationAssessor::updateHumansPerspective(const std::string& human_name,
