@@ -46,11 +46,9 @@ bool FakeRobotPerceptionModule::closeInitialization()
     onto_->close();
 
     BodyPart head = createBodyPart(robot_name_, head_link_, BodyPartType_e::BODY_PART_HEAD);
-    std::cout << "head pose " << head_pose_ << std::endl;
     head.updatePose(head_pose_);
     percepts_.insert(std::make_pair(head_link_, head));
     BodyPart base = createBodyPart(robot_name_, base_link_, BodyPartType_e::BODY_PART_BASE);
-    std::cout << "base pose " << base_pose_ << std::endl;
     base.updatePose(base_pose_);
     percepts_.insert(std::make_pair(base_link_, base));
 
@@ -105,7 +103,6 @@ Pose FakeRobotPerceptionModule::stringToPose(const std::string& str)
     end = str.find(" ", start);
     out.push_back(std::atof(str.substr(start, end - start).c_str()));
   }
-  std::cout << str << " has size" << out.size() << std::endl;
   if(out.size() == 7)
     return Pose({out[0], out[1], out[2]}, {out[3], out[4], out[5], out[6]});
   else
