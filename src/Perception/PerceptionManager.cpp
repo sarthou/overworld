@@ -84,7 +84,7 @@ bool PerceptionManager::applyConfigurationRobot(const std::string& config_path)
 bool PerceptionManager::applyConfigurationHuman(const std::string& config_path)
 {
     ConfigElement modules_list;
-    if(applyConfiguration(config_path, modules_list) == false)
+    if(applyConfiguration(config_path, modules_list, false) == false)
         return false;
 
     // Load static perception modules
@@ -113,7 +113,7 @@ bool PerceptionManager::applyConfigurationHuman(const std::string& config_path)
     return true;
 }
 
-bool PerceptionManager::applyConfiguration(const std::string& config_path, ConfigElement& modules_list)
+bool PerceptionManager::applyConfiguration(const std::string& config_path, ConfigElement& modules_list, bool display)
 {
     if(configuration_.read(config_path) == false)
     {
@@ -121,7 +121,8 @@ bool PerceptionManager::applyConfiguration(const std::string& config_path, Confi
         return false;
     }
 
-    configuration_.display();
+    if(display)
+        configuration_.display();
 
     modules_list = configuration_["modules"];
     if(!modules_list.getElementsKeys().size())
