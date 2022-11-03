@@ -5,11 +5,11 @@ namespace owds {
 FactsCalculator::FactsCalculator(const std::string& agent_name)
 {}
 
-std::vector<Fact> FactsCalculator::computeFacts(const std::map<std::string, Object*>& objects,
-                                                const std::map<std::string, Agent*>& agents,
-                                                const std::map<std::string, std::unordered_set<int>>& segmantation_ids)
+std::vector<Fact> FactsCalculator::computeObjectsFacts(const std::map<std::string, Object*>& objects,
+                                                       bool clear)
 {
-  facts_.clear();
+  if(clear)
+    facts_.clear();
 
   for(auto& obj_from : objects)
   {
@@ -43,6 +43,17 @@ std::vector<Fact> FactsCalculator::computeFacts(const std::map<std::string, Obje
             isOnTopfOf(obj_to.second, obj_from.second);
       }
   }
+
+  return facts_;
+}
+
+std::vector<Fact> FactsCalculator::computeAgentsFacts(const std::map<std::string, Object*>& objects,
+                                                      const std::map<std::string, Agent*>& agents,
+                                                      const std::map<std::string, std::unordered_set<int>>& segmantation_ids,
+                                                      bool clear)
+{
+  if(clear)
+    facts_.clear();
 
   for(auto& agent_from : agents)
   {

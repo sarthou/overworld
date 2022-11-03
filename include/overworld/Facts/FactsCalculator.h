@@ -14,10 +14,14 @@ namespace owds {
 class FactsCalculator
 {
 public:
-  FactsCalculator(const std::string& agent_name);
-  std::vector<Fact> computeFacts(const std::map<std::string, Object*>& objects,
-                                 const std::map<std::string, Agent*>& agents,
-                                 const std::map<std::string, std::unordered_set<int>>& segmantation_ids);
+  explicit FactsCalculator(const std::string& agent_name);
+  
+  std::vector<Fact> computeObjectsFacts(const std::map<std::string, Object*>& objects,
+                                        bool clear = true);
+  std::vector<Fact> computeAgentsFacts(const std::map<std::string, Object*>& objects,
+                                       const std::map<std::string, Agent*>& agents,
+                                       const std::map<std::string, std::unordered_set<int>>& segmantation_ids,
+                                       bool clear = true);
 
 private:
   std::vector<Fact> facts_;
