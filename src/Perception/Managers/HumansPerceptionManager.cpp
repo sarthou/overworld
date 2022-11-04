@@ -64,37 +64,37 @@ void HumansPerceptionManager::UpdateAgent(BodyPart* body_part)
       case BODY_PART_HEAD:
       {
         it_agent->second->setHead(body_part);
-        ShellDisplay::info("Head has been setted for " + it_agent->second->getId());
+        ShellDisplay::info("[HumansPerceptionManager] Head has been setted for " + it_agent->second->getId());
         break;
       }
       case BODY_PART_LEFT_HAND:
       {
         it_agent->second->setLeftHand(static_cast<Hand*>(body_part));
-        ShellDisplay::info("Left hand has been setted for " + it_agent->second->getId());
+        ShellDisplay::info("[HumansPerceptionManager] Left hand has been setted for " + it_agent->second->getId());
         break;
       }
       case BODY_PART_RIGHT_HAND:
       {
         it_agent->second->setRightHand(static_cast<Hand*>(body_part));
-        ShellDisplay::info("Right hand has been setted for " + it_agent->second->getId());
+        ShellDisplay::info("[HumansPerceptionManager] Right hand has been setted for " + it_agent->second->getId());
         break;
       }
       case BODY_PART_TORSO:
       {
         it_agent->second->setTorso(body_part);
-        ShellDisplay::info("Torso has been setted for " + it_agent->second->getId());
+        ShellDisplay::info("[HumansPerceptionManager] Torso has been setted for " + it_agent->second->getId());
         break;
       }
       case BODY_PART_BASE:
       {
         it_agent->second->setBase(body_part);
-        ShellDisplay::info("Base has been setted for " + it_agent->second->getId());
+        ShellDisplay::info("[HumansPerceptionManager] Base has been setted for " + it_agent->second->getId());
         break;
       }
     }
   }
   else
-    ShellDisplay::warning("The agent of the body part " + body_part->id() + " is undefined");
+    ShellDisplay::warning("[HumansPerceptionManager] The agent of the body part " + body_part->id() + " is undefined");
 }
 
 } // namespace owds

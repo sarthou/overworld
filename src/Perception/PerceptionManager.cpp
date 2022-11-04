@@ -6,7 +6,8 @@
 
 namespace owds {
 
-PerceptionManager::PerceptionManager(ros::NodeHandle* n, BulletClient* bullet_client) : n_(n),
+PerceptionManager::PerceptionManager(ros::NodeHandle* n, BulletClient* bullet_client) : objects_manager_(n),
+                                                                                        n_(n),
                                                                                         bullet_client_(bullet_client),
                                                                                         robot_bullet_id_(-1),
                                                                                         robot_agent_(nullptr)
@@ -45,7 +46,7 @@ bool PerceptionManager::applyConfigurationRobot(const std::string& config_path)
         {
             auto human_perception_module = agents_loader.createUnmanagedInstance("owds::" + human_module);
             ConfigElement module_config = configuration_[human_module_name];
-            human_perception_module->initialize(n_, bullet_client_, robot_bullet_id_, robot_agent_);
+            human_perception_module->initialize(human_module_name, n_, bullet_client_, robot_bullet_id_, robot_agent_);
             for(auto& param_name : module_config.getElementsKeys())
                 human_perception_module->setParameter(param_name, module_config[param_name].value().front());
 
@@ -66,7 +67,7 @@ bool PerceptionManager::applyConfigurationRobot(const std::string& config_path)
         {
             auto object_perception_module = objects_loader.createUnmanagedInstance("owds::" + object_module);
             ConfigElement module_config = configuration_[object_module_name];
-            object_perception_module->initialize(n_, bullet_client_, robot_bullet_id_, robot_agent_);
+            object_perception_module->initialize(object_module_name, n_, bullet_client_, robot_bullet_id_, robot_agent_);
             for(auto& param_name : module_config.getElementsKeys())
                 object_perception_module->setParameter(param_name, module_config[param_name].value().front());
 
@@ -83,7 +84,7 @@ bool PerceptionManager::applyConfigurationRobot(const std::string& config_path)
 bool PerceptionManager::applyConfigurationHuman(const std::string& config_path)
 {
     ConfigElement modules_list;
-    if(applyConfiguration(config_path, modules_list) == false)
+    if(applyConfiguration(config_path, modules_list, false) == false)
         return false;
 
     // Load static perception modules
@@ -98,7 +99,7 @@ bool PerceptionManager::applyConfigurationHuman(const std::string& config_path)
         {
             auto object_perception_module = objects_loader.createUnmanagedInstance("owds::" + object_module);
             ConfigElement module_config = configuration_[object_module_name];
-            object_perception_module->initialize(n_, bullet_client_, robot_bullet_id_, robot_agent_);
+            object_perception_module->initialize(object_module_name, n_, bullet_client_, robot_bullet_id_, robot_agent_);
             for(auto& param_name : module_config.getElementsKeys())
                 object_perception_module->setParameter(param_name, module_config[param_name].value().front());
 
@@ -112,7 +113,7 @@ bool PerceptionManager::applyConfigurationHuman(const std::string& config_path)
     return true;
 }
 
-bool PerceptionManager::applyConfiguration(const std::string& config_path, ConfigElement& modules_list)
+bool PerceptionManager::applyConfiguration(const std::string& config_path, ConfigElement& modules_list, bool display)
 {
     if(configuration_.read(config_path) == false)
     {
@@ -120,7 +121,8 @@ bool PerceptionManager::applyConfiguration(const std::string& config_path, Confi
         return false;
     }
 
-    configuration_.display();
+    if(display)
+        configuration_.display();
 
     modules_list = configuration_["modules"];
     if(!modules_list.getElementsKeys().size())
@@ -142,7 +144,7 @@ bool PerceptionManager::applyConfiguration(const std::string& config_path, Confi
     auto robot_perception_module = agents_loader.createUnmanagedInstance("owds::" + robot_modules[0]);
     std::string module_name = modules_list["robot"][robot_modules.front()].value().front();
     ConfigElement module_config = configuration_[module_name];
-    robot_perception_module->initialize(n_, bullet_client_, -1, nullptr);
+    robot_perception_module->initialize(module_name, n_, bullet_client_, -1, nullptr);
     for(auto& param_name : module_config.getElementsKeys())
         robot_perception_module->setParameter(param_name, module_config[param_name].value().front());
     

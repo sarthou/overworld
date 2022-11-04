@@ -8,7 +8,7 @@
 
 namespace owds {
 
-inline void onSpacebarPressed(BulletClient* bullet_client, RobotsPerceptionManager& robots_manager)
+inline void onSpacebarPressed(BulletClient* bullet_client, const RobotsPerceptionManager& robots_manager)
 {
     auto agents = robots_manager.getAgents();
     if(agents.size() != 1)
@@ -27,7 +27,7 @@ inline void onSpacebarPressed(BulletClient* bullet_client, RobotsPerceptionManag
     }
 }
 
-inline void handleKeypress(BulletClient* bullet_client, RobotsPerceptionManager& robots_manager)
+inline void handleKeypress(BulletClient* bullet_client, const RobotsPerceptionManager& robots_manager)
 {
     b3KeyboardEventsData keyboard = bullet_client->getKeyboardEvents();
     for (size_t i = 0; i < keyboard.m_numKeyboardEvents; i++)

@@ -58,7 +58,7 @@ void ROSSender::sendEntitiesToRViz(const std::string& topic_name, const std::vec
     for (const auto& entity : entities)
     {
         if (entity->isLocated())
-            markers.markers.push_back(entity->toMarker(id++, 1.0, "marker"));
+            markers.markers.push_back(entity->toMarker(id++, 0.2, "marker"));
     }
     pub_it->second.publish(markers);
 }
@@ -78,8 +78,8 @@ void ROSSender::sendEntitiesToTFAndRViz(const std::string& rviz_topic_name, cons
     {
         if (entity->isLocated())
         {
-            markers.markers.push_back(entity->toMarker(id++, 1.0, "marker"));
-            transforms.push_back(entity->toTfTransform());
+            markers.markers.emplace_back(entity->toMarker(id++, 0.2, "marker"));
+            transforms.emplace_back(entity->toTfTransform());
         }
     }
     pub_it->second.publish(markers);
@@ -112,7 +112,7 @@ void ROSSender::sendEntitiesToRViz(const std::string& topic_name, const std::map
     for (const auto& entity : entities)
     {
         if (entity.second->isLocated())
-            markers.markers.push_back(entity.second->toMarker(id++, 1.0, "marker"));
+            markers.markers.emplace_back(entity.second->toMarker(id++, 0.2, "marker"));
     }
     pub_it->second.publish(markers);
 }
@@ -132,8 +132,8 @@ void ROSSender::sendEntitiesToTFAndRViz(const std::string& rviz_topic_name, cons
     {
         if (entity.second->isLocated())
         {
-            markers.markers.push_back(entity.second->toMarker(id++, 1.0, "marker"));
-            transforms.push_back(entity.second->toTfTransform());
+            markers.markers.emplace_back(entity.second->toMarker(id++, 0.2, "marker"));
+            transforms.emplace_back(entity.second->toTfTransform());
         }
     }
     pub_it->second.publish(markers);

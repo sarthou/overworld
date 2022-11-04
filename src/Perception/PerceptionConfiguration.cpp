@@ -36,7 +36,7 @@ std::map<std::string, ConfigElement> PerceptionConfiguration::read(const std::ve
 {
   std::map<std::string, ConfigElement> res;
 
-  std::regex element_regex(R"(^\s*([^\s]*)\s*:\s*([^\n\s]*)\s*$)");
+  std::regex element_regex(R"(^\s*([^\s]*)\s*:\s*([^\n]*)\s*$)"); // in case of bug, previous regex was (^\s*([^\s]*)\s*:\s*([^\n\s]*)\s*$)
   std::regex list_regex(R"(^\s*-\s*(.*)\s*$)");
   std::smatch match;
 
@@ -98,31 +98,42 @@ void PerceptionConfiguration::display()
   display(elements_);
 }
 
-void PerceptionConfiguration::display(std::map<std::string, ConfigElement>& config, size_t nb)
+void PerceptionConfiguration::display(const std::map<std::string, ConfigElement>& config, size_t nb)
 {
+  if((nb == 0) && (config.find("modules") != config.end()))
+    displayElement(*config.find("modules"), nb);
+
   for(auto& c : config)
   {
-    displayTab(nb);
-    std::cout << "\e[1m" << c.first << "\e[0m : ";
-    if(c.second.data)
-    {
-      if(c.second.data.value().size() > 1)
-      {
-        std::cout << std::endl;
-        for(auto& d : c.second.data.value())
-        {
-          displayTab(nb+1);
-          std::cout << "- " << d << std::endl;
-        }
-      }
-      else
-        std::cout << c.second.data.value().front() << std::endl;
-    }
-    else if(c.second.subelem)
+    if((nb == 0) && (c.first == "modules"))
+      continue;
+      
+    displayElement(c, nb);
+  }
+}
+
+void PerceptionConfiguration::displayElement(const std::pair<std::string, ConfigElement>& it, size_t nb)
+{
+  displayTab(nb);
+  std::cout << "\e[1m" << it.first << "\e[0m : ";
+  if(it.second.data)
+  {
+    if(it.second.data.value().size() > 1)
     {
       std::cout << std::endl;
-      display(c.second.subelem.value(), nb+1);
+      for(auto& d : it.second.data.value())
+      {
+        displayTab(nb+1);
+        std::cout << "- " << d << std::endl;
+      }
     }
+    else
+      std::cout << it.second.data.value().front() << std::endl;
+  }
+  else if(it.second.subelem)
+  {
+    std::cout << std::endl;
+    display(it.second.subelem.value(), nb+1);
   }
 }
 

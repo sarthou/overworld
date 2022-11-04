@@ -41,7 +41,7 @@ private:
     int robot_bullet_id_;
     Agent* robot_agent_;
 
-    bool applyConfiguration(const std::string& config_path, ConfigElement& modules_list);
+    bool applyConfiguration(const std::string& config_path, ConfigElement& modules_list, bool display = true);
 
     PerceptionConfiguration configuration_;
 };

@@ -1,0 +1,130 @@
+<html lang="en_US">
+
+<head>
+  <title>Bullet GUI | Overworld 0.1.2</title>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+  <link href="../style/overworld_api.css" rel="stylesheet" type="text/css">
+  <link href="../images/favicon.ico" rel="shortcut icon">
+  <link href="../images/favicon-32x32.png" rel="icon" type="image/png">
+  <link href="../images/favicon-16x16.png" rel="icon" type="image/png">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+</head>
+
+<body>
+  <div class="header" id="header">
+    <header class="fixed" id="navbar">
+      <div class="container">
+          <div class="navbar-header">
+            <div id="header-buttons">
+                <ul id="header-ul" data-event="hover_intent" data-effect="fade" data-effect-speed="500">
+                    <li class="header-item"><a class="header-link" href="https://github.com/sarthou/overworld" tabindex="0"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Octicons-mark-github.svg/1200px-Octicons-mark-github.svg.png" alt="github" width="40px" height="40px"/></a></li>
+                </ul>
+            </div>
+            <a class="navbar-icon" href="../index.html">
+              <img src="../images/overworld.png " alt="overworld" width="53px" height="65px"/>
+            </a>
+        </div>
+      </div>
+    </header>
+  </div>
+
+  <div class="main">
+
+    <div class="navigationbar">
+      <ul class="sub-navigation">
+        <li><a href="https://www.youtube.com/watch?v=LUkjts8UacI" target="_blank" rel="noopener noreferrer">Demo video</a></li>
+        <li><a href="https://sarthou.github.io/ontologenius/index.html" target="_blank" rel="noopener noreferrer">Ontologenius</a></li>
+        <li><a href="https://github.com/sarthou/overworld/actions" target="_blank" rel="noopener noreferrer">Pipelines</a></li>
+      </ul>
+      <h1>Overworld Documentation</h1>
+    </div>
+
+    <div class="content">
+      <div class="sidebar" style="transition: all 0.2s ease-out 0s; top: 0px;">
+
+        <div class="contents">
+          <div id="contents-toggle" class=""></div>
+          <h3>Getting Start</h3>
+          <ul style="display: block;">
+            <li class="level1"><a href="../Download.html">Download</a></li>
+            <li class="level1"><a href="../InstallOverworld.html">Install Overworld</a></li>
+            <li class="level1"><a href="../AvailableModules.html">Available modules</a></li>
+            <!--li class="level1"><a href="../cpp_Tutorials/Tutorials.html">Cpp Tutorials</a></li>
+            <li class="level1"><a href="../python_Tutorials/Tutorials.html">Python Tutorials</a></li-->
+          </ul>
+        </div>
+
+        <div class="contents">
+          <div id="contents-toggle" class=""></div>
+          <h3>Overview</h3>
+          <ul style="display: block;">
+            <li class="level1"><a href="launchers.html">Launchers</a></li>
+            <li class="level1"><a href="Configuration.html">Configuration</a></li>
+            <li class="level1"><a href="Plugins.html">Plugins</a></li>
+            <li class="level1"><a href="bulletGUI.html"><b>Bullet GUI</b></a></li>
+          </ul>
+        </div>
+
+        <!--div class="contents">
+          <h3>
+            <i class="fas fa-angle-right"></i>
+            <a href="../cpp_API/CppAPI.html">
+              All C++ Classes
+            </a>
+          </h3>
+          <h3>
+            <i class="fas fa-angle-right"></i>
+            <a href="../python_API/PythonAPI.html">
+              All Python Classes
+            </a>
+          </h3>
+        </div-->
+      </div>
+
+      <div class="context">
+        <h1 class="title">Bullet GUI</h1>
+
+        <p>Overworld uses the Graphical User Interface of the Bullet simulator to render the robot's world. All humans' worlds cannot be rendered. Nevertheless, this interface is really usefull to monitor the robot's world state.</p>
+
+        <p>The interface is automatically launched with Overworld and cannot be desactivated.</p>
+
+        <div align="center">
+          <p>
+            <img src="../images/bulletGUI/bulletGUI.png " alt="Default view in the GUI" height="450px"/>
+          </p>
+        </div>
+
+        <p>By default the camera points to the world origin. You can move the camera with:</p>
+
+        <ul>
+          <li><b>Scroll wheel</b>: Zoom and dezoom.</li>
+          <li><b>CTRL + wheel click</b>: Translate the camera.</li>
+          <li><b>CTRL + mouse left</b>: Rotate the camera.</li>
+        </ul>
+
+        <p>Once your robot spawned in the world, you can also use the <b>SPACE</b> bar to automatically place the camera behind the robot.</p>
+
+        <div align="center">
+          <p>
+            <img src="../images/bulletGUI/bulletGUI_back.png " alt="Back view in the GUI" height="450px"/>
+          </p>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</body>
+
+<footer>
+  <div align="center">
+    <p>
+      Brought to you by:
+      <a class="laas_logo" href="https://www.laas.fr/public/">
+        <img src="../images/LogoLAAS-2016_BW.png " alt="LAAS-CNRS" height="60px"/>
+      </a>
+    </p>
+  </div>
+</footer>
+
+</html>
