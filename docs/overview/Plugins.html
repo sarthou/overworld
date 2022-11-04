@@ -1,7 +1,7 @@
 <html lang="en_US">
 
 <head>
-  <title>Bullet GUI | Overworld 0.1.2</title>
+  <title>Plugins | Overworld 0.1.2</title>
   <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
   <link href="../style/overworld_api.css" rel="stylesheet" type="text/css">
   <link href="../images/favicon.ico" rel="shortcut icon">
@@ -60,8 +60,8 @@
           <ul style="display: block;">
             <li class="level1"><a href="launchers.html">Launchers</a></li>
             <li class="level1"><a href="Configuration.html">Configuration</a></li>
-            <li class="level1"><a href="Plugins.html">Plugins</a></li>
-            <li class="level1"><a href="bulletGUI.html"><b>Bullet GUI</b></a></li>
+            <li class="level1"><a href="Plugins.html"><b>Plugins</b></a></li>
+            <li class="level1"><a href="bulletGUI.html">Bullet GUI</a></li>
           </ul>
         </div>
 
@@ -82,33 +82,55 @@
       </div>
 
       <div class="context">
-        <h1 class="title">Bullet GUI</h1>
+        <h1 class="title">Plugins</h1>
 
-        <p>Overworld uses the Graphical User Interface of the Bullet simulator to render the robot's world. All humans' worlds cannot be rendered. Nevertheless, this interface is really usefull to monitor the robot's world state.</p>
+        <p>Within Overworld, perception modules are implemented in the form of plugins. Modules to be used and their parameters are defined in the Overworld <a href="Configuration.html">configuration file</a>.</p>
 
-        <p>The interface is automatically launched with Overworld and cannot be desactivated.</p>
+        <p>Overworld comes with an executable to list the currently installed modules, get their description and parameters, or get the package implementing them. Its usage is the following:</p>
 
-        <div align="center">
-          <p>
-            <img src="../images/bulletGUI/bulletGUI.png " alt="Default view in the GUI" height="450px"/>
-          </p>
+        <div class="code_block">
+          <div class="terminal_line">rosrun overworld plugins COMMAND [ARGS]</div>
         </div>
 
-        <p>By default the camera points to the world origin. You can move the camera with:</p>
+        <h2><i class="fas fa-angle-right"></i> list</h2>
 
-        <ul>
-          <li><b>Scroll wheel</b>: Zoom and dezoom.</li>
-          <li><b>CTRL + wheel click</b>: Translate the camera.</li>
-          <li><b>CTRL + mouse left</b>: Rotate the camera.</li>
-        </ul>
-
-        <p>Once your robot spawned in the world, you can also use the <b>SPACE</b> bar to automatically place the camera behind the robot.</p>
-
-        <div align="center">
-          <p>
-            <img src="../images/bulletGUI/bulletGUI_back.png " alt="Back view in the GUI" height="450px"/>
-          </p>
+        <div class="code_block">
+          <div class="terminal_line">rosrun overworld plugins list [&lt;option&gt;]</div>
         </div>
+
+        <p>This command lists the available perception modules in the form of plugins.</p>
+
+        <p>The option can either be Objects or BodyParts to focus on specific module type.</p>
+
+        <h2><i class="fas fa-angle-right"></i> description</h2>
+
+        <div class="code_block">
+          <div class="terminal_line">rosrun overworld plugins description &lt;module&gt;</div>
+        </div>
+
+        <p>Given a module name, this command provides its description.</p>
+
+        <p>the module argument is the name of an existing perception module.</p>
+
+        <h2><i class="fas fa-angle-right"></i> library_path</h2>
+
+        <div class="code_block">
+          <div class="terminal_line">rosrun overworld plugins library_path &lt;module&gt;</div>
+        </div>
+
+        <p>Given a module name, this command provides the path to its associated library.</p>
+
+        <p>the module argument is the name of an existing perception module.</p>
+
+        <h2><i class="fas fa-angle-right"></i> package</h2>
+
+        <div class="code_block">
+          <div class="terminal_line">rosrun overworld plugins package &lt;module&gt;</div>
+        </div>
+
+        <p>Given a module name, this command provides the name of the containing package.</p>
+
+        <p>the module argument is the name of an existing perception module.</p>
 
       </div>
     </div>
