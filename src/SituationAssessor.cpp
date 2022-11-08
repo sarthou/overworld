@@ -14,13 +14,14 @@ namespace owds {
 
 SituationAssessor::SituationAssessor(const std::string& agent_name,
                                      const std::string& config_path,
+                                     double frequency,
                                      bool simulate,
                                      bool is_robot) : agent_name_(agent_name),
                                                       myself_agent_(nullptr),
                                                       is_robot_(is_robot),
                                                       config_path_(config_path),
                                                       simulate_(simulate),
-                                                      time_step_(0.06),
+                                                      time_step_(1.0 / frequency),
                                                       facts_publisher_(&n_, agent_name),
                                                       facts_calculator_(agent_name),
                                                       perception_manager_(&n_)

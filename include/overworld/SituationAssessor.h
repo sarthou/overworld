@@ -44,7 +44,8 @@ struct HumanAssessor_t
 class SituationAssessor
 {
 public:
-  SituationAssessor(const std::string& agent_name, const std::string& config_path, bool simulate = true, bool is_robot = false);
+  SituationAssessor(const std::string& agent_name, const std::string& config_path, 
+                    double frequency, bool simulate = true, bool is_robot = false);
   SituationAssessor(const SituationAssessor& other) = delete;
   ~SituationAssessor();
 
