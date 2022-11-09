@@ -45,7 +45,8 @@ class SituationAssessor
 {
 public:
   SituationAssessor(const std::string& agent_name, const std::string& config_path, 
-                    double frequency, bool simulate = true, bool is_robot = false);
+                    double assessment_frequency, double simulation_frequency, 
+                    bool simulate = true, bool is_robot = false);
   SituationAssessor(const SituationAssessor& other) = delete;
   ~SituationAssessor();
 
@@ -72,6 +73,7 @@ private:
   ros::ServiceServer bounding_box_service_;
   std::atomic<bool> run_;
   double time_step_; // in second
+  double simu_step_;
 
   BulletClient* bullet_client_;
   PerceptionManager perception_manager_;
