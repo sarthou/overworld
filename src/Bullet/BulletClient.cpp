@@ -24,6 +24,7 @@ void BulletClient::setAdditionalSearchPath(const std::string& path)
 	{
 		b3SharedMemoryCommandHandle command_handle = b3SetAdditionalSearchPath(*client_handle_, path.c_str());
 		b3SharedMemoryStatusHandle status_handle = b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+        (void)status_handle;
 
         if(additional_path_ != "")
             ShellDisplay::warning("[Bullet] The previous additional path has been overwritten");
