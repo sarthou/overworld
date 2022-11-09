@@ -1,6 +1,7 @@
 #ifndef OWDS_PERCEPTIONCONFIGURATION_H
 #define OWDS_PERCEPTIONCONFIGURATION_H
 
+#include <algorithm>
 #include <string>
 #include <vector>
 #include <map>
@@ -40,8 +41,9 @@ public:
   {
     std::vector<std::string> res;
     if(subelem)
-      for(auto& elem : subelem.value())
-        res.push_back(elem.first);
+      std::transform(subelem.value().cbegin(), subelem.value().cend(),
+                     std::back_inserter(res),
+                     [](const std::pair<std::string, ConfigElement>& elem){ return elem.first;});
     return res;
   }
 
