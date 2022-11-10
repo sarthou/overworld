@@ -49,43 +49,70 @@ bool RelationsSender::onGetRelationService(overworld::GetRelations::Request& req
   if(agent_ == nullptr)
     return true;
 
-  std::vector<bool> should_compute = shouldRecompute(request);
+  std::vector<ToCompute_t> should_compute = shouldRecompute(request);
   for(size_t i = 0; i < should_compute.size(); i++)
   {
-    if(should_compute[i])
-      computeRelation(request.patterns[i], response);
+    if(should_compute[i].subject == "")
+    {
+      computeRelationOnAll(request.patterns[i], response,
+                           (should_compute[i].deitic_relation || should_compute[i].egocentric_relation),
+                           (should_compute[i].intrinsic_relation || should_compute[i].egocentric_relation));
+      
+      if(should_compute[i].deitic_relation)
+        last_use_[request.origin_id].computed_deictic_relation.last_complete_use = frames_;
+      else if(should_compute[i].intrinsic_relation)
+        last_use_[request.origin_id].computed_intrinsic_relation.last_complete_use = frames_;
+      else if(should_compute[i].egocentric_relation)
+        last_use_[request.origin_id].computed_egocentric_relation.last_complete_use = frames_;
+    }
+    else
+    {
+      computeRelationOnAll(request.patterns[i], response,
+                           (should_compute[i].deitic_relation || should_compute[i].egocentric_relation),
+                           (should_compute[i].intrinsic_relation || should_compute[i].egocentric_relation));
+      if(should_compute[i].deitic_relation)
+        last_use_[request.origin_id].computed_deictic_relation.last_indiv_use[should_compute[i].subject] = frames_;
+      else if(should_compute[i].intrinsic_relation)
+        last_use_[request.origin_id].computed_intrinsic_relation.last_indiv_use[should_compute[i].subject] = frames_;
+      else if(should_compute[i].egocentric_relation)
+        last_use_[request.origin_id].computed_egocentric_relation.last_indiv_use[should_compute[i].subject] = frames_;
+    }
   }
   
   return true;
 }
 
-std::vector<bool> RelationsSender::shouldRecompute(const overworld::GetRelations::Request& request)
+std::vector<ToCompute_t> RelationsSender::shouldRecompute(const overworld::GetRelations::Request& request)
 {
   auto it = last_use_.find(request.origin_id);
   if(it == last_use_.end())
   {
     last_use_[request.origin_id] = ComputedRelations_t();
-    return std::vector<bool>(request.patterns.size(), true);
+    return std::vector<ToCompute_t>(request.patterns.size(), true);
   }
   else if(it->second.last_use + DELTA_FRAME < frames_)
-    return std::vector<bool>(request.patterns.size(), true);
+    return std::vector<ToCompute_t>(request.patterns.size(), true);
   else
   {
-    std::vector<bool> res;
+    std::vector<ToCompute_t> res;
     for(auto& pattern : request.patterns)
     {
+      ToCompute_t to_compute;
+      to_compute.subject = pattern.subject;
       if(pattern.predicate == "egocentricGeometricalProperty")
-        res.push_back(shouldRecompute(pattern.subject, it->second.computed_egocentric_relation));
+        to_compute.egocentric_relation = shouldRecompute(pattern.subject, it->second.computed_egocentric_relation);
       else if((pattern.predicate == "isAtRightOf") || (pattern.predicate == "isAtLeftOf") ||
               (pattern.predicate == "isInFrontOf") || (pattern.predicate == "isBehind"))
-        res.push_back(shouldRecompute(pattern.subject, it->second.computed_deictic_relation));
+        to_compute.deitic_relation = shouldRecompute(pattern.subject, it->second.computed_deictic_relation);
       else if(pattern.predicate == "deicticGeometricalProperty")
-        res.push_back(shouldRecompute(pattern.object, it->second.computed_deictic_relation));
+        to_compute.deitic_relation = shouldRecompute(pattern.object, it->second.computed_deictic_relation);
       else if((pattern.predicate == "isToTheRightOf") || (pattern.predicate == "isToTheLeftOf") ||
               (pattern.predicate == "isAtTheFrontOf") || (pattern.predicate == "isAtTheBack"))
-        res.push_back(shouldRecompute(pattern.subject, it->second.computed_intrinsic_relation));
+        to_compute.intrinsic_relation = shouldRecompute(pattern.subject, it->second.computed_intrinsic_relation);
       else if(pattern.predicate == "intrinsicGeometricalProperty")
-        res.push_back(shouldRecompute(pattern.object, it->second.computed_intrinsic_relation));
+        to_compute.intrinsic_relation = shouldRecompute(pattern.object, it->second.computed_intrinsic_relation);
+      
+      res.push_back(to_compute);
     }
 
     return res;
@@ -99,21 +126,27 @@ bool RelationsSender::shouldRecompute(const std::string& subject, ComputedRelati
     auto indiv_it = computed_relation.last_indiv_use.find(subject);
     if(indiv_it == computed_relation.last_indiv_use.end())
     {
-      computed_relation.last_indiv_use[subject] = 0;
+      computed_relation.last_indiv_use[subject] = frames_;
       return true;
     }
     else if(indiv_it->second + DELTA_FRAME < frames_)
+    {
+      indiv_it->second = frames_;
       return true;
+    }
     else
       return false;
   }
   else if(computed_relation.last_complete_use + DELTA_FRAME < frames_)
+  {
+    computed_relation.last_complete_use = frames_;
     return true;
+  }
   else
     return false;
 }
 
-void RelationsSender::computeRelation(const overworld::Triplet& pattern, overworld::GetRelations::Response& response)
+void RelationsSender::computeRelationOnAll(const overworld::Triplet& pattern, overworld::GetRelations::Response& response, bool deictic, bool intrinsic)
 {
   if(agent_->isLocated() == false)
     return;
@@ -124,11 +157,37 @@ void RelationsSender::computeRelation(const overworld::Triplet& pattern, overwor
     if(shouldBeTested(object_a_it->second) == false)
       continue;
 
-    std::cout << "test " << object_a_it->first << std::endl;
+    std::cout << "test all " << object_a_it->first << std::endl;
 
     for(auto object_b_it = std::next(object_a_it); object_b_it != objects.end(); ++object_b_it)
     {
-      computeDeicticRelation(object_a_it->second, object_b_it->second, response);
+      if(deictic)
+        computeDeicticRelation(object_a_it->second, object_b_it->second, response);
+    }
+  }
+}
+
+void RelationsSender::computeRelationOnOne(const overworld::Triplet& pattern, overworld::GetRelations::Response& response, bool deictic, bool intrinsic)
+{
+  if(agent_->isLocated() == false)
+    return;
+
+  auto objects = objects_manager_->getEntities();
+  auto ref_object_it = objects.find(pattern.subject);
+  if(ref_object_it == objects.end())
+    return;
+
+  if(shouldBeTested(ref_object_it->second) == false)
+    return;
+
+  std::cout << "test one" << ref_object_it->first << std::endl;
+
+  for(auto object_it = objects.begin(); object_it != objects.end(); ++object_it)
+  {
+    if(ref_object_it != object_it)
+    {
+      if(deictic)
+        computeDeicticRelation(ref_object_it->second, object_it->second, response);
     }
   }
 }

@@ -12,6 +12,17 @@
 
 namespace owds {
 
+struct ToCompute_t
+{
+  ToCompute_t(bool egocentric = false) : deitic_relation(false),
+                                         intrinsic_relation(false),
+                                         egocentric_relation(egocentric) {}
+  bool deitic_relation;
+  bool intrinsic_relation;
+  bool egocentric_relation;
+  std::string subject;
+};
+
 struct ComputedRelation_t
 {
   ComputedRelation_t() : last_complete_use(0) {}
@@ -56,10 +67,11 @@ private:
 
   bool onGetRelationService(overworld::GetRelations::Request& request,
                             overworld::GetRelations::Response& response);
-  std::vector<bool> shouldRecompute(const overworld::GetRelations::Request& request);
+  std::vector<ToCompute_t> shouldRecompute(const overworld::GetRelations::Request& request);
   bool shouldRecompute(const std::string& subject, ComputedRelation_t& computed_relation);
 
-  void computeRelation(const overworld::Triplet& pattern, overworld::GetRelations::Response& response);
+  void computeRelationOnAll(const overworld::Triplet& pattern, overworld::GetRelations::Response& response, bool deictic, bool intrinsic);
+  void computeRelationOnOne(const overworld::Triplet& pattern, overworld::GetRelations::Response& response, bool deictic, bool intrinsic);
   void computeDeicticRelation(Object* object_a, Object* object_b, overworld::GetRelations::Response& response);
 
   bool shouldBeTested(Object* object);
