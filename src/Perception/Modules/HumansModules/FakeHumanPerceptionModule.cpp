@@ -25,7 +25,6 @@ bool FakeHumanPerceptionModule::closeInitialization()
 
 bool FakeHumanPerceptionModule::perceptionCallback(const overworld::AgentPose& msg)
 {
-
     if (msg.parts.size() == 0)
         return false;
 
