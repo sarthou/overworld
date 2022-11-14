@@ -8,19 +8,20 @@
 #include <chrono>
 #include <thread>
 
-#define SIMU_STEP 0.015
-
 namespace owds {
 
 SituationAssessor::SituationAssessor(const std::string& agent_name,
                                      const std::string& config_path,
+                                     double assessment_frequency,
+                                     double simulation_frequency,
                                      bool simulate,
                                      bool is_robot) : agent_name_(agent_name),
                                                       myself_agent_(nullptr),
                                                       is_robot_(is_robot),
                                                       config_path_(config_path),
                                                       simulate_(simulate),
-                                                      time_step_(0.06),
+                                                      time_step_(1.0 / assessment_frequency),
+                                                      simu_step_(1.0 / simulation_frequency),
                                                       facts_publisher_(&n_, agent_name),
                                                       facts_calculator_(agent_name),
                                                       perception_manager_(&n_)
@@ -43,7 +44,7 @@ SituationAssessor::SituationAssessor(const std::string& agent_name,
       bullet_client_ = PhysicsServers::connectPhysicsServer(owds::CONNECT_DIRECT);
 
   bullet_client_->setGravity(0, 0, -9.81);
-  bullet_client_->setTimeStep(SIMU_STEP);
+  bullet_client_->setTimeStep(simu_step_);
 
   perception_manager_.setBulletClient(bullet_client_);
 
@@ -165,7 +166,7 @@ void SituationAssessor::assessmentLoop()
         if(next_start_time < std::chrono::high_resolution_clock::now())
           time_interval_sec = (std::chrono::high_resolution_clock::now() - start_time).count() / 1000000000.;
 
-        unsigned int nb_step = time_interval_sec / SIMU_STEP;
+        unsigned int nb_step = time_interval_sec / simu_step_;
         for(int i = 0; i < nb_step; i++)
         {
           bullet_client_->stepSimulation();
@@ -250,7 +251,7 @@ void SituationAssessor::processHumans(std::map<std::string, std::unordered_set<i
     auto view_matrix = bullet_client_->computeViewMatrix({(float)head_pose_trans[0], (float)head_pose_trans[1], (float)head_pose_trans[2]},
                                                           {(float)target_pose_trans[0], (float)target_pose_trans[1], (float)target_pose_trans[2]},
                                                           {0.,0.,1.});
-    auto images = bullet_client_->getCameraImage(175*human.second->getFieldOfView().getRatio(), 175, view_matrix, proj_matrix, owds::BULLET_HARDWARE_OPENGL);
+    auto images = bullet_client_->getCameraImage(300*human.second->getFieldOfView().getRatio(), 300, view_matrix, proj_matrix, owds::BULLET_HARDWARE_OPENGL);
 
     ros_sender_->sendImage(human.first + "/view", images);
     agents_segmentation_ids[human.first] = bullet_client_->getSegmentationIds(images);
@@ -292,7 +293,7 @@ std::map<std::string, HumanAssessor_t>::iterator SituationAssessor::createHumanA
 {
   auto assessor = humans_assessors_.insert(std::make_pair(human_name, HumanAssessor_t())).first;
 
-  assessor->second.assessor = new SituationAssessor(human_name, config_path_, simulate_);
+  assessor->second.assessor = new SituationAssessor(human_name, config_path_, 1.0/time_step_, 1.0/simu_step_, simulate_);
   assessor->second.objects_module = new ObjectsEmulatedPerceptionModule();
   assessor->second.humans_module = new HumansEmulatedPerceptionModule();
   assessor->second.assessor->addObjectPerceptionModule("emulated_objects", assessor->second.objects_module);

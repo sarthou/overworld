@@ -24,6 +24,7 @@ void BulletClient::setAdditionalSearchPath(const std::string& path)
 	{
 		b3SharedMemoryCommandHandle command_handle = b3SetAdditionalSearchPath(*client_handle_, path.c_str());
 		b3SharedMemoryStatusHandle status_handle = b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+        (void)status_handle;
 
         if(additional_path_ != "")
             ShellDisplay::warning("[Bullet] The previous additional path has been overwritten");
@@ -57,13 +58,8 @@ int BulletClient::createVisualShapeMesh(const std::string& file_name, const std:
     std::string hash_str = full_path + std::to_string(scale[0]) + std::to_string(scale[1]) + std::to_string(scale[2]) +
                             std::to_string(rgba_color[0]) + std::to_string(rgba_color[1]) + std::to_string(rgba_color[2]) + std::to_string(rgba_color[3]);
     size_t hash = std::hash<std::string>{}(hash_str);
-    auto it = loaded_visual_meshes_.find(hash);
-    if(it != loaded_visual_meshes_.end())
-        return it->second;
 
-    int id = createVisualShape(GEOM_MESH, 0, {0,0,0}, 0, full_path, scale, rgba_color);
-    loaded_visual_meshes_.emplace(hash, id);
-    return id;
+    return createVisualShape(GEOM_MESH, 0, {0,0,0}, 0, full_path, scale, rgba_color);
 }
 
 int BulletClient::createVisualShape(BulletShapeType_e shape_type, 
@@ -396,7 +392,7 @@ int BulletClient::loadURDFRaw(const std::string& raw_urdf, const std::string& te
 
 // Return the number of joints in an object based on
 // body index; body index is based on order of sequence
-// the object is loaded into simulation
+// the object is loaded into screateMultiBodyimulation
 int BulletClient::getNumJoints(int body_id)
 {
     std::lock_guard<std::mutex> lock(mutex_);

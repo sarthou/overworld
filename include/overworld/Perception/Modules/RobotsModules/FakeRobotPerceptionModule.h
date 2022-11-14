@@ -6,6 +6,9 @@
 
 #include "overworld/AgentPose.h"
 
+#include <tf2_ros/transform_listener.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+
 namespace owds {
 
 class FakeRobotPerceptionModule : public owds::PerceptionModuleRosBase<owds::BodyPart, overworld::AgentPose>
@@ -31,6 +34,9 @@ class FakeRobotPerceptionModule : public owds::PerceptionModuleRosBase<owds::Bod
 
     OntologiesManipulator* ontologies_manipulator_;
     OntologyManipulator* onto_;
+
+    tf2_ros::Buffer tf_buffer_;
+    tf2_ros::TransformListener tf2_listener_;
 
     BodyPart createBodyPart(const std::string& robot_name, const std::string& part_name, BodyPartType_e part_type);
     Pose stringToPose(const std::string& str);

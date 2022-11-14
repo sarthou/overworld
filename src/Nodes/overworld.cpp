@@ -31,6 +31,8 @@ int main(int argc, char** argv)
   params.insert(owds::Parameter("config_path", {"-c", "--config"}));
   params.insert(owds::Parameter("robot_name", {"-n", "--name"}));
   params.insert(owds::Parameter("simulate", {"-s", "--simulate"}, {"true"}));
+  params.insert(owds::Parameter("assessment frequency", {"-af", "--assessment-frequency"}, {"17"}));
+  params.insert(owds::Parameter("simulation frequency", {"-sf", "--simulation-frequency"}, {"70"}));
 
   bool valid_parameters = params.set(argc, argv);
   params.display();
@@ -42,6 +44,8 @@ int main(int argc, char** argv)
 
   owds::SituationAssessor robot_situation_assessor(params.at("robot_name").getFirst(),
                                                    params.at("config_path").getFirst(),
+                                                   std::stod(params.at("assessment frequency").getFirst()),
+                                                   std::stod(params.at("simulation frequency").getFirst()),
                                                    params.at("simulate").getFirst() == "true",
                                                    true);
 
