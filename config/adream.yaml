@@ -1,0 +1,93 @@
+adream_walls:
+  orientation:
+    z: 1.57
+
+adream_floor:
+  orientation:
+    z: 1.57
+
+adream_window_h10_1:
+  orientation:
+    z: 1.57
+
+adream_window_h10_2:
+  orientation:
+    z: 1.57
+
+adream_window_h20_1:
+  orientation:
+    z: 1.57
+
+adream_window_h20_2:
+  orientation:
+    z: 1.57
+
+adream_window_h20_3:
+  orientation:
+    z: 1.57
+
+adream_appartment:
+  orientation:
+    z: 1.57
+
+adream_door_h21_1:
+  position:
+    x: 1.03963
+    y: -0.00339
+    z: 1.0725
+  orientation:
+    z: 1.57
+
+adream_door_h21_2:
+  position:
+    x: 5.09035
+    y: 18.4801
+    z: 1.0725
+  orientation:
+    z: 1.57
+
+adream_door_h21_3:
+  position:
+    x: 0.932577
+    y: 18.4514
+    z: 1.0725
+  orientation:
+    z: 1.57
+
+adream_door_h16:
+  position:
+    x: -0.152311
+    y: 22.3506
+    z: 1.0725
+  orientation:
+    z: 3.14159
+
+adream_door_h12:
+  position:
+    x: -11.5018
+    y: 11.6701
+    z: 1.0725
+  orientation:
+    z: 2.51327
+
+adream_door_h14:
+  position:
+    x: -6.56428
+    y: 9.44934
+    z: 1.0725
+
+adream_door_h13:
+  position:
+    x: -10.236
+    y: 11.2895
+    z: 1.0725
+  orientation:
+    z: -0.942478
+
+adream_door_h11:
+  position:
+    x: -9.51151
+    y: 14.0825
+    z: 1.0725
+  orientation:
+    z: -0.942478

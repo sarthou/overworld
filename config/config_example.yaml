@@ -29,3 +29,6 @@ optitrack:
   name: human_0
   offset_x: 6.4868
   offset_y: 2.8506
+
+static:
+  file: package://overworld/config/adream.yaml

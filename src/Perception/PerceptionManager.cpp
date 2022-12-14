@@ -29,7 +29,7 @@ void PerceptionManager::update()
 
 bool PerceptionManager::applyConfigurationRobot(const std::string& config_path)
 {
-    ConfigElement modules_list;
+    YamlElement modules_list;
     if(applyConfiguration(config_path, modules_list) == false)
         return false;
 
@@ -45,7 +45,7 @@ bool PerceptionManager::applyConfigurationRobot(const std::string& config_path)
         for(auto& human_module_name : modules_list["humans"][human_module].value())
         {
             auto human_perception_module = agents_loader.createUnmanagedInstance("owds::" + human_module);
-            ConfigElement module_config = configuration_[human_module_name];
+            YamlElement module_config = configuration_[human_module_name];
             human_perception_module->initialize(human_module_name, n_, bullet_client_, robot_bullet_id_, robot_agent_);
             for(auto& param_name : module_config.getElementsKeys())
                 human_perception_module->setParameter(param_name, module_config[param_name].value().front());
@@ -66,7 +66,7 @@ bool PerceptionManager::applyConfigurationRobot(const std::string& config_path)
         for(auto& object_module_name : modules_list["objects"][object_module].value())
         {
             auto object_perception_module = objects_loader.createUnmanagedInstance("owds::" + object_module);
-            ConfigElement module_config = configuration_[object_module_name];
+            YamlElement module_config = configuration_[object_module_name];
             object_perception_module->initialize(object_module_name, n_, bullet_client_, robot_bullet_id_, robot_agent_);
             for(auto& param_name : module_config.getElementsKeys())
                 object_perception_module->setParameter(param_name, module_config[param_name].value().front());
@@ -83,7 +83,7 @@ bool PerceptionManager::applyConfigurationRobot(const std::string& config_path)
 
 bool PerceptionManager::applyConfigurationHuman(const std::string& config_path)
 {
-    ConfigElement modules_list;
+    YamlElement modules_list;
     if(applyConfiguration(config_path, modules_list, false) == false)
         return false;
 
@@ -98,7 +98,7 @@ bool PerceptionManager::applyConfigurationHuman(const std::string& config_path)
         for(auto& object_module_name : modules_list["objects"][object_module].value())
         {
             auto object_perception_module = objects_loader.createUnmanagedInstance("owds::" + object_module);
-            ConfigElement module_config = configuration_[object_module_name];
+            YamlElement module_config = configuration_[object_module_name];
             object_perception_module->initialize(object_module_name, n_, bullet_client_, robot_bullet_id_, robot_agent_);
             for(auto& param_name : module_config.getElementsKeys())
                 object_perception_module->setParameter(param_name, module_config[param_name].value().front());
@@ -113,7 +113,7 @@ bool PerceptionManager::applyConfigurationHuman(const std::string& config_path)
     return true;
 }
 
-bool PerceptionManager::applyConfiguration(const std::string& config_path, ConfigElement& modules_list, bool display)
+bool PerceptionManager::applyConfiguration(const std::string& config_path, YamlElement& modules_list, bool display)
 {
     if(configuration_.read(config_path) == false)
     {
@@ -143,7 +143,7 @@ bool PerceptionManager::applyConfiguration(const std::string& config_path, Confi
 
     auto robot_perception_module = agents_loader.createUnmanagedInstance("owds::" + robot_modules[0]);
     std::string module_name = modules_list["robot"][robot_modules.front()].value().front();
-    ConfigElement module_config = configuration_[module_name];
+    YamlElement module_config = configuration_[module_name];
     robot_perception_module->initialize(module_name, n_, bullet_client_, -1, nullptr);
     for(auto& param_name : module_config.getElementsKeys())
         robot_perception_module->setParameter(param_name, module_config[param_name].value().front());

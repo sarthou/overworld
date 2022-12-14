@@ -1,4 +1,4 @@
-#include "overworld/Perception/PerceptionConfiguration.h"
+#include "overworld/Utility/YamlReader.h"
 #include "overworld/Perception/Modules/PerceptionModuleBase.h"
 #include "overworld/BasicTypes/Object.h"
 
@@ -28,7 +28,7 @@ int main(int argc, char** argv)
 	ros::init(argc, argv, "listener");
     ros::NodeHandle n;
 
-    owds::PerceptionConfiguration config;
+    owds::YamlReader config;
 
     std::string path = ros::package::getPath("overworld") + "/config/config_example.yaml";
 
