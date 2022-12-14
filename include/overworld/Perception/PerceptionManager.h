@@ -5,7 +5,7 @@
 #include "overworld/Perception/Managers/ObjectsPerceptionManager.h"
 #include "overworld/Perception/Managers/HumansPerceptionManager.h"
 
-#include "overworld/Perception/PerceptionConfiguration.h"
+#include "overworld/Utility/YamlReader.h"
 
 namespace owds {
 
@@ -41,9 +41,9 @@ private:
     int robot_bullet_id_;
     Agent* robot_agent_;
 
-    bool applyConfiguration(const std::string& config_path, ConfigElement& modules_list, bool display = true);
+    bool applyConfiguration(const std::string& config_path, YamlElement& modules_list, bool display = true);
 
-    PerceptionConfiguration configuration_;
+    YamlReader configuration_;
 };
 
 } // namespace owds

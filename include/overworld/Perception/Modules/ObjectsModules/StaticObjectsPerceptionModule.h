@@ -13,11 +13,14 @@ class StaticObjectsPerceptionModule : public PerceptionModuleBase_<Object>
 public:
     StaticObjectsPerceptionModule();
 
+    virtual void setParameter(const std::string& parameter_name, const std::string& parameter_value) override;
     virtual bool closeInitialization() override;
     
 private:
     OntologiesManipulator* ontologies_manipulator_;
     OntologyManipulator* onto_;
+
+    std::string config_file_;
 
     void addObject(const std::string& name,
                    const std::string& visual_mesh,

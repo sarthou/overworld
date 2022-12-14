@@ -94,7 +94,7 @@ generate_messages(
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
   INCLUDE_DIRS include
-  LIBRARIES ${PROJECT_NAME}_bullet_lib ${PROJECT_NAME}_types_lib
+  LIBRARIES ${PROJECT_NAME}_bullet_lib ${PROJECT_NAME}_types_lib ${PROJECT_NAME}_utility_lib
   CATKIN_DEPENDS ontologenius roscpp std_msgs tf2 tf2_ros roslib
 #  DEPENDS system_lib
 )
@@ -142,6 +142,13 @@ target_link_libraries(${PROJECT_NAME}_types_lib PUBLIC
                       ${PROJECT_NAME}_bullet_lib)
 set_target_properties(${PROJECT_NAME}_types_lib PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
+add_library(${PROJECT_NAME}_utility_lib STATIC
+  src/Utility/YamlReader.cpp
+)
+target_link_libraries(${PROJECT_NAME}_utility_lib PUBLIC
+                      ${catkin_LIBRARIES})
+set_target_properties(${PROJECT_NAME}_utility_lib PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
 add_library(${PROJECT_NAME}_perception_lib STATIC
   src/Perception/Managers/ObjectsPerceptionManager.cpp
   src/Perception/Managers/RobotsPerceptionManager.cpp
@@ -149,12 +156,12 @@ add_library(${PROJECT_NAME}_perception_lib STATIC
   src/Perception/Modules/ObjectsModules/ObjectsEmulatedPerceptionModule.cpp
   src/Perception/Modules/HumansModules/HumansEmulatedPerceptionModule.cpp
   src/Perception/PerceptionManager.cpp
-  src/Perception/PerceptionConfiguration.cpp
 )
 target_link_libraries(${PROJECT_NAME}_perception_lib PUBLIC
                       ${catkin_LIBRARIES}
                       ${PROJECT_NAME}_bullet_lib
-                      ${PROJECT_NAME}_types_lib)
+                      ${PROJECT_NAME}_types_lib
+                      ${PROJECT_NAME}_utility_lib)
 
 add_library(${PROJECT_NAME}_facts_lib STATIC
   src/Facts/Publisher/FactsPublisher.cpp
@@ -193,7 +200,8 @@ add_library(overworld_modules_plugin MODULE
 target_link_libraries(overworld_modules_plugin PUBLIC
                       ${catkin_LIBRARIES}
                       ${PROJECT_NAME}_bullet_lib
-                      ${PROJECT_NAME}_types_lib)
+                      ${PROJECT_NAME}_types_lib
+                      ${PROJECT_NAME}_utility_lib)
 
 add_library(overworld_reasoner_plugin
   src/OntologeniusPlugins/ReasonerEgocentric.cpp

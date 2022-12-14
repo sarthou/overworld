@@ -1,6 +1,11 @@
 #include "overworld/Perception/Modules/ObjectsModules/StaticObjectsPerceptionModule.h"
 
 #include <pluginlib/class_list_macros.h>
+#include <ros/package.h>
+
+#include "overworld/Utility/YamlReader.h"
+
+#include <string>
 
 namespace owds {
 
@@ -8,6 +13,14 @@ StaticObjectsPerceptionModule::StaticObjectsPerceptionModule() : ontologies_mani
                                                                  onto_(nullptr)
 {
 
+}
+
+void StaticObjectsPerceptionModule::setParameter(const std::string& parameter_name, const std::string& parameter_value)
+{
+    if(parameter_name == "file")
+        config_file_ = parameter_value;
+    else
+        ShellDisplay::warning("[StaticObjectsPerceptionModule] Unkown parameter " + parameter_name);
 }
 
 bool StaticObjectsPerceptionModule::closeInitialization()
@@ -19,22 +32,54 @@ bool StaticObjectsPerceptionModule::closeInitialization()
     onto_ = ontologies_manipulator_->get(robot_name);
     onto_->close();
 
-    addObject("adream_walls", {0,0,0}, {0,0,1.57});
-    addObject("adream_floor", {0,0,0}, {0,0,1.57});
-    addObject("adream_window_h10_1", {0,0,0}, {0,0,1.57});
-    addObject("adream_window_h10_2", {0,0,0}, {0,0,1.57});
-    addObject("adream_window_h20_1", {0,0,0}, {0,0,1.57});
-    addObject("adream_window_h20_2", {0,0,0}, {0,0,1.57});
-    addObject("adream_window_h20_3", {0,0,0}, {0,0,1.57});
-    addObject("adream_appartment", {0,0,0}, {0,0,1.57});
-    addObject("adream_door_h21_1", {1.03963,-0.00339,1.0725}, {0,0,1.57});
-    addObject("adream_door_h21_2", {5.09035,18.4801,1.0725}, {0,0,1.57});
-    addObject("adream_door_h21_3", {0.932577,18.4514,1.0725}, {0,0,1.57});
-    addObject("adream_door_h16", {-0.152311,22.3506,1.0725}, {0,0,3.14159});
-    addObject("adream_door_h12", {-11.5018,11.6701,1.0725}, {0,0,-2.51327});
-    addObject("adream_door_h14", {-6.56428,9.44934,1.0725}, {0,0,0});
-    addObject("adream_door_h13", {-10.236,11.2895,1.0725}, {0,0,-0.942478});
-    addObject("adream_door_h11", {-9.51151,14.0825,1.0725}, {0,0,-0.942478});
+    if(config_file_ != "")
+    {
+        std::string package_pattern = "package://";
+        if(config_file_.find(package_pattern) != std::string::npos)
+        {
+            size_t pose = config_file_.find(package_pattern);
+            size_t pose_end_of_name = config_file_.find("/", pose + package_pattern.size());
+            std::string full_package = config_file_.substr(pose, pose_end_of_name - pose);
+            std::string package_name = config_file_.substr(pose + package_pattern.size(), pose_end_of_name - pose - package_pattern.size());
+            std::string package_path = ros::package::getPath(package_name);
+            config_file_.replace(config_file_.find(full_package), full_package.size(), package_path);
+        }
+
+        YamlReader reader;
+        if(reader.read(config_file_))
+        {
+            auto objects_ids = reader.getKeys();
+            for(auto& id : objects_ids)
+            {
+                double pose_x = 0, pose_y = 0, pose_z = 0;
+                double orientation_x = 0, orientation_y = 0, orientation_z = 0;
+                auto obj_description = reader[id];
+
+                if(obj_description.keyExists("position"))
+                {
+                    auto position = obj_description["position"];
+                    if(position.keyExists("x")) pose_x = std::stod(position["x"].value().front());
+                    if(position.keyExists("y")) pose_y = std::stod(position["y"].value().front());
+                    if(position.keyExists("z")) pose_z = std::stod(position["z"].value().front());
+                }
+
+                if(obj_description.keyExists("orientation"))
+                {
+                    auto orientation = obj_description["orientation"];
+                    if(orientation.keyExists("x")) orientation_x = std::stod(orientation["x"].value().front());
+                    if(orientation.keyExists("y")) orientation_y = std::stod(orientation["y"].value().front());
+                    if(orientation.keyExists("z")) orientation_z = std::stod(orientation["z"].value().front());
+                }
+
+                addObject(id, {pose_x, pose_y, pose_z}, {orientation_x, orientation_y, orientation_z});
+            }
+        }
+        else
+        {
+            ShellDisplay::error("[StaticObjectsPerceptionModule] fail to read file \'" + config_file_ + "\'");
+            return false;
+        }
+    }
 
     return true;
 }
