@@ -195,6 +195,10 @@ private:
     std::mutex mutex_;
 
     std::string additional_path_;
+    std::unordered_map<size_t, int> loaded_textures_;
+    std::unordered_map<size_t, int> loaded_collision_meshes_;
+    // Visual meshes are not cached as same texture would be 
+    // applied to all same visual meshes
 
     int createVisualShape(BulletShapeType_e shape_type, 
                             float radius,

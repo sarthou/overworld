@@ -21,11 +21,9 @@ find_package(catkin REQUIRED COMPONENTS
   tf2_geometry_msgs
   roslib
   message_filters
-  ar_track_alvar_msgs
   sensor_msgs
   visualization_msgs
   geometry_msgs
-  optitrack_msgs
   cv_bridge
   pluginlib
 )
@@ -66,6 +64,9 @@ endforeach()
 add_message_files(
   FILES
   Triplet.msg
+  EntityPose.msg
+  EntitiesPoses.msg
+  AgentPose.msg
 )
 
 add_service_files(
@@ -92,9 +93,9 @@ generate_messages(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES overworld
-   CATKIN_DEPENDS ontologenius roscpp std_msgs tf2 tf2_ros roslib
+  INCLUDE_DIRS include
+  LIBRARIES ${PROJECT_NAME}_bullet_lib ${PROJECT_NAME}_types_lib ${PROJECT_NAME}_utility_lib
+  CATKIN_DEPENDS ontologenius roscpp std_msgs tf2 tf2_ros roslib
 #  DEPENDS system_lib
 )
 
@@ -141,6 +142,13 @@ target_link_libraries(${PROJECT_NAME}_types_lib PUBLIC
                       ${PROJECT_NAME}_bullet_lib)
 set_target_properties(${PROJECT_NAME}_types_lib PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
+add_library(${PROJECT_NAME}_utility_lib STATIC
+  src/Utility/YamlReader.cpp
+)
+target_link_libraries(${PROJECT_NAME}_utility_lib PUBLIC
+                      ${catkin_LIBRARIES})
+set_target_properties(${PROJECT_NAME}_utility_lib PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
 add_library(${PROJECT_NAME}_perception_lib STATIC
   src/Perception/Managers/ObjectsPerceptionManager.cpp
   src/Perception/Managers/RobotsPerceptionManager.cpp
@@ -148,12 +156,12 @@ add_library(${PROJECT_NAME}_perception_lib STATIC
   src/Perception/Modules/ObjectsModules/ObjectsEmulatedPerceptionModule.cpp
   src/Perception/Modules/HumansModules/HumansEmulatedPerceptionModule.cpp
   src/Perception/PerceptionManager.cpp
-  src/Perception/PerceptionConfiguration.cpp
 )
 target_link_libraries(${PROJECT_NAME}_perception_lib PUBLIC
                       ${catkin_LIBRARIES}
                       ${PROJECT_NAME}_bullet_lib
-                      ${PROJECT_NAME}_types_lib)
+                      ${PROJECT_NAME}_types_lib
+                      ${PROJECT_NAME}_utility_lib)
 
 add_library(${PROJECT_NAME}_facts_lib STATIC
   src/Facts/Publisher/FactsPublisher.cpp
@@ -169,6 +177,7 @@ add_library(${PROJECT_NAME}_sender_lib STATIC
   src/Senders/ROSSender.cpp
   src/Senders/PoseSender.cpp
   src/Senders/Bernie.cpp
+  src/Senders/RelationsSender.cpp
 )
 target_link_libraries(${PROJECT_NAME}_sender_lib PUBLIC
                       ${catkin_LIBRARIES}
@@ -181,21 +190,23 @@ target_link_libraries(${PROJECT_NAME}_sender_lib PUBLIC
 #################
 
 add_library(overworld_modules_plugin MODULE
-  src/Perception/Modules/ObjectsModules/ArTrackPerceptionModule.cpp
   src/Perception/Modules/ObjectsModules/StaticObjectsPerceptionModule.cpp
-  src/Perception/Modules/ObjectsModules/Pr2GripperPerceptionModule.cpp
-  src/Perception/Modules/RobotsModules/PR2JointsPerception.cpp
-  src/Perception/Modules/HumansModules/OptitrackPerceptionModule.cpp
+  src/Perception/Modules/ObjectsModules/FakeObjectPerceptionModule.cpp
+  src/Perception/Modules/RobotsModules/JointStatePerceptionModule.cpp
+  src/Perception/Modules/RobotsModules/FakeRobotPerceptionModule.cpp
+  src/Perception/Modules/HumansModules/StampedPosePerceptionModule.cpp
+  src/Perception/Modules/HumansModules/FakeHumanPerceptionModule.cpp
 )
 target_link_libraries(overworld_modules_plugin PUBLIC
                       ${catkin_LIBRARIES}
                       ${PROJECT_NAME}_bullet_lib
-                      ${PROJECT_NAME}_types_lib)
+                      ${PROJECT_NAME}_types_lib
+                      ${PROJECT_NAME}_utility_lib)
 
 add_library(overworld_reasoner_plugin
   src/OntologeniusPlugins/ReasonerEgocentric.cpp
 )
-add_dependencies(overworld_reasoner_plugin overworld_gencpp)
+add_dependencies(overworld_reasoner_plugin overworld_gencpp ${catkin_EXPORTED_TARGETS})
 target_link_libraries(overworld_reasoner_plugin PUBLIC
                       ${catkin_LIBRARIES}
                       ${ontologenius_LIBRARIES})
@@ -211,6 +222,10 @@ target_link_libraries(${PROJECT_NAME}_node PRIVATE
                       ${PROJECT_NAME}_facts_lib
                       ${catkin_LIBRARIES})
 add_dependencies(${PROJECT_NAME}_node overworld_gencpp)
+
+add_executable(plugins src/Nodes/plugins.cpp)
+target_link_libraries(plugins ${catkin_LIBRARIES}
+                      ${PROJECT_NAME}_bullet_lib)
 
 #################
 #  Test files   #

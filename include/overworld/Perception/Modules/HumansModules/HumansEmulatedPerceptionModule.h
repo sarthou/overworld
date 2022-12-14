@@ -14,7 +14,7 @@ public:
   HumansEmulatedPerceptionModule() = default;
 
 private:
-  bool perceptionCallback(const std::vector<BodyPart*>& msg);
+  bool perceptionCallback(const std::vector<BodyPart*>& msg) override;
 
   std::map<std::string,BodyPart>::iterator createNewPercept(BodyPart* object);
 };

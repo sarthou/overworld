@@ -29,7 +29,7 @@ class PerceptionModuleBase_
 public:
   explicit PerceptionModuleBase_(bool need_access_to_external_entities = false):
                                 is_activated_(true),
-                                updated_(false),
+                                updated_(true),
                                 need_access_to_external_entities_(need_access_to_external_entities),
                                 n_(nullptr),
                                 bullet_client_(nullptr),
@@ -39,11 +39,13 @@ public:
   {}
   virtual ~PerceptionModuleBase_() = default;
 
-  virtual void initialize(ros::NodeHandle* n,
+  virtual void initialize(const std::string& module_name,
+                          ros::NodeHandle* n,
                           BulletClient* bullet_client,
                           int robot_bullet_id,
                           Agent* robot_agent)
   {
+    module_name_ = module_name;
     n_ = n;
     bullet_client_ = bullet_client;
     robot_bullet_id_ = robot_bullet_id;
@@ -51,7 +53,7 @@ public:
   }
 
   virtual void setParameter(const std::string& parameter_name, const std::string& parameter_value) {}
-  virtual bool closeInitialization() { return true; }
+  virtual bool closeInitialization() { updated_ = false; return true; }
 
   virtual std::string getAgentName() { return ""; } 
   virtual int getAgentBulletId() { return -1; }
@@ -132,6 +134,8 @@ public:
   }
 
 protected:
+  std::string module_name_;
+
   std::map<std::string, T> percepts_;
   std::atomic<bool> is_activated_;
   std::atomic<bool> updated_;
@@ -201,16 +205,17 @@ public:
   {}
   virtual ~PerceptionModuleRosBase() = default;
 
-  virtual void initialize(ros::NodeHandle* n,
+  virtual void initialize(const std::string& module_name,
+                          ros::NodeHandle* n,
                           BulletClient* bullet_client,
                           int robot_bullet_id,
                           Agent* robot_agent) override
   {
-    PerceptionModuleBase_<T>::initialize(n, bullet_client, robot_bullet_id, robot_agent);
+    PerceptionModuleBase_<T>::initialize(module_name, n, bullet_client, robot_bullet_id, robot_agent);
     if(topic_name_ != "")
     {
       sub_ = this->n_->subscribe(topic_name_, 1, &PerceptionModuleRosBase::privatePerceptionCallback, this);
-      ShellDisplay::info("PerceptionModuleRosBase subscribed to " + topic_name_);
+      ShellDisplay::info("[" + this->module_name_ + "] subscribed to " + topic_name_);
     }
   }
 
@@ -223,7 +228,7 @@ protected:
     if(topic_name_ != "")
     {
       sub_ = this->n_->subscribe(topic_name_, 1, &PerceptionModuleRosBase::privatePerceptionCallback, this);
-      ShellDisplay::info("PerceptionModuleRosBase subscribed to " + topic_name_);
+      ShellDisplay::info("[" + this->module_name_ + "] subscribed to " + topic_name_);
     }
   }
 
@@ -268,17 +273,18 @@ public:
   {}
   virtual ~PerceptionModuleRosSyncBase() = default;
 
-  virtual void initialize(ros::NodeHandle* n,
+  virtual void initialize(const std::string& module_name,
+                          ros::NodeHandle* n,
                           BulletClient* bullet_client,
                           int robot_bullet_id,
                           Agent* robot_agent) override
   {
-    PerceptionModuleBase_<T>::initialize(n, bullet_client, robot_bullet_id, robot_agent);
+    PerceptionModuleBase_<T>::initialize(module_name, n, bullet_client, robot_bullet_id, robot_agent);
     sub_0_.subscribe(*n, first_topic_name_, 1);
     sub_1_.subscribe(*n, second_topic_name_, 1);
     sync_.reset(new Sync(SyncPolicy(10), sub_0_, sub_1_));
     sync_->registerCallback(&PerceptionModuleRosSyncBase::privatePerceptionCallback, this);
-    ShellDisplay::info("PerceptionModuleRosSyncBase subscribed to " + first_topic_name_ + " and " + second_topic_name_);
+    ShellDisplay::info("[" + this->module_name_ + "] subscribed to " + first_topic_name_ + " and " + second_topic_name_);
   }
 
 protected:

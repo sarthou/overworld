@@ -24,6 +24,7 @@ void BulletClient::setAdditionalSearchPath(const std::string& path)
 	{
 		b3SharedMemoryCommandHandle command_handle = b3SetAdditionalSearchPath(*client_handle_, path.c_str());
 		b3SharedMemoryStatusHandle status_handle = b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+        (void)status_handle;
 
         if(additional_path_ != "")
             ShellDisplay::warning("[Bullet] The previous additional path has been overwritten");
@@ -53,7 +54,12 @@ int BulletClient::createVisualShapeCapsule(float radius, float height, const std
 
 int BulletClient::createVisualShapeMesh(const std::string& file_name, const std::array<double, 3>& scale, const std::array<double, 4>& rgba_color)
 {
-    return createVisualShape(GEOM_MESH, 0, {0,0,0}, 0, getFullPath(file_name), scale, rgba_color);
+    std::string full_path = getFullPath(file_name);
+    std::string hash_str = full_path + std::to_string(scale[0]) + std::to_string(scale[1]) + std::to_string(scale[2]) +
+                            std::to_string(rgba_color[0]) + std::to_string(rgba_color[1]) + std::to_string(rgba_color[2]) + std::to_string(rgba_color[3]);
+    size_t hash = std::hash<std::string>{}(hash_str);
+
+    return createVisualShape(GEOM_MESH, 0, {0,0,0}, 0, full_path, scale, rgba_color);
 }
 
 int BulletClient::createVisualShape(BulletShapeType_e shape_type, 
@@ -144,7 +150,17 @@ int BulletClient::createCollisionShapeCapsule(float radius, float height, int fl
 
 int BulletClient::createCollisionShapeMesh(const std::string& file_name, const std::array<double, 3>& scale, int flags)
 {
-    return createCollisionShape(GEOM_MESH, 0, {0}, 0, getFullPath(file_name), scale, flags);
+    std::string full_path = getFullPath(file_name);
+    std::string hash_str = full_path + std::to_string(scale[0]) + std::to_string(scale[1]) +
+                           std::to_string(scale[2]) + std::to_string(flags);
+    size_t hash = std::hash<std::string>{}(hash_str);
+    auto it = loaded_collision_meshes_.find(hash);
+    if(it != loaded_collision_meshes_.end())
+        return it->second;
+
+    int id = createCollisionShape(GEOM_MESH, 0, {0}, 0, full_path, scale, flags);
+    loaded_collision_meshes_.emplace(hash, id);
+    return id;
 }
 
 int BulletClient::createCollisionShape(BulletShapeType_e shape_type, 
@@ -161,7 +177,7 @@ int BulletClient::createCollisionShape(BulletShapeType_e shape_type,
 		int shape_index = -1;
 
 		b3SharedMemoryCommandHandle command_handle = b3CreateCollisionShapeCommandInit(*client_handle_);
-		if (shape_type == GEOM_SPHERE && radius > 0)
+		if (shape_type == GEOM_SPHERE)
 		{   
             if(radius > 0)
 			    shape_index = b3CreateCollisionShapeAddSphere(command_handle, radius);
@@ -248,14 +264,24 @@ int BulletClient::createMultiBody(float base_mass,
 
 int BulletClient::loadTexture(const std::string& file_path)
 {
+    auto full_path = getFullPath(file_path);
+    size_t hash = std::hash<std::string>{}(full_path);
+    auto it = loaded_textures_.find(hash);
+    if(it != loaded_textures_.end())
+        return it->second;
+
     std::lock_guard<std::mutex> lock(mutex_);
-	b3SharedMemoryCommandHandle command_handle = b3InitLoadTexture(*client_handle_, getFullPath(file_path).c_str());
+	b3SharedMemoryCommandHandle command_handle = b3InitLoadTexture(*client_handle_, full_path.c_str());
     b3SharedMemoryStatusHandle status_handle = b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
     int status_type = b3GetStatusType(status_handle);
     if (status_type == CMD_LOAD_TEXTURE_COMPLETED)
-        return b3GetStatusTextureUniqueId(status_handle);
+    {
+        int id = b3GetStatusTextureUniqueId(status_handle);
+        loaded_textures_.emplace(hash, id);
+        return id;
+    }
 
-    ShellDisplay::error("[Bullet] Error loading texture \'" + getFullPath(file_path) + "\'");
+    ShellDisplay::error("[Bullet] Error loading texture \'" + full_path + "\'");
     return -1;
 }
 
@@ -366,7 +392,7 @@ int BulletClient::loadURDFRaw(const std::string& raw_urdf, const std::string& te
 
 // Return the number of joints in an object based on
 // body index; body index is based on order of sequence
-// the object is loaded into simulation
+// the object is loaded into screateMultiBodyimulation
 int BulletClient::getNumJoints(int body_id)
 {
     std::lock_guard<std::mutex> lock(mutex_);
@@ -695,10 +721,7 @@ struct b3CameraImageData BulletClient::getCameraImage(int width, int height,
 
 std::unordered_set<int> BulletClient::getSegmentationIds(const b3CameraImageData& image)
 {
-  std::unordered_set<int> segmentation_ids;
-  for(size_t i = 0; i < image.m_pixelHeight*image.m_pixelWidth; i++)
-    segmentation_ids.insert(image.m_segmentationMaskValues[i]);
-
+  std::unordered_set<int> segmentation_ids(image.m_segmentationMaskValues, image.m_segmentationMaskValues+image.m_pixelHeight*image.m_pixelWidth);
   return segmentation_ids;
 }
 

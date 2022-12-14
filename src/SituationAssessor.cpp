@@ -1,11 +1,6 @@
 #include "overworld/SituationAssessor.h"
 
-#include "overworld/Perception/Modules/ObjectsModules/ArTrackPerceptionModule.h"
-#include "overworld/Perception/Modules/ObjectsModules/Pr2GripperPerceptionModule.h"
-#include "overworld/Perception/Modules/ObjectsModules/StaticObjectsPerceptionModule.h"
 #include "overworld/Perception/Modules/ObjectsModules/ObjectsEmulatedPerceptionModule.h"
-#include "overworld/Perception/Modules/RobotsModules/PR2JointsPerception.h"
-#include "overworld/Perception/Modules/HumansModules/OptitrackPerceptionModule.h"
 #include "overworld/Perception/Modules/HumansModules/HumansEmulatedPerceptionModule.h"
 
 #include "overworld/Utility/BulletKeypressHandler.h"
@@ -13,19 +8,22 @@
 #include <chrono>
 #include <thread>
 
-#define SIMU_STEP 0.015
-
 namespace owds {
 
 SituationAssessor::SituationAssessor(const std::string& agent_name,
                                      const std::string& config_path,
+                                     double assessment_frequency,
+                                     double simulation_frequency,
+                                     bool simulate,
                                      bool is_robot) : agent_name_(agent_name),
                                                       myself_agent_(nullptr),
                                                       is_robot_(is_robot),
                                                       config_path_(config_path),
-                                                      time_step_(0.06),
+                                                      simulate_(simulate),
+                                                      time_step_(1.0 / assessment_frequency),
+                                                      simu_step_(1.0 / simulation_frequency),
                                                       facts_publisher_(&n_, agent_name),
-                                                      facts_calculator_(&n_, agent_name),
+                                                      facts_calculator_(agent_name),
                                                       perception_manager_(&n_)
 {
   n_.setCallbackQueue(&callback_queue_);
@@ -46,7 +44,7 @@ SituationAssessor::SituationAssessor(const std::string& agent_name,
       bullet_client_ = PhysicsServers::connectPhysicsServer(owds::CONNECT_DIRECT);
 
   bullet_client_->setGravity(0, 0, -9.81);
-  bullet_client_->setTimeStep(SIMU_STEP);
+  bullet_client_->setTimeStep(simu_step_);
 
   perception_manager_.setBulletClient(bullet_client_);
 
@@ -160,7 +158,7 @@ void SituationAssessor::assessmentLoop()
     {
       next_start_time = start_time + interval;
 
-      if(perception_manager_.objects_manager_.needSimulation())
+      if(simulate_ && perception_manager_.objects_manager_.needSimulation())
       {
         perception_manager_.objects_manager_.initLerp();
 
@@ -168,7 +166,7 @@ void SituationAssessor::assessmentLoop()
         if(next_start_time < std::chrono::high_resolution_clock::now())
           time_interval_sec = (std::chrono::high_resolution_clock::now() - start_time).count() / 1000000000.;
 
-        unsigned int nb_step = time_interval_sec / SIMU_STEP;
+        unsigned int nb_step = time_interval_sec / simu_step_;
         for(int i = 0; i < nb_step; i++)
         {
           bullet_client_->stepSimulation();
@@ -204,38 +202,15 @@ void SituationAssessor::assess()
   auto humans = perception_manager_.humans_manager_.getAgents();
   auto body_parts = perception_manager_.humans_manager_.getEntities();
 
+  std::thread humans_process;
+
   if(is_robot_)
-  {
-    for(auto human : humans)
-    {
-      if(human.second->getHead() == nullptr)
-        continue;
-      else if(human.second->getHead()->isLocated() == false)
-        continue;
-
-      auto proj_matrix = bullet_client_->computeProjectionMatrix(human.second->getFieldOfView().getHeight(),
-                                                                 human.second->getFieldOfView().getRatio(),
-                                                                 human.second->getFieldOfView().getClipNear(),
-                                                                 human.second->getFieldOfView().getClipFar());
-      Pose target_pose = human.second->getHead()->pose() * Pose({1,0,0}, {0,0,0,1});
-      auto head_pose_trans = human.second->getHead()->pose().arrays().first;
-      auto target_pose_trans = target_pose.arrays().first;
-      auto view_matrix = bullet_client_->computeViewMatrix({(float)head_pose_trans[0], (float)head_pose_trans[1], (float)head_pose_trans[2]},
-                                                           {(float)target_pose_trans[0], (float)target_pose_trans[1], (float)target_pose_trans[2]},
-                                                           {0.,0.,1.});
-      auto images = bullet_client_->getCameraImage(175*human.second->getFieldOfView().getRatio(), 175, view_matrix, proj_matrix, owds::BULLET_HARDWARE_OPENGL);
-
-      ros_sender_->sendImage(human.first + "/view", images);
-      agents_segmentation_ids[human.first] = bullet_client_->getSegmentationIds(images);
-      updateHumansPerspective(human.first, objects, body_parts, agents_segmentation_ids[human.first]);
-    }
-  }
+    humans_process = std::thread(&SituationAssessor::processHumans, this, std::ref(agents_segmentation_ids));
 
   auto agents = humans;
   agents.insert(robots.begin(), robots.end());
 
-  auto facts = facts_calculator_.computeFacts(objects, agents, agents_segmentation_ids);
-  facts_publisher_.publish(facts);
+  facts_calculator_.computeObjectsFacts(objects, true);
 
   if(is_robot_)
   {
@@ -245,6 +220,43 @@ void SituationAssessor::assess()
   else
     ros_sender_->sendEntitiesToRViz(myself_agent_->getId() + "/objects_markers", objects);
   ros_sender_->sendEntitiesToRViz(myself_agent_->getId() + "/humans_markers", body_parts);
+
+  if(is_robot_)
+    humans_process.join();
+
+  auto facts = facts_calculator_.computeAgentsFacts(objects, agents, agents_segmentation_ids, false);
+  facts_publisher_.publish(facts);
+}
+
+void SituationAssessor::processHumans(std::map<std::string, std::unordered_set<int>>& agents_segmentation_ids)
+{
+  auto objects = perception_manager_.objects_manager_.getEntities();
+  auto humans = perception_manager_.humans_manager_.getAgents();
+  auto body_parts = perception_manager_.humans_manager_.getEntities();
+
+  for(auto human : humans)
+  {
+    if(human.second->getHead() == nullptr)
+      continue;
+    else if(human.second->getHead()->isLocated() == false)
+      continue;
+
+    auto proj_matrix = bullet_client_->computeProjectionMatrix(human.second->getFieldOfView().getHeight(),
+                                                                human.second->getFieldOfView().getRatio(),
+                                                                human.second->getFieldOfView().getClipNear(),
+                                                                human.second->getFieldOfView().getClipFar());
+    Pose target_pose = human.second->getHead()->pose() * Pose({1,0,0}, {0,0,0,1});
+    auto head_pose_trans = human.second->getHead()->pose().arrays().first;
+    auto target_pose_trans = target_pose.arrays().first;
+    auto view_matrix = bullet_client_->computeViewMatrix({(float)head_pose_trans[0], (float)head_pose_trans[1], (float)head_pose_trans[2]},
+                                                          {(float)target_pose_trans[0], (float)target_pose_trans[1], (float)target_pose_trans[2]},
+                                                          {0.,0.,1.});
+    auto images = bullet_client_->getCameraImage(300*human.second->getFieldOfView().getRatio(), 300, view_matrix, proj_matrix, owds::BULLET_HARDWARE_OPENGL);
+
+    ros_sender_->sendImage(human.first + "/view", images);
+    agents_segmentation_ids[human.first] = bullet_client_->getSegmentationIds(images);
+    updateHumansPerspective(human.first, objects, body_parts, agents_segmentation_ids[human.first]);
+  }
 }
 
 void SituationAssessor::updateHumansPerspective(const std::string& human_name,
@@ -281,7 +293,7 @@ std::map<std::string, HumanAssessor_t>::iterator SituationAssessor::createHumanA
 {
   auto assessor = humans_assessors_.insert(std::make_pair(human_name, HumanAssessor_t())).first;
 
-  assessor->second.assessor = new SituationAssessor(human_name, config_path_);
+  assessor->second.assessor = new SituationAssessor(human_name, config_path_, 1.0/time_step_, 1.0/simu_step_, simulate_);
   assessor->second.objects_module = new ObjectsEmulatedPerceptionModule();
   assessor->second.humans_module = new HumansEmulatedPerceptionModule();
   assessor->second.assessor->addObjectPerceptionModule("emulated_objects", assessor->second.objects_module);

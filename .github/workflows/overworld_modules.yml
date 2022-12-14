@@ -1,4 +1,4 @@
-name: ROS CI
+name: overworld modules CI
 
 on: [push]
 
@@ -64,6 +64,16 @@ jobs:
           make install
           cd ~/work
           git clone -b dev https://github.com/sarthou/ontologenius.git
+          
+
+      - name: Install modules
+        run: |
+          cd ~/work
+          mkdir overworld_modules && cd overworld_modules
+          git clone https://github.com/sarthou/artrack_perception_module.git
+          git clone https://github.com/sarthou/optitrack_perception_module.git
+          git clone https://github.com/sarthou/pr2_gripper_perception_module.git
+          cd ..
           git clone https://github.com/RIS-WITH/optitrack_msgs.git
           if [ $ROS_DISTRO != noetic ]
           then
@@ -71,6 +81,7 @@ jobs:
           else
             git clone -b noetic-devel https://github.com/sarthou/ar_track_alvar.git
           fi
+
 
       - name: build
         run: |

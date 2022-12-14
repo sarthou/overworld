@@ -2,26 +2,20 @@
 
 namespace owds {
 
-FactsCalculator::FactsCalculator(ros::NodeHandle* nh, const std::string& agent_name): ontos_(OntologiesManipulator(nh))
-{
-  ontos_.waitInit();
-  ontos_.add(agent_name);
-  onto_ = ontos_.get(agent_name);
-  onto_->close();
+FactsCalculator::FactsCalculator(const std::string& agent_name)
+{}
 
-}
-
-std::vector<Fact> FactsCalculator::computeFacts(const std::map<std::string, Object*>& objects,
-                                                const std::map<std::string, Agent*>& agents,
-                                                const std::map<std::string, std::unordered_set<int>>& segmantation_ids)
+std::vector<Fact> FactsCalculator::computeObjectsFacts(const std::map<std::string, Object*>& objects,
+                                                       bool clear)
 {
-  facts_.clear();
+  if(clear)
+    facts_.clear();
 
   for(auto& obj_from : objects)
   {
     if(obj_from.second->isInHand())
       continue;
-    else if(obj_from.second->isStatic())
+    else if(isValid(obj_from.second) == false)
       continue;
 
     bool is_in = false;
@@ -30,7 +24,7 @@ std::vector<Fact> FactsCalculator::computeFacts(const std::map<std::string, Obje
     {
       if(obj_to.second->isInHand())
         continue;
-      else if(obj_to.second->isStatic())
+      else if(isValid(obj_to.second) == false)
         continue;
 
       if(obj_from.first != obj_to.first)
@@ -42,7 +36,7 @@ std::vector<Fact> FactsCalculator::computeFacts(const std::map<std::string, Obje
       {
         if(obj_to.second->isInHand())
           continue;
-        else if(obj_to.second->isStatic())
+        else if(isValid(obj_to.second) == false)
           continue;
 
         if(obj_from.first != obj_to.first)
@@ -50,12 +44,23 @@ std::vector<Fact> FactsCalculator::computeFacts(const std::map<std::string, Obje
       }
   }
 
+  return facts_;
+}
+
+std::vector<Fact> FactsCalculator::computeAgentsFacts(const std::map<std::string, Object*>& objects,
+                                                      const std::map<std::string, Agent*>& agents,
+                                                      const std::map<std::string, std::unordered_set<int>>& segmantation_ids,
+                                                      bool clear)
+{
+  if(clear)
+    facts_.clear();
+
   for(auto& agent_from : agents)
   {
     isInHand(agent_from.second);
     for (auto& obj: objects)
     {
-      if(obj.second->isStatic())
+      if(isValid(obj.second) == false)
         continue;
 
       if (agent_from.second->getType() == AgentType_e::HUMAN){
@@ -80,11 +85,13 @@ std::vector<Fact> FactsCalculator::computeFacts(const std::map<std::string, Obje
 
 bool FactsCalculator::isOnTopfOf(Object* object_under, Object* object_on)
 {
-  if((object_under->isAabbValid() == false) || (object_on->isAabbValid() == false))
+  if(object_under->isA("Support") == false)
+    return false;
+  else if((object_under->isAabbValid() == false) || (object_on->isAabbValid() == false))
     return false;
   else if(overlapXY(object_under->getAabb(), object_on->getAabb()) == false)
     return false;
-  else if(std::abs(object_under->getAabb().max[2] - object_on->getAabb().min[2]) > 0.04)
+  else if(std::abs(object_under->getAabb().max[2] - object_on->getAabb().min[2]) > 0.08)
     return false;
   else
   {
@@ -95,7 +102,9 @@ bool FactsCalculator::isOnTopfOf(Object* object_under, Object* object_on)
 
 bool FactsCalculator::isInContainer(Object* object_around, Object* object_in)
 {
-  if((object_around->isAabbValid() == false) || (object_in->isAabbValid() == false))
+  if(object_around->isA("Container") == false)
+    return false;
+  else if((object_around->isAabbValid() == false) || (object_in->isAabbValid() == false))
     return false;
   else if(object_in->getAabb().min[2] < object_around->getAabb().min[2] - 0.06)
     return false;
@@ -216,8 +225,7 @@ bool FactsCalculator::hasInHand(Agent* agent, Object* object)
     {
       if (leftHand->pose().distanceTo(object->pose()) < 0.08)
       {
-        std::vector<std::string> types = onto_->individuals.getUp(object->id());
-        if (std::find(types.begin(), types.end(), "Pickable") != types.end())
+        if(object->isA("Pickable"))
         {
           object->setInHand(leftHand);
           leftHand->putInHand(object);
@@ -240,8 +248,7 @@ bool FactsCalculator::hasInHand(Agent* agent, Object* object)
     {
       if (rightHand->pose().distanceTo(object->pose()) < 0.08)
       {
-        std::vector<std::string> types = onto_->individuals.getUp(object->id());
-        if (std::find(types.begin(), types.end(), "Pickable") != types.end())
+        if(object->isA("Pickable"))
         {
           object->setInHand(rightHand);
           rightHand->putInHand(object);
@@ -316,6 +323,14 @@ bool FactsCalculator::isHandMovingTowards(Agent* agent, Object* object)
     }
   }
   return ret;
+}
+
+bool FactsCalculator::isValid(Object* object)
+{
+  if(object->isStatic())
+    return false;
+  else
+    return object->isLocated();
 }
 
 } // namespace owds

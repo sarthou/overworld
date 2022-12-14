@@ -1,4 +1,4 @@
-#include "overworld/Perception/Modules/RobotsModules/PR2JointsPerception.h"
+#include "overworld/Perception/Modules/RobotsModules/JointStatePerceptionModule.h"
 
 #include <ros/package.h>
 
@@ -6,14 +6,14 @@
 
 namespace owds {
 
-PR2JointsPerception::PR2JointsPerception(): PerceptionModuleRosBase("/joint_states"),
+JointStatePerceptionModule::JointStatePerceptionModule(): PerceptionModuleRosBase("/joint_states"),
                                             tf2_listener_(tf_buffer_),
                                             base_link_("base_footprint")
 {
     min_period_ = 0.9;
 }
 
-void PR2JointsPerception::setParameter(const std::string& parameter_name, const std::string& parameter_value)
+void JointStatePerceptionModule::setParameter(const std::string& parameter_name, const std::string& parameter_value)
 {
     if(parameter_name == "name")
         robot_name_ = parameter_value;
@@ -28,29 +28,29 @@ void PR2JointsPerception::setParameter(const std::string& parameter_name, const 
     else if(parameter_name == "base")
         base_link_ = parameter_value;
     else
-        ShellDisplay::warning("[PR2JointsPerception] Unkown parameter " + parameter_name);
+        ShellDisplay::warning("[JointStatePerceptionModule] Unkown parameter " + parameter_name);
 }
 
-bool PR2JointsPerception::closeInitialization()
+bool JointStatePerceptionModule::closeInitialization()
 {
     if(robot_name_ == "")
     {
-        ShellDisplay::error("[PR2JointsPerception] No robot name has been defined");
+        ShellDisplay::error("[JointStatePerceptionModule] No robot name has been defined");
         return false;
     }
     if(right_hand_link_ == "")
     {
-        ShellDisplay::error("[PR2JointsPerception] No right hand link has been defined");
+        ShellDisplay::error("[JointStatePerceptionModule] No right hand link has been defined");
         return false;
     }
     if(left_hand_link_ == "")
     {
-        ShellDisplay::error("[PR2JointsPerception] No left hand link has been defined");
+        ShellDisplay::error("[JointStatePerceptionModule] No left hand link has been defined");
         return false;
     }
     if(head_link_ == "")
     {
-        ShellDisplay::error("[PR2JointsPerception] No head link has been defined");
+        ShellDisplay::error("[JointStatePerceptionModule] No head link has been defined");
         return false;
     }
 
@@ -71,7 +71,7 @@ bool PR2JointsPerception::closeInitialization()
         if (links_name_id_.count(link_pair.first) == 0)
         {
             std::cout << "Error: link name '" << link_pair.first
-                      << "' passed as 'link_to_entity_names' of ctor of PR2JointsPerception does not exist in Bullet.";
+                      << "' passed as 'link_to_entity_names' of ctor of JointStatePerceptionModule does not exist in Bullet.";
             throw std::runtime_error("Link name '" + link_pair.first + "' not found in Bullet.");
         }
     }
@@ -79,7 +79,7 @@ bool PR2JointsPerception::closeInitialization()
     percepts_.at(base_link_).setAgentName(robot_name_);
     percepts_.at(base_link_).setType(BODY_PART_BASE);
     if(updateBasePose() == false)
-        ShellDisplay::warning("[PR2JointsPerception] Pr2 base has no position in tf");
+        ShellDisplay::warning("[JointStatePerceptionModule] Pr2 base has no position in tf");
     else
         updated_ = true;
 
@@ -90,7 +90,7 @@ bool PR2JointsPerception::closeInitialization()
     return true;
 }
 
-bool PR2JointsPerception::perceptionCallback(const sensor_msgs::JointState& msg)
+bool JointStatePerceptionModule::perceptionCallback(const sensor_msgs::JointState& msg)
 {
     if ((ros::Time::now() - last_update_).toSec() < min_period_)
         return false;
@@ -119,14 +119,14 @@ bool PR2JointsPerception::perceptionCallback(const sensor_msgs::JointState& msg)
     return true;
 }
 
-bool PR2JointsPerception::updateBasePose(const ros::Time& stamp)
+bool JointStatePerceptionModule::updateBasePose(const ros::Time& stamp)
 {
     geometry_msgs::TransformStamped robot_base;
     try {
         robot_base = tf_buffer_.lookupTransform("map", base_link_, stamp, ros::Duration(1.0));
     }
     catch (const tf2::TransformException& ex){
-      ShellDisplay::error("[PR2JointsPerception]" + std::string(ex.what()));
+        ShellDisplay::error("[JointStatePerceptionModule]" + std::string(ex.what()));
     }
     catch(...) {
         return false;
@@ -143,7 +143,7 @@ bool PR2JointsPerception::updateBasePose(const ros::Time& stamp)
     return true;
 }
 
-void PR2JointsPerception::loadPr2Model()
+void JointStatePerceptionModule::loadPr2Model()
 {
 	std::string path_overworld = ros::package::getPath("overworld");
 	
@@ -151,11 +151,11 @@ void PR2JointsPerception::loadPr2Model()
 
     std::string urdf = n_->param<std::string>("/robot_description", "");
     if (urdf == "")
-	    robot_bullet_id_ = bullet_client_->loadURDF(robot_name_ + ".urdf", {0,0,0}, {0,0,0,1});
+	    robot_bullet_id_ = bullet_client_->loadURDF(robot_name_ + ".urdf", {0,0,0}, {0,0,0,1}, true);
     else
-        robot_bullet_id_ = bullet_client_->loadURDFRaw(urdf, robot_name_ + "_tmp.urdf", {0,0,0}, {0,0,0,1});
+        robot_bullet_id_ = bullet_client_->loadURDFRaw(urdf, robot_name_ + "_tmp.urdf", {0,0,0}, {0,0,0,1}, true);
 }
 
 } // namespace owds
 
-PLUGINLIB_EXPORT_CLASS(owds::PR2JointsPerception, owds::PerceptionModuleBase_<owds::BodyPart>)
+PLUGINLIB_EXPORT_CLASS(owds::JointStatePerceptionModule, owds::PerceptionModuleBase_<owds::BodyPart>)

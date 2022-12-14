@@ -44,7 +44,9 @@ struct HumanAssessor_t
 class SituationAssessor
 {
 public:
-  SituationAssessor(const std::string& agent_name, const std::string& config_path, bool is_robot = false);
+  SituationAssessor(const std::string& agent_name, const std::string& config_path, 
+                    double assessment_frequency, double simulation_frequency, 
+                    bool simulate = true, bool is_robot = false);
   SituationAssessor(const SituationAssessor& other) = delete;
   ~SituationAssessor();
 
@@ -62,6 +64,7 @@ private:
   bool is_robot_;
 
   std::string config_path_;
+  bool simulate_;
 
   ros::NodeHandle n_;
   ros::CallbackQueue callback_queue_;
@@ -70,6 +73,7 @@ private:
   ros::ServiceServer bounding_box_service_;
   std::atomic<bool> run_;
   double time_step_; // in second
+  double simu_step_;
 
   BulletClient* bullet_client_;
   PerceptionManager perception_manager_;
@@ -86,6 +90,7 @@ private:
   void assessmentLoop();
   void assess();
 
+  void processHumans(std::map<std::string, std::unordered_set<int>>& agents_segmentation_ids);
   void updateHumansPerspective(const std::string& human_name,
                                const std::map<std::string, Object*>& objects,
                                const std::map<std::string, BodyPart*>& humans,

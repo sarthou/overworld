@@ -1,37 +1,43 @@
 <library path="lib/liboverworld_modules_plugin">
 
-  <class type="owds::PR2JointsPerception" base_class_type="owds::PerceptionModuleBase_<owds::BodyPart>">
+  <class type="owds::JointStatePerceptionModule" base_class_type="owds::PerceptionModuleBase_<owds::BodyPart>">
     <description>
-      A robot perception module for a PR2 robot.
+      A robot perception module using robot joint state.
       Possible parameters are: name, min_period,
       right_hand, left_hand, and head.
     </description>
   </class>
-
-  <class type="owds::OptitrackPerceptionModule" base_class_type="owds::PerceptionModuleBase_<owds::BodyPart>">
+  <class type="owds::FakeRobotPerceptionModule" base_class_type="owds::PerceptionModuleBase_<owds::BodyPart>">
     <description>
-      A human perception module using the Optitrack mocap system.
-      Possible parameters are: name, offset_x,
-      offset_y, offset_z.
+      A robot perception module providing fake body parts from a ROS topic.
+      Possible parameters are: name, head, base
+      head_pose, and base_pose.
     </description>
   </class>
 
-  <class type="owds::ArTrackPerceptionModule" base_class_type="owds::PerceptionModuleBase_<owds::Object>">
+  <class type="owds::StampedPosePerceptionModule" base_class_type="owds::PerceptionModuleBase_<owds::BodyPart>">
     <description>
-      An object perception module using the Ar_track_alvar system.
+      A human perception module using a poseStamped ROS message.
+      Possible parameters are: name.
+      The module subscribe to "/peopleTrack". Remap your topic if needed.
+    </description>
+  </class>
+  <class type="owds::FakeHumanPerceptionModule" base_class_type="owds::PerceptionModuleBase_<owds::BodyPart>">
+    <description>
+      A human perception module providing fake body parts from a ROS topic.
       Does not take any parameter.
     </description>
   </class>
-  <class type="owds::Pr2GripperPerceptionModule" base_class_type="owds::PerceptionModuleBase_<owds::Object>">
-    <description>
-      An object perception module using the Pr2 pressure sensors.
-      Possible parameters are: side (0 left / 1 right),
-      pressure_threshold, distance_threshold, min_period.
-    </description>
-  </class>
+
   <class type="owds::StaticObjectsPerceptionModule" base_class_type="owds::PerceptionModuleBase_<owds::Object>">
     <description>
       An object perception module providing static objects.
+      This module requires a 'file' parameter being a yaml description of the assets to be loaded.
+    </description>
+  </class>
+  <class type="owds::FakeObjectPerceptionModule" base_class_type="owds::PerceptionModuleBase_<owds::Object>">
+    <description>
+      An object perception module providing fake objects from a ROS topic.
       Does not take any parameter.
     </description>
   </class>

@@ -86,8 +86,7 @@ template<typename T>
 std::vector<std::string> EntitiesPerceptionManager<T>::getModulesList() const
 {
     std::vector<std::string> modules_name;
-    for(const auto& module : perception_modules_)
-        modules_name.push_back(module.first);
+    std::transform(perception_modules_.cbegin(), perception_modules_.cend(), std::back_inserter(modules_name), [](const auto& it){return it.first;});
     return modules_name;
 }
 
@@ -146,10 +145,7 @@ void EntitiesPerceptionManager<T>::deleteModules()
 template<typename T>
 bool EntitiesPerceptionManager<T>::shouldRun()
 {
-    for(const auto& module : perception_modules_)
-        if(module.second->isActivated() && module.second->hasBeenUpdated())
-            return true;
-    return false;
+    return std::any_of(perception_modules_.begin(), perception_modules_.end(), [](const auto& it){return it.second->isActivated() && it.second->hasBeenUpdated();});
 }
 
 template<typename T>

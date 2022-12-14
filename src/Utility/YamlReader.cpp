@@ -1,4 +1,4 @@
-#include "overworld/Perception/PerceptionConfiguration.h"
+#include "overworld/Utility/YamlReader.h"
 
 #include <fstream>
 #include <iostream>
@@ -7,7 +7,7 @@
 namespace owds
 {
 
-bool PerceptionConfiguration::read(const std::string& path)
+bool YamlReader::read(const std::string& path)
 {
   std::ifstream config_file(path);
   if(config_file.is_open())
@@ -32,11 +32,11 @@ bool PerceptionConfiguration::read(const std::string& path)
     return false;
 }
 
-std::map<std::string, ConfigElement> PerceptionConfiguration::read(const std::vector<std::string>& lines, size_t& current_line)
+std::map<std::string, YamlElement> YamlReader::read(const std::vector<std::string>& lines, size_t& current_line)
 {
-  std::map<std::string, ConfigElement> res;
+  std::map<std::string, YamlElement> res;
 
-  std::regex element_regex(R"(^\s*([^\s]*)\s*:\s*([^\n\s]*)\s*$)");
+  std::regex element_regex(R"(^\s*([^\s]*)\s*:\s*([^\n]*)\s*$)"); // in case of bug, previous regex was (^\s*([^\s]*)\s*:\s*([^\n\s]*)\s*$)
   std::regex list_regex(R"(^\s*-\s*(.*)\s*$)");
   std::smatch match;
 
@@ -54,7 +54,7 @@ std::map<std::string, ConfigElement> PerceptionConfiguration::read(const std::ve
       if(match[2].str() == "")
       {
         config_name = match[1].str();
-        res[config_name] = ConfigElement();
+        res[config_name] = YamlElement();
         size_t next_nb_spaces = countSpaces(lines[current_line + 1]);
         if(next_nb_spaces > nb_spaces_base)
         {
@@ -80,7 +80,7 @@ std::map<std::string, ConfigElement> PerceptionConfiguration::read(const std::ve
       else
       {
         config_name = match[1].str();
-        res[config_name] = ConfigElement();
+        res[config_name] = YamlElement();
         res[config_name].data = std::vector<std::string>();
         res[config_name].data->push_back(match[2].str());
       }
@@ -93,53 +93,64 @@ std::map<std::string, ConfigElement> PerceptionConfiguration::read(const std::ve
   return res;
 }
 
-void PerceptionConfiguration::display()
+void YamlReader::display()
 {
   display(elements_);
 }
 
-void PerceptionConfiguration::display(std::map<std::string, ConfigElement>& config, size_t nb)
+void YamlReader::display(const std::map<std::string, YamlElement>& config, size_t nb)
 {
+  if((nb == 0) && (config.find("modules") != config.end()))
+    displayElement(*config.find("modules"), nb);
+
   for(auto& c : config)
   {
-    displayTab(nb);
-    std::cout << "\e[1m" << c.first << "\e[0m : ";
-    if(c.second.data)
-    {
-      if(c.second.data.value().size() > 1)
-      {
-        std::cout << std::endl;
-        for(auto& d : c.second.data.value())
-        {
-          displayTab(nb+1);
-          std::cout << "- " << d << std::endl;
-        }
-      }
-      else
-        std::cout << c.second.data.value().front() << std::endl;
-    }
-    else if(c.second.subelem)
-    {
-      std::cout << std::endl;
-      display(c.second.subelem.value(), nb+1);
-    }
+    if((nb == 0) && (c.first == "modules"))
+      continue;
+      
+    displayElement(c, nb);
   }
 }
 
-void PerceptionConfiguration::displayTab(size_t nb)
+void YamlReader::displayElement(const std::pair<std::string, YamlElement>& it, size_t nb)
+{
+  displayTab(nb);
+  std::cout << "\e[1m" << it.first << "\e[0m : ";
+  if(it.second.data)
+  {
+    if(it.second.data.value().size() > 1)
+    {
+      std::cout << std::endl;
+      for(auto& d : it.second.data.value())
+      {
+        displayTab(nb+1);
+        std::cout << "- " << d << std::endl;
+      }
+    }
+    else
+      std::cout << it.second.data.value().front() << std::endl;
+  }
+  else if(it.second.subelem)
+  {
+    std::cout << std::endl;
+    display(it.second.subelem.value(), nb+1);
+  }
+}
+
+void YamlReader::displayTab(size_t nb)
 {
   for(size_t i = 0; i < nb; i++)
     std::cout << "\t";
 }
 
-void PerceptionConfiguration::removeComment(std::string& line)
+void YamlReader::removeComment(std::string& line)
 {
   size_t pose = line.find('#');
   if(pose != std::string::npos)
     line = line.substr(0, pose);
 }
 
-size_t PerceptionConfiguration::countSpaces(const std::string& line)
+size_t YamlReader::countSpaces(const std::string& line)
 {
   size_t nb = 0;
   while((nb < line.size()) && ((line[nb] == ' ') || (line[nb] == '\t')) )

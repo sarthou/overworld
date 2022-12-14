@@ -10,6 +10,15 @@
 
 namespace owds {
 
+void ObjectsPerceptionManager::setOwnerAgent(Agent* agent)
+{
+  myself_agent_ = agent;
+  ontos_.waitInit();
+  ontos_.add(myself_agent_->getId());
+  onto_ = ontos_.get(myself_agent_->getId());
+  onto_->close();
+}
+
 std::map<std::string, Object*> ObjectsPerceptionManager::getEntities() const
 {
   if(merged_ids_.size() == 0)
@@ -49,11 +58,8 @@ void ObjectsPerceptionManager::initLerp()
         {
           if(object.second->pose() != object.second->pose(1))
           {
-            //if(object.second->pose().similarTo(object.second->pose(1)) == false)
-            {
               goal_poses_.insert({object.second, object.second->pose()});
               undoInBullet(object.second); // set to the previous pose
-            }
           }
         }
       }
@@ -73,15 +79,16 @@ void ObjectsPerceptionManager::stepLerp(double alpha)
 
 std::map<std::string, Object*>::iterator ObjectsPerceptionManager::createFromPercept(const Object& percept)
 {
-  std::map<std::string, Object*>::iterator it = entities_.end();
   auto new_object = new Object(percept);
   new_object->setInHand(nullptr);
-  it = entities_.insert(std::pair<std::string, Object*>(percept.id(), new_object)).first;
+  auto it = entities_.insert(std::pair<std::string, Object*>(percept.id(), new_object)).first;
   addToBullet(it->second);
 
   getObjectBoundingBox(it->second);
   if(it->second->getMass() == 0)
     it->second->setDefaultMass();
+
+  it->second->setTypes(onto_->individuals.getUp(it->first));
 
   return it;
 }
@@ -107,6 +114,10 @@ void ObjectsPerceptionManager::getPercepts(std::map<std::string, Object>& percep
 
       if(merged_ids_.find(percept.first) != merged_ids_.end())
         continue;
+
+      // reset lost_objects_nb_frames_
+      if(percept.second.hasBeenSeen())
+        lost_objects_nb_frames_.erase(percept.first);
 
       if(percept.second.isInHand() && (it->second->isInHand() == false))
       {
@@ -504,6 +515,10 @@ void ObjectsPerceptionManager::getObjectBoundingBox(Object* object)
   updateEntityPose(object, tmp_pose, ros::Time::now());
 
   object->setBoundingBox({bb.max[0] - bb.min[0], bb.max[1] - bb.min[1], bb.max[2] - bb.min[2]});
+  object->setOriginOffset({(bb.max[0] - bb.min[0]) / 2. + bb.min[0],
+                           (bb.max[1] - bb.min[1]) / 2. + bb.min[1],
+                           (bb.max[2] - bb.min[2]) / 2. + bb.min[2]});
+  object->computeCorners();
 }
 
 } // namespace owds
