@@ -150,6 +150,7 @@ target_link_libraries(${PROJECT_NAME}_utility_lib PUBLIC
 set_target_properties(${PROJECT_NAME}_utility_lib PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 add_library(${PROJECT_NAME}_perception_lib STATIC
+  src/Perception/Managers/AgentPerceptionManager.cpp
   src/Perception/Managers/ObjectsPerceptionManager.cpp
   src/Perception/Managers/RobotsPerceptionManager.cpp
   src/Perception/Managers/HumansPerceptionManager.cpp
