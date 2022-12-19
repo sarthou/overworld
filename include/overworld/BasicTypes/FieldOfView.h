@@ -39,6 +39,14 @@ public:
                std::abs(pose.getOriginPan()) <= width_ * TO_HALF_RAD;
     }
 
+    std::string toString() const
+    {
+        return " - Height: " + std::to_string(height_) +
+               "\n - Width: " + std::to_string(width_) +
+               "\n - Clip near: " + std::to_string(clip_near_) +
+               "\n - Clip far: " + std::to_string(clip_far_);
+    }
+
 private:
     double height_; // degrees 
     double width_; // degrees
