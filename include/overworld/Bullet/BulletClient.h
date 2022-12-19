@@ -170,6 +170,14 @@ public:
                           double life_time = 0,
                           int replace_id = -1);
 
+    long addUserDebugText(const std::string& text,
+                          const std::array<double, 3>& position,
+                          const std::array<double, 3>& color_rgb,
+                          float text_size = 0.1,
+                          float life_time = 0,
+                          long parent_object_id = -1,
+                          int replace_id = -1);
+
     std::vector<struct b3RayHitInfo> rayTestBatch(const std::vector<std::array<double, 3>>& from_poses,
                                                   const std::vector<std::array<double,3>>& to_poses,
                                                   int nb_thread = 1,
