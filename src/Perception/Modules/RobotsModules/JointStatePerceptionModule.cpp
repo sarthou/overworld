@@ -38,25 +38,17 @@ bool JointStatePerceptionModule::closeInitialization()
         ShellDisplay::error("[JointStatePerceptionModule] No robot name has been defined");
         return false;
     }
-    if(right_hand_link_ == "")
-    {
-        ShellDisplay::error("[JointStatePerceptionModule] No right hand link has been defined");
-        return false;
-    }
-    if(left_hand_link_ == "")
-    {
-        ShellDisplay::error("[JointStatePerceptionModule] No left hand link has been defined");
-        return false;
-    }
     if(head_link_ == "")
     {
         ShellDisplay::error("[JointStatePerceptionModule] No head link has been defined");
         return false;
     }
 
-    links_to_entity_ = {{right_hand_link_, owds::BODY_PART_RIGHT_HAND},
-                        {left_hand_link_, owds::BODY_PART_LEFT_HAND},
-                        {head_link_, owds::BODY_PART_HEAD}};
+    links_to_entity_ = {{head_link_, owds::BODY_PART_HEAD}};
+    if(right_hand_link_ != "")
+        links_to_entity_.emplace_back(right_hand_link_, owds::BODY_PART_RIGHT_HAND);
+    if(left_hand_link_ != "")
+        links_to_entity_.emplace_back(left_hand_link_, owds::BODY_PART_LEFT_HAND);
 
     loadPr2Model();
 
