@@ -253,45 +253,54 @@ void ObjectsPerceptionManager::reasoningOnUpdate()
 
 std::vector<Object*> ObjectsPerceptionManager::simulatePhysics(const std::vector<Object*>& lost_objects, const std::vector<Object*>& to_simulate_objetcs)
 {
-  std::unordered_set<std::string> lost_ids;
-  lost_ids.reserve(lost_objects.size());
-  for(auto& object : lost_objects)
+  if(simulate_)
   {
-    lost_ids.insert(object->id());
-    auto it = simulated_objects_.find(object->id());
-    if(it == simulated_objects_.end())
-      startSimulation(object);
-  }
-
-  for(auto& object : to_simulate_objetcs)
-  {
-    auto it = simulated_objects_.find(object->id());
-    if(it == simulated_objects_.end())
-      startSimulation(object);
-  }
-
-  std::vector<Object*> objects_to_remove;
-  for(auto& simulated_object : simulated_objects_)
-  {
-    if(lost_ids.find(simulated_object.first) == lost_ids.end())
-      simulated_object.second = 0;
-    else
+    std::unordered_set<std::string> lost_ids;
+    lost_ids.reserve(lost_objects.size());
+    for(auto& object : lost_objects)
     {
-      simulated_object.second++;
-      if(simulated_object.second > MAX_SIMULATED)
+      lost_ids.insert(object->id());
+      auto it = simulated_objects_.find(object->id());
+      if(it == simulated_objects_.end())
+        startSimulation(object);
+    }
+
+    for(auto& object : to_simulate_objetcs)
+    {
+      auto it = simulated_objects_.find(object->id());
+      if(it == simulated_objects_.end())
+        startSimulation(object);
+    }
+
+    std::vector<Object*> objects_to_remove;
+    for(auto& simulated_object : simulated_objects_)
+    {
+      if(lost_ids.find(simulated_object.first) == lost_ids.end())
+        simulated_object.second = 0;
+      else
       {
-        auto entity = entities_[simulated_object.first];
-        stopSimulation(entity, false);
-        objects_to_remove.push_back(entity);
+        simulated_object.second++;
+        if(simulated_object.second > MAX_SIMULATED)
+        {
+          auto entity = entities_[simulated_object.first];
+          stopSimulation(entity, false);
+          objects_to_remove.push_back(entity);
+        }
       }
     }
+
+    // We remove them in a second time as we loop on them previously
+    for(auto entity : objects_to_remove)
+      simulated_objects_.erase(entity->id());
+
+    return objects_to_remove;
   }
-
-  // We remove them in a second time as we loop on them previously
-  for(auto entity : objects_to_remove)
-    simulated_objects_.erase(entity->id());
-
-  return objects_to_remove;
+  else
+  {
+    std::vector<Object*> objects_to_remove = lost_objects;
+    objects_to_remove.insert(objects_to_remove.end(), to_simulate_objetcs.begin(), to_simulate_objetcs.end());
+    return objects_to_remove;
+  }
 }
 
 void ObjectsPerceptionManager::startSimulation(Object* object)

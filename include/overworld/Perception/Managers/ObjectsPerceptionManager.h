@@ -12,11 +12,12 @@ namespace owds {
 class ObjectsPerceptionManager : public EntitiesPerceptionManager<Object>
 {
 public:
-  explicit ObjectsPerceptionManager(ros::NodeHandle* nh): EntitiesPerceptionManager(), myself_agent_(nullptr), ontos_(OntologiesManipulator(nh)), onto_(nullptr){}
+  explicit ObjectsPerceptionManager(ros::NodeHandle* nh): EntitiesPerceptionManager(), myself_agent_(nullptr), simulate_(false), ontos_(OntologiesManipulator(nh)), onto_(nullptr){}
   void setOwnerAgent(Agent* agent);
 
   std::map<std::string, Object*> getEntities() const;
 
+  void setSimulation(bool simulate) { simulate_ = simulate; }
   bool needSimulation() const { return simulated_objects_.size() != 0; }
   void updateSimulatedPoses();
   
@@ -25,6 +26,7 @@ public:
 
 private:
   Agent* myself_agent_;
+  bool simulate_;
   std::map<std::string, size_t> lost_objects_nb_frames_;
   std::map<std::string, size_t> simulated_objects_;
   std::map<Object*, Pose> goal_poses_;
