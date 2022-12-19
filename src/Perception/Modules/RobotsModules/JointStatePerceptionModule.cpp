@@ -50,7 +50,7 @@ bool JointStatePerceptionModule::closeInitialization()
     if(left_hand_link_ != "")
         links_to_entity_.emplace_back(left_hand_link_, owds::BODY_PART_LEFT_HAND);
 
-    loadPr2Model();
+    loadRobotModel();
 
     auto p = bullet_client_->findJointAndLinkIndices(robot_bullet_id_);
     joint_name_id_ = p.first;
@@ -135,7 +135,7 @@ bool JointStatePerceptionModule::updateBasePose(const ros::Time& stamp)
     return true;
 }
 
-void JointStatePerceptionModule::loadPr2Model()
+void JointStatePerceptionModule::loadRobotModel()
 {
 	std::string path_overworld = ros::package::getPath("overworld");
 	
