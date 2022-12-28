@@ -52,6 +52,8 @@ SituationAssessor::SituationAssessor(const std::string& agent_name,
    * Set perception modules  *
   ***************************/
 
+  perception_manager_.setOwnerAgentName(agent_name);
+
   if(is_robot_)
   {
     if(perception_manager_.applyConfigurationRobot(config_path_) == false)
@@ -67,6 +69,7 @@ SituationAssessor::SituationAssessor(const std::string& agent_name,
   }
 
   perception_manager_.objects_manager_.setOwnerAgent(myself_agent_);
+  perception_manager_.objects_manager_.setSimulation(simulate_);
 
   ros_sender_ = new ROSSender(&n_);
   if(is_robot_)

@@ -42,7 +42,7 @@ class JointStatePerceptionModule : public owds::PerceptionModuleRosBase<owds::Bo
     tf2_ros::TransformListener tf2_listener_;
 
     bool updateBasePose(const ros::Time& stamp = ros::Time(0));
-    void loadPr2Model();
+    void loadRobotModel();
 };
 
 } // namespace owds

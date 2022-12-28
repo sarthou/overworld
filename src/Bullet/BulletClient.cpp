@@ -820,7 +820,7 @@ std::pair<std::unordered_map<std::string, int>, std::unordered_map<std::string, 
         std::cout << "Warning: No joints found for Bullet body id: " << body_id << std::endl;
         return {joint_name_index, link_name_index};
     }
-    for (size_t i = 0; i < numJoints - 1; i++)
+    for (size_t i = 0; i < numJoints; i++)
     {
         b3JointInfo joint = getJointInfo(body_id, i);
         // std::cout << joint.m_jointName << std::endl;
@@ -854,6 +854,38 @@ long BulletClient::addUserDebugLine(const std::array<double, 3>& xyz_from,
     else
     {
         ShellDisplay::error("[Bullet] failed to draw debug line");
+        return -1;
+    }
+}
+
+long BulletClient::addUserDebugText(const std::string& text,
+                                    const std::array<double, 3>& position,
+                                    const std::array<double, 3>& color_rgb,
+                                    float text_size,
+                                    float life_time,
+                                    long parent_object_id,
+                                    int replace_id)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+	b3SharedMemoryCommandHandle command_handle = b3InitUserDebugDrawAddText3D(*client_handle_,
+                                                                              text.c_str(),
+                                                                              &position[0],
+                                                                              &color_rgb[0],
+                                                                              text_size, life_time);
+
+    if(parent_object_id >= 0)
+        b3UserDebugItemSetParentObject(command_handle, parent_object_id, -1);
+    
+    if (replace_id >= 0)
+		b3UserDebugItemSetReplaceItemUniqueId(command_handle, replace_id);
+
+	b3SharedMemoryStatusHandle status_handle = b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+	int status_type = b3GetStatusType(status_handle);
+	if (status_type == CMD_USER_DEBUG_DRAW_COMPLETED)
+        return b3GetDebugItemUniqueId(status_handle);
+    else
+    {
+        ShellDisplay::error("[Bullet] failed to draw debug text");
         return -1;
     }
 }
