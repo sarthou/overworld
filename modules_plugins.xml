@@ -7,13 +7,6 @@
       right_hand, left_hand, and head.
     </description>
   </class>
-  <class type="owds::FakeRobotPerceptionModule" base_class_type="owds::PerceptionModuleBase_<owds::BodyPart>">
-    <description>
-      A robot perception module providing fake body parts from a ROS topic.
-      Possible parameters are: name, head, base
-      head_pose, and base_pose.
-    </description>
-  </class>
 
   <class type="owds::StampedPosePerceptionModule" base_class_type="owds::PerceptionModuleBase_<owds::BodyPart>">
     <description>
