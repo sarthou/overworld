@@ -8,7 +8,7 @@ namespace owds {
 class RobotsPerceptionManager : public AgentPerceptionManager
 {
 public:
-  RobotsPerceptionManager(): AgentPerceptionManager(){}
+  explicit RobotsPerceptionManager(ros::NodeHandle* nh): AgentPerceptionManager(nh){}
   ~RobotsPerceptionManager() {}
 
   Agent* getAgent(const std::string& agent_name) { return AgentPerceptionManager::getAgent(agent_name, AgentType_e::ROBOT); }

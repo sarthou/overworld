@@ -5,15 +5,12 @@
 #include "overworld/BasicTypes/Agent.h"
 #include "overworld/BasicTypes/Object.h"
 
-#include <ontologenius/OntologiesManipulator.h>
-
 namespace owds {
 
 class ObjectsPerceptionManager : public EntitiesPerceptionManager<Object>
 {
 public:
-  explicit ObjectsPerceptionManager(ros::NodeHandle* nh): EntitiesPerceptionManager(), myself_agent_(nullptr), simulate_(false), ontos_(OntologiesManipulator(nh)), onto_(nullptr){}
-  void setOwnerAgent(Agent* agent);
+  explicit ObjectsPerceptionManager(ros::NodeHandle* nh): EntitiesPerceptionManager(nh), simulate_(false), myself_agent_(nullptr){}
 
   std::map<std::string, Object*> getEntities() const;
 
@@ -24,8 +21,9 @@ public:
   void initLerp();
   void stepLerp(double alpha);
 
+  void setOwnerAgent(Agent* agent) { myself_agent_ = agent; }
+
 private:
-  Agent* myself_agent_;
   bool simulate_;
   std::map<std::string, size_t> lost_objects_nb_frames_;
   std::map<std::string, size_t> simulated_objects_;
@@ -34,8 +32,7 @@ private:
   std::unordered_set<std::string> false_ids_to_be_merged_;
   std::map<std::string, std::string> merged_ids_;
 
-  OntologiesManipulator ontos_;
-  OntologyManipulator* onto_;
+  Agent* myself_agent_;
 
   std::map<std::string, Object*>::iterator createFromPercept(const Object& percept);
 

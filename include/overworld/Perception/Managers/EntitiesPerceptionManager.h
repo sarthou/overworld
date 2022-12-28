@@ -11,6 +11,7 @@
 
 #include "overworld/Utility/ShellDisplay.h"
 
+#include <ontologenius/OntologiesManipulator.h>
 
 namespace owds {
 
@@ -19,9 +20,13 @@ class EntitiesPerceptionManager
 {
     static_assert(std::is_base_of<Entity,T>::value, "T must be derived from Entity");
 public:
-    EntitiesPerceptionManager(): bullet_client_(nullptr){}
+    explicit EntitiesPerceptionManager(ros::NodeHandle* nh): bullet_client_(nullptr), 
+                                                             ontos_(OntologiesManipulator(nh)),
+                                                             onto_(nullptr)
+    {}
     virtual ~EntitiesPerceptionManager();
 
+    void setOwnerAgentName(const std::string& agent_name);
     void setBulletClient(BulletClient* client) { bullet_client_ = client; }
 
     void addPerceptionModule(const std::string& module_name, PerceptionModuleBase_<T>* perception_module);
@@ -40,6 +45,10 @@ protected:
     std::unordered_set<std::string> black_listed_entities_;
     std::map<std::string, PerceptionModuleBase_<T>* > perception_modules_;
     BulletClient* bullet_client_;
+
+    std::string myself_agent_name_;
+    OntologiesManipulator ontos_;
+    OntologyManipulator* onto_;
 
     bool shouldRun();
     virtual void getPercepts( std::map<std::string, T>& percepts);
@@ -62,6 +71,19 @@ EntitiesPerceptionManager<T>::~EntitiesPerceptionManager()
     for(auto& entity : entities_)
         delete entity.second;
     entities_.clear();
+
+    if(onto_ != nullptr)
+        delete onto_;
+}
+
+template<typename T>
+void EntitiesPerceptionManager<T>::setOwnerAgentName(const std::string& agent_name)
+{
+    myself_agent_name_ = agent_name;
+    ontos_.waitInit();
+    ontos_.add(myself_agent_name_);
+    onto_ = ontos_.get(myself_agent_name_);
+    onto_->close();
 }
 
 template<typename T>
@@ -274,7 +296,10 @@ void EntitiesPerceptionManager<T>::addToBullet(T* entity)
         }
         bullet_client_->setMass(obj_id, -1, 0); // We force the mass to zero to not have gravity effect
         bullet_client_->setRestitution(obj_id, -1, 0.001);
-        bullet_client_->setFrictionAnchor(obj_id, -1, 1);
+        bullet_client_->setFrictionAnchor(obj_id, -1, 0.7);
+        bullet_client_->setLateralFriction(obj_id, -1, 0.7);
+        bullet_client_->setSpinningFriction(obj_id, -1, 0.7);
+        bullet_client_->setRollingFriction(obj_id, -1, 0.7);
         bullet_client_->setActivationState(obj_id, eActivationStateDisableSleeping);
         entity->setBulletId(obj_id);
     }

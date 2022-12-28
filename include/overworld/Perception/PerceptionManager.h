@@ -27,6 +27,13 @@ public:
         humans_manager_.setBulletClient(bullet_client_);
     }
 
+    void setOwnerAgentName(const std::string& agent_name)
+    {
+        robots_manager_.setOwnerAgentName(agent_name);
+        objects_manager_.setOwnerAgentName(agent_name);
+        humans_manager_.setOwnerAgentName(agent_name);
+    }
+
     void update();
 
     bool applyConfigurationRobot(const std::string& config_path);

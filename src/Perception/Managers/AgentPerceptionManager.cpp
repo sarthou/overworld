@@ -24,7 +24,7 @@ Agent* AgentPerceptionManager::getAgent(const std::string& agent_name, AgentType
 std::map<std::string, Agent*>::iterator AgentPerceptionManager::createAgent(const std::string& name, AgentType_e type)
 {
   std::map<std::string, Agent*>::iterator it;
-  auto agent = new Agent(name, FieldOfView(60, 80, 0.1, 12), type);
+  auto agent = new Agent(name, getFov(name), type);
   it = agents_.insert(std::pair<std::string, Agent*>(name, agent)).first;
 
   if(type == AgentType_e::ROBOT)
@@ -79,6 +79,49 @@ void AgentPerceptionManager::UpdateAgent(BodyPart* body_part, AgentType_e type)
   }
   else
     ShellDisplay::warning("[AgentPerceptionManager] The agent of the body part " + body_part->id() + " is undefined");
+}
+
+FieldOfView AgentPerceptionManager::getFov(const std::string& agent_name)
+{
+  auto agent_fov = onto_->individuals.getOn(agent_name, "hasFieldOfView");
+  if(agent_fov.size())
+  {
+    std::vector<std::string> onto_res;
+    onto_res = onto_->individuals.getOn(agent_fov.front(), "fovHasClipNear");
+    double clip_near = getOntoValue(onto_res, 0.1);
+    onto_res = onto_->individuals.getOn(agent_fov.front(), "fovHasClipFar");
+    double clip_far = getOntoValue(onto_res, 12);
+    onto_res = onto_->individuals.getOn(agent_fov.front(), "fovHasHeight");
+    double height = getOntoValue(onto_res, 60);
+    onto_res = onto_->individuals.getOn(agent_fov.front(), "fovHasWidth");
+    double width = getOntoValue(onto_res, 80);
+
+    return FieldOfView(height, width, clip_near, clip_far);
+  }
+  else
+    return FieldOfView(60, 80, 0.1, 12);
+}
+
+double AgentPerceptionManager::getOntoValue(const std::vector<std::string>& vect, double default_value)
+{
+  if(vect.size())
+  {
+    std::string str_value = vect.front();
+    size_t pose = str_value.find("#");
+    if(pose != std::string::npos)
+      str_value = str_value.substr(pose + 1);
+
+    try {
+      return std::stod(str_value);
+    }
+    catch(...) {
+      ShellDisplay::warning("[AgentPerceptionManager] " + str_value + " cannot be converted in double. Use default value " + std::to_string(default_value) + " instead");
+      return default_value;
+    }
+    
+  }
+  else
+    return default_value;
 }
 
 } // namespace owds

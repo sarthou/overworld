@@ -52,6 +52,8 @@ SituationAssessor::SituationAssessor(const std::string& agent_name,
    * Set perception modules  *
   ***************************/
 
+  perception_manager_.setOwnerAgentName(agent_name);
+
   if(is_robot_)
   {
     if(perception_manager_.applyConfigurationRobot(config_path_) == false)
