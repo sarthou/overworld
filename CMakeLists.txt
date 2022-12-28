@@ -194,7 +194,6 @@ add_library(overworld_modules_plugin MODULE
   src/Perception/Modules/ObjectsModules/StaticObjectsPerceptionModule.cpp
   src/Perception/Modules/ObjectsModules/FakeObjectPerceptionModule.cpp
   src/Perception/Modules/RobotsModules/JointStatePerceptionModule.cpp
-  src/Perception/Modules/RobotsModules/FakeRobotPerceptionModule.cpp
   src/Perception/Modules/HumansModules/StampedPosePerceptionModule.cpp
   src/Perception/Modules/HumansModules/FakeHumanPerceptionModule.cpp
 )
