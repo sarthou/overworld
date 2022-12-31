@@ -89,6 +89,14 @@
     </collision>
   </link>
 
+  <joint name="left_gripper_joint" type="fixed">
+    <origin xyz="0.0 -0.05 -0.42" rpy="0 0.0 0"/>
+    <parent link="arm_left_link"/>
+    <child link="left_gripper_frame"/>
+  </joint>
+
+  <link name="left_gripper_frame"/>
+
   <joint name="arm_right_joint" type="revolute">
     <origin xyz="0.0 -0.3 0.6" rpy="0.0 0.0 0.0"/>
     <axis xyz="0.0 1.0 0.0"/>
@@ -113,5 +121,13 @@
       </geometry>
     </collision>
   </link>
+
+  <joint name="right_gripper_joint" type="fixed">
+    <origin xyz="0.0 0.05 -0.42" rpy="0 0.0 0"/>
+    <parent link="arm_right_link"/>
+    <child link="right_gripper_frame"/>
+  </joint>
+
+  <link name="right_gripper_frame"/>
 
 </robot>
