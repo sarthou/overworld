@@ -182,6 +182,103 @@
            This is important as Overworld uses this information to determine the robot's field of view.
         </p>
 
+        <h2>Semantic description</h2>
+
+        <p>Now that we have the geometry of our robot with its joints, its frames, and its meshes, we will describe it semantically to inform Overworld about the elements to consider.</p>
+
+        <P>To do so, we will use an ontology. The ontology is used by Overworld as a semantic knowledge base available to the entire architecture. 
+           In such a way, instead of creating many configuration files for each component, we rather use the ontology. 
+           One of the main advantages is that as it is available to all the components, we ensure to get a homogeneous configuration. 
+           Let's start by creating an ontologies folder in our package then create a new file called "agents.owl" with the following content.
+        </P>
+
+        <div class="code_block xml_code" style="counter-reset:code_line 0;">
+          <div class="code_line">&lt;?<span class="xml_tag">xml</span> <span class="xml_param">version</span>=<span class="xml_string">&quot;1.0&quot;</span>?&gt;</div>
+          <div class="code_line">&lt;<span class="xml_tag">rdf:RDF</span> <span class="xml_param">xmlns</span>=<span class="xml_string">&quot;https://gitlab.laas.fr/discuter/overworld_tutorials/-/blob/master/ontologies/agents#&quot;</span></div>
+          <div class="code_line">     <span class="xml_param">xmlns:agents</span>=<span class="xml_string">&quot;https://gitlab.laas.fr/discuter/overworld_tutorials/-/blob/master/ontologies/agents#&quot;</span></div>
+          <div class="code_line">     <span class="xml_param">xmlns:cg_agents</span>=<span class="xml_string">&quot;https://github.com/RIS-WITH/common_ground_ontology/blob/master/CG_agents#&quot;</span></div>
+          <div class="code_line">     <span class="xml_param">xmlns:cg_entities</span>=<span class="xml_string">&quot;https://github.com/RIS-WITH/common_ground_ontology/blob/master/CG_entities#&quot;</span></div>
+          <div class="code_line">     <span class="xml_param">xmlns:rdf</span>=<span class="xml_string">&quot;http://www.w3.org/1999/02/22-rdf-syntax-ns#&quot;</span></div>
+          <div class="code_line">     <span class="xml_param">xmlns:owl</span>=<span class="xml_string">&quot;http://www.w3.org/2002/07/owl#&quot;</span></div>
+          <div class="code_line">     <span class="xml_param">xmlns:xml</span>=<span class="xml_string">&quot;http://www.w3.org/XML/1998/namespace&quot;</span></div>
+          <div class="code_line">     <span class="xml_param">xmlns:xsd</span>=<span class="xml_string">&quot;http://www.w3.org/2001/XMLSchema#&quot;</span></div>
+          <div class="code_line">     <span class="xml_param">xmlns:rdfs</span>=<span class="xml_string">&quot;http://www.w3.org/2000/01/rdf-schema#&quot;</span>&gt;</div>
+          <div class="code_line">    &lt;<span class="xml_tag">owl:Ontology</span> <span class="xml_param">rdf:about</span>=<span class="xml_string">&quot;overworld_tutorials/ontologies/agents&quot;</span>&gt;</div>
+          <div class="code_line">      &lt;<span class="xml_tag">owl:imports</span> <span class="xml_param">rdf:resource</span>=<span class="xml_string">&quot;https://github.com/RIS-WITH/common_ground_ontology/blob/master/CG_agents&quot;</span>/&gt;</div>
+          <div class="code_line">    &lt;/<span class="xml_tag">owl:Ontology</span>&gt;</div>
+          <div class="code_line">    </div>
+          <div class="code_line"></div>
+          <div class="code_line"></div>
+          <div class="code_line">    <span class="xml_comment">&lt;!--</span> </div>
+          <div class="code_line">    <span class="xml_comment">&lt;///////////////////////////////////////////////////////////////////////////////////////</span> </div>
+          <div class="code_line">    <span class="xml_comment">&lt;//</span> </div>
+          <div class="code_line">    <span class="xml_comment">&lt;// Individuals</span> </div>
+          <div class="code_line">    <span class="xml_comment">&lt;//</span> </div>
+          <div class="code_line">    <span class="xml_comment">&lt;///////////////////////////////////////////////////////////////////////////////////////</span> </div>
+          <div class="code_line">    <span class="xml_comment">&lt;--&gt;</span> </div>
+          <div class="code_line">    </div>
+          <div class="code_line"></div>
+          <div class="code_line">    <span class="xml_comment">&lt;!-- agents#head_camera_frame --&gt;</span></div>
+          <div class="code_line"></div>
+          <div class="code_line">    &lt;<span class="xml_tag">owl:NamedIndividual</span> <span class="xml_param">rdf:about</span>=<span class="xml_string">&quot;agents#head_camera_frame&quot;</span>&gt;</div>
+          <div class="code_line">        &lt;<span class="xml_tag">rdf:type</span> <span class="xml_param">rdf:resource</span>=<span class="xml_string">&quot;cg_agents#Head&quot;</span>/&gt;</div>
+          <div class="code_line">    &lt;/<span class="xml_tag">owl:NamedIndividual</span>&gt;</div>
+          <div class="code_line">    </div>
+          <div class="code_line"></div>
+          <div class="code_line"></div>
+          <div class="code_line">    <span class="xml_comment">&lt;!-- agents#left_gripper_frame --&gt;</span></div>
+          <div class="code_line"></div>
+          <div class="code_line">    &lt;<span class="xml_tag">owl:NamedIndividual</span> <span class="xml_param">rdf:about</span>=<span class="xml_string">&quot;agents#left_gripper_frame&quot;</span>&gt;</div>
+          <div class="code_line">        &lt;<span class="xml_tag">rdf:type</span> <span class="xml_param">rdf:resource</span>=<span class="xml_string">&quot;cg_agents#Hand&quot;</span>/&gt;</div>
+          <div class="code_line">    &lt;/<span class="xml_tag">owl:NamedIndividual</span>&gt;</div>
+          <div class="code_line">    </div>
+          <div class="code_line"></div>
+          <div class="code_line"></div>
+          <div class="code_line">    <span class="xml_comment">&lt;!-- agents#right_gripper_frame --&gt;</span></div>
+          <div class="code_line"></div>
+          <div class="code_line">    &lt;<span class="xml_tag">owl:NamedIndividual</span> <span class="xml_param">rdf:about</span>=<span class="xml_string">&quot;agents#right_gripper_frame&quot;</span>&gt;</div>
+          <div class="code_line">        &lt;<span class="xml_tag">rdf:type</span> <span class="xml_param">rdf:resource</span>=<span class="xml_string">&quot;cg_agents#Hand&quot;</span>/&gt;</div>
+          <div class="code_line">    &lt;/<span class="xml_tag">owl:NamedIndividual</span>&gt;</div>
+          <div class="code_line">    </div>
+          <div class="code_line"></div>
+          <div class="code_line"></div>
+          <div class="code_line">    <span class="xml_comment">&lt;!-- agents#eve --&gt;</span></div>
+          <div class="code_line">    </div>
+          <div class="code_line">    &lt;<span class="xml_tag">owl:NamedIndividual</span> <span class="xml_param">rdf:about</span>=<span class="xml_string">&quot;agents#eve&quot;</span>&gt;</div>
+          <div class="code_line">        &lt;<span class="xml_tag">rdf:type</span> <span class="xml_param">rdf:resource</span>=<span class="xml_string">&quot;cg_agents#Robot&quot;</span>/&gt;</div>
+          <div class="code_line">        &lt;<span class="xml_tag">cg_agents:hasHead</span> <span class="xml_param">rdf:resource</span>=<span class="xml_string">&quot;agents#head_camera_frame&quot;</span>/&gt;</div>
+          <div class="code_line">        &lt;<span class="xml_tag">cg_agents:hasRightHand</span> <span class="xml_param">rdf:resource</span>=<span class="xml_string">&quot;agents#right_gripper_frame&quot;</span>/&gt;</div>
+          <div class="code_line">        &lt;<span class="xml_tag">cg_agents:hasLeftHand</span> <span class="xml_param">rdf:resource</span>=<span class="xml_string">&quot;agents#left_gripper_frame&quot;</span>/&gt;</div>
+          <div class="code_line">    &lt;/<span class="xml_tag">owl:NamedIndividual</span>&gt;</div>
+          <div class="code_line"></div>
+          <div class="code_line">&lt;/<span class="xml_tag">rdf:RDF</span>&gt;</div>
+        </div>
+
+        <p>Let's break down the content of this file. At the top, you first have the namespaces declaration. 
+           Here we can see that the namespace of this file is "agents" and that we will use the namespaces "cg_agents" and "cg_entities" for the concepts coming from the common_ground ontology. 
+           After the declaration of the other usual namespaces, we can see that our ontology imports the CG_agents ontology which is a subset of the common ground ontology. 
+           You can note that we do not import the CG_entities ontology as it is already imported by the CG_agents one.
+        </p>
+
+        <p>The following is the description of the individuals of our ontology. It's there that we describe our robot. Here we start with the simplest description.</p>
+
+        <p>The three first individuals are our robot's body parts. 
+           We declare a head and two hands. The names of these parts are in fact the robot's frames that we want to consider as specific body parts. 
+           For example, we state that the frame head_camera_frame has to be considered as a head of an agent. 
+           Nevertheless, for each body part, we do not say to which agent they correspond. 
+           We do it in the agent description.
+        </p>
+
+        <p>Our agent is the fourth individual. 
+           We can see that its identifier is "eve", that it is a Robot, and that it is composed of three body parts, a head and two hands.
+        </p>
+
+        <p>To describe a robot, only a head is required. Note that the head corresponds in fact to the robot camera whose forward axe is Z. 
+           For the hands, you can define, one, two, or none if you want.
+        </p>
+
+        <p>Now that we have fully described our robot, we will be able to launch Overworld!</p>
+
         <nav class="course-pagination">
           <a href="../Tutorials.html" class="course-pagination__btn">
             <i class="fas fa-angle-left"></i>
