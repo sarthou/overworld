@@ -216,6 +216,16 @@
           <div class="code_line">    <span class="xml_comment">&lt;//</span> </div>
           <div class="code_line">    <span class="xml_comment">&lt;///////////////////////////////////////////////////////////////////////////////////////</span> </div>
           <div class="code_line">    <span class="xml_comment">&lt;--&gt;</span> </div>
+          <div class="code_line"></div>
+          <div class="code_line"></div>
+          <div class="code_line">    <span class="xml_comment">&lt;!-- agents#base_link --&gt;</span></div>
+          <div class="code_line"></div>
+          <div class="code_line">    &lt;<span class="xml_tag">owl:NamedIndividual</span> <span class="xml_param">rdf:about</span>=<span class="xml_string">&quot;agents#base_link&quot;</span>&gt;</div>
+          <div class="code_line">        &lt;<span class="xml_tag">rdf:type</span> <span class="xml_param">rdf:resource</span>=<span class="xml_string">&quot;cg_agents#Base&quot;</span>/&gt;</div>
+          <div class="code_line">    &lt;/<span class="xml_tag">owl:NamedIndividual</span>&gt;</div>
+          <div class="code_line">    </div>
+          <div class="code_line"></div>
+          <div class="code_line"></div>
           <div class="code_line">    </div>
           <div class="code_line"></div>
           <div class="code_line">    <span class="xml_comment">&lt;!-- agents#head_camera_frame --&gt;</span></div>
@@ -246,6 +256,7 @@
           <div class="code_line">    </div>
           <div class="code_line">    &lt;<span class="xml_tag">owl:NamedIndividual</span> <span class="xml_param">rdf:about</span>=<span class="xml_string">&quot;agents#eve&quot;</span>&gt;</div>
           <div class="code_line">        &lt;<span class="xml_tag">rdf:type</span> <span class="xml_param">rdf:resource</span>=<span class="xml_string">&quot;cg_agents#Robot&quot;</span>/&gt;</div>
+          <div class="code_line">        &lt;<span class="xml_tag">cg_agents:hasBase</span> <span class="xml_param">rdf:resource</span>=<span class="xml_string">&quot;agents#base_link&quot;</span>/&gt;</div>
           <div class="code_line">        &lt;<span class="xml_tag">cg_agents:hasHead</span> <span class="xml_param">rdf:resource</span>=<span class="xml_string">&quot;agents#head_camera_frame&quot;</span>/&gt;</div>
           <div class="code_line">        &lt;<span class="xml_tag">cg_agents:hasRightHand</span> <span class="xml_param">rdf:resource</span>=<span class="xml_string">&quot;agents#right_gripper_frame&quot;</span>/&gt;</div>
           <div class="code_line">        &lt;<span class="xml_tag">cg_agents:hasLeftHand</span> <span class="xml_param">rdf:resource</span>=<span class="xml_string">&quot;agents#left_gripper_frame&quot;</span>/&gt;</div>
@@ -263,17 +274,17 @@
         <p>The following is the description of the individuals of our ontology. It's there that we describe our robot. Here we start with the simplest description.</p>
 
         <p>The three first individuals are our robot's body parts. 
-           We declare a head and two hands. The names of these parts are in fact the robot's frames that we want to consider as specific body parts. 
+           We declare a base, a head and two hands. The names of these parts are in fact the robot's frames that we want to consider as specific body parts. 
            For example, we state that the frame head_camera_frame has to be considered as a head of an agent. 
            Nevertheless, for each body part, we do not say to which agent they correspond. 
            We do it in the agent description.
         </p>
 
-        <p>Our agent is the fourth individual. 
-           We can see that its identifier is "eve", that it is a Robot, and that it is composed of three body parts, a head and two hands.
+        <p>Our agent is the fith individual. 
+           We can see that its identifier is "eve", that it is a Robot, and that it is composed of four body parts, a base, a head and two hands.
         </p>
 
-        <p>To describe a robot, only a head is required. Note that the head corresponds in fact to the robot camera whose forward axe is Z. 
+        <p>To describe a robot, only a head and a base are required. Note that the head corresponds in fact to the robot camera whose forward axe is Z. 
            For the hands, you can define, one, two, or none if you want.
         </p>
 

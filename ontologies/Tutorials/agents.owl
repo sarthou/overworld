@@ -36,6 +36,14 @@
     
 
 
+    <!-- agents#base_link -->
+
+    <owl:NamedIndividual rdf:about="agents#base_link">
+        <rdf:type rdf:resource="cg_agents#Base"/>
+    </owl:NamedIndividual>
+    
+
+
     <!-- agents#head_camera_frame -->
 
     <owl:NamedIndividual rdf:about="agents#head_camera_frame">
@@ -64,6 +72,7 @@
     
     <owl:NamedIndividual rdf:about="agents#eve">
         <rdf:type rdf:resource="cg_agents#Robot"/>
+        <cg_agents:hasBase rdf:resource="agents#base_link"/>
         <cg_agents:hasHead rdf:resource="agents#head_camera_frame"/>
         <cg_agents:hasRightHand rdf:resource="agents#right_gripper_frame"/>
         <cg_agents:hasLeftHand rdf:resource="agents#left_gripper_frame"/>
