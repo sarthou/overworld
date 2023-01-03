@@ -477,16 +477,16 @@ table.alignedsummary,table.propsummary {
 .cpp_string, .py_string, .color_brown {
   color:#bde674;
 }
-.cpp_value, .py_value {
+.cpp_value, .py_value, .yaml_value {
   color:#ecbd62;
 }
 .cpp_comment, .py_comment {
   color:#918e7b;
 }
-.xml_string {
+.xml_string, .yaml_string {
   color:#ce9178;
 }
-.xml_tag {
+.xml_tag, .yaml_key {
   color:#569cd6;
 }
 .xml_param {
