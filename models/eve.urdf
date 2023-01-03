@@ -1,4 +1,4 @@
-<robot name="architect">
+<robot name="eve">
   <material name="Head">
     <texture filename="package://overworld/models/tutorials/Eve/eve_head.png"/>
   </material>
