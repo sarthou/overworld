@@ -3,9 +3,8 @@
   <class type="owds::JointStatePerceptionModule" base_class_type="owds::PerceptionModuleBase_<owds::BodyPart>">
     <description>
       A robot perception module using robot joint state.
-      Possible parameter is min_period.
-      The robot name is taken from Overworld launch file and the
-      robot body parts are taken from the ontology.
+      Possible parameter is min_period (optional) and robot_name.
+      The the robot body parts are taken from the ontology.
     </description>
   </class>
 
