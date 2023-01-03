@@ -15,6 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   genmsg
   message_generation
+  tf
   tf2
   tf2_ros
   tf2_eigen
@@ -226,6 +227,9 @@ add_dependencies(${PROJECT_NAME}_node overworld_gencpp)
 add_executable(plugins src/Nodes/plugins.cpp)
 target_link_libraries(plugins ${catkin_LIBRARIES}
                       ${PROJECT_NAME}_bullet_lib)
+
+add_executable(teleop src/Nodes/teleop.cpp)
+target_link_libraries(teleop ${catkin_LIBRARIES})
 
 #################
 #  Test files   #
