@@ -88,37 +88,37 @@
         <p>The configuration is described in a YAML file. The content looks like what follows:</p>
 
         <div class="code_block">
-          <div class="terminal_line"><span class="cpp_type">modules</span>:</div>
-          <div class="terminal_line">  <span class="cpp_type">robot</span>:</div>
-          <div class="terminal_line">    <span class="cpp_type">JointStatePerceptionModule</span>: <span class="cpp_string">pr2_joints</span></div>
-          <div class="terminal_line">  <span class="cpp_type">humans</span>:</div>
-          <div class="terminal_line">    <span class="cpp_type">OptitrackPerceptionModule</span>: <span class="cpp_string">optitrack</span></div>
-          <div class="terminal_line">  <span class="cpp_type">objects</span>:</div>
-          <div class="terminal_line">    <span class="cpp_type">ArTrackPerceptionModule</span>: <span class="cpp_string">ar_track</span></div>
-          <div class="terminal_line">    <span class="cpp_type">Pr2GripperPerceptionModule</span>:</div>
-          <div class="terminal_line">      - <span class="cpp_string">pr2_left_gripper</span></div>
-          <div class="terminal_line">      - <span class="cpp_string">pr2_right_gripper</span></div>
-          <div class="terminal_line">    <span class="cpp_type">StaticObjectsPerceptionModule</span>: <span class="cpp_string">static</span></div>
+          <div class="terminal_line"><span class="yaml_key">modules</span>:</div>
+          <div class="terminal_line">  <span class="yaml_key">robot</span>:</div>
+          <div class="terminal_line">    <span class="yaml_key">JointStatePerceptionModule</span>: <span class="yaml_string">pr2_joints</span></div>
+          <div class="terminal_line">  <span class="yaml_key">humans</span>:</div>
+          <div class="terminal_line">    <span class="yaml_key">OptitrackPerceptionModule</span>: <span class="yaml_string">optitrack</span></div>
+          <div class="terminal_line">  <span class="yaml_key">objects</span>:</div>
+          <div class="terminal_line">    <span class="yaml_key">ArTrackPerceptionModule</span>: <span class="yaml_string">ar_track</span></div>
+          <div class="terminal_line">    <span class="yaml_key">Pr2GripperPerceptionModule</span>:</div>
+          <div class="terminal_line">      - <span class="yaml_string">pr2_left_gripper</span></div>
+          <div class="terminal_line">      - <span class="yaml_string">pr2_right_gripper</span></div>
+          <div class="terminal_line">    <span class="yaml_key">StaticObjectsPerceptionModule</span>: <span class="yaml_string">static</span></div>
           <div class="terminal_line"> </div>
-          <div class="terminal_line"><span class="cpp_type">pr2_joints</span>:</div>
-          <div class="terminal_line">  <span class="cpp_type">min_period</span> : <span class="cpp_string">0.9</span></div>
+          <div class="terminal_line"><span class="yaml_key">pr2_joints</span>:</div>
+          <div class="terminal_line">  <span class="yaml_key">min_period</span> : <span class="yaml_string">0.9</span></div>
           <div class="terminal_line"> </div>
-          <div class="terminal_line"><span class="cpp_type">pr2_left_gripper</span>:</div>
-          <div class="terminal_line">  <span class="cpp_type">side</span> : <span class="cpp_value">0</span></div>
-          <div class="terminal_line">  <span class="cpp_type">pressure_threshold</span> : <span class="cpp_value">400</span></div>
-          <div class="terminal_line">  <span class="cpp_type">distance_threshold</span> : <span class="cpp_value">0.03</span></div>
+          <div class="terminal_line"><span class="yaml_key">pr2_left_gripper</span>:</div>
+          <div class="terminal_line">  <span class="yaml_key">side</span> : <span class="yaml_value">0</span></div>
+          <div class="terminal_line">  <span class="yaml_key">pressure_threshold</span> : <span class="yaml_value">400</span></div>
+          <div class="terminal_line">  <span class="yaml_key">distance_threshold</span> : <span class="yaml_value">0.03</span></div>
           <div class="terminal_line"> </div>
-          <div class="terminal_line"><span class="cpp_type">pr2_right_gripper</span>:</div>
-          <div class="terminal_line">  <span class="cpp_type">side</span> : <span class="cpp_value">1</span></div>
-          <div class="terminal_line">  <span class="cpp_type">distance_threshold</span> : <span class="cpp_value">0.03</span></div>
+          <div class="terminal_line"><span class="yaml_key">pr2_right_gripper</span>:</div>
+          <div class="terminal_line">  <span class="yaml_key">side</span> : <span class="yaml_value">1</span></div>
+          <div class="terminal_line">  <span class="yaml_key">distance_threshold</span> : <span class="yaml_value">0.03</span></div>
           <div class="terminal_line"> </div>
-          <div class="terminal_line"><span class="cpp_type">optitrack</span>:</div>
-          <div class="terminal_line">  <span class="cpp_type">name</span> : <span class="cpp_string">human_0</span></div>
-          <div class="terminal_line">  <span class="cpp_type">offset_x</span> : <span class="cpp_value">6.4868</span></div>
-          <div class="terminal_line">  <span class="cpp_type">offset_y</span> : <span class="cpp_value">2.8506</span></div>
+          <div class="terminal_line"><span class="yaml_key">optitrack</span>:</div>
+          <div class="terminal_line">  <span class="yaml_key">name</span> : <span class="yaml_string">human_0</span></div>
+          <div class="terminal_line">  <span class="yaml_key">offset_x</span> : <span class="yaml_value">6.4868</span></div>
+          <div class="terminal_line">  <span class="yaml_key">offset_y</span> : <span class="yaml_value">2.8506</span></div>
           <div class="terminal_line"> </div>
-          <div class="terminal_line"><span class="cpp_type">static</span>:</div>
-          <div class="terminal_line">  <span class="cpp_type">file</span> : <span class="cpp_string">package://overworld/config/adream.yaml</span></div>
+          <div class="terminal_line"><span class="yaml_key">static</span>:</div>
+          <div class="terminal_line">  <span class="yaml_key">file</span> : <span class="yaml_string">package://overworld/config/adream.yaml</span></div>
         </div>
 
         <p>To pass your configuration file to an Overworld executable see the
