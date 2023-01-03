@@ -12,21 +12,21 @@ JointStatePerceptionModule::JointStatePerceptionModule(): PerceptionModuleRosBas
                                                           ontologies_manipulator_(nullptr),
                                                           onto_(nullptr)
 {
-    min_period_ = 0.9;
+    min_period_ = 0.005;
 }
 
 void JointStatePerceptionModule::setParameter(const std::string& parameter_name, const std::string& parameter_value)
 {
     if(parameter_name == "min_period")
         min_period_ = std::stod(parameter_value);
+    else if(parameter_name == "robot_name")
+        robot_name_ = parameter_value;
     else
         ShellDisplay::warning("[JointStatePerceptionModule] Unkown parameter " + parameter_name);
 }
 
 bool JointStatePerceptionModule::closeInitialization()
 {
-    robot_name_ = robot_agent_->getId();
-
     if(robot_name_ == "")
     {
         ShellDisplay::error("[JointStatePerceptionModule] No robot name has been defined");
@@ -154,9 +154,9 @@ void JointStatePerceptionModule::loadRobotModel()
 
     std::string urdf = n_->param<std::string>("/robot_description", "");
     if (urdf == "")
-	    robot_bullet_id_ = bullet_client_->loadURDF(robot_name_ + ".urdf", {0,0,0}, {0,0,0,1}, true);
+	    robot_bullet_id_ = bullet_client_->loadURDF(robot_name_ + ".urdf", {0,0,0}, {0,0,0,1}, true, URDF_USE_MATERIAL_COLORS_FROM_MTL);
     else
-        robot_bullet_id_ = bullet_client_->loadURDFRaw(urdf, robot_name_ + "_tmp.urdf", {0,0,0}, {0,0,0,1}, true);
+        robot_bullet_id_ = bullet_client_->loadURDFRaw(urdf, robot_name_ + "_tmp.urdf", {0,0,0}, {0,0,0,1}, true, URDF_USE_MATERIAL_COLORS_FROM_MTL);
 }
 
 } // namespace owds
