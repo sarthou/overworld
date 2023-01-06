@@ -1,0 +1,183 @@
+<html lang="en_US">
+
+<head>
+  <title>Describe its field of view : Represent your robot</title>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+  <link href="../../style/overworld_api.css" rel="stylesheet" type="text/css">
+  <link href="../../images/favicon.ico" rel="shortcut icon">
+  <link href="../../images/favicon-32x32.png" rel="icon" type="image/png">
+  <link href="../../images/favicon-16x16.png" rel="icon" type="image/png">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+</head>
+
+<body>
+  <div class="header" id="header">
+    <header class="fixed" id="navbar">
+      <div class="container">
+          <div class="navbar-header">
+            <div id="header-buttons">
+                <ul id="header-ul" data-event="hover_intent" data-effect="fade" data-effect-speed="500">
+                    <li class="header-item"><a class="header-link" href="https://github.com/sarthou/overworld" tabindex="0"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Octicons-mark-github.svg/1200px-Octicons-mark-github.svg.png" alt="github" width="40px" height="40px"/></a></li>
+                </ul>
+            </div>
+            <a class="navbar-icon" href="../../index.html">
+              <img src="../../images/overworld.png " alt="overworld" width="53px" height="65px"/>
+            </a>
+        </div>
+      </div>
+    </header>
+  </div>
+
+  <div class="main">
+
+    <div class="navigationbar">
+      <ul class="sub-navigation">
+        <li><a href="https://www.youtube.com/watch?v=LUkjts8UacI" target="_blank" rel="noopener noreferrer">Demo video</a></li>
+        <li><a href="https://sarthou.github.io/ontologenius/index.html" target="_blank" rel="noopener noreferrer">Ontologenius</a></li>
+        <li><a href="https://github.com/sarthou/overworld/actions" target="_blank" rel="noopener noreferrer">Pipelines</a></li>
+      </ul>
+      <h1>Overworld Cpp Documentation</h1>
+    </div>
+
+    <div class="content">
+      <div class="sidebar" style="transition: all 0.2s ease-out 0s; top: -270px;">
+        <div class="contents">
+          <div id="contents-toggle" class=""></div>
+          <h3>Contents</h3>
+          <ul style="display: block;">
+            <li class="level1"><a href="SetupRobot.html">1. Setting up the robot description</a></li>
+            <li class="level1"><a href="LaunchOverworld.html">2. Launch Overworld</a></li>
+            <li class="level1"><a href="SetFov.html"><b>3. Describe its field of view</b></a></li>
+          </ul>
+        </div>
+
+        <div class="contents">
+          <div id="contents-toggle" class=""></div>
+          <h3>Getting Start</h3>
+          <ul style="display: block;">
+            <li class="level1"><a href="../../Download.html">Download</a></li>
+            <li class="level1"><a href="../../InstallOverworld.html">Install Overworld</a></li>
+            <li class="level1"><a href="../../AvailableModules.html">Available modules</a></li>
+            <li class="level1"><a href="../Tutorials.html">Tutorials</a></li>
+          </ul>
+        </div>
+
+        <div class="contents">
+          <div id="contents-toggle" class=""></div>
+          <h3>Overview</h3>
+          <ul style="display: block;">
+            <li class="level1"><a href="../../overview/launchers.html">Launchers</a></li>
+            <li class="level1"><a href="../../overview/Configuration.html">Configuration</a></li>
+            <li class="level1"><a href="../../overview/Plugins.html">Plugins</a></li>
+            <li class="level1"><a href="../../overview/bulletGUI.html">Bullet GUI</a></li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="context">
+        <div class="toturial-header">
+          <h1 class="title">Represent your robot</h1>
+          <a class="toturial-subheader">
+            <div class="tutorial-subheader__main-icon">
+              <i class="fas fa-brain"></i>
+            </div>
+            <div class="toturial-subheader__title">
+              <h2 class="title">I, robot</h2>
+            </div>
+          </a>
+        </div>
+
+        <h1 class="title">Describe its field of view</h1>
+
+        <p>As we already explain, rather than describing each sensor (it will come), Overworld considers a single camera, being the robot head.
+           To allow Overworld to reason about what the robot is perceiving, we have to describe the camera characteristics.
+           The most important one is the Field of View (Fov) of the sensor. 
+           If an object is out of the sensor Fov, Overworld can thus deduce that it is normal if the object is no more perceived.
+        </p>
+
+        <h2>The FoV characteristics</h2>
+
+        <p>The Field of View (Fov) can be seen as the definition of the area, relative to a detector, to which a detector is sensitive to the phenomenon it sense.
+           Taking a camera, the FoV is also called the angle of view and it's generally defined by a horizontal angle and a vertical angle.
+        </p>
+
+        <p>Considering a virtual camera, as used in video games, we usually consider two additional characteristics being the clip near and the clip far.
+           They respectively represent the minimal distance at which an entity is rendered and the maximal distance.
+           If the camera is placed at the location of an agent's head, the clip near avoids to render elements of the head. 
+           For the clip far, it avoids to render too many objects.
+        </p>
+
+        <p>In Overworld, we thus need to define these four parameters: the horizontal angle (width) and the vertical angle (height), the clip near, and the clip far.</p>
+
+        <p>While the width and the height should match the used sensor, the clip near will be determined depending on your agent CAD model and the clip far will be determined by the used vision-based algorithm.</p>
+
+        <img src="../../images/Tutorials/tutorial1/fov.png" alt="tutorial 1 fov explanation" width="60%" class="center"/>
+
+        <h2>Describing a FoV</h2>
+
+        <p>To configure the agent's FoV, we will proceed as we already do, with the use of the ontology.</p>
+
+        <p>Open the "agent.owl" file and replace the Eve description with the following.</p>
+
+        <div class="code_block xml_code" style="counter-reset:code_line 58;">
+          <div class="code_line">    <span class="xml_comment">&lt;!-- agents#eve_fov --&gt;</span></div>
+          <div class="code_line">    </div>
+          <div class="code_line">    &lt;<span class="xml_tag">owl:NamedIndividual</span> <span class="xml_param">rdf:about</span>=<span class="xml_string">&quot;agents#eve_fov&quot;</span>&gt;</div>
+          <div class="code_line">        &lt;<span class="xml_tag">rdf:type</span> <span class="xml_param">rdf:resource</span>=<span class="xml_string">&quot;cg_agents#FieldOfView&quot;</span>/&gt;</div>
+          <div class="code_line">        &lt;<span class="xml_tag">cg_agents:fovHasClipNear</span> <span class="xml_param">rdf:datatype</span>=<span class="xml_string">&quot;http://www.w3.org/2002/07/owl#real&quot;</span>&gt;0.1&lt;/<span class="xml_tag">cg_agents:fovHasClipNear</span>&gt;</div>
+          <div class="code_line">        &lt;<span class="xml_tag">cg_agents:fovHasClipFar</span> <span class="xml_param">rdf:datatype</span>=<span class="xml_string">&quot;http://www.w3.org/2002/07/owl#real&quot;</span>&gt;12&lt;/<span class="xml_tag">cg_agents:fovHasClipFar</span>&gt;</div>
+          <div class="code_line">        &lt;<span class="xml_tag">cg_agents:fovHasHeight</span> <span class="xml_param">rdf:datatype</span>=<span class="xml_string">&quot;http://www.w3.org/2002/07/owl#real&quot;</span>&gt;70&lt;/<span class="xml_tag">cg_agents:fovHasHeight</span>&gt;</div>
+          <div class="code_line">        &lt;<span class="xml_tag">cg_agents:fovHasWidth</span> <span class="xml_param">rdf:datatype</span>=<span class="xml_string">&quot;http://www.w3.org/2002/07/owl#real&quot;</span>&gt;102.4&lt;/<span class="xml_tag">cg_agents:fovHasWidth</span>&gt;</div>
+          <div class="code_line">    &lt;/<span class="xml_tag">owl:NamedIndividual</span>&gt;</div>
+          <div class="code_line">    </div>
+          <div class="code_line">    </div>
+          <div class="code_line">    </div>
+          <div class="code_line">    <span class="xml_comment">&lt;!-- agents#eve --&gt;</span></div>
+          <div class="code_line">    </div>
+          <div class="code_line">    &lt;<span class="xml_tag">owl:NamedIndividual</span> <span class="xml_param">rdf:about</span>=<span class="xml_string">&quot;agents#eve&quot;</span>&gt;</div>
+          <div class="code_line">        &lt;<span class="xml_tag">rdf:type</span> <span class="xml_param">rdf:resource</span>=<span class="xml_string">&quot;cg_agents#Robot&quot;</span>/&gt;</div>
+          <div class="code_line">        &lt;<span class="xml_tag">cg_agents:hasBase</span> <span class="xml_param">rdf:resource</span>=<span class="xml_string">&quot;agents#base_link&quot;</span>/&gt;</div>
+          <div class="code_line">        &lt;<span class="xml_tag">cg_agents:hasHead</span> <span class="xml_param">rdf:resource</span>=<span class="xml_string">&quot;agents#head_camera_frame&quot;</span>/&gt;</div>
+          <div class="code_line">        &lt;<span class="xml_tag">cg_agents:hasRightHand</span> <span class="xml_param">rdf:resource</span>=<span class="xml_string">&quot;agents#right_gripper_frame&quot;</span>/&gt;</div>
+          <div class="code_line">        &lt;<span class="xml_tag">cg_agents:hasLeftHand</span> <span class="xml_param">rdf:resource</span>=<span class="xml_string">&quot;agents#left_gripper_frame&quot;</span>/&gt;</div>
+          <div class="code_line">        &lt;<span class="xml_tag">cg_agents:hasFieldOfView</span> <span class="xml_param">rdf:resource</span>=<span class="xml_string">&quot;agents#eve_fov&quot;</span>/&gt;</div>
+          <div class="code_line">    &lt;/<span class="xml_tag">owl:NamedIndividual</span>&gt;</div>
+        </div>
+
+        <p>The newly introduced individual represents the agent's FoV. It's of type FieldOfView and instantiates four relations being our four parameters. Where the clip far and clip near are defined in meters, the width and the height are in degrees.</p>
+
+        <p>We then attach the FoV to the agent with the property hasFieldOfView in the agent's description.</p>
+
+        <p>We are done! Almost too easy...</p>
+
+        <nav class="course-pagination">
+          <a href="LaunchOverworld.html" class="course-pagination__btn">
+            <i class="fas fa-angle-left"></i>
+            <span>Launch Overworld</span>
+          </a>
+          <span class="course-pagination__separator"></span>
+          <a href="../../construction.html" class="course-pagination__btn">
+            <span>Describe your environment</span>
+            <i class="fas fa-angle-right"></i>
+          </a>
+        </nav>
+
+      </div>
+    </div>
+
+  </div>
+</body>
+
+<footer>
+  <div align="center">
+    <p>
+      Brought to you by:
+      <a class="laas_logo" href="https://www.laas.fr/public/">
+        <img src="../../images/LogoLAAS-2016_BW.png " alt="LAAS-CNRS" height="60px"/>
+      </a>
+    </p>
+  </div>
+</footer>
+
+</html>

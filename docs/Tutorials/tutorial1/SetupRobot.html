@@ -47,7 +47,7 @@
           <ul style="display: block;">
             <li class="level1"><a href="SetupRobot.html"><b>1. Setting up the robot description</b></a></li>
             <li class="level1"><a href="LaunchOverworld.html">2. Launch Overworld</a></li>
-            <li class="level1"><a href="../../construction.html">3. Describe its field of view</a></li>
+            <li class="level1"><a href="SetFov.html">3. Describe its field of view</a></li>
           </ul>
         </div>
 
@@ -58,7 +58,7 @@
             <li class="level1"><a href="../../Download.html">Download</a></li>
             <li class="level1"><a href="../../InstallOverworld.html">Install Overworld</a></li>
             <li class="level1"><a href="../../AvailableModules.html">Available modules</a></li>
-            <li class="level1"><a href="Tutorials.html">Tutorials</a></li>
+            <li class="level1"><a href="../Tutorials.html">Tutorials</a></li>
           </ul>
         </div>
 
@@ -118,10 +118,10 @@
           <div class="code_line">    &lt;<span class="xml_tag">name</span>&gt;overworld_tutorials&lt;/<span class="xml_tag">name</span>&gt;</div>
           <div class="code_line">    &lt;<span class="xml_tag">version</span>&gt;0.0.0&lt;/<span class="xml_tag">version</span>&gt;</div>
           <div class="code_line">    &lt;<span class="xml_tag">description</span>&gt;The overworld_tutorials package&lt;/<span class="xml_tag">description</span>&gt;</div>
-          <div class="code_line"></div>
+          <div class="code_line">    </div>
           <div class="code_line">    &lt;<span class="xml_tag">maintainer</span> <span class="xml_param">email</span>=<span class="xml_string">&quot;plop@plop.com&quot;</span>&gt;Plop&lt;/<span class="xml_tag">maintainer</span>&gt;</div>
           <div class="code_line">    &lt;<span class="xml_tag">license</span>&gt;MIT&lt;/<span class="xml_tag">license</span>&gt;</div>
-          <div class="code_line"></div>
+          <div class="code_line">    </div>
           <div class="code_line">    &lt;<span class="xml_tag">buildtool_depend</span>&gt;catkin&lt;/<span class="xml_tag">buildtool_depend</span>&gt;</div>
           <div class="code_line">&lt;/<span class="xml_tag">package</span>&gt;</div>
         </div>
@@ -152,7 +152,7 @@
         <div class="code_block xml_code" style="counter-reset:code_line 0;">
           <div class="code_line">&lt;<span class="xml_tag">launch</span>&gt;</div>
           <div class="code_line">    &lt;<span class="xml_tag">param</span> <span class="xml_param">name</span>=<span class="xml_string">&quot;robot_description&quot;</span> <span class="xml_param">textfile</span>=<span class="xml_string">&quot;$(find overworld)/models/eve.urdf&quot;</span>/&gt;</div>
-          <div class="code_line"></div>
+          <div class="code_line">    </div>
           <div class="code_line">    &lt;<span class="xml_tag">node</span> <span class="xml_param">name</span>=<span class="xml_string">&quot;joint_state_publisher&quot;</span> <span class="xml_param">pkg</span>=<span class="xml_string">&quot;joint_state_publisher_gui&quot;</span> <span class="xml_param">type</span>=<span class="xml_string">&quot;joint_state_publisher_gui&quot;</span>/&gt;</div>
           <div class="code_line">    &lt;<span class="xml_tag">node</span> <span class="xml_param">name</span>=<span class="xml_string">&quot;robot_state_publisher&quot;</span> <span class="xml_param">pkg</span>=<span class="xml_string">&quot;robot_state_publisher&quot;</span> <span class="xml_param">type</span>=<span class="xml_string">&quot;robot_state_publisher&quot;</span>/&gt;</div>
           <div class="code_line">&lt;/<span class="xml_tag">launch</span>&gt;</div>
@@ -207,49 +207,50 @@
           <div class="code_line">      &lt;<span class="xml_tag">owl:imports</span> <span class="xml_param">rdf:resource</span>=<span class="xml_string">&quot;https://github.com/RIS-WITH/common_ground_ontology/blob/master/CG_agents&quot;</span>/&gt;</div>
           <div class="code_line">    &lt;/<span class="xml_tag">owl:Ontology</span>&gt;</div>
           <div class="code_line">    </div>
-          <div class="code_line"></div>
-          <div class="code_line"></div>
+          <div class="code_line">    </div>
+          <div class="code_line">    </div>
           <div class="code_line">    <span class="xml_comment">&lt;!--</span> </div>
-          <div class="code_line">    <span class="xml_comment">&lt;///////////////////////////////////////////////////////////////////////////////////////</span> </div>
-          <div class="code_line">    <span class="xml_comment">&lt;//</span> </div>
-          <div class="code_line">    <span class="xml_comment">&lt;// Individuals</span> </div>
-          <div class="code_line">    <span class="xml_comment">&lt;//</span> </div>
-          <div class="code_line">    <span class="xml_comment">&lt;///////////////////////////////////////////////////////////////////////////////////////</span> </div>
-          <div class="code_line">    <span class="xml_comment">&lt;--&gt;</span> </div>
-          <div class="code_line"></div>
-          <div class="code_line"></div>
+          <div class="code_line">    <span class="xml_comment">///////////////////////////////////////////////////////////////////////////////////////</span> </div>
+          <div class="code_line">    <span class="xml_comment">//</span> </div>
+          <div class="code_line">    <span class="xml_comment">// Individuals</span> </div>
+          <div class="code_line">    <span class="xml_comment">//</span> </div>
+          <div class="code_line">    <span class="xml_comment">///////////////////////////////////////////////////////////////////////////////////////</span> </div>
+          <div class="code_line">    <span class="xml_comment"> --&gt;</span> </div>
+          <div class="code_line">    </div>
+          <div class="code_line">    </div>
+          <div class="code_line">    </div>
           <div class="code_line">    <span class="xml_comment">&lt;!-- agents#base_link --&gt;</span></div>
-          <div class="code_line"></div>
+          <div class="code_line">    </div>
           <div class="code_line">    &lt;<span class="xml_tag">owl:NamedIndividual</span> <span class="xml_param">rdf:about</span>=<span class="xml_string">&quot;agents#base_link&quot;</span>&gt;</div>
           <div class="code_line">        &lt;<span class="xml_tag">rdf:type</span> <span class="xml_param">rdf:resource</span>=<span class="xml_string">&quot;cg_agents#Base&quot;</span>/&gt;</div>
           <div class="code_line">    &lt;/<span class="xml_tag">owl:NamedIndividual</span>&gt;</div>
           <div class="code_line">    </div>
-          <div class="code_line"></div>
-          <div class="code_line"></div>
+          <div class="code_line">    </div>
+          <div class="code_line">    </div>
           <div class="code_line">    <span class="xml_comment">&lt;!-- agents#head_camera_frame --&gt;</span></div>
-          <div class="code_line"></div>
+          <div class="code_line">    </div>
           <div class="code_line">    &lt;<span class="xml_tag">owl:NamedIndividual</span> <span class="xml_param">rdf:about</span>=<span class="xml_string">&quot;agents#head_camera_frame&quot;</span>&gt;</div>
           <div class="code_line">        &lt;<span class="xml_tag">rdf:type</span> <span class="xml_param">rdf:resource</span>=<span class="xml_string">&quot;cg_agents#Head&quot;</span>/&gt;</div>
           <div class="code_line">    &lt;/<span class="xml_tag">owl:NamedIndividual</span>&gt;</div>
           <div class="code_line">    </div>
-          <div class="code_line"></div>
-          <div class="code_line"></div>
+          <div class="code_line">    </div>
+          <div class="code_line">    </div>
           <div class="code_line">    <span class="xml_comment">&lt;!-- agents#left_gripper_frame --&gt;</span></div>
-          <div class="code_line"></div>
+          <div class="code_line">    </div>
           <div class="code_line">    &lt;<span class="xml_tag">owl:NamedIndividual</span> <span class="xml_param">rdf:about</span>=<span class="xml_string">&quot;agents#left_gripper_frame&quot;</span>&gt;</div>
           <div class="code_line">        &lt;<span class="xml_tag">rdf:type</span> <span class="xml_param">rdf:resource</span>=<span class="xml_string">&quot;cg_agents#Hand&quot;</span>/&gt;</div>
           <div class="code_line">    &lt;/<span class="xml_tag">owl:NamedIndividual</span>&gt;</div>
           <div class="code_line">    </div>
-          <div class="code_line"></div>
-          <div class="code_line"></div>
+          <div class="code_line">    </div>
+          <div class="code_line">    </div>
           <div class="code_line">    <span class="xml_comment">&lt;!-- agents#right_gripper_frame --&gt;</span></div>
-          <div class="code_line"></div>
+          <div class="code_line">    </div>
           <div class="code_line">    &lt;<span class="xml_tag">owl:NamedIndividual</span> <span class="xml_param">rdf:about</span>=<span class="xml_string">&quot;agents#right_gripper_frame&quot;</span>&gt;</div>
           <div class="code_line">        &lt;<span class="xml_tag">rdf:type</span> <span class="xml_param">rdf:resource</span>=<span class="xml_string">&quot;cg_agents#Hand&quot;</span>/&gt;</div>
           <div class="code_line">    &lt;/<span class="xml_tag">owl:NamedIndividual</span>&gt;</div>
           <div class="code_line">    </div>
-          <div class="code_line"></div>
-          <div class="code_line"></div>
+          <div class="code_line">    </div>
+          <div class="code_line">    </div>
           <div class="code_line">    <span class="xml_comment">&lt;!-- agents#eve --&gt;</span></div>
           <div class="code_line">    </div>
           <div class="code_line">    &lt;<span class="xml_tag">owl:NamedIndividual</span> <span class="xml_param">rdf:about</span>=<span class="xml_string">&quot;agents#eve&quot;</span>&gt;</div>
@@ -259,7 +260,7 @@
           <div class="code_line">        &lt;<span class="xml_tag">cg_agents:hasRightHand</span> <span class="xml_param">rdf:resource</span>=<span class="xml_string">&quot;agents#right_gripper_frame&quot;</span>/&gt;</div>
           <div class="code_line">        &lt;<span class="xml_tag">cg_agents:hasLeftHand</span> <span class="xml_param">rdf:resource</span>=<span class="xml_string">&quot;agents#left_gripper_frame&quot;</span>/&gt;</div>
           <div class="code_line">    &lt;/<span class="xml_tag">owl:NamedIndividual</span>&gt;</div>
-          <div class="code_line"></div>
+          <div class="code_line">    </div>
           <div class="code_line">&lt;/<span class="xml_tag">rdf:RDF</span>&gt;</div>
         </div>
 
