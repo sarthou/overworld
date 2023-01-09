@@ -24,9 +24,9 @@
     
 
 
-    <!-- ris_agents#eve_fov -->
+    <!-- agents#eve_fov -->
 
-    <owl:NamedIndividual rdf:about="ris_agents#eve_fov">
+    <owl:NamedIndividual rdf:about="agents#eve_fov">
         <rdf:type rdf:resource="cg_agents#FieldOfView"/>
         <cg_agents:fovHasClipNear rdf:datatype="http://www.w3.org/2002/07/owl#real">0.1</cg_agents:fovHasClipNear>
         <cg_agents:fovHasClipFar rdf:datatype="http://www.w3.org/2002/07/owl#real">12</cg_agents:fovHasClipFar>
