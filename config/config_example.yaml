@@ -11,7 +11,8 @@ modules:
     StaticObjectsPerceptionModule: static
 
 robot_joints:
-  min_period : 0.9
+  min_period : 0.09
+  robot_name: pr2
 
 pr2_left_gripper:
   side: 0 # = left
