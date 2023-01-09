@@ -145,6 +145,7 @@ set_target_properties(${PROJECT_NAME}_types_lib PROPERTIES POSITION_INDEPENDENT_
 
 add_library(${PROJECT_NAME}_utility_lib STATIC
   src/Utility/YamlReader.cpp
+  src/Utility/Ontology.cpp
 )
 target_link_libraries(${PROJECT_NAME}_utility_lib PUBLIC
                       ${catkin_LIBRARIES})

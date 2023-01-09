@@ -48,12 +48,12 @@ bool StampedPosePerceptionModule::closeInitialization()
     percepts_.emplace(head_name_, head_name_);
     percepts_.at(head_name_).setAgentName(human_name_);
     percepts_.at(head_name_).setType(BodyPartType_e::BODY_PART_HEAD);
-    Shape_t head_shape = PerceptionModuleBase_::getEntityShapeFromOntology(onto_, head_name_);
+    Shape_t head_shape = ontology::getEntityShape(onto_, head_name_);
     if(head_shape.type == SHAPE_NONE)
     {
         head_shape.type = SHAPE_SPEHERE;
         head_shape.scale = {0.12, 0.15, 0.2};
-        head_shape.color = PerceptionModuleBase_::getEntityColorFromOntology(onto_, head_name_, default_color);
+        head_shape.color = ontology::getEntityColor(onto_, head_name_, default_color);
     }
     percepts_.at(head_name_).setShape(head_shape);
 

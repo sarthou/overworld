@@ -77,7 +77,7 @@ BodyPart FakeHumanPerceptionModule::createBodyPart(const std::string& human_name
     part.setAgentName(human_name);
     part.setType(part_type);
 
-    Shape_t shape = PerceptionModuleBase_::getEntityShapeFromOntology(onto_, part_name);
+    Shape_t shape = ontology::getEntityShape(onto_, part_name);
     if(shape.type == SHAPE_NONE)
     {
         if(part_type == BodyPartType_e::BODY_PART_HEAD)
@@ -96,7 +96,7 @@ BodyPart FakeHumanPerceptionModule::createBodyPart(const std::string& human_name
             shape.scale = {0.5, 0.2, 0.85};
         }
 
-        shape.color = PerceptionModuleBase_::getEntityColorFromOntology(onto_, part_name, {0.976470588, 0.894117647, 0.717647059});
+        shape.color = ontology::getEntityColor(onto_, part_name, {0.976470588, 0.894117647, 0.717647059});
     }
     part.setShape(shape);
 

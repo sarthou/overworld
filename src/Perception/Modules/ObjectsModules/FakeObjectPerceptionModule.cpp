@@ -56,15 +56,15 @@ Object FakeObjectPerceptionModule::createNewEntity(const std::string& id)
 {
   Object obj(id);
 
-  Shape_t shape = PerceptionModuleBase_::getEntityShapeFromOntology(onto_, obj.id());
+  Shape_t shape = ontology::getEntityShape(onto_, obj.id());
   if(shape.type == SHAPE_NONE)
   {
     shape.type = SHAPE_CUBE;
-    shape.color = PerceptionModuleBase_::getEntityColorFromOntology(onto_, obj.id(), {0.8,0.8,0.8});
+    shape.color = ontology::getEntityColor(onto_, obj.id(), {0.8,0.8,0.8});
     shape.scale = {1, 1, 1};
   }
   obj.setShape(shape);
-  obj.setMass(PerceptionModuleBase_::getEntityMassFromOntology(onto_, obj.id()));
+  obj.setMass(ontology::getEntityMass(onto_, obj.id()));
 
   return obj;
 }
