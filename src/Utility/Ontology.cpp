@@ -1,5 +1,8 @@
 #include "overworld/Utility/Ontology.h"
 
+#include "overworld/Utility/Wavefront.h"
+#include "overworld/Utility/RosFiles.h"
+
 namespace owds {
 
 namespace ontology {
@@ -40,7 +43,30 @@ Shape_t getEntityShape(OntologyManipulator* onto, const std::string& indiv_name)
         shape.colision_mesh_resource = collision_meshes.front().substr(collision_meshes.front().find("#") + 1);
     else
         shape.colision_mesh_resource = meshes.front().substr(meshes.front().find("#") + 1);
-    shape.color = getEntityColor(onto, indiv_name);
+
+    if(wavefront::isWavefront(shape.visual_mesh_resource))
+    {
+      auto full_path = getFullPath(shape.visual_mesh_resource);
+      auto mlt = wavefront::getMltFile(full_path);
+      if(mlt != "")
+      {
+        auto materials = wavefront::getMltMaterials(mlt);
+        if(materials.size() == 1)
+        {
+          if(wavefront::getMaterialTexture(mlt, materials.front()) != "")
+            shape.color = {1, 1, 1};
+          else
+            shape.color = getEntityColor(onto, indiv_name);
+        }
+        else
+          shape.color = getEntityColor(onto, indiv_name);
+      }
+      else
+        shape.color = getEntityColor(onto, indiv_name);
+    }
+    else
+      shape.color = getEntityColor(onto, indiv_name);
+
     if(textures.size())
         shape.texture = textures.front().substr(textures.front().find("#") + 1);
   }
