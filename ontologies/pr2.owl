@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="https://gitlab.laas.fr/discuter/overworld/-/blob/master/ontologies/pr2#"
+     xmlns:pr2="https://gitlab.laas.fr/discuter/overworld/-/blob/master/ontologies/pr2#"
+     xmlns:cg_agents="https://github.com/RIS-WITH/common_ground_ontology/blob/master/CG_agents#"
+     xmlns:cg_entities="https://github.com/RIS-WITH/common_ground_ontology/blob/master/CG_entities#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+    <owl:Ontology rdf:about="https://gitlab.laas.fr/discuter/overworld/-/blob/master/ontologies/pr2">
+      <owl:imports rdf:resource="https://github.com/RIS-WITH/common_ground_ontology/blob/master/CG_agents"/>
+    </owl:Ontology>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+    
+
+
+    <!-- pr2#pr2_fov -->
+
+    <owl:NamedIndividual rdf:about="pr2#pr2_fov">
+        <rdf:type rdf:resource="cg_agents#FieldOfView"/>
+        <cg_agents:fovHasClipNear rdf:datatype="http://www.w3.org/2002/07/owl#real">0.1</cg_agents:fovHasClipNear>
+        <cg_agents:fovHasClipFar rdf:datatype="http://www.w3.org/2002/07/owl#real">6</cg_agents:fovHasClipFar>
+        <cg_agents:fovHasHeight rdf:datatype="http://www.w3.org/2002/07/owl#real">54.8</cg_agents:fovHasHeight>
+        <cg_agents:fovHasWidth rdf:datatype="http://www.w3.org/2002/07/owl#real">84.1</cg_agents:fovHasWidth>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- pr2#base_link -->
+
+    <owl:NamedIndividual rdf:about="pr2#base_link">
+        <rdf:type rdf:resource="cg_agents#Base"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- pr2#head_mount_kinect2_rgb_optical_frame -->
+
+    <owl:NamedIndividual rdf:about="pr2#head_mount_kinect2_rgb_optical_frame">
+        <rdf:type rdf:resource="cg_agents#Head"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- pr2#left_gripper_frame -->
+
+    <owl:NamedIndividual rdf:about="pr2#l_gripper_tool_frame">
+        <rdf:type rdf:resource="cg_agents#Hand"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- pr2#r_gripper_tool_frame -->
+
+    <owl:NamedIndividual rdf:about="pr2#r_gripper_tool_frame">
+        <rdf:type rdf:resource="cg_agents#Hand"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- pr2#pr2 -->
+    
+    <owl:NamedIndividual rdf:about="pr2#pr2">
+        <rdf:type rdf:resource="cg_agents#Robot"/>
+        <cg_agents:hasBase rdf:resource="pr2#base_link"/>
+        <cg_agents:hasHead rdf:resource="pr2#head_mount_kinect2_rgb_optical_frame"/>
+        <cg_agents:hasRightHand rdf:resource="pr2#r_gripper_tool_frame"/>
+        <cg_agents:hasLeftHand rdf:resource="pr2#l_gripper_tool_frame"/>
+        <cg_agents:hasFieldOfView rdf:resource="pr2#eve_fov"/>
+    </owl:NamedIndividual>
+
+</rdf:RDF>
