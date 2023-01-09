@@ -128,6 +128,7 @@ add_library(${PROJECT_NAME}_utility_lib STATIC
   src/Utility/YamlReader.cpp
   src/Utility/Ontology.cpp
   src/Utility/RosFiles.cpp
+  src/Utility/Wavefront.cpp
 )
 target_link_libraries(${PROJECT_NAME}_utility_lib PUBLIC
                       ${catkin_LIBRARIES})
@@ -244,6 +245,7 @@ target_link_libraries(${PROJECT_NAME}_bullet_test PRIVATE
                       ${PROJECT_NAME}_bullet_lib
                       ${PROJECT_NAME}_types_lib
                       ${PROJECT_NAME}_perception_lib
+                      ${PROJECT_NAME}_utility_lib
                       ${catkin_LIBRARIES})
 
 add_executable(${PROJECT_NAME}_multi_server_test src/TestFiles/multi_server_test.cpp )
