@@ -189,10 +189,9 @@
 
         <p>Blender allows to export objects in several formats. 
            With Overworld we mainly use OBJ but you can also use STL or DAE.
-           Here we will only explain for the OBJ format as it is the more common one, as it allows to export textures, and as it is also the more complex one.
         </p>
 
-        <p>Select your object first then, on the top left, go to <code>File > Export</code> and select <code>Wavefront (.obj)</code>.
+        <p>Let's start with the OBJ format. Select your object first then, on the top left, go to <code>File > Export</code> and select <code>Wavefront (.obj)</code>.
            Before selecting the desired folder, we have to modify some export parameters.
            On the right panel, select the <code>Selection Only</code> option to ensure that you only export the selected objects and not an entire scene.
            Then, in the transform panel, we have to change the <code>Forward</code> to X and the <code>Up</code> to Z. 
@@ -201,7 +200,22 @@
 
         <img src="../../images/Tutorials/tutorial2/obj_options.png" alt="tutorial 2 Obj export options" width="25%" class="center"/>
 
-        <p>You can now save the model in a "models" folder in the "overworld_tutorials" package we the name "frame.obj" and we are done!</p>
+        <p>You can now save the model in a "models" folder in the "overworld_tutorials" package with the name "frame.obj".</p>
+
+        <p>We have to note that with the OBJ format, Blander takes the world origin as the object origin.
+           If we want to use the true object origin, we have to put its location to the world origin (i.e. X = 0, Y = 0, Z = 0 in the Transform panel that we open with <kbd>N</kbd>).
+        </p>
+
+        <p>We will now do the same for the STL format. Select your object first then, on the top left, go to <code>File > Export</code> and select <code>Stl (.stl)</code>.
+           Once again, before selecting the desired folder, we have to modify some export parameters.
+           On the right panel, select again the <code>Selection Only</code> option to ensure that you only export the selected objects and not an entire scene.
+           Then, in the transform panel, change also the <code>Forward</code> to X and the <code>Up</code> to Z. 
+           You should get that:
+        </p>
+
+        <img src="../../images/Tutorials/tutorial2/stl_options.png" alt="tutorial 2 Stl export options" width="25%" class="center"/>
+
+        <p>You can now save the model in a "models" folder in the "overworld_tutorials" package with the name "frame.stl" and we are done!</p>
 
         <nav class="course-pagination">
           <a href="../tutorial1/SetFov.html" class="course-pagination__btn">
