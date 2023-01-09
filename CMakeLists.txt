@@ -124,11 +124,22 @@ target_link_libraries(Bullet3 INTERFACE
                       ${catkin_LIBRARIES}
                       Threads::Threads)
 
+add_library(${PROJECT_NAME}_utility_lib STATIC
+  src/Utility/YamlReader.cpp
+  src/Utility/Ontology.cpp
+  src/Utility/RosFiles.cpp
+)
+target_link_libraries(${PROJECT_NAME}_utility_lib PUBLIC
+                      ${catkin_LIBRARIES})
+set_target_properties(${PROJECT_NAME}_utility_lib PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
 add_library(${PROJECT_NAME}_bullet_lib STATIC
   src/Bullet/PhysicsServers.cpp
   src/Bullet/BulletClient.cpp
 )
-target_link_libraries(${PROJECT_NAME}_bullet_lib PUBLIC Bullet3)
+target_link_libraries(${PROJECT_NAME}_bullet_lib PUBLIC 
+                      Bullet3
+                      ${PROJECT_NAME}_utility_lib)
 set_target_properties(${PROJECT_NAME}_bullet_lib PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 add_library(${PROJECT_NAME}_types_lib STATIC
@@ -142,14 +153,6 @@ target_link_libraries(${PROJECT_NAME}_types_lib PUBLIC
                       ${catkin_LIBRARIES}
                       ${PROJECT_NAME}_bullet_lib)
 set_target_properties(${PROJECT_NAME}_types_lib PROPERTIES POSITION_INDEPENDENT_CODE ON)
-
-add_library(${PROJECT_NAME}_utility_lib STATIC
-  src/Utility/YamlReader.cpp
-  src/Utility/Ontology.cpp
-)
-target_link_libraries(${PROJECT_NAME}_utility_lib PUBLIC
-                      ${catkin_LIBRARIES})
-set_target_properties(${PROJECT_NAME}_utility_lib PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 add_library(${PROJECT_NAME}_perception_lib STATIC
   src/Perception/Managers/AgentPerceptionManager.cpp

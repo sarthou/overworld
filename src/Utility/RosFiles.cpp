@@ -1,13 +1,12 @@
-#ifndef OWDS_URDFHELPER_H
-#define OWDS_URDFHELPER_H
+#include "overworld/Utility/RosFiles.h"
 
-#include <string>
-#include <string>
 #include <fstream>
 #include <streambuf>
 #include <iostream>
 
 #include <ros/package.h>
+
+namespace owds {
 
 std::string createLocalUrdf(std::string urdf_path, const std::string& urdf_folder)
 {
@@ -27,7 +26,7 @@ std::string createLocalUrdf(std::string urdf_path, const std::string& urdf_folde
         std::string package_name = urdf_str.substr(pose + package_pattern.size(), pose_end_of_name - pose - package_pattern.size());
         std::string package_path = ros::package::getPath(package_name);
 
-        size_t pattern_pose = std::string::npos;
+        size_t pattern_pose;
         while((pattern_pose = urdf_str.find(full_package)) != std::string::npos)
         {
             urdf_str.replace(pattern_pose, full_package.size(), package_path);
@@ -78,4 +77,4 @@ std::string getFullPath(const std::string& file_name)
         return file_name;
 }
 
-#endif // OWDS_URDFHELPER_H
+} // namespace owds

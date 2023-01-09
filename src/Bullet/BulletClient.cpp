@@ -1,7 +1,9 @@
 #include "overworld/Bullet/BulletClient.h"
 
+#include <fstream>
+
 #include "overworld/Bullet/PhysicsServers.h"
-#include "overworld/Bullet/UrdfHelper.h"
+#include "overworld/Utility/RosFiles.h"
 #include "overworld/Utility/ShellDisplay.h"
 
 namespace owds {
