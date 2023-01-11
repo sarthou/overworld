@@ -1,0 +1,241 @@
+<html lang="en_US">
+
+<head>
+  <title>Make it spawn : Describe your environment</title>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+  <link href="../../style/overworld_api.css" rel="stylesheet" type="text/css">
+  <link href="../../images/favicon.ico" rel="shortcut icon">
+  <link href="../../images/favicon-32x32.png" rel="icon" type="image/png">
+  <link href="../../images/favicon-16x16.png" rel="icon" type="image/png">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+</head>
+
+<body>
+  <div class="header" id="header">
+    <header class="fixed" id="navbar">
+      <div class="container">
+          <div class="navbar-header">
+            <div id="header-buttons">
+                <ul id="header-ul" data-event="hover_intent" data-effect="fade" data-effect-speed="500">
+                    <li class="header-item"><a class="header-link" href="https://github.com/sarthou/overworld" tabindex="0"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Octicons-mark-github.svg/1200px-Octicons-mark-github.svg.png" alt="github" width="40px" height="40px"/></a></li>
+                </ul>
+            </div>
+            <a class="navbar-icon" href="../../index.html">
+              <img src="../../images/overworld.png " alt="overworld" width="53px" height="65px"/>
+            </a>
+        </div>
+      </div>
+    </header>
+  </div>
+
+  <div class="main">
+
+    <div class="navigationbar">
+      <ul class="sub-navigation">
+        <li><a href="https://www.youtube.com/watch?v=LUkjts8UacI" target="_blank" rel="noopener noreferrer">Demo video</a></li>
+        <li><a href="https://sarthou.github.io/ontologenius/index.html" target="_blank" rel="noopener noreferrer">Ontologenius</a></li>
+        <li><a href="https://github.com/sarthou/overworld/actions" target="_blank" rel="noopener noreferrer">Pipelines</a></li>
+      </ul>
+      <h1>Overworld Cpp Documentation</h1>
+    </div>
+
+    <div class="content">
+      <div class="sidebar" style="transition: all 0.2s ease-out 0s; top: -270px;">
+        <div class="contents">
+          <div id="contents-toggle" class=""></div>
+          <h3>Contents</h3>
+          <ul style="display: block;">
+            <li class="level1"><a href="CreateSimpleModel.html">1. Create a simple model</a></li>
+            <li class="level1"><a href="DescribeYourObject.html">2. Describe your object</a></li>
+            <li class="level1"><a href="MakeItSpawn.html"><b>3. Make it spawn</b></a></li>
+            <li class="level1"><a href="../../construction.html">4. Add textures</a></li>
+          </ul>
+        </div>
+
+        <div class="contents">
+          <div id="contents-toggle" class=""></div>
+          <h3>Getting Start</h3>
+          <ul style="display: block;">
+            <li class="level1"><a href="../../Download.html">Download</a></li>
+            <li class="level1"><a href="../../InstallOverworld.html">Install Overworld</a></li>
+            <li class="level1"><a href="../../AvailableModules.html">Available modules</a></li>
+            <li class="level1"><a href="../Tutorials.html">Tutorials</a></li>
+          </ul>
+        </div>
+
+        <div class="contents">
+          <div id="contents-toggle" class=""></div>
+          <h3>Overview</h3>
+          <ul style="display: block;">
+            <li class="level1"><a href="../../overview/launchers.html">Launchers</a></li>
+            <li class="level1"><a href="../../overview/Configuration.html">Configuration</a></li>
+            <li class="level1"><a href="../../overview/Plugins.html">Plugins</a></li>
+            <li class="level1"><a href="../../overview/bulletGUI.html">Bullet GUI</a></li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="context">
+        <div class="toturial-header">
+          <h1 class="title">Describe your environment</h1>
+          <a class="toturial-subheader">
+            <div class="tutorial-subheader__main-icon">
+              <i class="fas fa-brain"></i>
+            </div>
+            <div class="toturial-subheader__title">
+              <h2 class="title">There is no place like 127.0.0.1</h2>
+            </div>
+          </a>
+        </div>
+
+        <h1 class="title">Make it spawn</h1>
+
+        <p>Now that we have a way to link entities with some of their visual features, we just have to declare the entities to be loaded and their location.
+           To do so, we will create a new configuration file dedicated to the static entities and we will use a new perception module.
+        </p>
+
+        <h2>Setting the objects' location</h2>
+
+        <p>As we only consider the static environment for the moment, the description of the objects to be loaded as well as their location can be put in a simple configuration file.
+           Let's create a new configuration file names "static_env.yaml" in the "configurations" folder of the tutorials package. Then, paste in it the following content.
+        </p>
+
+        <div class="code_block xml_code" style="counter-reset:code_line 0;">
+          <div class="code_line"><span class="yaml_key">frame_obj</span>:</div>
+          <div class="code_line">  <span class="yaml_key">position</span>:</div>
+          <div class="code_line">    <span class="yaml_key">x</span>: <span class="yaml_value">0.0</span></div>
+          <div class="code_line">    <span class="yaml_key">y</span>: <span class="yaml_value">0.0</span></div>
+          <div class="code_line">    <span class="yaml_key">z</span>: <span class="yaml_value">0.0</span></div>
+          <div class="code_line">  <span class="yaml_key">orientation</span>:</div>
+          <div class="code_line">    <span class="yaml_key">x</span>: <span class="yaml_value">0.0</span></div>
+          <div class="code_line">    <span class="yaml_key">y</span>: <span class="yaml_value">0.0</span></div>
+          <div class="code_line">    <span class="yaml_key">z</span>: <span class="yaml_value">0.0</span></div>
+          <div class="code_line">    </div>
+          <div class="code_line"><span class="yaml_key">frame_stl</span>:</div>
+          <div class="code_line">  <span class="yaml_key">position</span>:</div>
+          <div class="code_line">    <span class="yaml_key">z</span>: <span class="yaml_value">2.0</span></div>
+          <div class="code_line">    </div>
+          <div class="code_line"><span class="yaml_key">frame_green</span>:</div>
+          <div class="code_line">  <span class="yaml_key">position</span>:</div>
+          <div class="code_line">    <span class="yaml_key">y</span>: <span class="yaml_value">2.0</span></div>
+          <div class="code_line">    </div>
+          <div class="code_line"><span class="yaml_key">frame_red</span>:</div>
+          <div class="code_line">  <span class="yaml_key">position</span>:</div>
+          <div class="code_line">    <span class="yaml_key">x</span>: <span class="yaml_value">2.0</span></div>
+        </div>
+
+        <p>The content and the structure of this file are really simple.
+           In there, we find as roots, the name of the individuals to be loaded.
+           These names are exactly the same as the ones described in the ontology.
+        </p>
+
+        <p>Bellow each individual, we find two possible keys being "position" to describe translation, and "orientation" to describe rotations.
+           Each of them can have three fields for their x, y, and z components.
+           To avoid too long files, all undefined fields are assigned to zero by default.
+        </p>
+
+        <p>With our current file, we have thus described that the frame_obj object is at the origin of the world.
+           If you have well followed, this description could have been shortened by simply putting the entity name with no field below.
+        </p>
+
+        <p>For the three other objects, they are all shifted on a different axis of the world.</p>
+
+        <h2>The static objects perception module</h2>
+
+        <p>With Overworld, the general inputs are always perception modules.
+           To spawn a static environment, Overworld comes with a StaticObjectsPerceptionModule which takes as a parameter a configuration file.
+        </p>
+
+        <p>Let's put it into practice by modifying our "overworld.yaml" file.
+           Replace its content with this new one:
+        </p>
+
+        <div class="code_block xml_code" style="counter-reset:code_line 0;">
+          <div class="code_line"><span class="yaml_key">modules</span>:</div>
+          <div class="code_line">  <span class="yaml_key">robot</span>:</div>
+          <div class="code_line">    <span class="yaml_key">JointStatePerceptionModule</span>: <span class="yaml_string">robot_joints</span></div>
+          <div class="code_line">  <span class="yaml_key">objects</span>:</div>
+          <div class="code_line">    <span class="yaml_key">StaticObjectsPerceptionModule</span>: <span class="yaml_string">static</span></div>
+          <div class="code_line"></div>
+          <div class="code_line"><span class="yaml_key">robot_joints</span>:</div>
+          <div class="code_line">  <span class="yaml_key">robot_name</span> : <span class="yaml_string">eve</span></div>
+          <div class="code_line"></div>
+          <div class="code_line"><span class="yaml_key">static</span>:</div>
+          <div class="code_line">  <span class="yaml_key">file</span>: <span class="yaml_string">package://overworld_tutorials/configurations/static_env.yaml</span></div>
+        </div>
+
+        <p>Where previously we only used a "robot" module, you can see that we now have an "objects" field with a StaticObjectsPerceptionModule in it.
+           This module is instantiated with the name "static".
+        </p>
+
+        <p>At the end of the file, you can see that the module takes one parameter being a configuration file.
+           In our case, this file is the one we created just before.
+        </p>
+
+        <p>As a reminder, if you want to:</p>
+        <ul>
+          <li>Change an object's visual features you have to modify the ontology.</li>
+          <li>Change the objects to be spawned or their location, you have to modify the static_env configuration file.</li>
+          <li>Load a completely new environment, you have to modify the file parameter of the StaticObjectsPerceptionModule in the module configuration file.</li>
+        </ul>
+
+        <h2>Launching Overworld</h2>
+
+        <p>The way to launch Overworld is exactly the same as before. We do not need to modify our overworld launch file.</p>
+
+        <p>Nevertheless, we have to add our new ontology file to ontologenius. 
+           To do so, add <code>$(find overworld_tutorials)/ontologies/objects.owl</code> to the "files" argument in the ontologenius launch file.
+        </p>
+
+        <p>We are now ready to launch Overworld! In different terminals, run the following in order:</p>
+
+        <div class="code_block">
+          <div class="terminal_line">roscore</div>
+          <div class="terminal_line">roslaunch overworld_tutorials eve_publisher.launch</div>
+          <div class="terminal_line">rosrun overworld teleop</div>
+          <div class="terminal_line">roslaunch overworld_tutorials ontologenius.launch</div>
+          <div class="terminal_line">roslaunch overworld_tutorials overworld.launch</div>
+        </div>
+
+        <p>Moving a bit the robot aside, you should get the following in the Bullet window.</p>
+
+        <img src="../../images/Tutorials/tutorial2/bullet_with_frames.png" alt="tutorial 2 Bullet GUI with frames" width="50%" class="center"/>
+
+        <p>Both the OBJ and STL meshes have been loaded correctly and the colors applied to two of the frames have been applied.
+           Nevertheless, we can notice that the texture in Blender we made has not been applied.
+           While this is normal for the STL mesh which does not embed texture data, the OBJ should have.
+        </p>
+
+        <p>Let's fix it in the next part of this tutorial.</p>
+
+        <nav class="course-pagination">
+          <a href="DescribeYourObject.html" class="course-pagination__btn">
+            <i class="fas fa-angle-left"></i>
+            <span>Describe your object</span>
+          </a>
+          <span class="course-pagination__separator"></span>
+          <a href="../../construction.html" class="course-pagination__btn">
+            <span>Add textures</span>
+            <i class="fas fa-angle-right"></i>
+          </a>
+        </nav>
+
+      </div>
+    </div>
+
+  </div>
+</body>
+
+<footer>
+  <div align="center">
+    <p>
+      Brought to you by:
+      <a class="laas_logo" href="https://www.laas.fr/public/">
+        <img src="../../images/LogoLAAS-2016_BW.png " alt="LAAS-CNRS" height="60px"/>
+      </a>
+    </p>
+  </div>
+</footer>
+
+</html>

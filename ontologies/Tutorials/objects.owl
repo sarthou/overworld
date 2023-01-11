@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="https://gitlab.laas.fr/discuter/overworld_tutorials/-/blob/master/ontologies/objects#"
+     xmlns:objects="https://gitlab.laas.fr/discuter/overworld_tutorials/-/blob/master/ontologies/objects#"
+     xmlns:cg_objects="https://github.com/RIS-WITH/common_ground_ontology/blob/master/CG_objects#"
+     xmlns:cg_entities="https://github.com/RIS-WITH/common_ground_ontology/blob/master/CG_entities#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+    <owl:Ontology rdf:about="https://gitlab.laas.fr/discuter/overworld_tutorials/-/blob/master/ontologies/objects">
+      <owl:imports rdf:resource="https://github.com/RIS-WITH/common_ground_ontology/blob/master/CG_objects"/>
+    </owl:Ontology>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+    
+
+
+    <!-- objects#Frame -->
+
+    <owl:Class rdf:about="objects#Frame">
+        <rdfs:subClassOf rdf:resource="cg_objects#Object"/>
+        <cg_entities:hasMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld_tutorials/models/frame.obj</cg_entities:hasVisualMesh>
+    </owl:Class>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+    
+
+
+    <!-- objects#frame_obj -->
+
+    <owl:NamedIndividual rdf:about="objects#frame_obj">
+        <rdf:type rdf:resource="objects#Frame"/>
+        <cg_entities:hasTexture rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/textures/adream_wall_texture.png</cg_entities:hasTexture>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- objects#frame_stl -->
+
+    <owl:NamedIndividual rdf:about="objects#frame_stl">
+        <rdf:type rdf:resource="objects#Frame"/>
+        <cg_entities:hasMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld_tutorials/models/frame.stl</cg_entities:hasVisualMesh>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- objects#frame_green -->
+
+    <owl:NamedIndividual rdf:about="objects#frame_green">
+        <rdf:type rdf:resource="objects#Frame"/>
+        <cg_entities:hasColor rdf:resource="cg_entities#green"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- objects#frame_red -->
+
+    <owl:NamedIndividual rdf:about="objects#frame_green">
+        <rdf:type rdf:resource="objects#Frame"/>
+        <cg_entities:hasMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld_tutorials/models/frame.stl</cg_entities:hasVisualMesh>
+        <cg_entities:hasColor rdf:resource="cg_entities#red"/>
+    </owl:NamedIndividual>
+
+</rdf:RDF>
