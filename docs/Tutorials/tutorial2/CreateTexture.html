@@ -1,0 +1,271 @@
+<html lang="en_US">
+
+<head>
+  <title>Create a texture : Describe your environment</title>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+  <link href="../../style/overworld_api.css" rel="stylesheet" type="text/css">
+  <link href="../../images/favicon.ico" rel="shortcut icon">
+  <link href="../../images/favicon-32x32.png" rel="icon" type="image/png">
+  <link href="../../images/favicon-16x16.png" rel="icon" type="image/png">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+</head>
+
+<body>
+  <div class="header" id="header">
+    <header class="fixed" id="navbar">
+      <div class="container">
+          <div class="navbar-header">
+            <div id="header-buttons">
+                <ul id="header-ul" data-event="hover_intent" data-effect="fade" data-effect-speed="500">
+                    <li class="header-item"><a class="header-link" href="https://github.com/sarthou/overworld" tabindex="0"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Octicons-mark-github.svg/1200px-Octicons-mark-github.svg.png" alt="github" width="40px" height="40px"/></a></li>
+                </ul>
+            </div>
+            <a class="navbar-icon" href="../../index.html">
+              <img src="../../images/overworld.png " alt="overworld" width="53px" height="65px"/>
+            </a>
+        </div>
+      </div>
+    </header>
+  </div>
+
+  <div class="main">
+
+    <div class="navigationbar">
+      <ul class="sub-navigation">
+        <li><a href="https://www.youtube.com/watch?v=LUkjts8UacI" target="_blank" rel="noopener noreferrer">Demo video</a></li>
+        <li><a href="https://sarthou.github.io/ontologenius/index.html" target="_blank" rel="noopener noreferrer">Ontologenius</a></li>
+        <li><a href="https://github.com/sarthou/overworld/actions" target="_blank" rel="noopener noreferrer">Pipelines</a></li>
+      </ul>
+      <h1>Overworld Cpp Documentation</h1>
+    </div>
+
+    <div class="content">
+      <div class="sidebar" style="transition: all 0.2s ease-out 0s; top: -270px;">
+        <div class="contents">
+          <div id="contents-toggle" class=""></div>
+          <h3>Contents</h3>
+          <ul style="display: block;">
+            <li class="level1"><a href="CreateSimpleModel.html">1. Create a simple model</a></li>
+            <li class="level1"><a href="DescribeYourObject.html">2. Describe your object</a></li>
+            <li class="level1"><a href="MakeItSpawn.html">3. Make it spawn</a></li>
+            <li class="level1"><a href="../../construction.html"><b>4. Create a texture</b></a></li>
+            <li class="level1"><a href="../../construction.html">5. Apply a texture</a></li>
+          </ul>
+        </div>
+
+        <div class="contents">
+          <div id="contents-toggle" class=""></div>
+          <h3>Getting Start</h3>
+          <ul style="display: block;">
+            <li class="level1"><a href="../../Download.html">Download</a></li>
+            <li class="level1"><a href="../../InstallOverworld.html">Install Overworld</a></li>
+            <li class="level1"><a href="../../AvailableModules.html">Available modules</a></li>
+            <li class="level1"><a href="../Tutorials.html">Tutorials</a></li>
+          </ul>
+        </div>
+
+        <div class="contents">
+          <div id="contents-toggle" class=""></div>
+          <h3>Overview</h3>
+          <ul style="display: block;">
+            <li class="level1"><a href="../../overview/launchers.html">Launchers</a></li>
+            <li class="level1"><a href="../../overview/Configuration.html">Configuration</a></li>
+            <li class="level1"><a href="../../overview/Plugins.html">Plugins</a></li>
+            <li class="level1"><a href="../../overview/bulletGUI.html">Bullet GUI</a></li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="context">
+        <div class="toturial-header">
+          <h1 class="title">Describe your environment</h1>
+          <a class="toturial-subheader">
+            <div class="tutorial-subheader__main-icon">
+              <i class="fas fa-brain"></i>
+            </div>
+            <div class="toturial-subheader__title">
+              <h2 class="title">There is no place like 127.0.0.1</h2>
+            </div>
+          </a>
+        </div>
+
+        <h1 class="title">Create a texture</h1>
+
+        <p>We see just before that we are able to load meshes, to apply colors on them, but that complex textures are not loaded.
+           To apply textures with Overworld (with Bullet truly speaking), we have to create a simple image texture.
+        </p>
+
+        <p>The first step before applying this image to our meshes is to create the image itself.
+           To do so, we will use Blender once again.
+           If you use models with existing textures or if you know how to create texture even with other tools, you can skip this part.
+           Nevertheless, with the following, you will have the basis to do texturing.
+        </p>
+
+        <p>This part is maybe the more complex one of all tutorials but everything will be good, we will process step by step.</p>
+
+        <h2>Import your model</h2>
+
+        <p>Open Blender and as the previous time, delete every object in the current scene by pressing <kbd>A</kbd> to select all, then <kbd>Delete</kbd> to suppress all objects.</p>
+
+        <p>Go to <code>File > Import > Wavefront (.obj)</code> and navigate toward your frame mesh in the tutorial package.</p>
+
+        <p class="tip">On the bottom left, you have the recent folders you used. The "models" folder of the tutorial package should be there.</p>
+
+        <p>Before importing the model, we have to modify the Forward axis to Y and the Up axis to Z, as we did for the export.</p>
+
+        <img src="../../images/Tutorials/tutorial2/obj_import.png" alt="tutorial 2 import an obj" width="25%" class="center"/>
+
+        <p>Once the frame is imported, it should be in the scene with its colors. 
+           If the colors do not appear, press <kbd>Z</kbd> and select <code>Material preview</code>.
+        </p>
+
+        <h2>Set a UV map</h2>
+
+        <p>To create and visualize the object UV map, we have to go to the <code>UV Editing</code> workspace that you find on the top of your screen.</p>
+
+        <img src="../../images/Tutorials/tutorial2/Uv_editing.png" alt="tutorial 2 uv editing tab" width="100%" class="center"/>
+
+        <p>In this new panel, your screen is divided in two with at the right your model and at the left a grey square.
+           It's in this second panel that we will visualize the UV map.
+        </p>
+
+        <p>First of all, we have to create an image that will be our texture.
+           To do so, at the top of the left panel, click on <code>+ New</code>.
+        </p>
+
+        <img src="../../images/Tutorials/tutorial2/new_imape.png" alt="tutorial 2 new image" width="60%" class="center"/>
+
+        <p>In the pop-up window, change the name of the image to "frame.png".
+           If you need to you can change the resolution to 256 x 256 px as our texture does not have many details.
+           Bullet suggests to avoid to go over a resolution of 1024 x 1024 px to gain in performance.
+        </p>
+
+        <p>On the right side, the object should be already selected, in edit mode, and with all the vertex selected.
+           If it's not, select it, press <kbd>Tab</kbd> (edit mode), and then <kbd>A</kbd> (select).
+        </p>
+
+        <p>After that, press <kbd>U</kbd> to unwrap and select the <code>Smart UV project</code> method.
+           A pop-up should appear.
+           In there, we will just put an island margin of 0.05.
+        </p>
+
+        <img src="../../images/Tutorials/tutorial2/smart_uv_project.png" alt="tutorial 2 smart UV project settings" width="25%" class="center"/>
+
+        <p>Once validated, you should see a decomposition of the faces of your object in the left panel of your screen.
+           This is what is called a UV map.
+           This means that we have fitted the location of the faces of an object on an image.
+           However, our image is still black so we have to put colors on it but we will not paint it by hand!
+        </p>
+
+        <img src="../../images/Tutorials/tutorial2/uv_map.png" alt="tutorial 2 smart UV map" width="40%" class="center"/>
+
+        <h2>Bake the image texture</h2>
+
+        <p>Within Blender, baking consists of generating image textures from complex materials applied to an object.
+           Indeed, Blender uses an internal representation of textures which cannot be understood by other tools like Bullet.
+           The only universal way to represent texture is the use of images.
+        </p>
+
+        <p>The following instructions should be followed as they are so be careful!</p>
+
+        <p>Let's move to the <code>Shading</code> workspace.</p>
+
+        <img src="../../images/Tutorials/tutorial2/shading_panel.png" alt="tutorial 2 shading tab" width="100%" class="center"/>
+
+        <p>On the top, you should have your object and on the bottom what are called texture nodes.</p>
+
+        <p>On the most right panel, go to the material the properties tab 
+           <img src="../../images/Tutorials/tutorial2/meterial_properties.png" alt="tutorial 2 Material Properties icon" height="15px"/>
+           where we have our four colors.
+           Clicking on the different colors, you should see that the nodes change.
+           These nodes are indeed the graphical representation of each material.
+        </p>
+
+        <p>Go on the "white" material and put the focus on the node panel by clicking in it.
+           To add a new node press <kbd>Shift+A</kbd>.
+           In the popup use the search bar to look for <code>Image Texture</code> and place the node where you want.
+        </p>
+
+        <p>In the Image Texture node, use the image icon on the left of the <code>New</code> button to select the "frame.png" image.</p>
+
+        <img src="../../images/Tutorials/tutorial2/white_node.png" alt="tutorial 2 white material node panel" width="70%" class="center"/>
+
+        <p>Keeping the Image Texture node selected (i.e. not clicking somewhere else in the node panel), do the same for the three other colors.</p>
+
+        <p>Now, go to the <code>Render Properties</code> in the right panel and change the <code>Render Engine</code> to "Cycle".</p>
+
+        <img src="../../images/Tutorials/tutorial2/render_engine.png" alt="tutorial 2 render engine" width="25%" class="center"/>
+
+        <p>In the same panel, you can find a <code>Bake</code> section.
+           Unwrap it and change the <code>Bake Type</code> to "Diffuse".
+           In <code>Influence</code>, unselect the direct and indirect contributions to only keep the color one.
+           Finally, in <code>Margin</code>, change the size to 3px. 
+           The final configuration should look like bellow.
+        </p>
+
+        <img src="../../images/Tutorials/tutorial2/bake.png" alt="tutorial 2 baking configuration" width="20%" class="center"/>
+
+        <p>You can now click on the <code>Bake</code> button!
+           The black image on the left should change a few seconds later to something like that:
+        </p>
+
+        <img src="../../images/Tutorials/tutorial2/baked_texture.png" alt="tutorial 2 baked texture" width="25%" class="center"/>
+
+        <p>In the image panel, you can now save the image by pressing <kbd>Shift + Alt + S</kbd>.
+           Save it in the "models" folder of the tutorial package.
+        </p>
+
+        <h2>Apply the texture</h2>
+
+        <p>We will now apply this texture to our object in Blender.</p>
+
+        <p>Go to <code>Material Properties</code> in the right panel and having your object selected, remove all the materials using the <code>-</code> button next to the material list.</p>
+
+        <p>Before moving on, let's export our object using the OBJ format with the name "frame_base.obj". We will use it later.</p>
+
+        <p>From there, you can create a new material that you can simply name frame. At this stage, your blender should be like that.</p>
+
+        <img src="../../images/Tutorials/tutorial2/frame_material_base.png" alt="tutorial 2 frame texture base" width="75%" class="center"/>
+
+        <p>In the node panel, we now add an Image Texture node by pressing <kbd>Shift + A</kbd>.
+           To select the image, use the <code>Open</code> button to locate the image we save just before.
+           Then, link the <code>Color</code> dot on the right of the Image Texture node, to the <code>Base Color</code> of the Principled BSDF node.
+        </p>
+
+        <img src="../../images/Tutorials/tutorial2/frame_textured.png" alt="tutorial 2 frame textured" width="75%" class="center"/>
+
+        <p>Your object is now textured!</p>
+
+        <p>You can export it in OBJ and STL overwriting the previous ones named "frame.obj" and "frame.stl".</p>
+
+        <nav class="course-pagination">
+          <a href="../tutorial2/MakeItSpawn.html" class="course-pagination__btn">
+            <i class="fas fa-angle-left"></i>
+            <span>Make it spawn</span>
+          </a>
+          <span class="course-pagination__separator"></span>
+          <a href="../../construction.html" class="course-pagination__btn">
+            <span>Apply a texture</span>
+            <i class="fas fa-angle-right"></i>
+          </a>
+        </nav>
+
+      </div>
+    </div>
+
+  </div>
+</body>
+
+<footer>
+  <div align="center">
+    <p>
+      Brought to you by:
+      <a class="laas_logo" href="https://www.laas.fr/public/">
+        <img src="../../images/LogoLAAS-2016_BW.png " alt="LAAS-CNRS" height="60px"/>
+      </a>
+    </p>
+  </div>
+</footer>
+
+</html>
