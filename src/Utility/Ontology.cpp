@@ -44,7 +44,8 @@ Shape_t getEntityShape(OntologyManipulator* onto, const std::string& indiv_name)
     else
         shape.colision_mesh_resource = meshes.front().substr(meshes.front().find("#") + 1);
 
-    if(wavefront::isWavefront(shape.visual_mesh_resource))
+    bool is_wavefront = wavefront::isWavefront(shape.visual_mesh_resource);
+    if(is_wavefront)
     {
       auto full_path = getFullPath(shape.visual_mesh_resource);
       auto mlt = wavefront::getMltFile(full_path);
@@ -67,7 +68,7 @@ Shape_t getEntityShape(OntologyManipulator* onto, const std::string& indiv_name)
     else
       shape.color = getEntityColor(onto, indiv_name);
 
-    if(textures.size())
+    if(is_wavefront && textures.size())
         shape.texture = textures.front().substr(textures.front().find("#") + 1);
   }
   else
