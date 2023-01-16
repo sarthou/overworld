@@ -27,9 +27,13 @@
 class TeleopKeyboard
 {
 public:
-  TeleopKeyboard()
+  TeleopKeyboard(double x = 0.0, double y = 0.0, double z = 0.0, double theta = 0.0)
   { 
     cmd_.linear.x = cmd_.linear.y = cmd_.angular.z = 0;
+    pose_.theta = theta;
+    pose_.x = x;
+    pose_.y = y;
+    z_ = z;
 
     ros::NodeHandle n_private("~");
     n_private.param("walk_vel_", walk_vel_, 0.02);
@@ -47,6 +51,7 @@ private:
   double yaw_rate_run_;
   geometry_msgs::Twist cmd_;
   turtlesim::Pose pose_;
+  double z_;
 
   ros::NodeHandle n_;
   tf::TransformBroadcaster br_;
@@ -153,7 +158,7 @@ void TeleopKeyboard::updatePose()
 void TeleopKeyboard::publishTransform()
 {
   tf::Transform transform;
-  transform.setOrigin( tf::Vector3(pose_.x, pose_.y, 0.0) );
+  transform.setOrigin( tf::Vector3(pose_.x, pose_.y, z_) );
   tf::Quaternion q;
   q.setRPY(0, 0, pose_.theta);
   transform.setRotation(q);
@@ -164,7 +169,19 @@ int main(int argc, char** argv)
 {
   ros::init(argc, argv, "overworld_teleop");
 
-  TeleopKeyboard teleop;
+  double x = 0.0;
+  double y = 0.0;
+  double z = 0.0;
+  double theta = 0.0;
+  if(argc > 1)
+    x = std::stod(argv[1]);
+  if(argc > 2)
+    y  = std::stod(argv[2]);
+  if(argc > 3)
+    z  = std::stod(argv[3]);
+  if(argc > 4)
+    theta  = std::stod(argv[4]);
+  TeleopKeyboard teleop(x, y, z, theta);
 
   signal(SIGINT,quit);
 
