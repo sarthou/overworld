@@ -116,8 +116,8 @@ a.laas_logo {
 }
 
 .main {
-  max-width:1280px;
-  width:95%;
+  max-width:1780px;
+  width:90%;
   margin:auto;
   margin-top:10px;
 }
@@ -451,7 +451,7 @@ table.alignedsummary,table.propsummary {
   margin-top:0.75em;
 }
 .code_block p, .code_line, .terminal_line {
-  color:#ffffff;
+  color:#e0e0e0;
   font-family:SFMono-Regular,Consolas,Liberation Mono,Menlo,Courier,monospace;
   font-size: .9em;
   margin-bottom: 0;
@@ -465,7 +465,7 @@ table.alignedsummary,table.propsummary {
 .cpp_code, .xml_code {
   border-radius: 5px;
 }
-.cpp_include, .cpp_return, .cpp_op, .xml_tag, .py_op {
+.cpp_include, .cpp_return, .cpp_op, .py_op {
   color:#fe4481;
 }
 .cpp_included, .color_purple {
@@ -477,14 +477,23 @@ table.alignedsummary,table.propsummary {
 .cpp_string, .py_string, .color_brown {
   color:#bde674;
 }
-.cpp_value, .py_value, .xml_param {
+.cpp_value, .py_value, .yaml_value {
   color:#ecbd62;
 }
 .cpp_comment, .py_comment {
   color:#918e7b;
 }
-.xml_string {
-  color:#a7fc99;
+.xml_string, .yaml_string {
+  color:#ce9178;
+}
+.xml_tag, .yaml_key {
+  color:#569cd6;
+}
+.xml_param {
+  color:#9CDCFE;
+}
+.xml_comment {
+  color:#6A9955;
 }
 .color_blue {
   color:#2e2ea3;
@@ -666,6 +675,25 @@ ol.tutorial-part-summary_list>li {
   font-size: .875rem;
   text-align: center;
   line-height: 1.5rem;
+}
+
+kbd {
+  border: 1px solid #696969;
+  border-radius: 3px;
+  color: #696969;
+  display: inline-block;
+  padding: 0 4px;
+  margin: 0 1px;
+  white-space: nowrap;
+}
+
+code {
+  padding: 2px 4px;
+  color: #d14;
+  background-color: #f7f7f9;
+  border: 1px solid #e1e1e8;
+  border-radius: 3px;
+  white-space: nowrap;
 }
 
 @media (max-width: 1279px) {

@@ -1,0 +1,250 @@
+<html lang="en_US">
+
+<head>
+  <title>Create a simple model : Describe your environment</title>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+  <link href="../../style/overworld_api.css" rel="stylesheet" type="text/css">
+  <link href="../../images/favicon.ico" rel="shortcut icon">
+  <link href="../../images/favicon-32x32.png" rel="icon" type="image/png">
+  <link href="../../images/favicon-16x16.png" rel="icon" type="image/png">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+</head>
+
+<body>
+  <div class="header" id="header">
+    <header class="fixed" id="navbar">
+      <div class="container">
+          <div class="navbar-header">
+            <div id="header-buttons">
+                <ul id="header-ul" data-event="hover_intent" data-effect="fade" data-effect-speed="500">
+                    <li class="header-item"><a class="header-link" href="https://github.com/sarthou/overworld" tabindex="0"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Octicons-mark-github.svg/1200px-Octicons-mark-github.svg.png" alt="github" width="40px" height="40px"/></a></li>
+                </ul>
+            </div>
+            <a class="navbar-icon" href="../../index.html">
+              <img src="../../images/overworld.png " alt="overworld" width="53px" height="65px"/>
+            </a>
+        </div>
+      </div>
+    </header>
+  </div>
+
+  <div class="main">
+
+    <div class="navigationbar">
+      <ul class="sub-navigation">
+        <li><a href="https://www.youtube.com/watch?v=LUkjts8UacI" target="_blank" rel="noopener noreferrer">Demo video</a></li>
+        <li><a href="https://sarthou.github.io/ontologenius/index.html" target="_blank" rel="noopener noreferrer">Ontologenius</a></li>
+        <li><a href="https://github.com/sarthou/overworld/actions" target="_blank" rel="noopener noreferrer">Pipelines</a></li>
+      </ul>
+      <h1>Overworld Cpp Documentation</h1>
+    </div>
+
+    <div class="content">
+      <div class="sidebar" style="transition: all 0.2s ease-out 0s; top: -270px;">
+        <div class="contents">
+          <div id="contents-toggle" class=""></div>
+          <h3>Contents</h3>
+          <ul style="display: block;">
+            <li class="level1"><a href="CreateSimpleModel.html"><b>1. Create a simple model</b></a></li>
+            <li class="level1"><a href="DescribeYourObject.html">2. Describe your object</a></li>
+            <li class="level1"><a href="MakeItSpawn.html">3. Make it spawn</a></li>
+            <li class="level1"><a href="CreateTexture.html">4. Create a texture</a></li>
+            <li class="level1"><a href="ApplyTexture.html">5. Apply a texture</a></li>
+          </ul>
+        </div>
+
+        <div class="contents">
+          <div id="contents-toggle" class=""></div>
+          <h3>Getting Start</h3>
+          <ul style="display: block;">
+            <li class="level1"><a href="../../Download.html">Download</a></li>
+            <li class="level1"><a href="../../InstallOverworld.html">Install Overworld</a></li>
+            <li class="level1"><a href="../../AvailableModules.html">Available modules</a></li>
+            <li class="level1"><a href="../Tutorials.html">Tutorials</a></li>
+          </ul>
+        </div>
+
+        <div class="contents">
+          <div id="contents-toggle" class=""></div>
+          <h3>Overview</h3>
+          <ul style="display: block;">
+            <li class="level1"><a href="../../overview/launchers.html">Launchers</a></li>
+            <li class="level1"><a href="../../overview/Configuration.html">Configuration</a></li>
+            <li class="level1"><a href="../../overview/Plugins.html">Plugins</a></li>
+            <li class="level1"><a href="../../overview/bulletGUI.html">Bullet GUI</a></li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="context">
+        <div class="toturial-header">
+          <h1 class="title">Describe your environment</h1>
+          <a class="toturial-subheader">
+            <div class="tutorial-subheader__main-icon">
+              <i class="fas fa-brain"></i>
+            </div>
+            <div class="toturial-subheader__title">
+              <h2 class="title">There is no place like 127.0.0.1</h2>
+            </div>
+          </a>
+        </div>
+
+        <h1 class="title">Create a simple model</h1>
+
+        <p>Now that we have a robot able to move in Overworld, we need to create the environment in which it will act.
+           While the robot could sense its entire environment, it's common to assume that part of it, like the building, is known ahead.
+           In this second tutorial, we will create this static environment.
+        </p>
+
+        <p>The first step to create the environment is to get CAD models. 
+           Do not be afraid but we will thus start with a bit of CAD modelling using Blender.
+           The goal is not to make you a Blender expert (it would be too long) but to give you a few tips to make it work properly with Overworld.
+           Even if you do plan to create your own models, this first part could help you to understand possible bugs.
+        </p>
+
+        <p>First of all, <a href="https://www.blender.org/download/" target="_blank" rel="noopener noreferrer">download blender</a> and launch it.</p>
+
+        <h2>Make a frame</h2>
+
+        <p>When you launch Blender, a cube, a light, and a camera are in the world. As we do not need them, let's remove them.
+           Press <kbd>A</kbd> (select all) then <kbd>Delete</kbd>.
+        </p>
+
+        <p>To model with Blender, we always start with a simple primitive mesh. In our case, we will use a cube.
+           To make it appears, press <kbd>Shift+A</kbd>. A popup should appear. Go to <code>Mesh</code>, then select <code>Cube</code>. 
+           At the bottom left, a widget has appeared with <code>Add Cube</code> written on it. Click on it.
+        </p>
+
+        <p>Once the widget expended, you have several data about the spawned cube. 
+           The only one interesting to us is the cube's size. 
+           Change it to <code>10cm</code> or <code>0.1</code>. The cube should now be much smaller. 
+        </p>
+
+        <img src="../../images/Tutorials/tutorial2/add_cube.png" alt="tutorial 2 Add Cube" width="25%" class="center"/>
+
+        <p>You can now click on the cube and we will model from it. 
+           For the moment, we are in <code>Object Mode</code>, meaning that we can only change its location, rotation and scale.
+           To change its inner geometry, we have to pass in <code>Edit Mode</code>.
+           To do so, with the cube selected, press <kbd>Tab</kbd>.
+           The cube should look like below.
+        </p>
+
+        <img src="../../images/Tutorials/tutorial2/edit_mode.png" alt="tutorial 2 Edit Mode" width="25%" class="center"/>
+
+        <p>By default, in edit mode, we work with vertex. Using the icons at the top left, we can pass from vertex mode 
+           <img src="../../images/Tutorials/tutorial2/vertex_mode.png" alt="tutorial vertex" height="13px"/> to face mode 
+           <img src="../../images/Tutorials/tutorial2/face_mode.png" alt="tutorial vertex" height="13px"/>.
+           This will all us to directly modify the cube faces. 
+           In this new mode, select the X forward face. 
+           The axis directions are always displayed at the top right.
+        </p>
+
+        <img src="../../images/Tutorials/tutorial2/face_selected.png" alt="tutorial 2 Select face" width="50%" class="center"/>
+
+        <p>We will extrude this face by pressing <kbd>E</kbd> and then typing <kbd>0.9</kbd>. 
+           By doing the same with the Z forward and Y forward faces, you should get the same as below.
+        </p>
+
+        <img src="../../images/Tutorials/tutorial2/axis_base.png" alt="tutorial 2 Axis base" width="50%" class="center"/>
+
+        <h2>Add colors</h2>
+
+        <p>That's great, we have created an axis but with color it would be nicer.</p>
+
+        <p>Let's stay in edit mode but with the <code>Material Properties</code> panel. Click on the 
+          <img src="../../images/Tutorials/tutorial2/meterial_properties.png" alt="tutorial 2 Material Properties icon" height="15px"/>
+          icon on the right.
+        </p>
+
+        <p>Click on the <code>New</code> button then rename the created material to "white".</p>
+
+        <img src="../../images/Tutorials/tutorial2/white.png" alt="tutorial 2 White material" width="25%" class="center"/>
+
+        <p>By clicking on the Base color color box (yes directly on the color) you can modify it and set it to a real white.</p>
+
+        <p>You can now press the <code>+</code> button to create another material.
+           Rename this new material to "red" and change the base color. 
+           Do the same to create a blue and green material.
+           By the end, you should get the following material list.
+        </p>
+
+        <img src="../../images/Tutorials/tutorial2/Materials.png" alt="tutorial 2 Material list" width="25%" class="center"/>
+
+        <p>We will now assign these colors to the different faces. 
+           Click on one of the Z axis faces, and holding <kbd>Shift</kbd>, click on the others ones to select all the faces of the Z axis.
+           After that, click on the blue material in your material list, then press the button <code>Assign</code>. 
+           If nothing has changed, with the mouse hover the modelling grid, press <kbd>Z</kbd> then <kbd>2</kbd> to get the material preview.
+           Your entire Z axis should now be blue. Do the same with the two other axes and you should get something like below.
+        </p>
+
+        <img src="../../images/Tutorials/tutorial2/axis_colored.png" alt="tutorial 2 Axis with colors" width="50%" class="center"/>
+
+        <p>You can finally press <kbd>Tab</kbd> to come back to object mode.</p>
+
+        <p>Selecting your model and pressing <kbd>N</kbd>, a new widget appears with information about our object. 
+           Here we can verify that the dimension of our object is 1m x 1m x 1m.
+        </p>
+
+        <h2>Export the object</h2>
+
+        <p>Blender allows to export objects in several formats. 
+           With Overworld we mainly use OBJ but you can also use STL or DAE.
+        </p>
+
+        <p>Let's start with the OBJ format. Select your object first then, on the top left, go to <code>File > Export</code> and select <code>Wavefront (.obj)</code>.
+           Before selecting the desired folder, we have to modify some export parameters.
+           On the right panel, select the <code>Selection Only</code> option to ensure that you only export the selected objects and not an entire scene.
+           Then, in the transform panel, we have to change the <code>Forward</code> to Y and the <code>Up</code> to Z. 
+           Finally, change the <code>Path Mode</code> to "Relative". You should get that:
+        </p>
+
+        <img src="../../images/Tutorials/tutorial2/obj_options.png" alt="tutorial 2 Obj export options" width="25%" class="center"/>
+
+        <p>You can now save the model in a "models" folder in the "overworld_tutorials" package with the name "frame.obj".</p>
+
+        <p>We have to note that with the OBJ format, Blander takes the world origin as the object origin.
+           If we want to use the true object origin, we have to put its location to the world origin (i.e. X = 0, Y = 0, Z = 0 in the Transform panel that we open with <kbd>N</kbd>).
+        </p>
+
+        <p>We will now do the same for the STL format. Select your object first then, on the top left, go to <code>File > Export</code> and select <code>Stl (.stl)</code>.
+           Once again, before selecting the desired folder, we have to modify some export parameters.
+           On the right panel, select again the <code>Selection Only</code> option to ensure that you only export the selected objects and not an entire scene.
+           Then, in the transform panel, change also the <code>Forward</code> to Y and the <code>Up</code> to Z. 
+           You should get that:
+        </p>
+
+        <img src="../../images/Tutorials/tutorial2/stl_options.png" alt="tutorial 2 Stl export options" width="25%" class="center"/>
+
+        <p>You can now save the model in a "models" folder in the "overworld_tutorials" package with the name "frame.stl" and we are done!</p>
+
+        <nav class="course-pagination">
+          <a href="../tutorial1/SetFov.html" class="course-pagination__btn">
+            <i class="fas fa-angle-left"></i>
+            <span>Describe its FoV</span>
+          </a>
+          <span class="course-pagination__separator"></span>
+          <a href="DescribeYourObject.html" class="course-pagination__btn">
+            <span>Describe your object</span>
+            <i class="fas fa-angle-right"></i>
+          </a>
+        </nav>
+
+      </div>
+    </div>
+
+  </div>
+</body>
+
+<footer>
+  <div align="center">
+    <p>
+      Brought to you by:
+      <a class="laas_logo" href="https://www.laas.fr/public/">
+        <img src="../../images/LogoLAAS-2016_BW.png " alt="LAAS-CNRS" height="60px"/>
+      </a>
+    </p>
+  </div>
+</footer>
+
+</html>

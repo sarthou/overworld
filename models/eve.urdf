@@ -1,0 +1,133 @@
+<robot name="eve">
+  <material name="Head">
+    <texture filename="package://overworld/models/tutorials/Eve/eve_head.png"/>
+  </material>
+
+  <material name="White">
+    <color rgba="1.0 1.0 1.0 1.0"/>
+  </material>
+
+  <link name="base_link">
+    <visual>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 1.57079632679"/>
+      <geometry>
+        <mesh filename="package://overworld/models/tutorials/Eve/eve_body.obj"/>
+      </geometry>
+      <material name="White"/>
+    </visual>
+    <collision>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 1.57079632679"/>
+      <geometry>
+        <mesh filename="package://overworld/models/tutorials/Eve/eve_body.obj"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="head_base_joint" type="fixed">
+    <origin xyz="0.0 0.0 0.8" rpy="0.0 0.0 0.0"/>
+    <parent link="base_link"/>
+    <child link="head_base"/>
+  </joint>
+
+  <link name="head_base"/>
+
+  <joint name="head_joint" type="revolute">
+    <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+    <axis xyz="0.0 1.0 0.0"/>
+    <parent link="head_base"/>
+    <child link="head"/>
+    <limit effort="1000.0" lower="-1.57079632679" upper="1.57079632679" velocity="0.5"/>
+    <dynamics damping="0.001"/>
+  </joint>
+
+  <link name="head">
+    <visual>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 1.57079632679"/>
+      <geometry>
+        <mesh filename="package://overworld/models/tutorials/Eve/eve_head.obj"/>
+      </geometry>
+      <material name="Head"/>
+    </visual>
+    <collision>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 1.57079632679"/>
+      <geometry>3
+        <mesh filename="package://overworld/models/tutorials/Eve/eve_head.obj"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="head_camera_frame_joint" type="fixed">
+    <origin xyz="0.19 0.0 0.24" rpy="-1.57079632679 0.0 -1.57079632679"/>
+    <parent link="head"/>
+    <child link="head_camera_frame"/>
+  </joint>
+
+  <link name="head_camera_frame"/>
+
+  <joint name="arm_left_joint" type="revolute">
+    <origin xyz="0.0 0.3 0.6" rpy="0.0 0.0 0.0"/>
+    <axis xyz="0.0 1.0 0.0"/>
+    <parent link="base_link"/>
+    <child link="arm_left_link"/>
+    <limit effort="1000.0" lower="-1.57079632679" upper="1.57079632679" velocity="0.5"/>
+    <dynamics damping="0.001"/>
+  </joint>
+
+  <link name="arm_left_link">
+    <visual>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 1.57079632679"/>
+      <geometry>
+        <mesh filename="package://overworld/models/tutorials/Eve/eve_arm_left.obj"/>
+      </geometry>
+      <material name="White"/>
+    </visual>
+    <collision>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 1.57079632679"/>
+      <geometry>
+        <mesh filename="package://overworld/models/tutorials/Eve/eve_arm_left.obj"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="left_gripper_joint" type="fixed">
+    <origin xyz="0.0 -0.05 -0.42" rpy="0 0.0 0"/>
+    <parent link="arm_left_link"/>
+    <child link="left_gripper_frame"/>
+  </joint>
+
+  <link name="left_gripper_frame"/>
+
+  <joint name="arm_right_joint" type="revolute">
+    <origin xyz="0.0 -0.3 0.6" rpy="0.0 0.0 0.0"/>
+    <axis xyz="0.0 1.0 0.0"/>
+    <parent link="base_link"/>
+    <child link="arm_right_link"/>
+    <limit effort="1000.0" lower="-1.57079632679" upper="1.57079632679" velocity="0.5"/>
+    <dynamics damping="0.001"/>
+  </joint>
+
+  <link name="arm_right_link">
+    <visual>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 1.57079632679"/>
+      <geometry>
+        <mesh filename="package://overworld/models/tutorials/Eve/eve_arm_right.obj"/>
+      </geometry>
+      <material name="White"/>
+    </visual>
+    <collision>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 1.57079632679"/>
+      <geometry>
+        <mesh filename="package://overworld/models/tutorials/Eve/eve_arm_right.obj"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="right_gripper_joint" type="fixed">
+    <origin xyz="0.0 0.05 -0.42" rpy="0 0.0 0"/>
+    <parent link="arm_right_link"/>
+    <child link="right_gripper_frame"/>
+  </joint>
+
+  <link name="right_gripper_frame"/>
+
+</robot>

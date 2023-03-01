@@ -3,8 +3,8 @@
   <class type="owds::JointStatePerceptionModule" base_class_type="owds::PerceptionModuleBase_<owds::BodyPart>">
     <description>
       A robot perception module using robot joint state.
-      Possible parameters are: name, min_period,
-      right_hand, left_hand, and head.
+      Possible parameter is min_period (optional) and robot_name.
+      The the robot body parts are taken from the ontology.
     </description>
   </class>
 

@@ -122,7 +122,7 @@ void StaticObjectsPerceptionModule::addObject(const std::string& name,
     }
 
     Object obj(name);
-    Shape_t shape = PerceptionModuleBase_::getEntityShapeFromOntology(onto_, name);
+    Shape_t shape = ontology::getEntityShape(onto_, name);
     if(shape.type == SHAPE_MESH)
     {
         obj.setShape(shape);

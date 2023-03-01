@@ -15,6 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   genmsg
   message_generation
+  tf
   tf2
   tf2_ros
   tf2_eigen
@@ -123,11 +124,23 @@ target_link_libraries(Bullet3 INTERFACE
                       ${catkin_LIBRARIES}
                       Threads::Threads)
 
+add_library(${PROJECT_NAME}_utility_lib STATIC
+  src/Utility/YamlReader.cpp
+  src/Utility/Ontology.cpp
+  src/Utility/RosFiles.cpp
+  src/Utility/Wavefront.cpp
+)
+target_link_libraries(${PROJECT_NAME}_utility_lib PUBLIC
+                      ${catkin_LIBRARIES})
+set_target_properties(${PROJECT_NAME}_utility_lib PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
 add_library(${PROJECT_NAME}_bullet_lib STATIC
   src/Bullet/PhysicsServers.cpp
   src/Bullet/BulletClient.cpp
 )
-target_link_libraries(${PROJECT_NAME}_bullet_lib PUBLIC Bullet3)
+target_link_libraries(${PROJECT_NAME}_bullet_lib PUBLIC 
+                      Bullet3
+                      ${PROJECT_NAME}_utility_lib)
 set_target_properties(${PROJECT_NAME}_bullet_lib PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 add_library(${PROJECT_NAME}_types_lib STATIC
@@ -141,13 +154,6 @@ target_link_libraries(${PROJECT_NAME}_types_lib PUBLIC
                       ${catkin_LIBRARIES}
                       ${PROJECT_NAME}_bullet_lib)
 set_target_properties(${PROJECT_NAME}_types_lib PROPERTIES POSITION_INDEPENDENT_CODE ON)
-
-add_library(${PROJECT_NAME}_utility_lib STATIC
-  src/Utility/YamlReader.cpp
-)
-target_link_libraries(${PROJECT_NAME}_utility_lib PUBLIC
-                      ${catkin_LIBRARIES})
-set_target_properties(${PROJECT_NAME}_utility_lib PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 add_library(${PROJECT_NAME}_perception_lib STATIC
   src/Perception/Managers/AgentPerceptionManager.cpp
@@ -194,7 +200,6 @@ add_library(overworld_modules_plugin MODULE
   src/Perception/Modules/ObjectsModules/StaticObjectsPerceptionModule.cpp
   src/Perception/Modules/ObjectsModules/FakeObjectPerceptionModule.cpp
   src/Perception/Modules/RobotsModules/JointStatePerceptionModule.cpp
-  src/Perception/Modules/RobotsModules/FakeRobotPerceptionModule.cpp
   src/Perception/Modules/HumansModules/StampedPosePerceptionModule.cpp
   src/Perception/Modules/HumansModules/FakeHumanPerceptionModule.cpp
 )
@@ -228,6 +233,9 @@ add_executable(plugins src/Nodes/plugins.cpp)
 target_link_libraries(plugins ${catkin_LIBRARIES}
                       ${PROJECT_NAME}_bullet_lib)
 
+add_executable(teleop src/Nodes/teleop.cpp)
+target_link_libraries(teleop ${catkin_LIBRARIES})
+
 #################
 #  Test files   #
 #################
@@ -237,6 +245,7 @@ target_link_libraries(${PROJECT_NAME}_bullet_test PRIVATE
                       ${PROJECT_NAME}_bullet_lib
                       ${PROJECT_NAME}_types_lib
                       ${PROJECT_NAME}_perception_lib
+                      ${PROJECT_NAME}_utility_lib
                       ${catkin_LIBRARIES})
 
 add_executable(${PROJECT_NAME}_multi_server_test src/TestFiles/multi_server_test.cpp )

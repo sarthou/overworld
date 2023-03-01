@@ -7,26 +7,20 @@
 namespace owds {
 
 JointStatePerceptionModule::JointStatePerceptionModule(): PerceptionModuleRosBase("/joint_states"),
-                                            tf2_listener_(tf_buffer_),
-                                            base_link_("base_footprint")
+                                                          tf2_listener_(tf_buffer_),
+                                                          base_link_("base_footprint"),
+                                                          ontologies_manipulator_(nullptr),
+                                                          onto_(nullptr)
 {
-    min_period_ = 0.9;
+    min_period_ = 0.005;
 }
 
 void JointStatePerceptionModule::setParameter(const std::string& parameter_name, const std::string& parameter_value)
 {
-    if(parameter_name == "name")
-        robot_name_ = parameter_value;
-    else if(parameter_name == "min_period")
+    if(parameter_name == "min_period")
         min_period_ = std::stod(parameter_value);
-    else if(parameter_name == "right_hand")
-        right_hand_link_ = parameter_value;
-    else if(parameter_name == "left_hand")
-        left_hand_link_ = parameter_value;
-    else if(parameter_name == "head")
-        head_link_ = parameter_value;
-    else if(parameter_name == "base")
-        base_link_ = parameter_value;
+    else if(parameter_name == "robot_name")
+        robot_name_ = parameter_value;
     else
         ShellDisplay::warning("[JointStatePerceptionModule] Unkown parameter " + parameter_name);
 }
@@ -38,6 +32,23 @@ bool JointStatePerceptionModule::closeInitialization()
         ShellDisplay::error("[JointStatePerceptionModule] No robot name has been defined");
         return false;
     }
+
+    ontologies_manipulator_ = new OntologiesManipulator(n_);
+    ontologies_manipulator_->waitInit();
+    ontologies_manipulator_->add(robot_name_);
+    onto_ = ontologies_manipulator_->get(robot_name_);
+    onto_->close();
+
+    auto head_names = onto_->individuals.getOn(robot_name_, "hasHead");
+    auto left_hand_names = onto_->individuals.getOn(robot_name_, "hasLeftHand");
+    auto right_hand_names = onto_->individuals.getOn(robot_name_, "hasRightHand");
+    auto base_names = onto_->individuals.getOn(robot_name_, "hasBase");
+
+    if(head_names.size()) head_link_ = head_names.front();
+    if(left_hand_names.size()) left_hand_link_ = left_hand_names.front();
+    if(right_hand_names.size()) right_hand_link_ = right_hand_names.front();
+    if(base_names.size()) base_link_ = base_names.front();
+
     if(head_link_ == "")
     {
         ShellDisplay::error("[JointStatePerceptionModule] No head link has been defined");
@@ -143,9 +154,9 @@ void JointStatePerceptionModule::loadRobotModel()
 
     std::string urdf = n_->param<std::string>("/robot_description", "");
     if (urdf == "")
-	    robot_bullet_id_ = bullet_client_->loadURDF(robot_name_ + ".urdf", {0,0,0}, {0,0,0,1}, true);
+	    robot_bullet_id_ = bullet_client_->loadURDF(robot_name_ + ".urdf", {0,0,0}, {0,0,0,1}, true, URDF_USE_MATERIAL_COLORS_FROM_MTL);
     else
-        robot_bullet_id_ = bullet_client_->loadURDFRaw(urdf, robot_name_ + "_tmp.urdf", {0,0,0}, {0,0,0,1}, true);
+        robot_bullet_id_ = bullet_client_->loadURDFRaw(urdf, robot_name_ + "_tmp.urdf", {0,0,0}, {0,0,0,1}, true, URDF_USE_MATERIAL_COLORS_FROM_MTL);
 }
 
 } // namespace owds
