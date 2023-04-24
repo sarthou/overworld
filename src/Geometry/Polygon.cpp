@@ -18,7 +18,8 @@ int Polygon::isInside(const point_t& p, const std::vector<point_t>& vertex)
 
 std::vector<segement_t> Polygon::offsetingPolygon(double offset, const std::vector<point_t>& vertices)
 {
-	std::vector<segement_t > segements(vertices.size());
+	std::vector<segement_t > segments;
+  segments.reserve(vertices.size());
 	std::vector<point_t>::const_iterator it_next;
 
 	for (auto it_vect = vertices.begin(); it_vect < vertices.end(); ++it_vect)
@@ -93,23 +94,23 @@ std::vector<segement_t> Polygon::offsetingPolygon(double offset, const std::vect
 			c = c_tmp;
 		} // end m != 0
 
-		segements.emplace_back(a, m, c);
+		segments.emplace_back(a, m, c);
 	} // end for it_vect
-	return segements;
+	return segments;
 }
 
-void Polygon::extractVectrices(const std::vector<segement_t>& segements_out, const std::vector<segement_t>& segements_in,
+void Polygon::extractVectrices(const std::vector<segement_t>& segments_out, const std::vector<segement_t>& segments_in,
                                std::vector<point_t>& inner, std::vector<point_t>& outer,
                                const std::vector<point_t>& base)
 {
-	for (unsigned int i = 0, j = segements_out.size() - 1; i < segements_out.size(); j = i++)
+	for (unsigned int i = 0, j = segments_out.size() - 1; i < segments_out.size(); j = i++)
 	{
     //the order of the points is really important
     // do not change it !!
-		std::vector<point_t> scare = { getIntersect(segements_out[i], segements_out[j]),
-		                               getIntersect(segements_out[i], segements_in[j]),
-		                               getIntersect(segements_in[i], segements_in[j]),
-		                               getIntersect(segements_in[i], segements_out[j]) };
+		std::vector<point_t> scare = { getIntersect(segments_out[i], segments_out[j]),
+		                               getIntersect(segments_out[i], segments_in[j]),
+		                               getIntersect(segments_in[i], segments_in[j]),
+		                               getIntersect(segments_in[i], segments_out[j]) };
 
 		point_t in(0, 0);
 		point_t out(0, 0);

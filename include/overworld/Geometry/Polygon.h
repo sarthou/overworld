@@ -29,16 +29,16 @@ public:
 
   int isInside(const point_t& p, const std::vector<point_t>& vertex);
   std::vector<segement_t> offsetingPolygon(double offset, const std::vector<point_t>& vertices);
-  void extractVectrices(const std::vector<segement_t>& segements_out, const std::vector<segement_t>& segements_in,
+  void extractVectrices(const std::vector<segement_t>& segments_out, const std::vector<segement_t>& segments_in,
                         std::vector<point_t>& inner, std::vector<point_t>& outer,
                         const std::vector<point_t>& base);
 
   int isInside(const point_t& p) { return isInside(p, points); }
   std::vector<segement_t> offsetingPolygon(double offset) { return offsetingPolygon(offset, points); }
-  void extractVectrices(const std::vector<segement_t>& segements_out, const std::vector<segement_t>& segements_in,
+  void extractVectrices(const std::vector<segement_t>& segments_out, const std::vector<segement_t>& segments_in,
                         std::vector<point_t>& inner, std::vector<point_t>& outer)
   {
-    return extractVectrices(segements_out, segements_in, inner, outer, points);
+    extractVectrices(segments_out, segments_in, inner, outer, points);
   }
 
   std::vector<point_t> points;
