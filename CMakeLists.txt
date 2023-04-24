@@ -145,6 +145,7 @@ set_target_properties(${PROJECT_NAME}_bullet_lib PROPERTIES POSITION_INDEPENDENT
 
 add_library(${PROJECT_NAME}_types_lib STATIC
   src/Geometry/Pose.cpp
+  src/Geometry/Polygon.cpp
   src/BasicTypes/Entity.cpp
   src/BasicTypes/BodyPart.cpp
   src/BasicTypes/Object.cpp
