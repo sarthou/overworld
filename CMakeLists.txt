@@ -267,3 +267,7 @@ target_link_libraries(${PROJECT_NAME}_gravity_test PRIVATE
                       ${PROJECT_NAME}_bullet_lib
                       ${catkin_LIBRARIES})
 add_dependencies(${PROJECT_NAME}_gravity_test overworld_gencpp)
+
+add_executable(${PROJECT_NAME}_area_test src/TestFiles/area.cpp )
+target_link_libraries(${PROJECT_NAME}_area_test PRIVATE
+                      ${PROJECT_NAME}_types_lib)
