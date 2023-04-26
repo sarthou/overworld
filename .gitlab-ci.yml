@@ -11,7 +11,7 @@
   - pip3 install requests --user
 
 .install_bullet_template : &install_bullet
-  before_script:
+  script:
     - mkdir -p ~/dependencies && cd ~/dependencies
     - git clone https://github.com/bulletphysics/bullet3.git
     - cd bullet3
@@ -24,13 +24,13 @@
     - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$BULLET_INSTALL_PATH/lib
 
 .create_ws_template : &create_ws
-  before_script:
+  script:
     - mkdir -p ~/ros_ws/src
     - cd ~/ros_ws
     - catkin_make -DCMAKE_BUILD_TYPE=Release
 
 .clone_modules_template : &clone_modules
-  before_script:
+  script:
     - cd ~/ros_ws/src
     - mkdir overworld_modules && cd overworld_modules
     - git clone https://github.com/sarthou/artrack_perception_module.git
@@ -38,13 +38,13 @@
     - git clone https://github.com/sarthou/pr2_gripper_perception_module.git
 
 .clone_deps_melodic_template : &clone_deps_melodic
-  before_script:
+  script:
     - cd ~/ros_ws/src
     - git clone https://github.com/RIS-WITH/optitrack_msgs.git
     - git clone https://github.com/sarthou/ar_track_alvar.git
 
 .clone_deps_noetic_template : &clone_deps_noetic
-  before_script:
+  script:
     - cd ~/ros_ws/src
     - git clone https://github.com/RIS-WITH/optitrack_msgs.git
     - git clone -b noetic-devel https://github.com/sarthou/ar_track_alvar.git
@@ -79,7 +79,7 @@ run-build-noetic:
 
 run-build-modules-melodic:
   image: ros:melodic-perception-bionic
-  stage: build
+  stage: build_modules
   <<: *melodic_before_definition
   <<: *install_bullet
   <<: *create_ws
@@ -89,7 +89,7 @@ run-build-modules-melodic:
 
 run-build-modules-noetic:
   image: ros:noetic-perception-focal
-  stage: build
+  stage: build_modules
   <<: *noetic_before_definition
   <<: *install_bullet
   <<: *create_ws
