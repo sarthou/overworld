@@ -194,7 +194,9 @@ public:
                           const std::array<double, 3>& color_rgb,
                           double line_width = 1,
                           double life_time = 0,
-                          int replace_id = -1);
+                          int replace_id = -1,
+                          int parent_object_id = -1,
+                          int parent_link_index = -1);
 
     long addUserDebugText(const std::string& text,
                           const std::array<double, 3>& position,
