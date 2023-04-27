@@ -68,6 +68,7 @@ add_message_files(
   EntityPose.msg
   EntitiesPoses.msg
   AgentPose.msg
+  Pose.msg
 )
 
 add_service_files(

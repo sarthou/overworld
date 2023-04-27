@@ -7,8 +7,9 @@
 
 #include <ros/ros.h>
 #include <geometry_msgs/Twist.h>
-#include <turtlesim/Pose.h>
 #include <tf/transform_broadcaster.h>
+
+#include "overworld/Pose.h"
 
 #define KEYCODE_A 0x61
 #define KEYCODE_D 0x64
@@ -50,7 +51,7 @@ private:
   double yaw_rate_;
   double yaw_rate_run_;
   geometry_msgs::Twist cmd_;
-  turtlesim::Pose pose_;
+  overworld::Pose pose_;
   double z_;
 
   ros::NodeHandle n_;
