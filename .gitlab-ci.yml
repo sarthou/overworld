@@ -48,7 +48,6 @@
   cd ~/ros_ws/src
   cp -r /builds/$GITLAB_USER_LOGIN/overworld .
   git clone -b dev https://github.com/sarthou/ontologenius.git
-  git clone https://github.com/ros/ros_tutorials.git
   cd ..
   catkin_make -DCMAKE_BUILD_TYPE=Release
 
@@ -77,6 +76,10 @@ run-build-noetic:
 run-build-modules-melodic:
   image: ros:melodic-perception-bionic
   stage: build_modules
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev"'
+      when: always
+    - when: never
   <<: *melodic_before_definition
   script:
     - *install_bullet
@@ -88,6 +91,10 @@ run-build-modules-melodic:
 run-build-modules-noetic:
   image: ros:noetic-perception-focal
   stage: build_modules
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev"'
+      when: always
+    - when: never
   <<: *noetic_before_definition
   script:
     - *install_bullet
