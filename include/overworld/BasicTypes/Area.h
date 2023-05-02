@@ -14,9 +14,13 @@ class Area
 {
 public:
   Area(const std::string& id, const Pose& center, double radius, double half_height);
-  Area(const std::string& id, const Pose& center, const Polygon& polygon, double z_min, double height);
+  Area(const std::string& id, const Polygon& polygon, double z_min, double height);
 
   void setHysteresis(double hysteresis);
+  void setOwner(Entity* owner) { owner_ = owner; }
+
+  bool isStatic() { return (owner_ != nullptr); }
+  bool isEmpty();
 
   bool isInside(Entity* entity);
   bool setOut(Entity* entity);
@@ -24,6 +28,7 @@ public:
 private:
   std::string id_;
   Pose center_;
+  Entity* owner_;
   bool is_circle_;
 
   double radius_;

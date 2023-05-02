@@ -4,6 +4,7 @@ namespace owds {
 
 Area::Area(const std::string& id, const Pose& center, double radius, double half_height) : id_(id),
                                                                                            center_(center),
+                                                                                           owner_(nullptr),
                                                                                            is_circle_(true),
                                                                                            polygon_({}),
                                                                                            radius_(radius),
@@ -12,9 +13,9 @@ Area::Area(const std::string& id, const Pose& center, double radius, double half
 
 {}
 
-Area::Area(const std::string& id, const Pose& center, const Polygon& polygon,
+Area::Area(const std::string& id, const Polygon& polygon,
                                   double z_min, double height) : id_(id),
-                                                                 center_(center),
+                                                                 owner_(nullptr),
                                                                  is_circle_(false),
                                                                  polygon_(polygon),
                                                                  z_min_(z_min),
@@ -25,6 +26,14 @@ Area::Area(const std::string& id, const Pose& center, const Polygon& polygon,
 void Area::setHysteresis(double hysteresis)
 {
   hysteresis_distance_ = hysteresis + 0.0001;
+}
+
+bool Area::isEmpty()
+{
+  size_t nb_entity = leaving_entities_.size() +
+                     inside_entities_.size();
+
+  return (nb_entity == 0);
 }
 
 bool Area::isInside(Entity* entity)
@@ -49,6 +58,15 @@ bool Area::isInCircle(Entity* entity)
 {
   Pose entity_pose = entity->pose();
   Pose circle_pose = center_;
+  if(owner_ != nullptr)
+  {
+    if(owner_->isLocated() == false)
+    {
+      setOut(entity);
+      return false;
+    }
+    circle_pose = owner_->pose() * center_;
+  }
 
   double up_limit = circle_pose.getZ() + half_height_;
   double down_limit = circle_pose.getZ() - half_height_;
@@ -80,9 +98,23 @@ bool Area::isInCircle(Entity* entity)
 bool Area::isInPolygon(Entity* entity)
 {
   Pose entity_pose = entity->pose();
+  Pose polygon_pose = center_;
+  if(owner_ != nullptr)
+  {
+    if(owner_->isLocated() == false)
+    {
+      setOut(entity);
+      return false;
+    }
+    polygon_pose = owner_->pose();
+    polygon_.transformIn(owner_->pose());
+  }
 
-  if((entity_pose.getZ() > z_max_) ||
-     (entity_pose.getZ() < z_min_))
+  double up_limit = polygon_pose.getZ() + z_max_;
+  double down_limit = polygon_pose.getZ() + z_min_;
+
+  if((entity_pose.getZ() > up_limit) ||
+     (entity_pose.getZ() < down_limit))
   {
     setOut(entity);
     return false;
