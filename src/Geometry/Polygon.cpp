@@ -4,6 +4,21 @@
 
 namespace owds {
 
+void Polygon::transformIn(const Pose& pose)
+{
+  points.clear();
+  points.reserve(base_points_.size());
+  for(auto& point : base_points_)
+  {
+    double sin_angle = std::sin(pose.getYaw());
+    double cos_angle = std::cos(pose.getYaw());
+
+    double x_new = point.x * cos_angle - point.y * sin_angle;
+    double y_new = point.x * sin_angle + point.y * cos_angle;
+    points.emplace_back(x_new + pose.getX(), y_new + pose.getY());
+  }
+}
+
 int Polygon::isInside(const point_t& p, const std::vector<point_t>& vertex)
 {
 	int cross = 0;

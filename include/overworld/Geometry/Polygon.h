@@ -2,6 +2,7 @@
 #define OWDS_POLYGON_H
 
 #include <vector>
+#include "overworld/Geometry/Pose.h"
 
 namespace owds {
 
@@ -25,7 +26,9 @@ struct segement_t
 class Polygon
 {
 public:
-  explicit Polygon(const std::vector<point_t>& poly_points) : points(poly_points) {}
+  explicit Polygon(const std::vector<point_t>& poly_points) : points(poly_points), base_points_(poly_points) {}
+
+  void transformIn(const Pose& pose);
 
   int isInside(const point_t& p, const std::vector<point_t>& vertex);
   std::vector<segement_t> offsetingPolygon(double offset, const std::vector<point_t>& vertices);
@@ -46,6 +49,8 @@ public:
 private:
   point_t getIntersect(const segement_t& seg1, const segement_t& seg2);
   void getInOutPoints(const std::vector<point_t>& scare, const std::vector<point_t>& base, point_t& in, point_t& out);
+
+  std::vector<point_t> base_points_;
 };
 
 } // namespace owds
