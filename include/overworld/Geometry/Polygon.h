@@ -51,6 +51,7 @@ private:
   void getInOutPoints(const std::vector<point_t>& scare, const std::vector<point_t>& base, point_t& in, point_t& out);
 
   std::vector<point_t> base_points_;
+  Pose last_transform_pose_;
 };
 
 } // namespace owds

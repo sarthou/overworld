@@ -6,13 +6,18 @@ namespace owds {
 
 void Polygon::transformIn(const Pose& pose)
 {
+	if(last_transform_pose_ == pose)
+		return;
+
+	last_transform_pose_ = pose;
   points.clear();
   points.reserve(base_points_.size());
+
+	double sin_angle = std::sin(pose.getYaw());
+	double cos_angle = std::cos(pose.getYaw());
+
   for(auto& point : base_points_)
   {
-    double sin_angle = std::sin(pose.getYaw());
-    double cos_angle = std::cos(pose.getYaw());
-
     double x_new = point.x * cos_angle - point.y * sin_angle;
     double y_new = point.x * sin_angle + point.y * cos_angle;
     points.emplace_back(x_new + pose.getX(), y_new + pose.getY());
