@@ -26,6 +26,8 @@ public:
   std::string getActivatedModulesListStr() const;
   void deleteModules();
 
+  bool shouldRun();
+
   std::map<std::string, PerceptionModuleBase_<T>* > perception_modules_;
 };
 
@@ -105,6 +107,12 @@ void BasePerceptionManager<T>::deleteModules()
         delete module.second;
     }
     perception_modules_.clear();
+}
+
+template<typename T>
+bool BasePerceptionManager<T>::shouldRun()
+{
+  return std::any_of(perception_modules_.begin(), perception_modules_.end(), [](const auto& it){return it.second->isActivated() && it.second->hasBeenUpdated();});
 }
 
 } // namespace owds

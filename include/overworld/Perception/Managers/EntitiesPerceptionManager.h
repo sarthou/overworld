@@ -44,7 +44,6 @@ protected:
     OntologiesManipulator ontos_;
     OntologyManipulator* onto_;
 
-    bool shouldRun();
     virtual void getPercepts( std::map<std::string, T>& percepts);
     virtual void reasoningOnUpdate() {}
 
@@ -81,12 +80,6 @@ void EntitiesPerceptionManager<T>::setOwnerAgentName(const std::string& agent_na
 }
 
 template<typename T>
-bool EntitiesPerceptionManager<T>::shouldRun()
-{
-    return std::any_of(this->perception_modules_.begin(), this->perception_modules_.end(), [](const auto& it){return it.second->isActivated() && it.second->hasBeenUpdated();});
-}
-
-template<typename T>
 void EntitiesPerceptionManager<T>::getPercepts( std::map<std::string, T>& percepts)
 {
     // This implementation only has test purposes
@@ -107,7 +100,7 @@ void EntitiesPerceptionManager<T>::getPercepts( std::map<std::string, T>& percep
 template<typename T>
 bool EntitiesPerceptionManager<T>::update()
 {
-    if(!shouldRun())
+    if(!this->shouldRun())
         return false;
 
     for(auto& entity : entities_)
