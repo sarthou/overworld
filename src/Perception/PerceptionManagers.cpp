@@ -1,4 +1,4 @@
-#include "overworld/Perception/PerceptionManager.h"
+#include "overworld/Perception/PerceptionManagers.h"
 
 #include <pluginlib/class_loader.h>
 
@@ -6,7 +6,7 @@
 
 namespace owds {
 
-PerceptionManager::PerceptionManager(ros::NodeHandle* n, BulletClient* bullet_client) : robots_manager_(n),
+PerceptionManagers::PerceptionManagers(ros::NodeHandle* n, BulletClient* bullet_client) : robots_manager_(n),
                                                                                         objects_manager_(n),
                                                                                         humans_manager_(n),
                                                                                         n_(n),
@@ -15,21 +15,21 @@ PerceptionManager::PerceptionManager(ros::NodeHandle* n, BulletClient* bullet_cl
                                                                                         robot_agent_(nullptr)
 {}
 
-PerceptionManager::~PerceptionManager()
+PerceptionManagers::~PerceptionManagers()
 {
     robots_manager_.deleteModules();
     objects_manager_.deleteModules();
     humans_manager_.deleteModules();
 }
 
-void PerceptionManager::update()
+void PerceptionManagers::update()
 {
     robots_manager_.update();
     objects_manager_.update();
     humans_manager_.update();
 }
 
-bool PerceptionManager::applyConfigurationRobot(const std::string& config_path)
+bool PerceptionManagers::applyConfigurationRobot(const std::string& config_path)
 {
     YamlElement modules_list;
     if(applyConfiguration(config_path, modules_list) == false)
@@ -83,7 +83,7 @@ bool PerceptionManager::applyConfigurationRobot(const std::string& config_path)
     return true;
 }
 
-bool PerceptionManager::applyConfigurationHuman(const std::string& config_path)
+bool PerceptionManagers::applyConfigurationHuman(const std::string& config_path)
 {
     YamlElement modules_list;
     if(applyConfiguration(config_path, modules_list, false) == false)
@@ -115,7 +115,7 @@ bool PerceptionManager::applyConfigurationHuman(const std::string& config_path)
     return true;
 }
 
-bool PerceptionManager::applyConfiguration(const std::string& config_path, YamlElement& modules_list, bool display)
+bool PerceptionManagers::applyConfiguration(const std::string& config_path, YamlElement& modules_list, bool display)
 {
     if(configuration_.read(config_path) == false)
     {

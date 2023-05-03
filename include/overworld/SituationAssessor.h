@@ -9,7 +9,7 @@
 
 #include "overworld/Bullet/PhysicsServers.h"
 
-#include "overworld/Perception/PerceptionManager.h"
+#include "overworld/Perception/PerceptionManagers.h"
 
 #include "overworld/Senders/ROSSender.h"
 #include "overworld/Senders/PoseSender.h"
@@ -76,7 +76,7 @@ private:
   double simu_step_;
 
   BulletClient* bullet_client_;
-  PerceptionManager perception_manager_;
+  PerceptionManagers perception_manager_;
 
   FactsCalculator facts_calculator_;
   OntologeniusFactsPublisher facts_publisher_;

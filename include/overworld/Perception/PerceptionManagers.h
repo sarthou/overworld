@@ -9,11 +9,11 @@
 
 namespace owds {
 
-class PerceptionManager
+class PerceptionManagers
 {
 public:
-    explicit PerceptionManager(ros::NodeHandle* n, BulletClient* bullet_client = nullptr);
-    ~PerceptionManager();
+    explicit PerceptionManagers(ros::NodeHandle* n, BulletClient* bullet_client = nullptr);
+    ~PerceptionManagers();
 
     RobotsPerceptionManager robots_manager_;
     ObjectsPerceptionManager objects_manager_;
