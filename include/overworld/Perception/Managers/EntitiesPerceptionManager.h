@@ -7,16 +7,18 @@
 
 #include "overworld/BasicTypes/Entity.h"
 #include "overworld/Bullet/BulletClient.h"
-#include "overworld/Perception/Modules/PerceptionModuleBase.h"
+#include "overworld/Perception/Managers/BasePerceptionManager.h"
 
 #include "overworld/Utility/ShellDisplay.h"
+#include "overworld/Utility/Wavefront.h"
+#include "overworld/Utility/RosFiles.h"
 
 #include <ontologenius/OntologiesManipulator.h>
 
 namespace owds {
 
 template<typename T>
-class EntitiesPerceptionManager
+class EntitiesPerceptionManager : public BasePerceptionManager<T>
 {
     static_assert(std::is_base_of<Entity,T>::value, "T must be derived from Entity");
 public:
@@ -29,13 +31,6 @@ public:
     void setOwnerAgentName(const std::string& agent_name);
     void setBulletClient(BulletClient* client) { bullet_client_ = client; }
 
-    void addPerceptionModule(const std::string& module_name, PerceptionModuleBase_<T>* perception_module);
-    PerceptionModuleBase_<T>* getPerceptionModule(const std::string& module_name) const;
-    std::vector<std::string> getModulesList() const;
-    std::vector<std::string> getActivatedModulesList() const;
-    std::string getModulesListStr() const;
-    std::string getActivatedModulesListStr() const;
-    void deleteModules();
     const std::map<std::string, T*>& getEntities() const { return entities_; }
 
     bool update();
@@ -43,7 +38,6 @@ public:
 protected:
     std::map<std::string, T*> entities_;
     std::unordered_set<std::string> black_listed_entities_;
-    std::map<std::string, PerceptionModuleBase_<T>* > perception_modules_;
     BulletClient* bullet_client_;
 
     std::string myself_agent_name_;
@@ -87,87 +81,9 @@ void EntitiesPerceptionManager<T>::setOwnerAgentName(const std::string& agent_na
 }
 
 template<typename T>
-void EntitiesPerceptionManager<T>::addPerceptionModule(const std::string& module_name, PerceptionModuleBase_<T>* perception_module)
-{
-    if(perception_modules_.find(module_name) == perception_modules_.end())
-        perception_modules_[module_name] = perception_module;
-    else
-        ShellDisplay::error("A perception module named " + module_name + " is already registered");
-}
-
-template<typename T>
-PerceptionModuleBase_<T>* EntitiesPerceptionManager<T>::getPerceptionModule(const std::string& module_name) const
-{
-    if(perception_modules_.find(module_name) != perception_modules_.end())
-        return perception_modules_.at(module_name);
-    else
-        return nullptr;
-}
-
-template<typename T>
-std::vector<std::string> EntitiesPerceptionManager<T>::getModulesList() const
-{
-    std::vector<std::string> modules_name;
-    std::transform(perception_modules_.cbegin(), perception_modules_.cend(), std::back_inserter(modules_name), [](const auto& it){return it.first;});
-    return modules_name;
-}
-
-template<typename T>
-std::vector<std::string> EntitiesPerceptionManager<T>::getActivatedModulesList() const
-{
-    std::vector<std::string> modules_name;
-    for(const auto& module : perception_modules_)
-    {
-        if(module.second->isActivated())
-            modules_name.push_back(module.first);
-    }
-    return modules_name;
-}
-
-template<typename T>
-std::string EntitiesPerceptionManager<T>::getModulesListStr() const
-{
-    std::string modules_name;
-    for(const auto& module : perception_modules_)
-    {
-        if(modules_name != "")
-            modules_name += ", ";
-        modules_name += module.first;
-    }
-    return modules_name;
-}
-
-template<typename T>
-std::string EntitiesPerceptionManager<T>::getActivatedModulesListStr() const
-{
-    std::string modules_name;
-    for(const auto& module : perception_modules_)
-    {
-        if(module.second->isActivated())
-        {
-            if(modules_name != "")
-                modules_name += ", ";
-            modules_name += module.first;
-        }
-    }
-    return modules_name;
-}
-
-template<typename T>
-void EntitiesPerceptionManager<T>::deleteModules()
-{
-    for(const auto& module : perception_modules_)
-    {
-        module.second->activate(false);
-        delete module.second;
-    }
-    perception_modules_.clear();
-}
-
-template<typename T>
 bool EntitiesPerceptionManager<T>::shouldRun()
 {
-    return std::any_of(perception_modules_.begin(), perception_modules_.end(), [](const auto& it){return it.second->isActivated() && it.second->hasBeenUpdated();});
+    return std::any_of(this->perception_modules_.begin(), this->perception_modules_.end(), [](const auto& it){return it.second->isActivated() && it.second->hasBeenUpdated();});
 }
 
 template<typename T>
@@ -197,7 +113,7 @@ bool EntitiesPerceptionManager<T>::update()
     for(auto& entity : entities_)
         entity.second->setUnseen();
 
-    for(const auto& module : perception_modules_)
+    for(const auto& module : this->perception_modules_)
         if(module.second->isActivated() && module.second->hasBeenUpdated())
             module.second->accessPercepts([this](std::map<std::string, T>& percepts){ this->getPercepts(percepts); });
 
