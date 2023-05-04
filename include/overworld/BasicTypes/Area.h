@@ -16,6 +16,11 @@ public:
   Area(const std::string& id, const Pose& center, double radius, double half_height);
   Area(const std::string& id, const Polygon& polygon, double z_min, double height);
 
+  const std::string& id() const { return id_; }
+
+  const std::unordered_set<int>& getBulletIds() { return bullet_ids_; }
+  void setBulletIds(const std::unordered_set<int>& bullet_ids) { bullet_ids_ = bullet_ids; }
+
   void setHysteresis(double hysteresis);
   void setOwner(Entity* owner) { owner_ = owner; }
 
@@ -42,6 +47,8 @@ private:
   std::unordered_set<Entity*> upcoming_entities_;
   std::unordered_set<Entity*> inside_entities_;
   std::unordered_set<Entity*> leaving_entities_;
+
+  std::unordered_set<int> bullet_ids_;
 
   bool isInCircle(Entity* entity);
   bool isInPolygon(Entity* entity);

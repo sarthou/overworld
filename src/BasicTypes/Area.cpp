@@ -26,6 +26,8 @@ Area::Area(const std::string& id, const Polygon& polygon,
 void Area::setHysteresis(double hysteresis)
 {
   hysteresis_distance_ = hysteresis + 0.0001;
+  if(is_circle_ == false)
+    polygon_.setHysteresis(hysteresis_distance_);
 }
 
 bool Area::isEmpty()
