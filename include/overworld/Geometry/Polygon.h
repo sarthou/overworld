@@ -26,7 +26,9 @@ struct segement_t
 class Polygon
 {
 public:
-  explicit Polygon(const std::vector<point_t>& poly_points, double hysteresis = 0);
+  explicit Polygon(const std::vector<point_t>& poly_points, double hysteresis = 0.0001);
+
+  void setHysteresis(double hysteresis);
 
   void transformIn(const Pose& pose);
 

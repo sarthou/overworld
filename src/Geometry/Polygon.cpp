@@ -11,6 +11,12 @@ Polygon::Polygon(const std::vector<point_t>& poly_points, double hysteresis) : p
 	computeInOutPolygons();
 }
 
+void Polygon::setHysteresis(double hysteresis)
+{
+	hysteresis_ = hysteresis;
+	computeInOutPolygons();
+}
+
 void Polygon::transformIn(const Pose& pose)
 {
 	if(last_transform_pose_ == pose)
