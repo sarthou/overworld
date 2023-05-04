@@ -120,26 +120,16 @@ bool Area::isInPolygon(Entity* entity)
     return false;
   }
 
-  //create the inner and outer segments for each segments of the base polygon
-  // /!\ At this point we can say if segments are really inside or ouside the base polygon
-  std::vector<segement_t> inner_segments = polygon_.offsetingPolygon(hysteresis_distance_);
-	std::vector<segement_t> outer_segments = polygon_.offsetingPolygon(-hysteresis_distance_);
-
-  // The vectrice extraction will detect witch is inside and witch is outside the base polygon
-	std::vector<point_t> enter_poly;
-	std::vector<point_t> leave_poly;
-	polygon_.extractVectrices(outer_segments, inner_segments, enter_poly, leave_poly);
-
   point_t entity_point(entity_pose.getX(), entity_pose.getY());
 
-  if(polygon_.isInside(entity_point, leave_poly) == false)
+  if(polygon_.isInsideOuter(entity_point) == false)
   {
     setOut(entity);
     return false;
   }
   else if(polygon_.isInside(entity_point) == false)
     return entityInLeaving(entity);
-  else if(polygon_.isInside(entity_point, enter_poly) == true)
+  else if(polygon_.isInsideInner(entity_point) == true)
     return entityInUpcoming(entity);
   else
     return entityInArea(entity);

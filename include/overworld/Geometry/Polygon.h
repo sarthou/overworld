@@ -26,7 +26,7 @@ struct segement_t
 class Polygon
 {
 public:
-  explicit Polygon(const std::vector<point_t>& poly_points) : points(poly_points), base_points_(poly_points) {}
+  explicit Polygon(const std::vector<point_t>& poly_points, double hysteresis = 0);
 
   void transformIn(const Pose& pose);
 
@@ -37,6 +37,8 @@ public:
                         const std::vector<point_t>& base);
 
   int isInside(const point_t& p) { return isInside(p, points); }
+  int isInsideInner(const point_t& p) { return isInside(p, inner_points); }
+  int isInsideOuter(const point_t& p) { return isInside(p, outer_points); }
   std::vector<segement_t> offsetingPolygon(double offset) { return offsetingPolygon(offset, points); }
   void extractVectrices(const std::vector<segement_t>& segments_out, const std::vector<segement_t>& segments_in,
                         std::vector<point_t>& inner, std::vector<point_t>& outer)
@@ -44,14 +46,19 @@ public:
     extractVectrices(segments_out, segments_in, inner, outer, points);
   }
 
+  std::vector<point_t> inner_points;
   std::vector<point_t> points;
+  std::vector<point_t> outer_points;
   
 private:
   point_t getIntersect(const segement_t& seg1, const segement_t& seg2);
   void getInOutPoints(const std::vector<point_t>& scare, const std::vector<point_t>& base, point_t& in, point_t& out);
 
+  void computeInOutPolygons();
+
   std::vector<point_t> base_points_;
   Pose last_transform_pose_;
+  double hysteresis_;
 };
 
 } // namespace owds

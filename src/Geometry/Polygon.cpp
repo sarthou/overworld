@@ -4,6 +4,13 @@
 
 namespace owds {
 
+Polygon::Polygon(const std::vector<point_t>& poly_points, double hysteresis) : points(poly_points),
+																																							 base_points_(poly_points),
+																																							 hysteresis_(hysteresis)
+{
+	computeInOutPolygons();
+}
+
 void Polygon::transformIn(const Pose& pose)
 {
 	if(last_transform_pose_ == pose)
@@ -22,6 +29,8 @@ void Polygon::transformIn(const Pose& pose)
     double y_new = point.x * sin_angle + point.y * cos_angle;
     points.emplace_back(x_new + pose.getX(), y_new + pose.getY());
   }
+
+	computeInOutPolygons();
 }
 
 int Polygon::isInside(const point_t& p, const std::vector<point_t>& vertex)
@@ -189,6 +198,17 @@ void Polygon::getInOutPoints(const std::vector<point_t>& scare, const std::vecto
 		out = scare[out_points[0]];
 		in = scare[(out_points[0] + 2) % 4];
 	}
+}
+
+void Polygon::computeInOutPolygons()
+{
+	//create the inner and outer segments for each segments of the base polygon
+  // /!\ At this point we can say if segments are really inside or ouside the base polygon
+  std::vector<segement_t> inner_segments = offsetingPolygon(hysteresis_);
+	std::vector<segement_t> outer_segments = offsetingPolygon(-hysteresis_);
+
+  // The vectrice extraction will detect witch is inside and witch is outside the base polygon
+	extractVectrices(outer_segments, inner_segments, inner_points, outer_points);
 }
 
 } // namespace owds
