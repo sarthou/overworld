@@ -31,6 +31,7 @@ struct HumanAssessor_t
   PerceptionModuleBase<Object, std::vector<Object*>>* objects_module;
   PerceptionModuleBase<BodyPart, std::vector<BodyPart*>>* humans_module;
   PerceptionModuleBase<BodyPart, std::vector<BodyPart*>>* robots_module;
+  PerceptionModuleBase<BodyPart, std::vector<Area*>>* areas_module;
 
   HumanAssessor_t()
   {
@@ -38,6 +39,7 @@ struct HumanAssessor_t
     objects_module = nullptr;
     humans_module = nullptr;
     robots_module = nullptr;
+    areas_module = nullptr;
   }
 };
 
@@ -57,6 +59,7 @@ public:
   void addObjectPerceptionModule(const std::string& module_name, PerceptionModuleBase_<Object>* module);
   void addHumanPerceptionModule(const std::string& module_name, PerceptionModuleBase_<BodyPart>* module);
   void addRobotPerceptionModule(const std::string& module_name, PerceptionModuleBase_<BodyPart>* module);
+  void addAreaPerceptionModule(const std::string& module_name, PerceptionModuleBase_<Area>* module);
   
 private:
   std::string agent_name_;
@@ -100,15 +103,15 @@ private:
   bool stopModules(overworld::StartStopModules::Request &req, overworld::StartStopModules::Response &res);
   bool startModules(overworld::StartStopModules::Request &req, overworld::StartStopModules::Response &res);
   template<typename T>
-  bool startModule(EntitiesPerceptionManager<T>& manager, const std::string& module_name, int& status);
+  bool startModule(BasePerceptionManager<T>& manager, const std::string& module_name, int& status);
   template<typename T>
-  bool stopModule(EntitiesPerceptionManager<T>& manager, const std::string& module_name, int& status);
+  bool stopModule(BasePerceptionManager<T>& manager, const std::string& module_name, int& status);
   bool getBoundingBox(overworld::BoundingBox::Request &req, overworld::BoundingBox::Response &res);
 
 };
 
 template<typename T>
-bool SituationAssessor::startModule(EntitiesPerceptionManager<T>& manager, const std::string& module_name, int& status)
+bool SituationAssessor::startModule(BasePerceptionManager<T>& manager, const std::string& module_name, int& status)
 {
   PerceptionModuleBase_<T>* perception_module = manager.getPerceptionModule(module_name);
   if (perception_module != nullptr)
@@ -126,7 +129,7 @@ bool SituationAssessor::startModule(EntitiesPerceptionManager<T>& manager, const
 }
 
 template<typename T>
-bool SituationAssessor::stopModule(EntitiesPerceptionManager<T>& manager, const std::string& module_name, int& status)
+bool SituationAssessor::stopModule(BasePerceptionManager<T>& manager, const std::string& module_name, int& status)
 {
   PerceptionModuleBase_<T>* perception_module = manager.getPerceptionModule(module_name);
   if (perception_module != nullptr)

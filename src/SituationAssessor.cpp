@@ -141,6 +141,11 @@ void SituationAssessor::addRobotPerceptionModule(const std::string& module_name,
   perception_manager_.robots_manager_.addPerceptionModule(module_name, module);
 }
 
+void SituationAssessor::addAreaPerceptionModule(const std::string& module_name, PerceptionModuleBase_<Area>* module)
+{
+  perception_manager_.areas_manager_.addPerceptionModule(module_name, module);
+}
+
 void SituationAssessor::assessmentLoop()
 {
   std::chrono::milliseconds interval(int(time_step_ * 1000));
@@ -319,6 +324,8 @@ bool SituationAssessor::startModules(overworld::StartStopModules::Request &req, 
       continue;
     if (startModule(perception_manager_.humans_manager_, module_name, res.statuses[i]))
       continue;
+    if (startModule(perception_manager_.areas_manager_, module_name, res.statuses[i]))
+      continue;
     res.statuses[i] = overworld::StartStopModules::Response::MODULE_NOT_FOUND;
   }
   return true;
@@ -335,6 +342,8 @@ bool SituationAssessor::stopModules(overworld::StartStopModules::Request &req, o
     if (stopModule(perception_manager_.robots_manager_, module_name, res.statuses[i]))
       continue;
     if (stopModule(perception_manager_.humans_manager_, module_name, res.statuses[i]))
+      continue;
+    if (stopModule(perception_manager_.areas_manager_, module_name, res.statuses[i]))
       continue;
     res.statuses[i] = overworld::StartStopModules::Response::MODULE_NOT_FOUND;
   }
