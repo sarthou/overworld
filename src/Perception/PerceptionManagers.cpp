@@ -6,17 +6,19 @@
 
 namespace owds {
 
-PerceptionManagers::PerceptionManagers(ros::NodeHandle* n, BulletClient* bullet_client) : robots_manager_(n),
-                                                                                        objects_manager_(n),
-                                                                                        humans_manager_(n),
-                                                                                        n_(n),
-                                                                                        bullet_client_(bullet_client),
-                                                                                        robot_bullet_id_(-1),
-                                                                                        robot_agent_(nullptr)
+PerceptionManagers::PerceptionManagers(ros::NodeHandle* n, BulletClient* bullet_client) : areas_manager_(n),
+                                                                                          robots_manager_(n),
+                                                                                          objects_manager_(n),
+                                                                                          humans_manager_(n),
+                                                                                          n_(n),
+                                                                                          bullet_client_(bullet_client),
+                                                                                          robot_bullet_id_(-1),
+                                                                                          robot_agent_(nullptr)
 {}
 
 PerceptionManagers::~PerceptionManagers()
 {
+    areas_manager_.deleteModules();
     robots_manager_.deleteModules();
     objects_manager_.deleteModules();
     humans_manager_.deleteModules();
@@ -27,6 +29,7 @@ void PerceptionManagers::update()
     robots_manager_.update();
     objects_manager_.update();
     humans_manager_.update();
+    areas_manager_.update();
 }
 
 bool PerceptionManagers::applyConfigurationRobot(const std::string& config_path)
@@ -37,6 +40,7 @@ bool PerceptionManagers::applyConfigurationRobot(const std::string& config_path)
 
     auto humans_modules = modules_list["humans"].getElementsKeys();
     auto objects_modules = modules_list["objects"].getElementsKeys();
+    auto areas_modules = modules_list["areas"].getElementsKeys();
 
     // Load humans perception modules
 
@@ -77,6 +81,27 @@ bool PerceptionManagers::applyConfigurationRobot(const std::string& config_path)
                 return false;
 
             objects_manager_.addPerceptionModule(object_module_name, object_perception_module);
+        }
+    }
+
+    // Load areas perception modules
+
+    pluginlib::ClassLoader<PerceptionModuleBase_<Area>> areas_loader("overworld", "owds::PerceptionModuleBase_<owds::Area>");
+
+    for(auto& area_module : areas_modules)
+    {
+        for(auto& area_module_name : modules_list["areas"][area_module].value())
+        {
+            auto area_perception_module = areas_loader.createUnmanagedInstance("owds::" + area_module);
+            YamlElement module_config = configuration_[area_module_name];
+            area_perception_module->initialize(area_module_name, n_, bullet_client_, robot_bullet_id_, robot_agent_);
+            for(auto& param_name : module_config.getElementsKeys())
+                area_perception_module->setParameter(param_name, module_config[param_name].value().front());
+
+            if(area_perception_module->closeInitialization() == false)
+                return false;
+
+            areas_manager_.addPerceptionModule(area_module_name, area_perception_module);
         }
     }
 

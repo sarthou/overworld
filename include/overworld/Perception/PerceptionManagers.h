@@ -1,6 +1,7 @@
 #ifndef OWDS_PERCEPTIONMANAGER_H
 #define OWDS_PERCEPTIONMANAGER_H
 
+#include "overworld/Perception/Managers/AreasPerceptionManager.h"
 #include "overworld/Perception/Managers/RobotsPerceptionManager.h"
 #include "overworld/Perception/Managers/ObjectsPerceptionManager.h"
 #include "overworld/Perception/Managers/HumansPerceptionManager.h"
@@ -15,6 +16,7 @@ public:
     explicit PerceptionManagers(ros::NodeHandle* n, BulletClient* bullet_client = nullptr);
     ~PerceptionManagers();
 
+    AreasPerceptionManager areas_manager_;
     RobotsPerceptionManager robots_manager_;
     ObjectsPerceptionManager objects_manager_;
     HumansPerceptionManager humans_manager_;
@@ -22,6 +24,7 @@ public:
     void setBulletClient(BulletClient* bullet_client)
     {
         bullet_client_ = bullet_client;
+        areas_manager_.setBulletClient(bullet_client_);
         robots_manager_.setBulletClient(bullet_client_);
         objects_manager_.setBulletClient(bullet_client_);
         humans_manager_.setBulletClient(bullet_client_);
