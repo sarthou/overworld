@@ -160,6 +160,7 @@ set_target_properties(${PROJECT_NAME}_types_lib PROPERTIES POSITION_INDEPENDENT_
 
 add_library(${PROJECT_NAME}_perception_lib STATIC
   src/Perception/Managers/AgentPerceptionManager.cpp
+  src/Perception/Managers/AreasPerceptionManager.cpp
   src/Perception/Managers/ObjectsPerceptionManager.cpp
   src/Perception/Managers/RobotsPerceptionManager.cpp
   src/Perception/Managers/HumansPerceptionManager.cpp
