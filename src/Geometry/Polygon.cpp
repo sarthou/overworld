@@ -4,7 +4,7 @@
 
 namespace owds {
 
-Polygon::Polygon(const std::vector<point_t>& poly_points, double hysteresis) : points(poly_points),
+Polygon::Polygon(const std::vector<point_t>& poly_points, double hysteresis) : points_(poly_points),
 																																							 base_points_(poly_points),
 																																							 hysteresis_(hysteresis)
 {
@@ -23,8 +23,8 @@ void Polygon::transformIn(const Pose& pose)
 		return;
 
 	last_transform_pose_ = pose;
-  points.clear();
-  points.reserve(base_points_.size());
+  points_.clear();
+  points_.reserve(base_points_.size());
 
 	double sin_angle = std::sin(pose.getYaw());
 	double cos_angle = std::cos(pose.getYaw());
@@ -33,13 +33,13 @@ void Polygon::transformIn(const Pose& pose)
   {
     double x_new = point.x * cos_angle - point.y * sin_angle;
     double y_new = point.x * sin_angle + point.y * cos_angle;
-    points.emplace_back(x_new + pose.getX(), y_new + pose.getY());
+    points_.emplace_back(x_new + pose.getX(), y_new + pose.getY());
   }
 
 	computeInOutPolygons();
 }
 
-int Polygon::isInside(const point_t& p, const std::vector<point_t>& vertex)
+int Polygon::isInside(const point_t& p, const std::vector<point_t>& vertex) const
 {
 	int cross = 0;
 	for (int i = 0, j = vertex.size() - 1; i < vertex.size(); j = i++)
@@ -214,7 +214,7 @@ void Polygon::computeInOutPolygons()
 	std::vector<segement_t> outer_segments = offsetingPolygon(-hysteresis_);
 
   // The vectrice extraction will detect witch is inside and witch is outside the base polygon
-	extractVectrices(outer_segments, inner_segments, inner_points, outer_points);
+	extractVectrices(outer_segments, inner_segments, inner_points_, outer_points_);
 }
 
 } // namespace owds
