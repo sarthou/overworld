@@ -30,7 +30,7 @@ void Area::setHysteresis(double hysteresis)
     polygon_.setHysteresis(hysteresis_distance_);
 }
 
-bool Area::isEmpty()
+bool Area::isEmpty() const
 {
   size_t nb_entity = leaving_entities_.size() +
                      inside_entities_.size();

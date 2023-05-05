@@ -18,14 +18,23 @@ public:
 
   const std::string& id() const { return id_; }
 
-  const std::unordered_set<int>& getBulletIds() { return bullet_ids_; }
+  const std::unordered_set<int>& getBulletIds() const { return bullet_ids_; }
   void setBulletIds(const std::unordered_set<int>& bullet_ids) { bullet_ids_ = bullet_ids; }
 
   void setHysteresis(double hysteresis);
   void setOwner(Entity* owner) { owner_ = owner; }
 
-  bool isStatic() { return (owner_ != nullptr); }
-  bool isEmpty();
+  bool isStatic() const { return (owner_ != nullptr); }
+  bool isEmpty() const;
+  bool isCircle() const { return is_circle_; }
+
+  Entity* getOwner() const { return owner_; }
+  const Polygon& getPolygon() const { return polygon_; }
+  double getZmin() const { return z_min_; }
+  double getZmax() const { return z_max_; }
+  double getRadius() const { return radius_; }
+  double getHalfHeight() const { return half_height_; }
+  const Pose& getCenterPose() const { return center_; }
 
   bool isInside(Entity* entity);
   bool setOut(Entity* entity);
@@ -39,8 +48,8 @@ private:
   double radius_;
   double half_height_;
 
-  float z_min_;
-  float z_max_;
+  double z_min_;
+  double z_max_;
   Polygon polygon_;
 
   double hysteresis_distance_;
