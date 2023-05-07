@@ -66,7 +66,7 @@ void AreasPerceptionManager::addPolygonToBullet(Area* area)
                                                        {1,0,0}, 1, 0, -1, owner_id));
     bullet_ids.insert(bullet_client_->addUserDebugLine({polygon_points[i].x, polygon_points[i].y, z_max},
                                                        {polygon_points[j].x, polygon_points[j].y, z_max},
-                                                       {1,0,0}, 1, 0, -1, owner_id));
+                                                       {1,0,0}, 2, 0, -1, owner_id));
   }
 
   area->setBulletIds(bullet_ids);
@@ -93,7 +93,7 @@ void AreasPerceptionManager::addCircleToBullet(Area* area)
     double y = y_center + radius * std::sin(angle);
     bullet_ids.insert(bullet_client_->addUserDebugLine({x, y, z_min},
                                                        {x, y, z_max},
-                                                       {1,0,0}, 1, 0, -1, owner_id));
+                                                       {1,0,0}, 2, 0, -1, owner_id));
   }
 
   area->setBulletIds(bullet_ids);
