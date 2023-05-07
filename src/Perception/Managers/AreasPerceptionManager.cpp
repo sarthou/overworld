@@ -1,5 +1,7 @@
 #include "overworld/Perception/Managers/AreasPerceptionManager.h"
 
+#define CIRCLE_STEPS 10
+
 namespace owds {
 
 AreasPerceptionManager::~AreasPerceptionManager()
@@ -60,10 +62,10 @@ void AreasPerceptionManager::addPolygonToBullet(Area* area)
 
     bullet_ids.insert(bullet_client_->addUserDebugLine({polygon_points[i].x, polygon_points[i].y, z_min},
                                                        {polygon_points[i].x, polygon_points[i].y, z_max},
-                                                       {1,0,0}, 1, 0, -1, owner_id));
+                                                       {1,0,0}, 2, 0, -1, owner_id));
     bullet_ids.insert(bullet_client_->addUserDebugLine({polygon_points[i].x, polygon_points[i].y, z_min},
                                                        {polygon_points[j].x, polygon_points[j].y, z_min},
-                                                       {1,0,0}, 1, 0, -1, owner_id));
+                                                       {1,0,0}, 2, 0, -1, owner_id));
     bullet_ids.insert(bullet_client_->addUserDebugLine({polygon_points[i].x, polygon_points[i].y, z_max},
                                                        {polygon_points[j].x, polygon_points[j].y, z_max},
                                                        {1,0,0}, 2, 0, -1, owner_id));
@@ -80,19 +82,28 @@ void AreasPerceptionManager::addCircleToBullet(Area* area)
 
   std::unordered_set<int> bullet_ids;
 
-  double angle_step = (2 * M_PI / 6);
+  double angle_step = (2 * M_PI / CIRCLE_STEPS);
   double radius = area->getRadius();
   double z_min = area->getCenterPose().getZ() - area->getHalfHeight();
   double z_max = area->getCenterPose().getZ() + area->getHalfHeight();
   double x_center = area->getCenterPose().getX();
   double y_center = area->getCenterPose().getY();
-  for(size_t i = 0; i < 6; i++)
+  for(size_t i = 0; i < CIRCLE_STEPS; i++)
   {
     double angle = i * angle_step;
     double x = x_center + radius * std::cos(angle);
     double y = y_center + radius * std::sin(angle);
+    double angle_next = (i+1) * angle_step;
+    double x_next = x_center + radius * std::cos(angle_next);
+    double y_next = y_center + radius * std::sin(angle_next);
     bullet_ids.insert(bullet_client_->addUserDebugLine({x, y, z_min},
                                                        {x, y, z_max},
+                                                       {1,0,0}, 2, 0, -1, owner_id));
+    bullet_ids.insert(bullet_client_->addUserDebugLine({x, y, z_min},
+                                                       {x_next, y_next, z_min},
+                                                       {1,0,0}, 2, 0, -1, owner_id));
+    bullet_ids.insert(bullet_client_->addUserDebugLine({x, y, z_max},
+                                                       {x_next, y_next, z_max},
                                                        {1,0,0}, 2, 0, -1, owner_id));
   }
 
