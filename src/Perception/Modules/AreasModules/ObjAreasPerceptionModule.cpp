@@ -90,6 +90,7 @@ void ObjAreasPerceptionModule::addCircle(const std::string& id, const std::array
 {
   Area area(id, Pose({pose[0], pose[1], pose[2]}, {0,0,0,0}), radius, half_height);
   area.setHysteresis(hysteresis);
+  area.setOwnerStr(owner);
 
   updated_ = true;
 
@@ -106,6 +107,7 @@ void ObjAreasPerceptionModule::addPolygon(const std::string& id, const std::stri
   Polygon polygon(points);
   Area area(id, polygon, z_min, z_max - z_min);
   area.setHysteresis(hysteresis);
+  area.setOwnerStr(owner);
 
   updated_ = true;
 
