@@ -24,7 +24,7 @@ public:
   void setHysteresis(double hysteresis);
   void setOwner(Entity* owner) { owner_ = owner; }
 
-  bool isStatic() const { return (owner_ != nullptr); }
+  bool isStatic() const { return (owner_ == nullptr); }
   bool isEmpty() const;
   bool isCircle() const { return is_circle_; }
 
