@@ -42,16 +42,15 @@ bool ObjAreasPerceptionModule::closeInitialization()
       {
         double pose_x = 0, pose_y = 0, pose_z = 0;
         double radius = 0, half_height = 0;
-        double z_min = 0, z_max = 0;
         std::string polygon_path;
         double hysteresis = 0;
         std::string owner;
 
         auto area_description = reader[id];
 
-        if(area_description.keyExists("center"))
+        if(area_description.keyExists("pose"))
         {
-          auto position = area_description["center"];
+          auto position = area_description["pose"];
           if(position.keyExists("x")) pose_x = std::stod(position["x"].value().front());
           if(position.keyExists("y")) pose_y = std::stod(position["y"].value().front());
           if(position.keyExists("z")) pose_z = std::stod(position["z"].value().front());
@@ -59,33 +58,22 @@ bool ObjAreasPerceptionModule::closeInitialization()
 
         if(area_description.keyExists("radius")) radius = std::stod(area_description["radius"].value().front());
         if(area_description.keyExists("half_height")) half_height = std::stod(area_description["half_height"].value().front());
-        if(area_description.keyExists("z_min")) z_min = std::stod(area_description["z_min"].value().front());
-        if(area_description.keyExists("z_max")) z_max = std::stod(area_description["z_max"].value().front());
         if(area_description.keyExists("polygon_path")) polygon_path = area_description["polygon_path"].value().front();
         if(area_description.keyExists("owner")) owner = area_description["owner"].value().front();
         if(area_description.keyExists("hysteresis")) hysteresis = std::stod(area_description["hysteresis"].value().front());
 
-        if((polygon_path != "") && ((pose_x != 0) || (pose_y != 0) || (pose_z != 0)))
-          ShellDisplay::warning("[ObjAreasPerceptionModule] " + id + " is define by a polygon but a center is define. The later will be ignored");
-        if((polygon_path != "") && ((radius != 0) || (half_height != 0)))
-          ShellDisplay::warning("[ObjAreasPerceptionModule] " + id + " is define by a polygon but a radius or half height is define. The later will be ignored");
-        if((polygon_path != "") && (z_min == 0) && (z_max == 0))
+        if((polygon_path != "") && (radius != 0))
+          ShellDisplay::warning("[ObjAreasPerceptionModule] " + id + " is define by a polygon but a radius is defined. The later will be ignored");
+        if(half_height == 0)
         {
-          ShellDisplay::error("[ObjAreasPerceptionModule] " + id + " is define by a polygon but has no height (use z_min and z_max parameters).");
-          continue;
-        }
-        if((polygon_path == "") && ((z_min != 0) || (z_max != 0)))
-          ShellDisplay::warning("[ObjAreasPerceptionModule] " + id + " is define by a circle but has z_min or z_max defined. Consider using the half_height parameter.");
-        if((polygon_path == "") && (half_height == 0))
-        {
-          ShellDisplay::error("[ObjAreasPerceptionModule] " + id + " is define by a circle but has no height (use half_height parameter).");
+          ShellDisplay::error("[ObjAreasPerceptionModule] " + id + " has no height (use half_height parameter).");
           continue;
         }
 
         if(polygon_path == "")
           addCircle(id, {pose_x, pose_y, pose_z}, radius, half_height, hysteresis, owner);
         else
-          addPolygon(id, polygon_path, z_min, z_max, hysteresis, owner);
+          addPolygon(id, polygon_path, {pose_x, pose_y, pose_z}, pose_z - half_height, pose_z + half_height, hysteresis, owner);
       }
     }
     else
@@ -106,16 +94,15 @@ void ObjAreasPerceptionModule::addCircle(const std::string& id, const std::array
   updated_ = true;
 
   percepts_.insert(std::make_pair(area.id(), area));
-  std::cout << "[ObjAreasPerceptionModule] circle " << id << " added" << std::endl;
 }
 
-void ObjAreasPerceptionModule::addPolygon(const std::string& id, const std::string& polygon_path, double z_min, double z_max, double hysteresis, const std::string& owner)
+void ObjAreasPerceptionModule::addPolygon(const std::string& id, const std::string& polygon_path, const std::array<double, 3>& pose, double z_min, double z_max, double hysteresis, const std::string& owner)
 {
   std::string full_path = getFullPath(polygon_path);
   auto vertexes = wavefront::getVertexes(full_path);
   std::vector<point_t> points;
   for(auto vertex : vertexes)
-    points.emplace_back(vertex[0], vertex[1]);
+    points.emplace_back(vertex[0] + pose[0], vertex[1] + pose[1]);
   Polygon polygon(points);
   Area area(id, polygon, z_min, z_max - z_min);
   area.setHysteresis(hysteresis);
@@ -123,7 +110,6 @@ void ObjAreasPerceptionModule::addPolygon(const std::string& id, const std::stri
   updated_ = true;
 
   percepts_.insert(std::make_pair(area.id(), area));
-  std::cout << "[ObjAreasPerceptionModule] polygon " << id << " added" << std::endl;
 }
 
 } // namespace owds
