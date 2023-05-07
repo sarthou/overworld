@@ -35,4 +35,11 @@
     </description>
   </class>
 
+  <class type="owds::ObjAreasPerceptionModule" base_class_type="owds::PerceptionModuleBase_<owds::Area>">
+    <description>
+      An area perception module providing predefined areas.
+      This module requires a 'file' parameter being a yaml description of the areas to be loaded.
+    </description>
+  </class>
+
 </library>

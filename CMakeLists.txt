@@ -206,6 +206,7 @@ add_library(overworld_modules_plugin MODULE
   src/Perception/Modules/RobotsModules/JointStatePerceptionModule.cpp
   src/Perception/Modules/HumansModules/StampedPosePerceptionModule.cpp
   src/Perception/Modules/HumansModules/FakeHumanPerceptionModule.cpp
+  src/Perception/Modules/AreasModules/ObjAreasPerceptionModule.cpp
 )
 target_link_libraries(overworld_modules_plugin PUBLIC
                       ${catkin_LIBRARIES}
