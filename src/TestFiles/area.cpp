@@ -24,5 +24,18 @@ int main(int argc, char** argv)
   std::cout << "u_shape and O = " << u_shape.isInside(O) << std::endl;
   std::cout << "u_shape and P = " << u_shape.isInside(P) << std::endl;
 
+  owds::Polygon simple({{-1,-1}, {-1,1}, {1,1}, {1,-1}});
+
+  owds::Pose p1(std::array<double, 3>{2.,2.,2.}, std::array<double, 3>{45.*M_PI/180., 30.*M_PI/180., 10.*M_PI/180.});
+  std::cout << "yaw = " << p1.getYaw() * 180. / M_PI << std::endl;
+  std::cout << "roll = " << p1.getRoll() * 180. / M_PI << std::endl;
+  std::cout << "pitch = " << p1.getPitch() * 180. / M_PI << std::endl;
+  std::cout << "pan = " << p1.getOriginPan() * 180. / M_PI << std::endl;
+  std::cout << "tilt = " << p1.getOriginTilt() * 180. / M_PI << std::endl;
+  square.transformIn(p1);
+
+  for(auto& p : square.getPoints())
+    std::cout << p.x << " -- " << p.y << std::endl;
+
   return 0;
 }
