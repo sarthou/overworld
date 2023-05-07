@@ -1,6 +1,7 @@
 #ifndef OWDS_WAVEFRONT_H
 #define OWDS_WAVEFRONT_H
 
+#include <array>
 #include <string>
 #include <vector>
 
@@ -9,6 +10,8 @@ namespace owds {
 namespace wavefront {
 
 bool isWavefront(const std::string& cad_file);
+
+std::vector<std::array<double, 3>> getVertexes(const std::string& obj_path);
 
 std::string getMltFile(const std::string& obj_path);
 
