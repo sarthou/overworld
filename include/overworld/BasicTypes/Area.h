@@ -23,12 +23,14 @@ public:
 
   void setHysteresis(double hysteresis);
   void setOwner(Entity* owner) { owner_ = owner; }
+  void setOwnerStr(const std::string& owner_str) { owner_str_ = owner_str; }
 
-  bool isStatic() const { return (owner_ == nullptr); }
+  bool isStatic() const { return (owner_str_ == ""); }
   bool isEmpty() const;
   bool isCircle() const { return is_circle_; }
 
   Entity* getOwner() const { return owner_; }
+  const std::string& getOwnerStr() const { return owner_str_; }
   const Polygon& getPolygon() const { return polygon_; }
   double getZmin() const { return z_min_; }
   double getZmax() const { return z_max_; }
@@ -43,6 +45,7 @@ private:
   std::string id_;
   Pose center_;
   Entity* owner_;
+  std::string owner_str_;
   bool is_circle_;
 
   double radius_;
