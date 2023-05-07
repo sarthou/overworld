@@ -1,11 +1,14 @@
 kitchen:
+  pose:
+    x: 6.5
+    y: 5.6
+    z: 1.75
   polygon_path: package://overworld/models/areas/area_test.obj
-  z_min: 0
-  z_max: 3.5
+  half_height: 1.75
   hysteresis: 0.4
 
 cylinder:
-  center:
+  pose:
     x: 3.5
     y: 4.6
     z: 1.5
