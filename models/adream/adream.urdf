@@ -1,0 +1,201 @@
+<?xml version="0.0" ?>
+<robot name="adream">
+
+  <material name="wall_material">
+    <texture filename="package://overworld/models/texture/adream_wall_texture.png"/>
+  </material>
+
+  <material name="floor_material">
+    <texture filename="package://overworld/models/texture/adream_floor_texture.png"/>
+  </material>
+
+  <link concave="yes" name="adream_walls">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+       <mass value=".0"/>
+       <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 1.57" xyz="0 0 0"/>
+      <geometry>
+				<mesh filename="package://overworld/models/adream/walls.obj" scale="1 1 1"/>
+      </geometry>
+       <material name="wall_material"/>
+    </visual>
+    <collision>
+      <origin rpy="0 0 1.57" xyz="0 0 0"/>
+      <geometry>
+       <mesh filename="package://overworld/models/adream/walls_vhacd.obj" scale="1 1 1"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="adream_floor">
+  <contact>
+      <lateral_friction value="1"/>
+  </contact>
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+       <mass value=".0"/>
+       <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 1.57" xyz="0 0 0.0"/>
+      <geometry>
+				<mesh filename="package://overworld/models/adream/floor.obj" scale="1 1 1"/>
+      </geometry>
+       <material name="floor_material"/>
+    </visual>
+    <collision>
+      <contact_coefficients mu="1000.0" kp="0.00" kd="0.0"/>
+      <origin rpy="0 0 1.57" xyz="0 0 0.0"/>
+      <geometry>
+       <mesh filename="package://overworld/models/adream/floor.obj" scale="1 1 1"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="adream_window_h10_1">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+       <mass value=".0"/>
+       <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 1.57" xyz="0 0 0.0"/>
+      <geometry>
+        <mesh filename="package://overworld/models/adream/window_h10_1.obj" scale="1 1 1"/>
+      </geometry>
+       <material name="black">
+        <color rgba="0 0 0 1"/>
+      </material>
+    </visual>
+  </link>
+
+  <link name="adream_window_h10_2">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+       <mass value=".0"/>
+       <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 1.57" xyz="0 0 0.0"/>
+      <geometry>
+        <mesh filename="package://overworld/models/adream/window_h10_2.obj" scale="1 1 1"/>
+      </geometry>
+       <material name="black">
+        <color rgba="0 0 0 1"/>
+      </material>
+    </visual>
+  </link>
+
+  <link name="adream_window_h20_1">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+       <mass value=".0"/>
+       <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 1.57" xyz="0 0 0.0"/>
+      <geometry>
+        <mesh filename="package://overworld/models/adream/window_h20_1.obj" scale="1 1 1"/>
+      </geometry>
+       <material name="black">
+        <color rgba="0 0 0 1"/>
+      </material>
+    </visual>
+  </link>
+
+  <link name="adream_window_h20_2">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+       <mass value=".0"/>
+       <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 1.57" xyz="0 0 0.0"/>
+      <geometry>
+        <mesh filename="package://overworld/models/adream/window_h20_2.obj" scale="1 1 1"/>
+      </geometry>
+       <material name="black">
+        <color rgba="0 0 0 1"/>
+      </material>
+    </visual>
+  </link>
+
+  <link name="adream_window_h20_3">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+       <mass value=".0"/>
+       <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 1.57" xyz="0 0 0.0"/>
+      <geometry>
+        <mesh filename="package://overworld/models/adream/window_h20_3.obj" scale="1 1 1"/>
+      </geometry>
+       <material name="black">
+        <color rgba="0 0 0 1"/>
+      </material>
+    </visual>
+  </link>
+
+  <link concave="yes" name="adream_appartment">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+       <mass value=".0"/>
+       <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 1.57" xyz="0 0 0"/>
+      <geometry>
+				<mesh filename="package://overworld/models/adream/appartment.obj" scale="1 1 1"/>
+      </geometry>
+       <material name="white">
+        <color rgba="1 1 1 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 1.57" xyz="0 0 0.0"/>
+      <geometry>
+       <mesh filename="package://overworld/models/adream/appartment_vhacd.obj" scale="1 1 1"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="base_to_floor" type="fixed">
+    <parent link="adream_walls"/>
+    <child link="adream_floor"/>
+  </joint>
+
+  <joint name="base_to_appartment" type="fixed">
+    <parent link="adream_walls"/>
+    <child link="adream_appartment"/>
+  </joint>
+
+  <joint name="base_to_adream_window_h10_1" type="fixed">
+    <parent link="adream_walls"/>
+    <child link="adream_window_h10_1"/>
+  </joint>
+
+  <joint name="base_to_adream_window_h10_2" type="fixed">
+    <parent link="adream_walls"/>
+    <child link="adream_window_h10_2"/>
+  </joint>
+
+  <joint name="base_to_adream_window_h20_1" type="fixed">
+    <parent link="adream_walls"/>
+    <child link="adream_window_h20_1"/>
+  </joint>
+
+  <joint name="base_to_adream_window_h20_2" type="fixed">
+    <parent link="adream_walls"/>
+    <child link="adream_window_h20_2"/>
+  </joint>
+
+  <joint name="base_to_adream_window_h20_3" type="fixed">
+    <parent link="adream_walls"/>
+    <child link="adream_window_h20_3"/>
+  </joint>
+
+</robot>
