@@ -32,6 +32,7 @@ public:
     void setBulletClient(BulletClient* client) { bullet_client_ = client; }
 
     const std::map<std::string, T*>& getEntities() const { return entities_; }
+    T* getEntity(const std::string& entity_id) const;
 
     bool update();
 
@@ -77,6 +78,16 @@ void EntitiesPerceptionManager<T>::setOwnerAgentName(const std::string& agent_na
     ontos_.add(myself_agent_name_);
     onto_ = ontos_.get(myself_agent_name_);
     onto_->close();
+}
+
+template<typename T>
+T* EntitiesPerceptionManager<T>::getEntity(const std::string& entity_id) const
+{
+    auto it = entities_.find(entity_id);
+    if(it != entities_.end())
+        return it->second;
+    else
+        return nullptr;
 }
 
 template<typename T>

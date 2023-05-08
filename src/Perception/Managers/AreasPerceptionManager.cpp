@@ -13,12 +13,14 @@ AreasPerceptionManager::~AreasPerceptionManager()
 
 bool AreasPerceptionManager::update()
 {
-  if(!this->shouldRun())
+  if((pending_percepts_.size() == 0) && !this->shouldRun())
     return false;
 
   for(const auto& module : this->perception_modules_)
     if(module.second->isActivated() && module.second->hasBeenUpdated())
       module.second->accessPercepts([this](std::map<std::string, Area>& percepts){ this->getPercepts(percepts); });
+
+  solvePendingAreas();
 
   return true;
 }
@@ -31,10 +33,34 @@ void AreasPerceptionManager::getPercepts(std::map<std::string, Area>& percepts)
     if(it == areas_.end())
     {
       Area* new_entity = new Area(percept.second);
-      it = areas_.insert(std::pair<std::string, Area*>(percept.second.id(), new_entity)).first;
-      addToBullet(it->second);
+      if(percept.second.isStatic() == true)
+      {
+        it = areas_.insert(std::pair<std::string, Area*>(percept.second.id(), new_entity)).first;
+        addToBullet(it->second);
+      }
+      else
+        pending_percepts_.insert(std::pair<std::string, Area*>(percept.first, new_entity));
     }
   }
+}
+
+void AreasPerceptionManager::solvePendingAreas()
+{
+  std::unordered_set<std::string> solved;
+  for(auto percept : pending_percepts_)
+  {
+    Entity* owner = findAreaOwner(percept.second);
+    if(owner != nullptr)
+    {
+      percept.second->setOwner(owner);
+      auto it = areas_.insert(std::pair<std::string, Area*>(percept.second->id(), percept.second)).first;
+      addToBullet(it->second);
+      solved.insert(it->first);
+    }
+  }
+
+  for(auto id : solved)
+    pending_percepts_.erase(id);
 }
 
 void AreasPerceptionManager::addToBullet(Area* area)
@@ -108,6 +134,24 @@ void AreasPerceptionManager::addCircleToBullet(Area* area)
   }
 
   area->setBulletIds(bullet_ids);
+}
+
+Entity* AreasPerceptionManager::findAreaOwner(Area* area)
+{
+  Entity* owner = nullptr;
+  for(auto manager : objects_managers_)
+  {
+    owner = manager->getEntity(area->getOwnerStr());
+    if(owner != nullptr)
+      return owner;
+  }
+
+  for(auto manager : bodyparts_managers_)
+  {
+    owner = manager->getEntity(area->getOwnerStr());
+    if(owner != nullptr)
+      return owner;
+  }
 }
 
 } // namespace owds
