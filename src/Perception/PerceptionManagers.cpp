@@ -14,7 +14,11 @@ PerceptionManagers::PerceptionManagers(ros::NodeHandle* n, BulletClient* bullet_
                                                                                           bullet_client_(bullet_client),
                                                                                           robot_bullet_id_(-1),
                                                                                           robot_agent_(nullptr)
-{}
+{
+    areas_manager_.registerObjectsManager(&objects_manager_);
+    areas_manager_.registerBodyPartsManager(&robots_manager_);
+    areas_manager_.registerBodyPartsManager(&humans_manager_);
+}
 
 PerceptionManagers::~PerceptionManagers()
 {
