@@ -20,7 +20,11 @@ void HumansPerceptionManager::getPercepts( std::map<std::string, BodyPart>& perc
               else
                 new_body_part = new BodyPart(percept.second);
               it = entities_.insert(std::pair<std::string, BodyPart*>(percept.second.id(), new_body_part)).first;
-              addToBullet(it->second);
+              if(addToBullet(it->second) == false)
+              {
+                if(it->second->bulletId() != -1)
+                  addToBullet(it->second, it->second->bulletId());
+              }
               UpdateAgent(it->second, AgentType_e::HUMAN);
           }
           
