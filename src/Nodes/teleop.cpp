@@ -144,6 +144,8 @@ void TeleopKeyboard::keyboardLoop()
 
       updatePose();
     }
+    else
+      usleep(10000);
     
     publishTransform();
   }
