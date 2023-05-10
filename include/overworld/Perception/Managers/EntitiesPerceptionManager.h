@@ -51,7 +51,8 @@ protected:
     void updateEntityPose(T* entity, const Pose& pose, const ros::Time& stamp);
     void removeEntityPose(T* entity);
 
-    void addToBullet(T* entity);
+    bool addToBullet(T* entity);
+    void addToBullet(T* entity, int bullet_parent_id);
     void updateToBullet(T* entity);
     void undoInBullet(T* entity);
     T* getEntityFromBulletId(int bullet_id);
@@ -142,10 +143,10 @@ void EntitiesPerceptionManager<T>::removeEntityPose(T* entity)
 }
 
 template<typename T>
-void EntitiesPerceptionManager<T>::addToBullet(T* entity)
+bool EntitiesPerceptionManager<T>::addToBullet(T* entity)
 {
     if(black_listed_entities_.find(entity->id()) != black_listed_entities_.end())
-        return;
+        return true;
 
     int visual_id = -1;
     int collision_id = -1;
@@ -222,18 +223,35 @@ void EntitiesPerceptionManager<T>::addToBullet(T* entity)
         bullet_client_->setRollingFriction(obj_id, -1, 0.7);
         bullet_client_->setActivationState(obj_id, eActivationStateDisableSleeping);
         entity->setBulletId(obj_id);
+        return true;
     }
     else
     {
         black_listed_entities_.insert(entity->id());
         ShellDisplay::warning("Entity " + entity->id() + " has been black listed from body creation to prevent future errors");
+        return false;
+    }
+}
+
+template<typename T>
+void EntitiesPerceptionManager<T>::addToBullet(T* entity, int bullet_parent_id)
+{
+    auto p = bullet_client_->findJointAndLinkIndices(bullet_parent_id);
+    //std::unordered_map<std::string, int> joint_name_id = p.first;
+    std::unordered_map<std::string, int> links_name_id = p.second;
+
+    auto it = links_name_id.find(entity->id());
+    if(it != links_name_id.end())
+    {
+        entity->setBulletId(bullet_parent_id);
+        entity->setBulletLinkId(it->second);
     }
 }
 
 template<typename T>
 void EntitiesPerceptionManager<T>::updateToBullet(T* entity)
 {
-    if(entity->bulletId() != -1)
+    if((entity->bulletLinkId() == -1) && (entity->bulletId() != -1))
     {
         if(entity->isLocated() == true)
         {
@@ -252,7 +270,7 @@ void EntitiesPerceptionManager<T>::updateToBullet(T* entity)
 template<typename T>
 void EntitiesPerceptionManager<T>::undoInBullet(T* entity)
 {
-    if(entity->bulletId() != -1)
+    if((entity->bulletLinkId() == -1) && (entity->bulletId() != -1))
     {
         if(entity->isLocated() == true)
         {
@@ -269,8 +287,9 @@ T* EntitiesPerceptionManager<T>::getEntityFromBulletId(int bullet_id)
 {
     for(auto entity : entities_)
     {
-        if(entity.second->bulletId() == bullet_id)
-            return entity.second;
+        if(entity.second->bulletLinkId() == -1)
+            if(entity.second->bulletId() == bullet_id)
+                return entity.second;
     }
     return nullptr;
 }
