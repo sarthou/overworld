@@ -83,6 +83,58 @@ std::vector<Fact> FactsCalculator::computeAgentsFacts(const std::map<std::string
   return facts_;
 }
 
+std::vector<Fact> FactsCalculator::computeAreasFacts(const std::map<std::string, Area*>& areas,
+                                                     const std::map<std::string, Object*>& objects,
+                                                     const std::map<std::string, BodyPart*>& body_parts,
+                                                     bool clear)
+{
+  if(clear)
+    facts_.clear();
+
+  if(areas.size() == 0)
+    return facts_;
+
+  for(auto& object : objects)
+  {
+    if(isValid(object.second))
+    {
+      for(auto& area : areas)
+      {
+        if(area.second->getOwner() == object.second)
+          continue;
+        if(area.second->isInside(object.second))
+          facts_.emplace_back(object.second->id(), "isInArea", area.second->id());
+      }
+    }
+    else if(object.second->isLocated() == false)
+      for(auto& area : areas)
+        area.second->setOut(object.second);
+  }
+
+  for(auto& body_part : body_parts)
+  {
+    if(body_part.second->isLocated())
+    {
+      for(auto& area : areas)
+      {
+        if(area.second->getOwner() != nullptr)
+        {
+          if(area.second->getOwner() == body_part.second)
+            continue;
+          // TODO : check for every body parts of the agent
+        }
+        if(area.second->isInside(body_part.second))
+          facts_.emplace_back(body_part.second->getAgentName(), "isInArea", area.second->id());
+      }
+    }
+    else
+      for(auto& area : areas)
+        area.second->setOut(body_part.second);
+  }
+
+  return facts_;
+}
+
 bool FactsCalculator::isOnTopfOf(Object* object_under, Object* object_on)
 {
   if(object_under->isA("Support") == false)

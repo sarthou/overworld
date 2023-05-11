@@ -7,6 +7,7 @@
 
 #include "overworld/BasicTypes/Object.h"
 #include "overworld/BasicTypes/Agent.h"
+#include "overworld/BasicTypes/Area.h"
 #include "overworld/Facts/Fact.h"
 
 namespace owds {
@@ -22,6 +23,10 @@ public:
                                        const std::map<std::string, Agent*>& agents,
                                        const std::map<std::string, std::unordered_set<int>>& segmantation_ids,
                                        bool clear = true);
+  std::vector<Fact> computeAreasFacts(const std::map<std::string, Area*>& areas,
+                                      const std::map<std::string, Object*>& objects,
+                                      const std::map<std::string, BodyPart*>& body_parts,
+                                      bool clear = true);
 
 private:
   std::vector<Fact> facts_;

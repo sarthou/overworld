@@ -207,8 +207,10 @@ void SituationAssessor::assess()
   perception_manager_.update();
   auto objects = perception_manager_.objects_manager_.getEntities();
   auto robots = perception_manager_.robots_manager_.getAgents();
+  auto robot_parts = perception_manager_.robots_manager_.getEntities();
   auto humans = perception_manager_.humans_manager_.getAgents();
   auto body_parts = perception_manager_.humans_manager_.getEntities();
+  auto areas = perception_manager_.areas_manager_.getEntities();
 
   std::thread humans_process;
 
@@ -232,7 +234,9 @@ void SituationAssessor::assess()
   if(is_robot_)
     humans_process.join();
 
-  auto facts = facts_calculator_.computeAgentsFacts(objects, agents, agents_segmentation_ids, false);
+  facts_calculator_.computeAgentsFacts(objects, agents, agents_segmentation_ids, false);
+  facts_calculator_.computeAreasFacts(areas, {}, robot_parts, false);
+  auto facts = facts_calculator_.computeAreasFacts(areas, objects, body_parts, false);
   facts_publisher_.publish(facts);
 }
 
