@@ -138,6 +138,10 @@ void Polygon::extractVectrices(const std::vector<segement_t>& segments_out, cons
                                std::vector<point_t>& inner, std::vector<point_t>& outer,
                                const std::vector<point_t>& base)
 {
+	inner.clear();
+	inner.reserve(base.size());
+	outer.clear();
+	outer.reserve(base.size());
 	for (unsigned int i = 0, j = segments_out.size() - 1; i < segments_out.size(); j = i++)
 	{
     //the order of the points is really important
