@@ -73,12 +73,14 @@ void AreasPerceptionManager::addToBullet(Area* area)
 
 void AreasPerceptionManager::addPolygonToBullet(Area* area)
 {
+  std::array<double, 3> color = {1, 0, 0};
   int owner_id = -1;
   int owner_link_id = -1;
   if(area->isStatic() == false)
   {
     owner_id = area->getOwner()->bulletId();
     owner_link_id = area->getOwner()->bulletLinkId();
+    color = {0, 0, 1};
   }
 
   std::unordered_set<int> bullet_ids;
@@ -92,13 +94,13 @@ void AreasPerceptionManager::addPolygonToBullet(Area* area)
 
     bullet_ids.insert(bullet_client_->addUserDebugLine({polygon_points[i].x, polygon_points[i].y, z_min},
                                                        {polygon_points[i].x, polygon_points[i].y, z_max},
-                                                       {1,0,0}, 2, 0, -1, owner_id, owner_link_id));
+                                                       color, 2, 0, -1, owner_id, owner_link_id));
     bullet_ids.insert(bullet_client_->addUserDebugLine({polygon_points[i].x, polygon_points[i].y, z_min},
                                                        {polygon_points[j].x, polygon_points[j].y, z_min},
-                                                       {1,0,0}, 2, 0, -1, owner_id, owner_link_id));
+                                                       color, 2, 0, -1, owner_id, owner_link_id));
     bullet_ids.insert(bullet_client_->addUserDebugLine({polygon_points[i].x, polygon_points[i].y, z_max},
                                                        {polygon_points[j].x, polygon_points[j].y, z_max},
-                                                       {1,0,0}, 2, 0, -1, owner_id, owner_link_id));
+                                                       color, 2, 0, -1, owner_id, owner_link_id));
   }
 
   area->setBulletIds(bullet_ids);
@@ -106,12 +108,14 @@ void AreasPerceptionManager::addPolygonToBullet(Area* area)
 
 void AreasPerceptionManager::addCircleToBullet(Area* area)
 {
+  std::array<double, 3> color = {1, 0, 0};
   int owner_id = -1;
   int owner_link_id = -1;
   if(area->isStatic() == false)
   {
     owner_id = area->getOwner()->bulletId();
     owner_link_id = area->getOwner()->bulletLinkId();
+    color = {0, 0, 1};
   }
 
   std::unordered_set<int> bullet_ids;
@@ -132,13 +136,13 @@ void AreasPerceptionManager::addCircleToBullet(Area* area)
     double y_next = y_center + radius * std::sin(angle_next);
     bullet_ids.insert(bullet_client_->addUserDebugLine({x, y, z_min},
                                                        {x, y, z_max},
-                                                       {1,0,0}, 2, 0, -1, owner_id, owner_link_id));
+                                                       color, 2, 0, -1, owner_id, owner_link_id));
     bullet_ids.insert(bullet_client_->addUserDebugLine({x, y, z_min},
                                                        {x_next, y_next, z_min},
-                                                       {1,0,0}, 2, 0, -1, owner_id, owner_link_id));
+                                                       color, 2, 0, -1, owner_id, owner_link_id));
     bullet_ids.insert(bullet_client_->addUserDebugLine({x, y, z_max},
                                                        {x_next, y_next, z_max},
-                                                       {1,0,0}, 2, 0, -1, owner_id, owner_link_id));
+                                                       color, 2, 0, -1, owner_id, owner_link_id));
   }
 
   area->setBulletIds(bullet_ids);
