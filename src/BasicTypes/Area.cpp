@@ -131,7 +131,7 @@ bool Area::isInPolygon(Entity* entity)
   }
   else if(polygon_.isInside(entity_point) == false)
     return entityInLeaving(entity);
-  else if(polygon_.isInsideInner(entity_point) == true)
+  else if(polygon_.isInsideInner(entity_point) == false)
     return entityInUpcoming(entity);
   else
     return entityInArea(entity);
