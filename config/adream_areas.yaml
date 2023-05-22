@@ -1,7 +1,5 @@
 adream_kitchen:
   pose:
-    x: 10.048
-    y: -7.414
     z: 1.75
   polygon_path: package://overworld/models/areas/adream_kitchen.obj
   half_height: 1.75
@@ -9,8 +7,6 @@ adream_kitchen:
 
 adream_bedroom:
   pose:
-    x: 10.048
-    y: -3.3456
     z: 1.75
   polygon_path: package://overworld/models/areas/adream_bedroom.obj
   half_height: 1.75
@@ -18,8 +14,6 @@ adream_bedroom:
 
 adream_saloon:
   pose:
-    x: 5.944
-    y: -3.3456
     z: 1.75
   polygon_path: package://overworld/models/areas/adream_saloon.obj
   half_height: 1.75
