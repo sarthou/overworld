@@ -206,6 +206,8 @@ public:
                           long parent_object_id = -1,
                           int replace_id = -1);
 
+    bool removeUserDebugItem(int unique_id);
+
     std::vector<struct b3RayHitInfo> rayTestBatch(const std::vector<std::array<double, 3>>& from_poses,
                                                   const std::vector<std::array<double,3>>& to_poses,
                                                   int nb_thread = 1,

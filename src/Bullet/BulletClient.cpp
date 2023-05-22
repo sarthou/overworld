@@ -897,6 +897,15 @@ long BulletClient::addUserDebugText(const std::string& text,
     }
 }
 
+bool BulletClient::removeUserDebugItem(int unique_id)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+	b3SharedMemoryCommandHandle command_handle = b3InitUserDebugDrawRemove(*client_handle_, unique_id);
+    b3SharedMemoryStatusHandle status_handle = b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+	int status_type = b3GetStatusType(status_handle);
+    return (status_type != -1);
+}
+
 std::vector<struct b3RayHitInfo> BulletClient::rayTestBatch(const std::vector<std::array<double, 3>>& from_poses,
                                                             const std::vector<std::array<double,3>>& to_poses,
                                                             int nb_thread,
