@@ -1,17 +1,34 @@
-kitchen:
+adream_kitchen:
   pose:
-    x: 6.5
-    y: 5.6
+    x: 10.048
+    y: -7.414
     z: 1.75
-  polygon_path: package://overworld/models/areas/area_test.obj
+  polygon_path: package://overworld/models/areas/adream_kitchen.obj
   half_height: 1.75
-  hysteresis: 0.4
-
-cylinder:
-  pose:
-    x: 3.5
-    y: 4.6
-    z: 1.5
-  half_height: 1.4
-  radius: 1.2
   hysteresis: 0.2
+
+adream_bedroom:
+  pose:
+    x: 10.048
+    y: -3.3456
+    z: 1.75
+  polygon_path: package://overworld/models/areas/adream_bedroom.obj
+  half_height: 1.75
+  hysteresis: 0.2
+
+adream_saloon:
+  pose:
+    x: 5.944
+    y: -3.3456
+    z: 1.75
+  polygon_path: package://overworld/models/areas/adream_saloon.obj
+  half_height: 1.75
+  hysteresis: 0.2
+
+#eve_area:
+#  pose:
+#    z: 0.5
+#  half_height: 0.5
+#  radius: 0.5
+#  hysteresis: 0.05
+#  owner: base_link
