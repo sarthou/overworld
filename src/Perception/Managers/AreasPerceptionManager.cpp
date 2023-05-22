@@ -136,7 +136,7 @@ void AreasPerceptionManager::addPolygonToBullet(Area* area)
   mean_y = mean_y/polygon_points.size();
   bullet_ids.insert(bullet_client_->addUserDebugText(area->id(),
                                                      {mean_x, mean_y, z_max + 0.2},
-                                                     color, 1, 0, owner_id, owner_link_id));
+                                                     color, 1.5, 0, owner_id, owner_link_id));
 
   area->setBulletIds(bullet_ids);
 }
@@ -181,7 +181,7 @@ void AreasPerceptionManager::addCircleToBullet(Area* area)
   }
   bullet_ids.insert(bullet_client_->addUserDebugText(area->id(),
                                                      {x_center, y_center, z_max + 0.2},
-                                                     color, 1, 0, owner_id, owner_link_id));
+                                                     color, 1.5, 0, owner_id, owner_link_id));
 
   area->setBulletIds(bullet_ids);
 }
