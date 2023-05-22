@@ -160,7 +160,7 @@ void SituationAssessor::assessmentLoop()
     assess();
 
     if(is_robot_)
-      handleKeypress(bullet_client_, perception_manager_.robots_manager_);
+      handleKeypress(bullet_client_, perception_manager_);
 
     if(ros::ok() && isRunning())
     {
