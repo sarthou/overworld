@@ -25,6 +25,22 @@ bool AreasPerceptionManager::update()
   return true;
 }
 
+void AreasPerceptionManager::drawAreas()
+{
+  drawn_ = true;
+  for(auto& area : areas_)
+    if(area.second->getBulletIds().size() == 0)
+      addToBullet(area.second);
+}
+
+void AreasPerceptionManager::undrawAreas()
+{
+  drawn_ = false;
+  for(auto& area : areas_)
+    if(area.second->getBulletIds().size() != 0)
+      removeFromBullet(area.second);
+}
+
 void AreasPerceptionManager::getPercepts(std::map<std::string, Area>& percepts)
 {
   for(auto& percept : percepts)
@@ -63,8 +79,18 @@ void AreasPerceptionManager::solvePendingAreas()
     pending_percepts_.erase(id);
 }
 
+void AreasPerceptionManager::removeFromBullet(Area* area)
+{
+  for(auto id : area->getBulletIds())
+    bullet_client_->removeUserDebugItem(id);
+  area->setBulletIds({});
+}
+
 void AreasPerceptionManager::addToBullet(Area* area)
 {
+  if(drawn_ == false)
+    return;
+    
   if(area->isCircle())
     addCircleToBullet(area);
   else
@@ -87,6 +113,8 @@ void AreasPerceptionManager::addPolygonToBullet(Area* area)
   auto polygon_points = area->getPolygon().getBasePoints();
   double z_min = area->getZmin();
   double z_max = area->getZmax();
+  double mean_x = 0;
+  double mean_y = 0;
   for(size_t i = 0, j = 1; i < polygon_points.size(); i++, j++)
   {
     if(j >= polygon_points.size())
@@ -101,7 +129,14 @@ void AreasPerceptionManager::addPolygonToBullet(Area* area)
     bullet_ids.insert(bullet_client_->addUserDebugLine({polygon_points[i].x, polygon_points[i].y, z_max},
                                                        {polygon_points[j].x, polygon_points[j].y, z_max},
                                                        color, 2, 0, -1, owner_id, owner_link_id));
+    mean_x += polygon_points[i].x;
+    mean_y += polygon_points[i].y;
   }
+  mean_x = mean_x/polygon_points.size();
+  mean_y = mean_y/polygon_points.size();
+  bullet_ids.insert(bullet_client_->addUserDebugText(area->id(),
+                                                     {mean_x, mean_y, z_max + 0.2},
+                                                     color, 1, 0, owner_id, owner_link_id));
 
   area->setBulletIds(bullet_ids);
 }
@@ -144,6 +179,9 @@ void AreasPerceptionManager::addCircleToBullet(Area* area)
                                                        {x_next, y_next, z_max},
                                                        color, 2, 0, -1, owner_id, owner_link_id));
   }
+  bullet_ids.insert(bullet_client_->addUserDebugText(area->id(),
+                                                     {x_center, y_center, z_max + 0.2},
+                                                     color, 1, 0, owner_id, owner_link_id));
 
   area->setBulletIds(bullet_ids);
 }

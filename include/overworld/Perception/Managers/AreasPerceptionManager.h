@@ -19,7 +19,7 @@ namespace owds {
 class AreasPerceptionManager : public BasePerceptionManager<Area>
 {
 public:
-  explicit AreasPerceptionManager(ros::NodeHandle* nh): bullet_client_(nullptr) {}
+  explicit AreasPerceptionManager(ros::NodeHandle* nh): bullet_client_(nullptr), drawn_(true) {}
   ~AreasPerceptionManager();
   
   void setBulletClient(BulletClient* client) { bullet_client_ = client; }
@@ -31,10 +31,15 @@ public:
 
   bool update();
 
+  bool isDrawn() { return drawn_; }
+  void drawAreas();
+  void undrawAreas();
+
 private:
   std::map<std::string, Area*> areas_;
   std::map<std::string, Area*> pending_percepts_;
   BulletClient* bullet_client_;
+  bool drawn_;
 
   std::set<EntitiesPerceptionManager<Object>*> objects_managers_;
   std::set<EntitiesPerceptionManager<BodyPart>*> bodyparts_managers_;
@@ -43,6 +48,7 @@ private:
 
   void solvePendingAreas();
 
+  void removeFromBullet(Area* area);
   void addToBullet(Area* area);
   void addPolygonToBullet(Area* area);
   void addCircleToBullet(Area* area);
