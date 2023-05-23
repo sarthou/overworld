@@ -99,6 +99,8 @@
           <div class="terminal_line">      - <span class="yaml_string">pr2_left_gripper</span></div>
           <div class="terminal_line">      - <span class="yaml_string">pr2_right_gripper</span></div>
           <div class="terminal_line">    <span class="yaml_key">StaticObjectsPerceptionModule</span>: <span class="yaml_string">static</span></div>
+          <div class="terminal_line">  <span class="yaml_key">areas</span>:</div>
+          <div class="terminal_line">    <span class="yaml_key">ObjAreasPerceptionModule</span>: <span class="yaml_string">obj_area</span></div>
           <div class="terminal_line"> </div>
           <div class="terminal_line"><span class="yaml_key">pr2_joints</span>:</div>
           <div class="terminal_line">  <span class="yaml_key">min_period</span> : <span class="yaml_string">0.9</span></div>
@@ -119,6 +121,9 @@
           <div class="terminal_line"> </div>
           <div class="terminal_line"><span class="yaml_key">static</span>:</div>
           <div class="terminal_line">  <span class="yaml_key">file</span> : <span class="yaml_string">package://overworld/config/adream.yaml</span></div>
+          <div class="terminal_line"> </div>
+          <div class="terminal_line"><span class="yaml_key">obj_area</span>:</div>
+          <div class="terminal_line">  <span class="yaml_key">file</span> : <span class="yaml_string">package://overworld/config/adream_areas.yaml</span></div>
         </div>
 
         <p>To pass your configuration file to an Overworld executable see the
@@ -129,7 +134,7 @@
 
         <h2><i class="fas fa-angle-right"></i> Modules</h2>
 
-        <p>The modules correspond to the perception modules that will be loaded at the launch. These modules are divided in three categories: <b>robot</b>, <b>humans</b>, and <b>objects</b>.</p>
+        <p>The modules correspond to the perception modules that will be loaded at the launch. These modules are divided in four categories: <b>robot</b>, <b>humans</b>, <b>objects</b>, and <b>areas</b>.</p>
         <p>In each category, the keys correspond to the modules' type while the values are the user-defined instances names. For example, in the provided configuration file, we load a JointStatePerceptionModule module called <i>pr2_joints</i> and two Pr2GripperPerceptionModule modules called <i>r_gripper_tool_frame</i> and <i>pr2_right_gripper</i></p>
 
         <h2><i class="fas fa-angle-right"></i> Parameters</h2>
