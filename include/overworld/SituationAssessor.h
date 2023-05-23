@@ -31,7 +31,7 @@ struct HumanAssessor_t
   PerceptionModuleBase<Object, std::vector<Object*>>* objects_module;
   PerceptionModuleBase<BodyPart, std::vector<BodyPart*>>* humans_module;
   PerceptionModuleBase<BodyPart, std::vector<BodyPart*>>* robots_module;
-  PerceptionModuleBase<BodyPart, std::vector<Area*>>* areas_module;
+  PerceptionModuleBase<Area, std::vector<Area*>>* areas_module;
 
   HumanAssessor_t()
   {
@@ -97,6 +97,7 @@ private:
   void updateHumansPerspective(const std::string& human_name,
                                const std::map<std::string, Object*>& objects,
                                const std::map<std::string, BodyPart*>& humans,
+                               const std::map<std::string, Area*>& areas,
                                const std::unordered_set<int>& segmented_ids);
   std::map<std::string, HumanAssessor_t>::iterator createHumanAssessor(const std::string& human_name);
 

@@ -2,6 +2,7 @@
 
 #include "overworld/Perception/Modules/ObjectsModules/ObjectsEmulatedPerceptionModule.h"
 #include "overworld/Perception/Modules/HumansModules/HumansEmulatedPerceptionModule.h"
+#include "overworld/Perception/Modules/AreasModules/AreasEmulatedPerceptionModule.h"
 
 #include "overworld/Utility/BulletKeypressHandler.h"
 
@@ -245,6 +246,7 @@ void SituationAssessor::processHumans(std::map<std::string, std::unordered_set<i
   auto objects = perception_manager_.objects_manager_.getEntities();
   auto humans = perception_manager_.humans_manager_.getAgents();
   auto body_parts = perception_manager_.humans_manager_.getEntities();
+  auto areas = perception_manager_.areas_manager_.getEntities();
 
   for(auto human : humans)
   {
@@ -267,13 +269,14 @@ void SituationAssessor::processHumans(std::map<std::string, std::unordered_set<i
 
     ros_sender_->sendImage(human.first + "/view", images);
     agents_segmentation_ids[human.first] = bullet_client_->getSegmentationIds(images);
-    updateHumansPerspective(human.first, objects, body_parts, agents_segmentation_ids[human.first]);
+    updateHumansPerspective(human.first, objects, body_parts, areas, agents_segmentation_ids[human.first]);
   }
 }
 
 void SituationAssessor::updateHumansPerspective(const std::string& human_name,
                                                 const std::map<std::string, Object*>& objects,
                                                 const std::map<std::string, BodyPart*>& humans,
+                                                const std::map<std::string, Area*>& areas,
                                                 const std::unordered_set<int>& segmented_ids)
 {
   auto assessor_it = humans_assessors_.find(human_name);
@@ -297,8 +300,13 @@ void SituationAssessor::updateHumansPerspective(const std::string& human_name,
       seen_humans.push_back(body_part.second);
   }
 
+  std::vector<Area*> seen_areas;
+  std::transform(areas.cbegin(), areas.cend(), std::back_inserter(seen_areas),
+                 [](const auto& it) { return it.second; });
+
   assessor_it->second.objects_module->sendPerception(seen_objects);
   assessor_it->second.humans_module->sendPerception(seen_humans);
+  assessor_it->second.areas_module->sendPerception(seen_areas);
 }
 
 std::map<std::string, HumanAssessor_t>::iterator SituationAssessor::createHumanAssessor(const std::string& human_name)
@@ -308,8 +316,10 @@ std::map<std::string, HumanAssessor_t>::iterator SituationAssessor::createHumanA
   assessor->second.assessor = new SituationAssessor(human_name, config_path_, 1.0/time_step_, 1.0/simu_step_, simulate_);
   assessor->second.objects_module = new ObjectsEmulatedPerceptionModule();
   assessor->second.humans_module = new HumansEmulatedPerceptionModule();
+  assessor->second.areas_module = new AreasEmulatedPerceptionModule();
   assessor->second.assessor->addObjectPerceptionModule("emulated_objects", assessor->second.objects_module);
   assessor->second.assessor->addHumanPerceptionModule("emulated_humans", assessor->second.humans_module);
+  assessor->second.assessor->addAreaPerceptionModule("emulated_areas", assessor->second.areas_module);
   std::thread th(&SituationAssessor::run, assessor->second.assessor);
   assessor->second.thread = std::move(th);
 
