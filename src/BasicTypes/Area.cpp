@@ -56,6 +56,13 @@ bool Area::setOut(Entity* entity)
   return (nb != 0);
 }
 
+void Area::clearInsideEntities()
+{
+  upcoming_entities_.clear();
+  inside_entities_.clear();
+  leaving_entities_.clear();
+}
+
 bool Area::isInCircle(Entity* entity)
 {
   Pose entity_pose = entity->pose();

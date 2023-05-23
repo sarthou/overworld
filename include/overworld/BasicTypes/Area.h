@@ -40,6 +40,7 @@ public:
 
   bool isInside(Entity* entity);
   bool setOut(Entity* entity);
+  void clearInsideEntities();
 
 private:
   std::string id_;
