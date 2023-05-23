@@ -1,5 +1,6 @@
 #include "overworld/Utility/ShellDisplay.h"
 #include "overworld/Perception/Modules/PerceptionModuleBase.h"
+#include "overworld/BasicTypes/Area.h"
 #include "overworld/BasicTypes/BodyPart.h"
 #include "overworld/BasicTypes/Object.h"
 
@@ -59,19 +60,19 @@ void help(const std::string& command)
 
   std::cout << std::endl << "OPTIONS" << std::endl;
   if(command == "list")
-    std::cout << "\t<option>" << std::endl << "\t\tEither Objects or BodyParts to focus on specific module type." << std::endl;
+    std::cout << "\t<option>" << std::endl << "\t\tEither Objects, BodyParts, or Areas to focus on specific module type." << std::endl;
   else
     std::cout << "\t<module>" << std::endl << "\t\tThe name of an existing perception module." << std::endl;
 
   std::cout << std::endl;
 }
 
-void list(bool objects, bool bodyparts)
+void list(bool objects, bool bodyparts, bool areas)
 {
   std::cout << std::endl;
   if(bodyparts)
   {
-    std::cout << "Available body part perception modules are:" << std::endl;
+    std::cout << "Available body parts perception modules are:" << std::endl;
     pluginlib::ClassLoader<owds::PerceptionModuleBase_<owds::BodyPart>> loader_bodyparts("overworld", "owds::PerceptionModuleBase_<owds::BodyPart>");
     std::vector<std::string> modules = loader_bodyparts.getDeclaredClasses();
     for(auto& module : modules)
@@ -83,9 +84,21 @@ void list(bool objects, bool bodyparts)
 
   if(objects)
   {
-    std::cout << "Available body part perception modules are:" << std::endl;
+    std::cout << "Available objects perception modules are:" << std::endl;
     pluginlib::ClassLoader<owds::PerceptionModuleBase_<owds::Object>> loader_objects("overworld", "owds::PerceptionModuleBase_<owds::Object>");
     std::vector<std::string> modules = loader_objects.getDeclaredClasses();
+    for(auto& module : modules)
+    {
+      std::cout << "\t- " << module << std::endl;
+    }
+    std::cout << std::endl;
+  }
+
+  if(areas)
+  {
+    std::cout << "Available areas perception modules are:" << std::endl;
+    pluginlib::ClassLoader<owds::PerceptionModuleBase_<owds::Area>> loader_areas("overworld", "owds::PerceptionModuleBase_<owds::Area>");
+    std::vector<std::string> modules = loader_areas.getDeclaredClasses();
     for(auto& module : modules)
     {
       std::cout << "\t- " << module << std::endl;
@@ -104,6 +117,12 @@ void description(const std::string& _class)
   {
     pluginlib::ClassLoader<owds::PerceptionModuleBase_<owds::Object>> loader_objects("overworld", "owds::PerceptionModuleBase_<owds::Object>");
     description = loader_objects.getClassDescription(_class);
+
+    if(description == "")
+    {
+      pluginlib::ClassLoader<owds::PerceptionModuleBase_<owds::Area>> loader_areas("overworld", "owds::PerceptionModuleBase_<owds::Area>");
+      description = loader_areas.getClassDescription(_class);
+    }
   }
 
   if(description == "")
@@ -122,6 +141,12 @@ void libraryPath(const std::string& _class)
   {
     pluginlib::ClassLoader<owds::PerceptionModuleBase_<owds::Object>> loader_objects("overworld", "owds::PerceptionModuleBase_<owds::Object>");
     path = loader_objects.getClassLibraryPath(_class);
+
+    if(path == "")
+    {
+      pluginlib::ClassLoader<owds::PerceptionModuleBase_<owds::Area>> loader_areas("overworld", "owds::PerceptionModuleBase_<owds::Area>");
+      path = loader_areas.getClassLibraryPath(_class);
+    }
   }
 
   if(path == "")
@@ -140,6 +165,12 @@ void classPackage(const std::string& _class)
   {
     pluginlib::ClassLoader<owds::PerceptionModuleBase_<owds::Object>> loader_objects("overworld", "owds::PerceptionModuleBase_<owds::Object>");
     package = loader_objects.getClassPackage(_class);
+
+    if(package == "")
+    {
+      pluginlib::ClassLoader<owds::PerceptionModuleBase_<owds::Area>> loader_areas("overworld", "owds::PerceptionModuleBase_<owds::Area>");
+      package = loader_areas.getClassPackage(_class);
+    }
   }
 
   if(package == "")
@@ -160,11 +191,11 @@ int main(int argc, char** argv)
     if(command == "list")
     {
       if(argc == 2)
-        list(true, true);
+        list(true, true, true);
       else if(argc > 2)
       {
         std::string option = std::string(argv[2]);
-        list(option == "Objects", option == "BodyParts");
+        list(option == "Objects", option == "BodyParts", option == "Areas");
       }
     }
     else if(command == "description")
