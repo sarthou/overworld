@@ -837,7 +837,9 @@ long BulletClient::addUserDebugLine(const std::array<double, 3>& xyz_from,
                                     const std::array<double, 3>& color_rgb,
                                     double line_width,
                                     double life_time,
-                                    int replace_id)
+                                    int replace_id,
+                                    int parent_object_id,
+                                    int parent_link_index)
 {
     std::lock_guard<std::mutex> lock(mutex_);
 	b3SharedMemoryCommandHandle command_handle = b3InitUserDebugDrawAddLine3D(*client_handle_, 
@@ -848,6 +850,9 @@ long BulletClient::addUserDebugLine(const std::array<double, 3>& xyz_from,
 
 	if (replace_id >= 0)
 		b3UserDebugItemSetReplaceItemUniqueId(command_handle, replace_id);
+
+    if (parent_object_id >= 0)
+        b3UserDebugItemSetParentObject(command_handle, parent_object_id, parent_link_index);
 
 	b3SharedMemoryStatusHandle status_handle = b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
 	int status_type = b3GetStatusType(status_handle);
@@ -890,6 +895,15 @@ long BulletClient::addUserDebugText(const std::string& text,
         ShellDisplay::error("[Bullet] failed to draw debug text");
         return -1;
     }
+}
+
+bool BulletClient::removeUserDebugItem(int unique_id)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+	b3SharedMemoryCommandHandle command_handle = b3InitUserDebugDrawRemove(*client_handle_, unique_id);
+    b3SharedMemoryStatusHandle status_handle = b3SubmitClientCommandAndWaitStatus(*client_handle_, command_handle);
+	int status_type = b3GetStatusType(status_handle);
+    return (status_type != -1);
 }
 
 std::vector<struct b3RayHitInfo> BulletClient::rayTestBatch(const std::vector<std::array<double, 3>>& from_poses,

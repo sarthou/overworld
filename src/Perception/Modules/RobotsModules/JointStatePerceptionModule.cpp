@@ -71,6 +71,8 @@ bool JointStatePerceptionModule::closeInitialization()
         percepts_.emplace(link_pair.first, link_pair.first);
         percepts_.at(link_pair.first).setAgentName(robot_name_);
         percepts_.at(link_pair.first).setType(link_pair.second);
+        // we set the bullet id of the parent to inform the manager
+        percepts_.at(link_pair.first).setBulletId(robot_bullet_id_);
         if (links_name_id_.count(link_pair.first) == 0)
         {
             std::cout << "Error: link name '" << link_pair.first
@@ -81,6 +83,9 @@ bool JointStatePerceptionModule::closeInitialization()
     percepts_.emplace(base_link_, BodyPart(base_link_));
     percepts_.at(base_link_).setAgentName(robot_name_);
     percepts_.at(base_link_).setType(BODY_PART_BASE);
+    // we set the bullet id of the parent to inform the manager
+    percepts_.at(base_link_).setBulletId(robot_bullet_id_);
+    
     if(updateBasePose() == false)
         ShellDisplay::warning("[JointStatePerceptionModule] Pr2 base has no position in tf");
     else

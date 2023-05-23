@@ -7,16 +7,18 @@
 
 #include "overworld/BasicTypes/Entity.h"
 #include "overworld/Bullet/BulletClient.h"
-#include "overworld/Perception/Modules/PerceptionModuleBase.h"
+#include "overworld/Perception/Managers/BasePerceptionManager.h"
 
 #include "overworld/Utility/ShellDisplay.h"
+#include "overworld/Utility/Wavefront.h"
+#include "overworld/Utility/RosFiles.h"
 
 #include <ontologenius/OntologiesManipulator.h>
 
 namespace owds {
 
 template<typename T>
-class EntitiesPerceptionManager
+class EntitiesPerceptionManager : public BasePerceptionManager<T>
 {
     static_assert(std::is_base_of<Entity,T>::value, "T must be derived from Entity");
 public:
@@ -29,35 +31,28 @@ public:
     void setOwnerAgentName(const std::string& agent_name);
     void setBulletClient(BulletClient* client) { bullet_client_ = client; }
 
-    void addPerceptionModule(const std::string& module_name, PerceptionModuleBase_<T>* perception_module);
-    PerceptionModuleBase_<T>* getPerceptionModule(const std::string& module_name) const;
-    std::vector<std::string> getModulesList() const;
-    std::vector<std::string> getActivatedModulesList() const;
-    std::string getModulesListStr() const;
-    std::string getActivatedModulesListStr() const;
-    void deleteModules();
     const std::map<std::string, T*>& getEntities() const { return entities_; }
+    T* getEntity(const std::string& entity_id) const;
 
     bool update();
 
 protected:
     std::map<std::string, T*> entities_;
     std::unordered_set<std::string> black_listed_entities_;
-    std::map<std::string, PerceptionModuleBase_<T>* > perception_modules_;
     BulletClient* bullet_client_;
 
     std::string myself_agent_name_;
     OntologiesManipulator ontos_;
     OntologyManipulator* onto_;
 
-    bool shouldRun();
     virtual void getPercepts( std::map<std::string, T>& percepts);
     virtual void reasoningOnUpdate() {}
 
     void updateEntityPose(T* entity, const Pose& pose, const ros::Time& stamp);
     void removeEntityPose(T* entity);
 
-    void addToBullet(T* entity);
+    bool addToBullet(T* entity);
+    void addToBullet(T* entity, int bullet_parent_id);
     void updateToBullet(T* entity);
     void undoInBullet(T* entity);
     T* getEntityFromBulletId(int bullet_id);
@@ -87,87 +82,13 @@ void EntitiesPerceptionManager<T>::setOwnerAgentName(const std::string& agent_na
 }
 
 template<typename T>
-void EntitiesPerceptionManager<T>::addPerceptionModule(const std::string& module_name, PerceptionModuleBase_<T>* perception_module)
+T* EntitiesPerceptionManager<T>::getEntity(const std::string& entity_id) const
 {
-    if(perception_modules_.find(module_name) == perception_modules_.end())
-        perception_modules_[module_name] = perception_module;
-    else
-        ShellDisplay::error("A perception module named " + module_name + " is already registered");
-}
-
-template<typename T>
-PerceptionModuleBase_<T>* EntitiesPerceptionManager<T>::getPerceptionModule(const std::string& module_name) const
-{
-    if(perception_modules_.find(module_name) != perception_modules_.end())
-        return perception_modules_.at(module_name);
+    auto it = entities_.find(entity_id);
+    if(it != entities_.end())
+        return it->second;
     else
         return nullptr;
-}
-
-template<typename T>
-std::vector<std::string> EntitiesPerceptionManager<T>::getModulesList() const
-{
-    std::vector<std::string> modules_name;
-    std::transform(perception_modules_.cbegin(), perception_modules_.cend(), std::back_inserter(modules_name), [](const auto& it){return it.first;});
-    return modules_name;
-}
-
-template<typename T>
-std::vector<std::string> EntitiesPerceptionManager<T>::getActivatedModulesList() const
-{
-    std::vector<std::string> modules_name;
-    for(const auto& module : perception_modules_)
-    {
-        if(module.second->isActivated())
-            modules_name.push_back(module.first);
-    }
-    return modules_name;
-}
-
-template<typename T>
-std::string EntitiesPerceptionManager<T>::getModulesListStr() const
-{
-    std::string modules_name;
-    for(const auto& module : perception_modules_)
-    {
-        if(modules_name != "")
-            modules_name += ", ";
-        modules_name += module.first;
-    }
-    return modules_name;
-}
-
-template<typename T>
-std::string EntitiesPerceptionManager<T>::getActivatedModulesListStr() const
-{
-    std::string modules_name;
-    for(const auto& module : perception_modules_)
-    {
-        if(module.second->isActivated())
-        {
-            if(modules_name != "")
-                modules_name += ", ";
-            modules_name += module.first;
-        }
-    }
-    return modules_name;
-}
-
-template<typename T>
-void EntitiesPerceptionManager<T>::deleteModules()
-{
-    for(const auto& module : perception_modules_)
-    {
-        module.second->activate(false);
-        delete module.second;
-    }
-    perception_modules_.clear();
-}
-
-template<typename T>
-bool EntitiesPerceptionManager<T>::shouldRun()
-{
-    return std::any_of(perception_modules_.begin(), perception_modules_.end(), [](const auto& it){return it.second->isActivated() && it.second->hasBeenUpdated();});
 }
 
 template<typename T>
@@ -191,13 +112,13 @@ void EntitiesPerceptionManager<T>::getPercepts( std::map<std::string, T>& percep
 template<typename T>
 bool EntitiesPerceptionManager<T>::update()
 {
-    if(!shouldRun())
+    if(!this->shouldRun())
         return false;
 
     for(auto& entity : entities_)
         entity.second->setUnseen();
 
-    for(const auto& module : perception_modules_)
+    for(const auto& module : this->perception_modules_)
         if(module.second->isActivated() && module.second->hasBeenUpdated())
             module.second->accessPercepts([this](std::map<std::string, T>& percepts){ this->getPercepts(percepts); });
 
@@ -222,10 +143,10 @@ void EntitiesPerceptionManager<T>::removeEntityPose(T* entity)
 }
 
 template<typename T>
-void EntitiesPerceptionManager<T>::addToBullet(T* entity)
+bool EntitiesPerceptionManager<T>::addToBullet(T* entity)
 {
     if(black_listed_entities_.find(entity->id()) != black_listed_entities_.end())
-        return;
+        return true;
 
     int visual_id = -1;
     int collision_id = -1;
@@ -302,18 +223,35 @@ void EntitiesPerceptionManager<T>::addToBullet(T* entity)
         bullet_client_->setRollingFriction(obj_id, -1, 0.7);
         bullet_client_->setActivationState(obj_id, eActivationStateDisableSleeping);
         entity->setBulletId(obj_id);
+        return true;
     }
     else
     {
         black_listed_entities_.insert(entity->id());
         ShellDisplay::warning("Entity " + entity->id() + " has been black listed from body creation to prevent future errors");
+        return false;
+    }
+}
+
+template<typename T>
+void EntitiesPerceptionManager<T>::addToBullet(T* entity, int bullet_parent_id)
+{
+    auto p = bullet_client_->findJointAndLinkIndices(bullet_parent_id);
+    //std::unordered_map<std::string, int> joint_name_id = p.first;
+    std::unordered_map<std::string, int> links_name_id = p.second;
+
+    auto it = links_name_id.find(entity->id());
+    if(it != links_name_id.end())
+    {
+        entity->setBulletId(bullet_parent_id);
+        entity->setBulletLinkId(it->second);
     }
 }
 
 template<typename T>
 void EntitiesPerceptionManager<T>::updateToBullet(T* entity)
 {
-    if(entity->bulletId() != -1)
+    if((entity->bulletLinkId() == -1) && (entity->bulletId() != -1))
     {
         if(entity->isLocated() == true)
         {
@@ -332,7 +270,7 @@ void EntitiesPerceptionManager<T>::updateToBullet(T* entity)
 template<typename T>
 void EntitiesPerceptionManager<T>::undoInBullet(T* entity)
 {
-    if(entity->bulletId() != -1)
+    if((entity->bulletLinkId() == -1) && (entity->bulletId() != -1))
     {
         if(entity->isLocated() == true)
         {
@@ -349,8 +287,9 @@ T* EntitiesPerceptionManager<T>::getEntityFromBulletId(int bullet_id)
 {
     for(auto entity : entities_)
     {
-        if(entity.second->bulletId() == bullet_id)
-            return entity.second;
+        if(entity.second->bulletLinkId() == -1)
+            if(entity.second->bulletId() == bullet_id)
+                return entity.second;
     }
     return nullptr;
 }

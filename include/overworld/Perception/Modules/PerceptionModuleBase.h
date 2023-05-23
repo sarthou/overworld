@@ -11,7 +11,6 @@
 #include <message_filters/synchronizer.h>
 #include <message_filters/sync_policies/approximate_time.h>
 
-#include "overworld/BasicTypes/Entity.h"
 #include "overworld/BasicTypes/Agent.h"
 
 #include "overworld/Bullet/PhysicsServers.h"
@@ -24,7 +23,6 @@ namespace owds {
 template<typename T>
 class PerceptionModuleBase_
 {
-  static_assert(std::is_base_of<Entity,T>::value, "T must be derived from Entity");
 public:
   explicit PerceptionModuleBase_(bool need_access_to_external_entities = false):
                                 is_activated_(true),

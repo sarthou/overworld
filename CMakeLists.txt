@@ -68,6 +68,7 @@ add_message_files(
   EntityPose.msg
   EntitiesPoses.msg
   AgentPose.msg
+  Pose.msg
 )
 
 add_service_files(
@@ -145,6 +146,8 @@ set_target_properties(${PROJECT_NAME}_bullet_lib PROPERTIES POSITION_INDEPENDENT
 
 add_library(${PROJECT_NAME}_types_lib STATIC
   src/Geometry/Pose.cpp
+  src/Geometry/Polygon.cpp
+  src/BasicTypes/Area.cpp
   src/BasicTypes/Entity.cpp
   src/BasicTypes/BodyPart.cpp
   src/BasicTypes/Object.cpp
@@ -157,12 +160,14 @@ set_target_properties(${PROJECT_NAME}_types_lib PROPERTIES POSITION_INDEPENDENT_
 
 add_library(${PROJECT_NAME}_perception_lib STATIC
   src/Perception/Managers/AgentPerceptionManager.cpp
+  src/Perception/Managers/AreasPerceptionManager.cpp
   src/Perception/Managers/ObjectsPerceptionManager.cpp
   src/Perception/Managers/RobotsPerceptionManager.cpp
   src/Perception/Managers/HumansPerceptionManager.cpp
   src/Perception/Modules/ObjectsModules/ObjectsEmulatedPerceptionModule.cpp
   src/Perception/Modules/HumansModules/HumansEmulatedPerceptionModule.cpp
-  src/Perception/PerceptionManager.cpp
+  src/Perception/Modules/AreasModules/AreasEmulatedPerceptionModule.cpp
+  src/Perception/PerceptionManagers.cpp
 )
 target_link_libraries(${PROJECT_NAME}_perception_lib PUBLIC
                       ${catkin_LIBRARIES}
@@ -202,6 +207,7 @@ add_library(overworld_modules_plugin MODULE
   src/Perception/Modules/RobotsModules/JointStatePerceptionModule.cpp
   src/Perception/Modules/HumansModules/StampedPosePerceptionModule.cpp
   src/Perception/Modules/HumansModules/FakeHumanPerceptionModule.cpp
+  src/Perception/Modules/AreasModules/ObjAreasPerceptionModule.cpp
 )
 target_link_libraries(overworld_modules_plugin PUBLIC
                       ${catkin_LIBRARIES}
@@ -266,3 +272,7 @@ target_link_libraries(${PROJECT_NAME}_gravity_test PRIVATE
                       ${PROJECT_NAME}_bullet_lib
                       ${catkin_LIBRARIES})
 add_dependencies(${PROJECT_NAME}_gravity_test overworld_gencpp)
+
+add_executable(${PROJECT_NAME}_area_test src/TestFiles/area.cpp )
+target_link_libraries(${PROJECT_NAME}_area_test PRIVATE
+                      ${PROJECT_NAME}_types_lib)

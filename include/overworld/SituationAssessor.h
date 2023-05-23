@@ -9,7 +9,7 @@
 
 #include "overworld/Bullet/PhysicsServers.h"
 
-#include "overworld/Perception/PerceptionManager.h"
+#include "overworld/Perception/PerceptionManagers.h"
 
 #include "overworld/Senders/ROSSender.h"
 #include "overworld/Senders/PoseSender.h"
@@ -31,6 +31,7 @@ struct HumanAssessor_t
   PerceptionModuleBase<Object, std::vector<Object*>>* objects_module;
   PerceptionModuleBase<BodyPart, std::vector<BodyPart*>>* humans_module;
   PerceptionModuleBase<BodyPart, std::vector<BodyPart*>>* robots_module;
+  PerceptionModuleBase<Area, std::vector<Area*>>* areas_module;
 
   HumanAssessor_t()
   {
@@ -38,6 +39,7 @@ struct HumanAssessor_t
     objects_module = nullptr;
     humans_module = nullptr;
     robots_module = nullptr;
+    areas_module = nullptr;
   }
 };
 
@@ -57,6 +59,7 @@ public:
   void addObjectPerceptionModule(const std::string& module_name, PerceptionModuleBase_<Object>* module);
   void addHumanPerceptionModule(const std::string& module_name, PerceptionModuleBase_<BodyPart>* module);
   void addRobotPerceptionModule(const std::string& module_name, PerceptionModuleBase_<BodyPart>* module);
+  void addAreaPerceptionModule(const std::string& module_name, PerceptionModuleBase_<Area>* module);
   
 private:
   std::string agent_name_;
@@ -76,7 +79,7 @@ private:
   double simu_step_;
 
   BulletClient* bullet_client_;
-  PerceptionManager perception_manager_;
+  PerceptionManagers perception_manager_;
 
   FactsCalculator facts_calculator_;
   OntologeniusFactsPublisher facts_publisher_;
@@ -94,21 +97,22 @@ private:
   void updateHumansPerspective(const std::string& human_name,
                                const std::map<std::string, Object*>& objects,
                                const std::map<std::string, BodyPart*>& humans,
+                               const std::map<std::string, Area*>& areas,
                                const std::unordered_set<int>& segmented_ids);
   std::map<std::string, HumanAssessor_t>::iterator createHumanAssessor(const std::string& human_name);
 
   bool stopModules(overworld::StartStopModules::Request &req, overworld::StartStopModules::Response &res);
   bool startModules(overworld::StartStopModules::Request &req, overworld::StartStopModules::Response &res);
   template<typename T>
-  bool startModule(EntitiesPerceptionManager<T>& manager, const std::string& module_name, int& status);
+  bool startModule(BasePerceptionManager<T>& manager, const std::string& module_name, int& status);
   template<typename T>
-  bool stopModule(EntitiesPerceptionManager<T>& manager, const std::string& module_name, int& status);
+  bool stopModule(BasePerceptionManager<T>& manager, const std::string& module_name, int& status);
   bool getBoundingBox(overworld::BoundingBox::Request &req, overworld::BoundingBox::Response &res);
 
 };
 
 template<typename T>
-bool SituationAssessor::startModule(EntitiesPerceptionManager<T>& manager, const std::string& module_name, int& status)
+bool SituationAssessor::startModule(BasePerceptionManager<T>& manager, const std::string& module_name, int& status)
 {
   PerceptionModuleBase_<T>* perception_module = manager.getPerceptionModule(module_name);
   if (perception_module != nullptr)
@@ -126,7 +130,7 @@ bool SituationAssessor::startModule(EntitiesPerceptionManager<T>& manager, const
 }
 
 template<typename T>
-bool SituationAssessor::stopModule(EntitiesPerceptionManager<T>& manager, const std::string& module_name, int& status)
+bool SituationAssessor::stopModule(BasePerceptionManager<T>& manager, const std::string& module_name, int& status)
 {
   PerceptionModuleBase_<T>* perception_module = manager.getPerceptionModule(module_name);
   if (perception_module != nullptr)

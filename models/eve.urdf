@@ -50,7 +50,7 @@
     </visual>
     <collision>
       <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 1.57079632679"/>
-      <geometry>3
+      <geometry>
         <mesh filename="package://overworld/models/tutorials/Eve/eve_head.obj"/>
       </geometry>
     </collision>

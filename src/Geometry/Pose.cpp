@@ -145,17 +145,17 @@ double Pose::getZ() const
 
 double Pose::getRoll() const
 {
-    return t_.rotation().eulerAngles(0,1,2)[0];
+    return t_.rotation().eulerAngles(2,1,0)[0];
 }
 
 double Pose::getPitch() const
 {
-    return t_.rotation().eulerAngles(0,1,2)[1];
+    return t_.rotation().eulerAngles(2,1,0)[1];
 }
 
 double Pose::getYaw() const
 {
-    return t_.rotation().eulerAngles(0,1,2)[2];
+    return t_.rotation().eulerAngles(2,1,0)[2];
 }
 
 Pose Pose::lerpTo(const Pose& goal, double alpha) const

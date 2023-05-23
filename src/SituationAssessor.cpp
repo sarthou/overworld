@@ -2,6 +2,7 @@
 
 #include "overworld/Perception/Modules/ObjectsModules/ObjectsEmulatedPerceptionModule.h"
 #include "overworld/Perception/Modules/HumansModules/HumansEmulatedPerceptionModule.h"
+#include "overworld/Perception/Modules/AreasModules/AreasEmulatedPerceptionModule.h"
 
 #include "overworld/Utility/BulletKeypressHandler.h"
 
@@ -66,6 +67,7 @@ SituationAssessor::SituationAssessor(const std::string& agent_name,
   {
     perception_manager_.applyConfigurationHuman(config_path_);
     myself_agent_ = perception_manager_.humans_manager_.getAgent(agent_name);
+    perception_manager_.areas_manager_.undrawAreas();
   }
 
   perception_manager_.objects_manager_.setOwnerAgent(myself_agent_);
@@ -141,6 +143,11 @@ void SituationAssessor::addRobotPerceptionModule(const std::string& module_name,
   perception_manager_.robots_manager_.addPerceptionModule(module_name, module);
 }
 
+void SituationAssessor::addAreaPerceptionModule(const std::string& module_name, PerceptionModuleBase_<Area>* module)
+{
+  perception_manager_.areas_manager_.addPerceptionModule(module_name, module);
+}
+
 void SituationAssessor::assessmentLoop()
 {
   std::chrono::milliseconds interval(int(time_step_ * 1000));
@@ -155,7 +162,7 @@ void SituationAssessor::assessmentLoop()
     assess();
 
     if(is_robot_)
-      handleKeypress(bullet_client_, perception_manager_.robots_manager_);
+      handleKeypress(bullet_client_, perception_manager_);
 
     if(ros::ok() && isRunning())
     {
@@ -202,8 +209,10 @@ void SituationAssessor::assess()
   perception_manager_.update();
   auto objects = perception_manager_.objects_manager_.getEntities();
   auto robots = perception_manager_.robots_manager_.getAgents();
+  auto robot_parts = perception_manager_.robots_manager_.getEntities();
   auto humans = perception_manager_.humans_manager_.getAgents();
   auto body_parts = perception_manager_.humans_manager_.getEntities();
+  auto areas = perception_manager_.areas_manager_.getEntities();
 
   std::thread humans_process;
 
@@ -227,7 +236,9 @@ void SituationAssessor::assess()
   if(is_robot_)
     humans_process.join();
 
-  auto facts = facts_calculator_.computeAgentsFacts(objects, agents, agents_segmentation_ids, false);
+  facts_calculator_.computeAgentsFacts(objects, agents, agents_segmentation_ids, false);
+  facts_calculator_.computeAreasFacts(areas, {}, robot_parts, false);
+  auto facts = facts_calculator_.computeAreasFacts(areas, objects, body_parts, false);
   facts_publisher_.publish(facts);
 }
 
@@ -236,6 +247,7 @@ void SituationAssessor::processHumans(std::map<std::string, std::unordered_set<i
   auto objects = perception_manager_.objects_manager_.getEntities();
   auto humans = perception_manager_.humans_manager_.getAgents();
   auto body_parts = perception_manager_.humans_manager_.getEntities();
+  auto areas = perception_manager_.areas_manager_.getEntities();
 
   for(auto human : humans)
   {
@@ -258,13 +270,14 @@ void SituationAssessor::processHumans(std::map<std::string, std::unordered_set<i
 
     ros_sender_->sendImage(human.first + "/view", images);
     agents_segmentation_ids[human.first] = bullet_client_->getSegmentationIds(images);
-    updateHumansPerspective(human.first, objects, body_parts, agents_segmentation_ids[human.first]);
+    updateHumansPerspective(human.first, objects, body_parts, areas, agents_segmentation_ids[human.first]);
   }
 }
 
 void SituationAssessor::updateHumansPerspective(const std::string& human_name,
                                                 const std::map<std::string, Object*>& objects,
                                                 const std::map<std::string, BodyPart*>& humans,
+                                                const std::map<std::string, Area*>& areas,
                                                 const std::unordered_set<int>& segmented_ids)
 {
   auto assessor_it = humans_assessors_.find(human_name);
@@ -288,8 +301,13 @@ void SituationAssessor::updateHumansPerspective(const std::string& human_name,
       seen_humans.push_back(body_part.second);
   }
 
+  std::vector<Area*> seen_areas;
+  std::transform(areas.cbegin(), areas.cend(), std::back_inserter(seen_areas),
+                 [](const auto& it) { return it.second; });
+
   assessor_it->second.objects_module->sendPerception(seen_objects);
   assessor_it->second.humans_module->sendPerception(seen_humans);
+  assessor_it->second.areas_module->sendPerception(seen_areas);
 }
 
 std::map<std::string, HumanAssessor_t>::iterator SituationAssessor::createHumanAssessor(const std::string& human_name)
@@ -299,8 +317,10 @@ std::map<std::string, HumanAssessor_t>::iterator SituationAssessor::createHumanA
   assessor->second.assessor = new SituationAssessor(human_name, config_path_, 1.0/time_step_, 1.0/simu_step_, simulate_);
   assessor->second.objects_module = new ObjectsEmulatedPerceptionModule();
   assessor->second.humans_module = new HumansEmulatedPerceptionModule();
+  assessor->second.areas_module = new AreasEmulatedPerceptionModule();
   assessor->second.assessor->addObjectPerceptionModule("emulated_objects", assessor->second.objects_module);
   assessor->second.assessor->addHumanPerceptionModule("emulated_humans", assessor->second.humans_module);
+  assessor->second.assessor->addAreaPerceptionModule("emulated_areas", assessor->second.areas_module);
   std::thread th(&SituationAssessor::run, assessor->second.assessor);
   assessor->second.thread = std::move(th);
 
@@ -319,6 +339,8 @@ bool SituationAssessor::startModules(overworld::StartStopModules::Request &req, 
       continue;
     if (startModule(perception_manager_.humans_manager_, module_name, res.statuses[i]))
       continue;
+    if (startModule(perception_manager_.areas_manager_, module_name, res.statuses[i]))
+      continue;
     res.statuses[i] = overworld::StartStopModules::Response::MODULE_NOT_FOUND;
   }
   return true;
@@ -335,6 +357,8 @@ bool SituationAssessor::stopModules(overworld::StartStopModules::Request &req, o
     if (stopModule(perception_manager_.robots_manager_, module_name, res.statuses[i]))
       continue;
     if (stopModule(perception_manager_.humans_manager_, module_name, res.statuses[i]))
+      continue;
+    if (stopModule(perception_manager_.areas_manager_, module_name, res.statuses[i]))
       continue;
     res.statuses[i] = overworld::StartStopModules::Response::MODULE_NOT_FOUND;
   }

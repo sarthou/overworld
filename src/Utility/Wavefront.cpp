@@ -15,6 +15,44 @@ bool isWavefront(const std::string& cad_file)
   return (cad_file.find(".obj") != std::string::npos);
 }
 
+std::vector<std::array<double, 3>> getVertexes(const std::string& obj_path)
+{
+  std::vector<std::array<double, 3>> vertexes;
+  std::map<int, int> order;
+  std::regex v_regex("v\\s([-|\\d|.]+)\\s([-|\\d|.]+)\\s([-|\\d|.]+)");
+  std::regex l_regex("l\\s([\\d]+)\\s([\\d]+)");
+  std::smatch match;
+
+  std::ifstream obj_file(obj_path);
+  if(obj_file.is_open())
+  {
+    std::string line;
+    while(std::getline(obj_file,line))
+    {
+      if(std::regex_match(line, match, v_regex))
+        vertexes.push_back(std::array<double, 3>{std::stod(match[1]), std::stod(match[2]), std::stod(match[3])});
+      else if(std::regex_match(line, match, l_regex))
+        order[std::stoi(match[1])] = std::stoi(match[2]);
+    }
+
+    if(order.size())
+    {
+      std::vector<std::array<double, 3>> ordered_vertexes;
+      int index = order.begin()->first;
+      for(size_t i = 0; i < order.size(); i++)
+      {
+        ordered_vertexes.emplace_back(vertexes[index-1]);
+        index = order[index];
+      }
+      vertexes = std::move(ordered_vertexes);
+    }
+
+    obj_file.close();
+  }
+
+  return vertexes;
+}
+
 std::string getMltFile(const std::string& obj_path)
 {
   std::ifstream obj_f(obj_path);

@@ -35,7 +35,7 @@ std::map<std::string, Agent*>::iterator AgentPerceptionManager::createAgent(cons
   return it;
 }
 
-void AgentPerceptionManager::UpdateAgent(BodyPart* body_part, AgentType_e type)
+Agent* AgentPerceptionManager::UpdateAgent(BodyPart* body_part, AgentType_e type)
 {
   if(body_part->isAgentKnown())
   {
@@ -76,9 +76,13 @@ void AgentPerceptionManager::UpdateAgent(BodyPart* body_part, AgentType_e type)
         break;
       }
     }
+    return it_agent->second;
   }
   else
+  {
     ShellDisplay::warning("[AgentPerceptionManager] The agent of the body part " + body_part->id() + " is undefined");
+    return nullptr;
+  }
 }
 
 FieldOfView AgentPerceptionManager::getFov(const std::string& agent_name)
