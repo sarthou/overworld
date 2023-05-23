@@ -166,6 +166,7 @@ add_library(${PROJECT_NAME}_perception_lib STATIC
   src/Perception/Managers/HumansPerceptionManager.cpp
   src/Perception/Modules/ObjectsModules/ObjectsEmulatedPerceptionModule.cpp
   src/Perception/Modules/HumansModules/HumansEmulatedPerceptionModule.cpp
+  src/Perception/Modules/AreasModules/AreasEmulatedPerceptionModule.cpp
   src/Perception/PerceptionManagers.cpp
 )
 target_link_libraries(${PROJECT_NAME}_perception_lib PUBLIC
