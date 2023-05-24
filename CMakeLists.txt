@@ -133,7 +133,8 @@ add_library(${PROJECT_NAME}_utility_lib STATIC
   src/Utility/Wavefront.cpp
 )
 target_link_libraries(${PROJECT_NAME}_utility_lib PUBLIC
-                      ${catkin_LIBRARIES})
+                      ${catkin_LIBRARIES}
+                      ${ontologenius_LIBRARIES})
 set_target_properties(${PROJECT_NAME}_utility_lib PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 add_library(${PROJECT_NAME}_bullet_lib STATIC
@@ -243,6 +244,7 @@ target_link_libraries(plugins ${catkin_LIBRARIES}
 
 add_executable(teleop src/Nodes/teleop.cpp)
 target_link_libraries(teleop ${catkin_LIBRARIES})
+add_dependencies(teleop overworld_gencpp)
 
 #################
 #  Test files   #
