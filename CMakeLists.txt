@@ -10,7 +10,6 @@ if(DEFINED ENV{BULLET_INSTALL_PATH})
 endif()
 
 find_package(catkin REQUIRED COMPONENTS
-  ontologenius
   roscpp
   std_msgs
   genmsg
@@ -28,7 +27,8 @@ find_package(catkin REQUIRED COMPONENTS
   cv_bridge
   pluginlib
 )
-find_package (Eigen3 REQUIRED NO_MODULE)
+find_package(ontologenius 0.2.12 REQUIRED)
+find_package(Eigen3 REQUIRED NO_MODULE)
 find_package(Threads REQUIRED)
 find_package(CURL REQUIRED)
 find_package(pluginlib REQUIRED)
@@ -107,6 +107,7 @@ catkin_package(
 
 include_directories(
   include
+  ${ontologenius_INCLUDE_DIRS}
   ${EIGEN3_INCLUDE_DIRS}
   ${catkin_INCLUDE_DIRS}
   ${CURL_INCLUDE_DIRS}
@@ -232,7 +233,8 @@ target_link_libraries(${PROJECT_NAME}_node PRIVATE
                       ${PROJECT_NAME}_perception_lib
                       ${PROJECT_NAME}_sender_lib
                       ${PROJECT_NAME}_facts_lib
-                      ${catkin_LIBRARIES})
+                      ${catkin_LIBRARIES}
+                      ${ontologenius_LIBRARIES})
 add_dependencies(${PROJECT_NAME}_node overworld_gencpp)
 
 add_executable(plugins src/Nodes/plugins.cpp)
