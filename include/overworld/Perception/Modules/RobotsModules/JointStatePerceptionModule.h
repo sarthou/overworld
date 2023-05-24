@@ -4,8 +4,11 @@
 #include "overworld/BasicTypes/BodyPart.h"
 #include "overworld/Bullet/PhysicsServers.h"
 #include "overworld/Perception/Modules/PerceptionModuleBase.h"
+
 #include <sensor_msgs/JointState.h>
 #include <tf2_ros/transform_listener.h>
+
+#include "ontologenius/OntologiesManipulator.h"
 
 namespace owds {
 
@@ -41,8 +44,11 @@ class JointStatePerceptionModule : public owds::PerceptionModuleRosBase<owds::Bo
     tf2_ros::Buffer tf_buffer_;
     tf2_ros::TransformListener tf2_listener_;
 
+    OntologiesManipulator* ontologies_manipulator_;
+    OntologyManipulator* onto_;
+
     bool updateBasePose(const ros::Time& stamp = ros::Time(0));
-    void loadPr2Model();
+    void loadRobotModel();
 };
 
 } // namespace owds

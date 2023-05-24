@@ -1,27 +1,19 @@
 #ifndef OWDS_HUMANSPERCEPTIONMANAGER_H
 #define OWDS_HUMANSPERCEPTIONMANAGER_H
 
-#include "overworld/Perception/Managers/EntitiesPerceptionManager.h"
-#include "overworld/BasicTypes/BodyPart.h"
-#include "overworld/BasicTypes/Agent.h"
+#include "overworld/Perception/Managers/AgentPerceptionManager.h"
 
 namespace owds {
 
-class HumansPerceptionManager : public EntitiesPerceptionManager<BodyPart>
+class HumansPerceptionManager : public AgentPerceptionManager
 {
 public:
-  HumansPerceptionManager(): EntitiesPerceptionManager(){}
-  ~HumansPerceptionManager();
+  explicit HumansPerceptionManager(ros::NodeHandle* nh): AgentPerceptionManager(nh){}
   
-  Agent* getAgent(const std::string& agent_name);
-  std::map<std::string, Agent*> getAgents() const { return agents_; }
+  Agent* getAgent(const std::string& agent_name) { return AgentPerceptionManager::getAgent(agent_name, AgentType_e::HUMAN); }
 
 private:
-  std::map<std::string, Agent*> agents_;
-
   void getPercepts( std::map<std::string, BodyPart>& percepts) override;
-
-  void UpdateAgent(BodyPart* body_part);
 };
 
 } // namespace owds

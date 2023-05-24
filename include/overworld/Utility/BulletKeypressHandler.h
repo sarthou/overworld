@@ -3,7 +3,7 @@
 
 #include "overworld/Bullet/BulletClient.h"
 #include "overworld/Geometry/GeometryUtils.h"
-#include "overworld/Perception/Managers/RobotsPerceptionManager.h"
+#include "overworld/Perception/PerceptionManagers.h"
 #include "overworld/Utility/ShellDisplay.h"
 
 namespace owds {
@@ -27,7 +27,21 @@ inline void onSpacebarPressed(BulletClient* bullet_client, const RobotsPerceptio
     }
 }
 
-inline void handleKeypress(BulletClient* bullet_client, const RobotsPerceptionManager& robots_manager)
+inline void onAPressed(AreasPerceptionManager& areas_manager)
+{
+    if(areas_manager.isDrawn())
+    {
+        areas_manager.undrawAreas();
+        ShellDisplay::success("Area visualization has been disabled");
+    }
+    else
+    {
+        areas_manager.drawAreas();
+        ShellDisplay::success("Area visualization has been enabled");
+    }
+}
+
+inline void handleKeypress(BulletClient* bullet_client, PerceptionManagers& managers)
 {
     b3KeyboardEventsData keyboard = bullet_client->getKeyboardEvents();
     for (size_t i = 0; i < keyboard.m_numKeyboardEvents; i++)
@@ -37,7 +51,11 @@ inline void handleKeypress(BulletClient* bullet_client, const RobotsPerceptionMa
             switch (keyboard.m_keyboardEvents[i].m_keyCode)
             {
             case ' ':
-                onSpacebarPressed(bullet_client, robots_manager);
+                onSpacebarPressed(bullet_client, managers.robots_manager_);
+                break;
+            case 'a':
+            case 'A':
+                onAPressed(managers.areas_manager_);
                 break;
             case 65281:  // F2
                 ShellDisplay::success("Debug visualizer has been disabled");
@@ -50,5 +68,7 @@ inline void handleKeypress(BulletClient* bullet_client, const RobotsPerceptionMa
         }
     }
 }
+
 } // namespace owds
+
 #endif /* OWDS_BULLETKEYPRESSHANDLER_H */

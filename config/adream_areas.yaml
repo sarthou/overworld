@@ -1,0 +1,28 @@
+adream_kitchen:
+  pose:
+    z: 1.75
+  polygon_path: package://overworld/models/areas/adream_kitchen.obj
+  half_height: 1.75
+  hysteresis: 0.2
+
+adream_bedroom:
+  pose:
+    z: 1.75
+  polygon_path: package://overworld/models/areas/adream_bedroom.obj
+  half_height: 1.75
+  hysteresis: 0.2
+
+adream_saloon:
+  pose:
+    z: 1.75
+  polygon_path: package://overworld/models/areas/adream_saloon.obj
+  half_height: 1.75
+  hysteresis: 0.2
+
+#eve_area:
+#  pose:
+#    z: 0.5
+#  half_height: 0.5
+#  radius: 0.5
+#  hysteresis: 0.05
+#  owner: base_link

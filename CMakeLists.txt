@@ -10,11 +10,11 @@ if(DEFINED ENV{BULLET_INSTALL_PATH})
 endif()
 
 find_package(catkin REQUIRED COMPONENTS
-  ontologenius
   roscpp
   std_msgs
   genmsg
   message_generation
+  tf
   tf2
   tf2_ros
   tf2_eigen
@@ -27,7 +27,8 @@ find_package(catkin REQUIRED COMPONENTS
   cv_bridge
   pluginlib
 )
-find_package (Eigen3 REQUIRED NO_MODULE)
+find_package(ontologenius 0.2.12 REQUIRED)
+find_package(Eigen3 REQUIRED NO_MODULE)
 find_package(Threads REQUIRED)
 find_package(CURL REQUIRED)
 find_package(pluginlib REQUIRED)
@@ -67,6 +68,7 @@ add_message_files(
   EntityPose.msg
   EntitiesPoses.msg
   AgentPose.msg
+  Pose.msg
 )
 
 add_service_files(
@@ -105,6 +107,7 @@ catkin_package(
 
 include_directories(
   include
+  ${ontologenius_INCLUDE_DIRS}
   ${EIGEN3_INCLUDE_DIRS}
   ${catkin_INCLUDE_DIRS}
   ${CURL_INCLUDE_DIRS}
@@ -123,15 +126,30 @@ target_link_libraries(Bullet3 INTERFACE
                       ${catkin_LIBRARIES}
                       Threads::Threads)
 
+add_library(${PROJECT_NAME}_utility_lib STATIC
+  src/Utility/YamlReader.cpp
+  src/Utility/Ontology.cpp
+  src/Utility/RosFiles.cpp
+  src/Utility/Wavefront.cpp
+)
+target_link_libraries(${PROJECT_NAME}_utility_lib PUBLIC
+                      ${catkin_LIBRARIES}
+                      ${ontologenius_LIBRARIES})
+set_target_properties(${PROJECT_NAME}_utility_lib PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
 add_library(${PROJECT_NAME}_bullet_lib STATIC
   src/Bullet/PhysicsServers.cpp
   src/Bullet/BulletClient.cpp
 )
-target_link_libraries(${PROJECT_NAME}_bullet_lib PUBLIC Bullet3)
+target_link_libraries(${PROJECT_NAME}_bullet_lib PUBLIC 
+                      Bullet3
+                      ${PROJECT_NAME}_utility_lib)
 set_target_properties(${PROJECT_NAME}_bullet_lib PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 add_library(${PROJECT_NAME}_types_lib STATIC
   src/Geometry/Pose.cpp
+  src/Geometry/Polygon.cpp
+  src/BasicTypes/Area.cpp
   src/BasicTypes/Entity.cpp
   src/BasicTypes/BodyPart.cpp
   src/BasicTypes/Object.cpp
@@ -142,20 +160,16 @@ target_link_libraries(${PROJECT_NAME}_types_lib PUBLIC
                       ${PROJECT_NAME}_bullet_lib)
 set_target_properties(${PROJECT_NAME}_types_lib PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
-add_library(${PROJECT_NAME}_utility_lib STATIC
-  src/Utility/YamlReader.cpp
-)
-target_link_libraries(${PROJECT_NAME}_utility_lib PUBLIC
-                      ${catkin_LIBRARIES})
-set_target_properties(${PROJECT_NAME}_utility_lib PROPERTIES POSITION_INDEPENDENT_CODE ON)
-
 add_library(${PROJECT_NAME}_perception_lib STATIC
+  src/Perception/Managers/AgentPerceptionManager.cpp
+  src/Perception/Managers/AreasPerceptionManager.cpp
   src/Perception/Managers/ObjectsPerceptionManager.cpp
   src/Perception/Managers/RobotsPerceptionManager.cpp
   src/Perception/Managers/HumansPerceptionManager.cpp
   src/Perception/Modules/ObjectsModules/ObjectsEmulatedPerceptionModule.cpp
   src/Perception/Modules/HumansModules/HumansEmulatedPerceptionModule.cpp
-  src/Perception/PerceptionManager.cpp
+  src/Perception/Modules/AreasModules/AreasEmulatedPerceptionModule.cpp
+  src/Perception/PerceptionManagers.cpp
 )
 target_link_libraries(${PROJECT_NAME}_perception_lib PUBLIC
                       ${catkin_LIBRARIES}
@@ -193,9 +207,9 @@ add_library(overworld_modules_plugin MODULE
   src/Perception/Modules/ObjectsModules/StaticObjectsPerceptionModule.cpp
   src/Perception/Modules/ObjectsModules/FakeObjectPerceptionModule.cpp
   src/Perception/Modules/RobotsModules/JointStatePerceptionModule.cpp
-  src/Perception/Modules/RobotsModules/FakeRobotPerceptionModule.cpp
   src/Perception/Modules/HumansModules/StampedPosePerceptionModule.cpp
   src/Perception/Modules/HumansModules/FakeHumanPerceptionModule.cpp
+  src/Perception/Modules/AreasModules/ObjAreasPerceptionModule.cpp
 )
 target_link_libraries(overworld_modules_plugin PUBLIC
                       ${catkin_LIBRARIES}
@@ -220,12 +234,17 @@ target_link_libraries(${PROJECT_NAME}_node PRIVATE
                       ${PROJECT_NAME}_perception_lib
                       ${PROJECT_NAME}_sender_lib
                       ${PROJECT_NAME}_facts_lib
-                      ${catkin_LIBRARIES})
+                      ${catkin_LIBRARIES}
+                      ${ontologenius_LIBRARIES})
 add_dependencies(${PROJECT_NAME}_node overworld_gencpp)
 
 add_executable(plugins src/Nodes/plugins.cpp)
 target_link_libraries(plugins ${catkin_LIBRARIES}
                       ${PROJECT_NAME}_bullet_lib)
+
+add_executable(teleop src/Nodes/teleop.cpp)
+target_link_libraries(teleop ${catkin_LIBRARIES})
+add_dependencies(teleop overworld_gencpp)
 
 #################
 #  Test files   #
@@ -236,6 +255,7 @@ target_link_libraries(${PROJECT_NAME}_bullet_test PRIVATE
                       ${PROJECT_NAME}_bullet_lib
                       ${PROJECT_NAME}_types_lib
                       ${PROJECT_NAME}_perception_lib
+                      ${PROJECT_NAME}_utility_lib
                       ${catkin_LIBRARIES})
 
 add_executable(${PROJECT_NAME}_multi_server_test src/TestFiles/multi_server_test.cpp )
@@ -256,3 +276,7 @@ target_link_libraries(${PROJECT_NAME}_gravity_test PRIVATE
                       ${PROJECT_NAME}_bullet_lib
                       ${catkin_LIBRARIES})
 add_dependencies(${PROJECT_NAME}_gravity_test overworld_gencpp)
+
+add_executable(${PROJECT_NAME}_area_test src/TestFiles/area.cpp )
+target_link_libraries(${PROJECT_NAME}_area_test PRIVATE
+                      ${PROJECT_NAME}_types_lib)

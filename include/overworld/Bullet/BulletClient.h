@@ -35,6 +35,32 @@ enum RendererFlags_e {
 	ER_NO_SEGMENTATION_MASK = 4,
 };
 
+enum UrdfFlags_e
+{
+	URDF_USE_INERTIA_FROM_FILE = 2,  //sync with URDFJointTypes.h 'ConvertURDFFlags'
+	URDF_USE_SELF_COLLISION = 8,     //see CUF_USE_SELF_COLLISION
+	URDF_USE_SELF_COLLISION_EXCLUDE_PARENT = 16,
+	URDF_USE_SELF_COLLISION_EXCLUDE_ALL_PARENTS = 32,
+	URDF_RESERVED = 64,
+	URDF_USE_IMPLICIT_CYLINDER = 128,
+	URDF_GLOBAL_VELOCITIES_MB = 256,
+	MJCF_COLORS_FROM_FILE = 512,
+	URDF_ENABLE_CACHED_GRAPHICS_SHAPES = 1024,
+	URDF_ENABLE_SLEEPING = 2048,
+	URDF_INITIALIZE_SAT_FEATURES = 4096,
+	URDF_USE_SELF_COLLISION_INCLUDE_PARENT = 8192,
+	URDF_PARSE_SENSORS = 16384,
+	URDF_USE_MATERIAL_COLORS_FROM_MTL = 32768,
+	URDF_USE_MATERIAL_TRANSPARANCY_FROM_MTL = 65536,
+	URDF_MAINTAIN_LINK_ORDER = 131072,
+	URDF_ENABLE_WAKEUP = 1 << 18,
+	URDF_MERGE_FIXED_LINKS = 1 << 19,
+	URDF_IGNORE_VISUAL_SHAPES = 1 << 20,
+	URDF_IGNORE_COLLISION_SHAPES = 1 << 21,
+	URDF_PRINT_URDF_INFO = 1 << 22,
+	URDF_GOOGLEY_UNDEFINED_COLORS = 1 << 23,
+};
+
 struct aabb_t
 {
     std::array<double, 3> min;
@@ -168,7 +194,19 @@ public:
                           const std::array<double, 3>& color_rgb,
                           double line_width = 1,
                           double life_time = 0,
+                          int replace_id = -1,
+                          int parent_object_id = -1,
+                          int parent_link_index = -1);
+
+    long addUserDebugText(const std::string& text,
+                          const std::array<double, 3>& position,
+                          const std::array<double, 3>& color_rgb,
+                          float text_size = 0.1,
+                          float life_time = 0,
+                          long parent_object_id = -1,
                           int replace_id = -1);
+
+    bool removeUserDebugItem(int unique_id);
 
     std::vector<struct b3RayHitInfo> rayTestBatch(const std::vector<std::array<double, 3>>& from_poses,
                                                   const std::vector<std::array<double,3>>& to_poses,

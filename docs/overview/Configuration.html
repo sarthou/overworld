@@ -1,7 +1,7 @@
 <html lang="en_US">
 
 <head>
-  <title>Configuration | Overworld 0.1.3</title>
+  <title>Configuration | Overworld 0.1.4</title>
   <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
   <link href="../style/overworld_api.css" rel="stylesheet" type="text/css">
   <link href="../images/favicon.ico" rel="shortcut icon">
@@ -49,8 +49,7 @@
             <li class="level1"><a href="../Download.html">Download</a></li>
             <li class="level1"><a href="../InstallOverworld.html">Install Overworld</a></li>
             <li class="level1"><a href="../AvailableModules.html">Available modules</a></li>
-            <!--li class="level1"><a href="../cpp_Tutorials/Tutorials.html">Cpp Tutorials</a></li>
-            <li class="level1"><a href="../python_Tutorials/Tutorials.html">Python Tutorials</a></li-->
+            <li class="level1"><a href="../Tutorials/Tutorials.html">Tutorials</a></li>
           </ul>
         </div>
 
@@ -89,40 +88,42 @@
         <p>The configuration is described in a YAML file. The content looks like what follows:</p>
 
         <div class="code_block">
-          <div class="terminal_line"><span class="cpp_type">modules</span>:</div>
-          <div class="terminal_line">  <span class="cpp_type">robot</span>:</div>
-          <div class="terminal_line">    <span class="cpp_type">JointStatePerceptionModule</span>: <span class="cpp_string">pr2_joints</span></div>
-          <div class="terminal_line">  <span class="cpp_type">humans</span>:</div>
-          <div class="terminal_line">    <span class="cpp_type">OptitrackPerceptionModule</span>: <span class="cpp_string">optitrack</span></div>
-          <div class="terminal_line">  <span class="cpp_type">objects</span>:</div>
-          <div class="terminal_line">    <span class="cpp_type">ArTrackPerceptionModule</span>: <span class="cpp_string">ar_track</span></div>
-          <div class="terminal_line">    <span class="cpp_type">Pr2GripperPerceptionModule</span>:</div>
-          <div class="terminal_line">      - <span class="cpp_string">pr2_left_gripper</span></div>
-          <div class="terminal_line">      - <span class="cpp_string">pr2_right_gripper</span></div>
-          <div class="terminal_line">    <span class="cpp_type">StaticObjectsPerceptionModule</span>: <span class="cpp_string">static</span></div>
+          <div class="terminal_line"><span class="yaml_key">modules</span>:</div>
+          <div class="terminal_line">  <span class="yaml_key">robot</span>:</div>
+          <div class="terminal_line">    <span class="yaml_key">JointStatePerceptionModule</span>: <span class="yaml_string">pr2_joints</span></div>
+          <div class="terminal_line">  <span class="yaml_key">humans</span>:</div>
+          <div class="terminal_line">    <span class="yaml_key">OptitrackPerceptionModule</span>: <span class="yaml_string">optitrack</span></div>
+          <div class="terminal_line">  <span class="yaml_key">objects</span>:</div>
+          <div class="terminal_line">    <span class="yaml_key">ArTrackPerceptionModule</span>: <span class="yaml_string">ar_track</span></div>
+          <div class="terminal_line">    <span class="yaml_key">Pr2GripperPerceptionModule</span>:</div>
+          <div class="terminal_line">      - <span class="yaml_string">pr2_left_gripper</span></div>
+          <div class="terminal_line">      - <span class="yaml_string">pr2_right_gripper</span></div>
+          <div class="terminal_line">    <span class="yaml_key">StaticObjectsPerceptionModule</span>: <span class="yaml_string">static</span></div>
+          <div class="terminal_line">  <span class="yaml_key">areas</span>:</div>
+          <div class="terminal_line">    <span class="yaml_key">ObjAreasPerceptionModule</span>: <span class="yaml_string">obj_area</span></div>
           <div class="terminal_line"> </div>
-          <div class="terminal_line"><span class="cpp_type">pr2_joints</span>:</div>
-          <div class="terminal_line">  <span class="cpp_type">name</span> : <span class="cpp_string">pr2</span></div>
-          <div class="terminal_line">  <span class="cpp_type">right_hand</span> : <span class="cpp_string">r_gripper_tool_frame</span></div>
-          <div class="terminal_line">  <span class="cpp_type">left_hand</span> : <span class="cpp_string">l_gripper_tool_frame</span></div>
-          <div class="terminal_line">  <span class="cpp_type">head</span> : <span class="cpp_string">head_mount_kinect2_rgb_optical_frame</span></div>
+          <div class="terminal_line"><span class="yaml_key">pr2_joints</span>:</div>
+          <div class="terminal_line">  <span class="yaml_key">min_period</span> : <span class="yaml_string">0.9</span></div>
           <div class="terminal_line"> </div>
-          <div class="terminal_line"><span class="cpp_type">pr2_left_gripper</span>:</div>
-          <div class="terminal_line">  <span class="cpp_type">side</span> : <span class="cpp_value">0</span></div>
-          <div class="terminal_line">  <span class="cpp_type">pressure_threshold</span> : <span class="cpp_value">400</span></div>
-          <div class="terminal_line">  <span class="cpp_type">distance_threshold</span> : <span class="cpp_value">0.03</span></div>
+          <div class="terminal_line"><span class="yaml_key">pr2_left_gripper</span>:</div>
+          <div class="terminal_line">  <span class="yaml_key">side</span> : <span class="yaml_value">0</span></div>
+          <div class="terminal_line">  <span class="yaml_key">pressure_threshold</span> : <span class="yaml_value">400</span></div>
+          <div class="terminal_line">  <span class="yaml_key">distance_threshold</span> : <span class="yaml_value">0.03</span></div>
           <div class="terminal_line"> </div>
-          <div class="terminal_line"><span class="cpp_type">pr2_right_gripper</span>:</div>
-          <div class="terminal_line">  <span class="cpp_type">side</span> : <span class="cpp_value">1</span></div>
-          <div class="terminal_line">  <span class="cpp_type">distance_threshold</span> : <span class="cpp_value">0.03</span></div>
+          <div class="terminal_line"><span class="yaml_key">pr2_right_gripper</span>:</div>
+          <div class="terminal_line">  <span class="yaml_key">side</span> : <span class="yaml_value">1</span></div>
+          <div class="terminal_line">  <span class="yaml_key">distance_threshold</span> : <span class="yaml_value">0.03</span></div>
           <div class="terminal_line"> </div>
-          <div class="terminal_line"><span class="cpp_type">optitrack</span>:</div>
-          <div class="terminal_line">  <span class="cpp_type">name</span> : <span class="cpp_string">human_0</span></div>
-          <div class="terminal_line">  <span class="cpp_type">offset_x</span> : <span class="cpp_value">6.4868</span></div>
-          <div class="terminal_line">  <span class="cpp_type">offset_y</span> : <span class="cpp_value">2.8506</span></div>
+          <div class="terminal_line"><span class="yaml_key">optitrack</span>:</div>
+          <div class="terminal_line">  <span class="yaml_key">name</span> : <span class="yaml_string">human_0</span></div>
+          <div class="terminal_line">  <span class="yaml_key">offset_x</span> : <span class="yaml_value">6.4868</span></div>
+          <div class="terminal_line">  <span class="yaml_key">offset_y</span> : <span class="yaml_value">2.8506</span></div>
           <div class="terminal_line"> </div>
-          <div class="terminal_line"><span class="cpp_type">static</span>:</div>
-          <div class="terminal_line">  <span class="cpp_type">file</span> : <span class="cpp_string">package://overworld/config/adream.yaml</span></div>
+          <div class="terminal_line"><span class="yaml_key">static</span>:</div>
+          <div class="terminal_line">  <span class="yaml_key">file</span> : <span class="yaml_string">package://overworld/config/adream.yaml</span></div>
+          <div class="terminal_line"> </div>
+          <div class="terminal_line"><span class="yaml_key">obj_area</span>:</div>
+          <div class="terminal_line">  <span class="yaml_key">file</span> : <span class="yaml_string">package://overworld/config/adream_areas.yaml</span></div>
         </div>
 
         <p>To pass your configuration file to an Overworld executable see the
@@ -133,7 +134,7 @@
 
         <h2><i class="fas fa-angle-right"></i> Modules</h2>
 
-        <p>The modules correspond to the perception modules that will be loaded at the launch. These modules are divided in three categories: <b>robot</b>, <b>humans</b>, and <b>objects</b>.</p>
+        <p>The modules correspond to the perception modules that will be loaded at the launch. These modules are divided in four categories: <b>robot</b>, <b>humans</b>, <b>objects</b>, and <b>areas</b>.</p>
         <p>In each category, the keys correspond to the modules' type while the values are the user-defined instances names. For example, in the provided configuration file, we load a JointStatePerceptionModule module called <i>pr2_joints</i> and two Pr2GripperPerceptionModule modules called <i>r_gripper_tool_frame</i> and <i>pr2_right_gripper</i></p>
 
         <h2><i class="fas fa-angle-right"></i> Parameters</h2>

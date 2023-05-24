@@ -10,52 +10,46 @@
   - apt-get update -qq && apt-get install -y libcppunit-1.15-0 libcppunit-dev libtinyxml-dev git-all python3-rosdep python3-pip
   - pip3 install requests --user
 
-.install_bullet_template : &install_bullet
-  before_script:
-    - mkdir -p ~/dependencies && cd ~/dependencies
-    - git clone https://github.com/bulletphysics/bullet3.git
-    - cd bullet3
-    - mkdir build && mkdir install
-    - export BULLET_PATH=$(pwd)
-    - cd build
-    - cmake .. -DCMAKE_INSTALL_PREFIX=$BULLET_PATH/install -DBUILD_SHARED_LIBS=ON
-    - make install
-    - export BULLET_INSTALL_PATH=~/dependencies/bullet3/install
-    - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$BULLET_INSTALL_PATH/lib
+.install_bullet_template : &install_bullet |
+  mkdir -p ~/dependencies && cd ~/dependencies
+  git clone https://github.com/bulletphysics/bullet3.git
+  cd bullet3
+  mkdir build && mkdir install
+  export BULLET_PATH=$(pwd)
+  cd build
+  cmake .. -DCMAKE_INSTALL_PREFIX=$BULLET_PATH/install -DBUILD_SHARED_LIBS=ON
+  make install
+  export BULLET_INSTALL_PATH=~/dependencies/bullet3/install
+  export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$BULLET_INSTALL_PATH/lib
 
-.create_ws_template : &create_ws
-  before_script:
-    - mkdir -p ~/ros_ws/src
-    - cd ~/ros_ws
-    - catkin_make -DCMAKE_BUILD_TYPE=Release
+.create_ws_template : &create_ws |
+  mkdir -p ~/ros_ws/src
+  cd ~/ros_ws
+  catkin_make -DCMAKE_BUILD_TYPE=Release
 
-.clone_modules_template : &clone_modules
-  before_script:
-    - cd ~/ros_ws/src
-    - mkdir overworld_modules && cd overworld_modules
-    - git clone https://github.com/sarthou/artrack_perception_module.git
-    - git clone https://github.com/sarthou/optitrack_perception_module.git
-    - git clone https://github.com/sarthou/pr2_gripper_perception_module.git
+.clone_modules_template : &clone_modules |
+  cd ~/ros_ws/src
+  mkdir overworld_modules && cd overworld_modules
+  git clone https://github.com/sarthou/artrack_perception_module.git
+  git clone https://github.com/sarthou/optitrack_perception_module.git
+  git clone https://github.com/sarthou/pr2_gripper_perception_module.git
 
-.clone_deps_melodic_template : &clone_deps_melodic
-  before_script:
-    - cd ~/ros_ws/src
-    - git clone https://github.com/RIS-WITH/optitrack_msgs.git
-    - git clone https://github.com/sarthou/ar_track_alvar.git
+.clone_deps_melodic_template : &clone_deps_melodic |
+  cd ~/ros_ws/src
+  git clone https://github.com/RIS-WITH/optitrack_msgs.git
+  git clone https://github.com/sarthou/ar_track_alvar.git
 
-.clone_deps_noetic_template : &clone_deps_noetic
-  before_script:
-    - cd ~/ros_ws/src
-    - git clone https://github.com/RIS-WITH/optitrack_msgs.git
-    - git clone -b noetic-devel https://github.com/sarthou/ar_track_alvar.git
+.clone_deps_noetic_template : &clone_deps_noetic |
+  cd ~/ros_ws/src
+  git clone https://github.com/RIS-WITH/optitrack_msgs.git
+  git clone -b noetic-devel https://github.com/sarthou/ar_track_alvar.git
 
-.build_script_template : &build_script_definition
-  script:
-    - cd ~/ros_ws/src
-    - cp -r /builds/$GITLAB_USER_LOGIN/overworld .
-    - git clone -b dev https://github.com/sarthou/ontologenius.git
-    - cd ..
-    - catkin_make -DCMAKE_BUILD_TYPE=Release
+.build_script_template : &build_script_definition |
+  cd ~/ros_ws/src
+  cp -r /builds/$GITLAB_USER_LOGIN/overworld .
+  git clone -b dev https://github.com/sarthou/ontologenius.git
+  cd ..
+  catkin_make -DCMAKE_BUILD_TYPE=Release
 
 stages:
   - build
@@ -65,34 +59,46 @@ run-build-melodic:
   image: ros:melodic-perception-bionic
   stage: build
   <<: *melodic_before_definition
-  <<: *install_bullet
-  <<: *create_ws
-  <<: *build_script_definition
+  script:
+    - *install_bullet
+    - *create_ws
+    - *build_script_definition
 
 run-build-noetic:
   image: ros:noetic-perception-focal
   stage: build
   <<: *noetic_before_definition
-  <<: *install_bullet
-  <<: *create_ws
-  <<: *build_script_definition
+  script:
+    - *install_bullet
+    - *create_ws
+    - *build_script_definition
 
 run-build-modules-melodic:
   image: ros:melodic-perception-bionic
-  stage: build
+  stage: build_modules
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev"'
+      when: always
+    - when: never
   <<: *melodic_before_definition
-  <<: *install_bullet
-  <<: *create_ws
-  <<: *clone_modules
-  <<: *clone_deps_melodic
-  <<: *build_script_definition
+  script:
+    - *install_bullet
+    - *create_ws
+    - *clone_modules
+    - *clone_deps_melodic
+    - *build_script_definition
 
 run-build-modules-noetic:
   image: ros:noetic-perception-focal
-  stage: build
+  stage: build_modules
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev"'
+      when: always
+    - when: never
   <<: *noetic_before_definition
-  <<: *install_bullet
-  <<: *create_ws
-  <<: *clone_modules
-  <<: *clone_deps_noetic
-  <<: *build_script_definition
+  script:
+    - *install_bullet
+    - *create_ws
+    - *clone_modules
+    - *clone_deps_noetic
+    - *build_script_definition

@@ -1,0 +1,18 @@
+modules:
+  robot:
+    JointStatePerceptionModule: robot_joints
+  objects:
+    ArTrackPerceptionModule: ar_track
+    StaticObjectsPerceptionModule: static
+  areas:
+    ObjAreasPerceptionModule: obj_area
+
+robot_joints:
+  min_period : 0.09
+  robot_name: eve
+
+static:
+  file: package://overworld/config/adream.yaml
+
+obj_area:
+  file: package://overworld/config/adream_areas.yaml
