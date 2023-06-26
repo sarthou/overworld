@@ -15,7 +15,7 @@ public:
 
   virtual void initialize() override;
 
-  virtual void preReason(const QueryInfo_t& query_info) override;
+  virtual bool preReason(const QueryInfo_t& query_info) override;
 
   virtual bool implementPreReasoning() override { return true; }
 
