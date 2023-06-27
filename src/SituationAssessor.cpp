@@ -29,6 +29,11 @@ SituationAssessor::SituationAssessor(const std::string& agent_name,
 {
   n_.setCallbackQueue(&callback_queue_);
 
+  if(is_robot_)
+  {
+    new_assessor_publisher_ = n_.advertise<std_msgs::String>("/overworld/new_assessor",5);
+  }
+
   if (is_robot_)
   {
       bullet_client_ = PhysicsServers::connectPhysicsServer(owds::CONNECT_GUI);
@@ -87,6 +92,12 @@ SituationAssessor::SituationAssessor(const std::string& agent_name,
   start_modules_service_ = n_.advertiseService(agent_name_ + "/startPerceptionModules", &SituationAssessor::startModules, this);
   stop_modules_service_ = n_.advertiseService(agent_name_ + "/stopPerceptionModules", &SituationAssessor::stopModules, this);
   bounding_box_service_ = n_.advertiseService(agent_name_ + "/getBoundingBox", &SituationAssessor::getBoundingBox, this);
+  if(is_robot_)
+  {
+    auto msg = std_msgs::String();
+    msg.data = "ADD|"+agent_name_;
+    new_assessor_publisher_.publish(msg);
+  }
 }
 
 SituationAssessor::~SituationAssessor()
@@ -323,6 +334,9 @@ std::map<std::string, HumanAssessor_t>::iterator SituationAssessor::createHumanA
   assessor->second.assessor->addAreaPerceptionModule("emulated_areas", assessor->second.areas_module);
   std::thread th(&SituationAssessor::run, assessor->second.assessor);
   assessor->second.thread = std::move(th);
+  auto msg = std_msgs::String();
+  msg.data = "ADD|"+human_name;
+  new_assessor_publisher_.publish(msg);
 
   return assessor;
 }
