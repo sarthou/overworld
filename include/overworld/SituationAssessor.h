@@ -74,6 +74,7 @@ private:
   ros::ServiceServer start_modules_service_;
   ros::ServiceServer stop_modules_service_;
   ros::ServiceServer bounding_box_service_;
+  ros::Publisher new_assessor_publisher_;
   std::atomic<bool> run_;
   double time_step_; // in second
   double simu_step_;
