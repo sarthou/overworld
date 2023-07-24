@@ -44,8 +44,8 @@ class JointStatePerceptionModule : public owds::PerceptionModuleRosBase<owds::Bo
     tf2_ros::Buffer tf_buffer_;
     tf2_ros::TransformListener tf2_listener_;
 
-    OntologiesManipulator* ontologies_manipulator_;
-    OntologyManipulator* onto_;
+    onto::OntologiesManipulator* ontologies_manipulator_;
+    onto::OntologyManipulator* onto_;
 
     bool updateBasePose(const ros::Time& stamp = ros::Time(0));
     void loadRobotModel();

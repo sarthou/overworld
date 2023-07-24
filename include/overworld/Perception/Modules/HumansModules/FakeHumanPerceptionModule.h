@@ -26,8 +26,8 @@ class FakeHumanPerceptionModule : public PerceptionModuleRosBase<BodyPart, overw
 
     BodyPart createBodyPart(const std::string& human_name, const std::string& part_name);
 
-    OntologiesManipulator* ontologies_manipulator_;
-    OntologyManipulator* onto_;
+    onto::OntologiesManipulator* ontologies_manipulator_;
+    onto::OntologyManipulator* onto_;
 
     tf2_ros::Buffer tf_buffer_;
     tf2_ros::TransformListener tf2_listener_;

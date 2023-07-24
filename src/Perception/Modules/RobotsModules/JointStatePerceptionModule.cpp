@@ -33,7 +33,7 @@ bool JointStatePerceptionModule::closeInitialization()
         return false;
     }
 
-    ontologies_manipulator_ = new OntologiesManipulator(n_);
+    ontologies_manipulator_ = new onto::OntologiesManipulator(n_);
     ontologies_manipulator_->waitInit();
     ontologies_manipulator_->add(robot_name_);
     onto_ = ontologies_manipulator_->get(robot_name_);

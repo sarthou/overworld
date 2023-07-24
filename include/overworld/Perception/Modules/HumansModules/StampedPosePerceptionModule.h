@@ -22,8 +22,8 @@ class StampedPosePerceptionModule : public PerceptionModuleRosBase<BodyPart, geo
   protected:
     bool perceptionCallback(const geometry_msgs::PoseStamped& msg) override;
 
-    OntologiesManipulator* ontologies_manipulator_;
-    OntologyManipulator* onto_;
+    onto::OntologiesManipulator* ontologies_manipulator_;
+    onto::OntologyManipulator* onto_;
 
     std::string human_name_;
     std::string head_name_;
