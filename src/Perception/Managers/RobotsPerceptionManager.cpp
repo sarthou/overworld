@@ -23,7 +23,7 @@ void RobotsPerceptionManager::getPercepts( std::map<std::string, BodyPart>& perc
         if(it->second->bulletId() != -1)
           addToBullet(it->second, it->second->bulletId());
       }
-      UpdateAgent(it->second, AgentType_e::ROBOT);
+      updateAgent(it->second, AgentType_e::ROBOT);
     }
     
     if(percept.second.isLocated())
