@@ -92,6 +92,7 @@ SituationAssessor::SituationAssessor(const std::string& agent_name,
   start_modules_service_ = n_.advertiseService(agent_name_ + "/startPerceptionModules", &SituationAssessor::startModules, this);
   stop_modules_service_ = n_.advertiseService(agent_name_ + "/stopPerceptionModules", &SituationAssessor::stopModules, this);
   bounding_box_service_ = n_.advertiseService(agent_name_ + "/getBoundingBox", &SituationAssessor::getBoundingBox, this);
+  agents_list_service_ = n_.advertiseService(agent_name_ + "/getAgents", &SituationAssessor::getAgents, this);
   if(is_robot_)
   {
     auto msg = std_msgs::String();
@@ -390,6 +391,14 @@ bool SituationAssessor::getBoundingBox(overworld::BoundingBox::Request &req, ove
     res.y = bb[1];
     res.z = bb[2];
   }
+  return true;
+}
+
+bool SituationAssessor::getAgents(overworld::GetAgents::Request &req, overworld::GetAgents::Response &res)
+{
+  (void)req;
+  for(auto& assessor : humans_assessors_)
+    res.agents.push_back(assessor.first);
   return true;
 }
 

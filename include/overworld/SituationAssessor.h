@@ -19,6 +19,7 @@
 
 #include <overworld/StartStopModules.h>
 #include <overworld/BoundingBox.h>
+#include <overworld/GetAgents.h>
 
 namespace owds {
 
@@ -74,6 +75,7 @@ private:
   ros::ServiceServer start_modules_service_;
   ros::ServiceServer stop_modules_service_;
   ros::ServiceServer bounding_box_service_;
+  ros::ServiceServer agents_list_service_;
   ros::Publisher new_assessor_publisher_;
   std::atomic<bool> run_;
   double time_step_; // in second
@@ -109,6 +111,7 @@ private:
   template<typename T>
   bool stopModule(BasePerceptionManager<T>& manager, const std::string& module_name, int& status);
   bool getBoundingBox(overworld::BoundingBox::Request &req, overworld::BoundingBox::Response &res);
+  bool getAgents(overworld::GetAgents::Request &req, overworld::GetAgents::Response &res);
 
 };
 
