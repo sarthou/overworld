@@ -32,6 +32,7 @@ SituationAssessor::SituationAssessor(const std::string& agent_name,
   if(is_robot_)
   {
     new_assessor_publisher_ = n_.advertise<std_msgs::String>("/overworld/new_assessor",5);
+    agents_list_service_ = n_.advertiseService("/overworld/getAgents", &SituationAssessor::getAgents, this);
   }
 
   if (is_robot_)
@@ -92,7 +93,6 @@ SituationAssessor::SituationAssessor(const std::string& agent_name,
   start_modules_service_ = n_.advertiseService(agent_name_ + "/startPerceptionModules", &SituationAssessor::startModules, this);
   stop_modules_service_ = n_.advertiseService(agent_name_ + "/stopPerceptionModules", &SituationAssessor::stopModules, this);
   bounding_box_service_ = n_.advertiseService(agent_name_ + "/getBoundingBox", &SituationAssessor::getBoundingBox, this);
-  agents_list_service_ = n_.advertiseService(agent_name_ + "/getAgents", &SituationAssessor::getAgents, this);
   if(is_robot_)
   {
     auto msg = std_msgs::String();
@@ -397,6 +397,7 @@ bool SituationAssessor::getBoundingBox(overworld::BoundingBox::Request &req, ove
 bool SituationAssessor::getAgents(overworld::GetAgents::Request &req, overworld::GetAgents::Response &res)
 {
   (void)req;
+  res.agents.push_back(agent_name_);
   for(auto& assessor : humans_assessors_)
     res.agents.push_back(assessor.first);
   return true;
