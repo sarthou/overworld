@@ -75,6 +75,7 @@ add_service_files(
   FILES
   StartStopModules.srv
   BoundingBox.srv
+  GetAgents.srv
   GetPose.srv
   GetRelations.srv
 )
