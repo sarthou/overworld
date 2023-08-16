@@ -135,6 +135,7 @@ bool JointStatePerceptionModule::updateBasePose(const ros::Time& stamp)
     }
     catch (const tf2::TransformException& ex){
         ShellDisplay::error("[JointStatePerceptionModule]" + std::string(ex.what()));
+        return false;
     }
     catch(...) {
         return false;

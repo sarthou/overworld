@@ -51,6 +51,7 @@ bool FakeHumanPerceptionModule::perceptionCallback(const overworld::AgentPose& m
         }
         catch (const tf2::TransformException& ex) {
             ShellDisplay::error("[FakeHumanPerceptionModule]" + std::string(ex.what()));
+            return false;
         }
     }
 

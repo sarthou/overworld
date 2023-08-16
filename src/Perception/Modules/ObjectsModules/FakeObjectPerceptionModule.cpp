@@ -46,6 +46,7 @@ bool FakeObjectPerceptionModule::perceptionCallback(const overworld::EntitiesPos
     }
     catch (const tf2::TransformException& ex) {
       ShellDisplay::error("[FakeObjectPerceptionModule]" + std::string(ex.what()));
+      return false;
     }
   }
 
