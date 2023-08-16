@@ -31,8 +31,8 @@ PerceptionManagers::~PerceptionManagers()
 void PerceptionManagers::update()
 {
     robots_manager_.update();
-    objects_manager_.update();
     humans_manager_.update();
+    objects_manager_.update();
     areas_manager_.update();
 }
 
