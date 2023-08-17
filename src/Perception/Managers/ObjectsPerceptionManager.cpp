@@ -226,8 +226,17 @@ void ObjectsPerceptionManager::reasoningOnUpdate()
 
       for(auto no_data_obj : no_data_objects)
       {
+        // equivalent to shouldBeSeen
         if(objects_in_camera.find(no_data_obj->bulletId()) != objects_in_camera.end())
+        {
+          auto it_unseen = lost_objects_nb_frames_.find(no_data_obj->id());
+          if(it_unseen == lost_objects_nb_frames_.end())
+            it_unseen = lost_objects_nb_frames_.insert({no_data_obj->id(), 0}).first;
+
+          it_unseen->second++;
+          if(it_unseen->second > MAX_UNSEEN)
           objects_to_remove.push_back(no_data_obj);
+        }
         else
           objects_to_simulate.push_back(no_data_obj);
       }
