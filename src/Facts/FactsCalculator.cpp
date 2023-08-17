@@ -1,5 +1,7 @@
 #include "overworld/Facts/FactsCalculator.h"
 
+#define IN_HAND_DIST 0.08
+
 namespace owds {
 
 FactsCalculator::FactsCalculator(const std::string& agent_name)
@@ -57,13 +59,14 @@ std::vector<Fact> FactsCalculator::computeAgentsFacts(const std::map<std::string
 
   for(auto& agent_from : agents)
   {
-    isInHand(agent_from.second);
+    //isInHand(agent_from.second); // objects already in agent's hand
     for (auto& obj: objects)
     {
       if(isValid(obj.second) == false)
         continue;
 
-      if (agent_from.second->getType() == AgentType_e::HUMAN){
+      if (agent_from.second->getType() == AgentType_e::HUMAN)
+      {
         hasInHand(agent_from.second, obj.second);
         isHandMovingTowards(agent_from.second, obj.second);
       } 
@@ -264,46 +267,44 @@ bool FactsCalculator::isLookingAt(Agent* agent, const std::unordered_set<int>& s
 
 bool FactsCalculator::hasInHand(Agent* agent, Object* object)
 {
-  Hand *leftHand, *rightHand;
-  if ((leftHand = agent->getLeftHand()) != nullptr)
+  Hand *left_hand, *right_hand;
+  if ((left_hand = agent->getLeftHand()) != nullptr)
   {
-    const auto inLeftHand = leftHand->getInHand();
-    if (std::find(inLeftHand.begin(), inLeftHand.end(), object->id()) != inLeftHand.end())
+    if (left_hand->isInHand(object->id()))
     {
       facts_.emplace_back(agent->getId(), "hasInLeftHand", object->id());
-      return true;
+      return true; // cannot be in two hands at time
     }
-    else if (leftHand->isLocated() && object->isLocated())
+    else if (left_hand->isEmpty() && left_hand->isLocated() && object->isLocated()) // allows only one object in hand
     {
-      if (leftHand->pose().distanceTo(object->pose()) < 0.08)
+      if (left_hand->pose().distanceTo(object->pose()) < IN_HAND_DIST)
       {
         if(object->isA("Pickable"))
         {
-          object->setInHand(leftHand);
-          leftHand->putInHand(object);
+          object->setInHand(left_hand);
+          left_hand->putInHand(object);
           facts_.emplace_back(agent->getId(), "hasInLeftHand", object->id());
-          return true;
+          return true; // cannot be in two hands at time
         }
       }
     }
   }
 
-  if ((rightHand = agent->getRightHand()) != nullptr)
+  if ((right_hand = agent->getRightHand()) != nullptr)
   {
-    const auto inRightHand = rightHand->getInHand();
-    if (std::find(inRightHand.begin(), inRightHand.end(), object->id()) != inRightHand.end())
+    if (right_hand->isInHand(object->id()))
     {
       facts_.emplace_back(agent->getId(), "hasInRightHand", object->id());
       return true;
     }
-    else if (rightHand->isLocated() && object->isLocated())
+    else if (right_hand->isEmpty() && right_hand->isLocated() && object->isLocated()) // allows only one object in hand
     {
-      if (rightHand->pose().distanceTo(object->pose()) < 0.08)
+      if (right_hand->pose().distanceTo(object->pose()) < IN_HAND_DIST)
       {
         if(object->isA("Pickable"))
         {
-          object->setInHand(rightHand);
-          rightHand->putInHand(object);
+          object->setInHand(right_hand);
+          right_hand->putInHand(object);
           facts_.emplace_back(agent->getId(), "hasInRightHand", object->id());
           return true;
         }
