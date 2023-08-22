@@ -445,12 +445,7 @@ std::unordered_set<int> ObjectsPerceptionManager::getObjectsInCamera()
                                                               myself_agent_->getFieldOfView().getRatio(),
                                                               myself_agent_->getFieldOfView().getClipNear(),
                                                               myself_agent_->getFieldOfView().getClipFar());
-
-  std::array<double, 3> axes = {1,0,0};
-  if(myself_agent_->getType() == AgentType_e::ROBOT)
-    axes = {0,0,1};
-
-  Pose target_pose = myself_agent_->getHead()->pose() * Pose(axes, {0,0,0,1});
+  Pose target_pose = myself_agent_->getHead()->pose() * Pose({0,0,1}, {0,0,0,1});
   auto head_pose_trans = myself_agent_->getHead()->pose().arrays().first;
   auto target_pose_trans = target_pose.arrays().first;
   auto view_matrix = bullet_client_->computeViewMatrix({(float)head_pose_trans[0], (float)head_pose_trans[1], (float)head_pose_trans[2]},
