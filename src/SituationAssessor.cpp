@@ -239,11 +239,15 @@ void SituationAssessor::assess()
   if(is_robot_)
   {
     ros_sender_->sendEntitiesToTFAndRViz(myself_agent_->getId() + "/objects_markers", objects);
+    ros_sender_->sendEntitiesToTFAndRViz(myself_agent_->getId() + "/humans_markers", body_parts);
     //bernie_sender_->sendBernie();
   }
   else
+  {
     ros_sender_->sendEntitiesToRViz(myself_agent_->getId() + "/objects_markers", objects);
   ros_sender_->sendEntitiesToRViz(myself_agent_->getId() + "/humans_markers", body_parts);
+  }
+    
 
   if(is_robot_)
     humans_process.join();
