@@ -220,11 +220,12 @@ void ObjectsPerceptionManager::reasoningOnUpdate()
 
   if(no_data_objects.size())
   {
-    if(isObjectsInFovAabb(no_data_objects))
+    auto objects_in_fov = isObjectsInFovAabb(no_data_objects);
+    if(objects_in_fov.size())
     {
       auto objects_in_camera = getObjectsInCamera();
 
-      for(auto no_data_obj : no_data_objects)
+      for(auto no_data_obj : objects_in_fov)
       {
         // equivalent to shouldBeSeen
         if(objects_in_camera.find(no_data_obj->bulletId()) != objects_in_camera.end())
@@ -373,10 +374,12 @@ std::vector<PointOfInterest> ObjectsPerceptionManager::getPoisInFov(Object* obje
   return pois_in_fov;
 }
 
-bool ObjectsPerceptionManager::isObjectsInFovAabb(std::vector<Object*> objects)
+std::vector<Object*> ObjectsPerceptionManager::isObjectsInFovAabb(std::vector<Object*> objects)
 {
+  std::vector<Object*> res;
   for(auto object : objects)
   {
+    size_t nb_in_fov = 0;
     std::array<Pose, 8> points = { Pose({object->getAabb().min[0], object->getAabb().min[1], object->getAabb().min[2]}, {0,0,0,1}),
                                    Pose({object->getAabb().min[0], object->getAabb().min[1], object->getAabb().max[2]}, {0,0,0,1}),
                                    Pose({object->getAabb().min[0], object->getAabb().max[1], object->getAabb().min[2]}, {0,0,0,1}),
@@ -389,12 +392,16 @@ bool ObjectsPerceptionManager::isObjectsInFovAabb(std::vector<Object*> objects)
     for(const auto& point : points)
     {
       auto point_in_head = point.transformIn(myself_agent_->getHead()->pose());
-      if (myself_agent_->getFieldOfView().hasIn(point_in_head))
-        return true;
+      if (myself_agent_->getFieldOfView().hasIn(point_in_head, 2))
+      {
+        nb_in_fov ++;
+        if(nb_in_fov >= 2)
+          res.push_back(object);
+      }
     }
   }
 
-  return false;
+  return res;
 }
 
 bool ObjectsPerceptionManager::shouldBeSeen(Object* object, const std::vector<PointOfInterest>& pois)
