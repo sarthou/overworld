@@ -17,7 +17,9 @@ public:
                                    width_(width),
                                    clip_near_(clip_near),
                                    clip_far_(clip_far)
-    {}
+    {
+        opengl_ratio_ = std::sqrt(2) * std::tan(width_ / height_ * 0.6116);
+    }
 
     double getHeight() const { return height_; }
     double getWidth() const { return width_; }
@@ -25,6 +27,8 @@ public:
     double getClipFar() const { return clip_far_; }
 
     double getRatio() const { return width_ / height_; }
+    double getRatioOpenGl() const { return opengl_ratio_ }
+    //double getRatioOpenGl() const { return 1.4227 * std::tan(width_ / height_ * 0.6105); }
 
     /**
      * @brief 
@@ -52,6 +56,7 @@ private:
     double width_; // degrees
     double clip_near_; // meters
     double clip_far_; // meters
+    double opengl_ratio_;
 };
 
 } // namespace owds

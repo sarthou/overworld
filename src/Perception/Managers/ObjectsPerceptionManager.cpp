@@ -442,7 +442,7 @@ std::unordered_set<int> ObjectsPerceptionManager::getObjectsInCamera()
     return {};
 
   auto proj_matrix = bullet_client_->computeProjectionMatrix(myself_agent_->getFieldOfView().getHeight(),
-                                                              myself_agent_->getFieldOfView().getRatio(),
+                                                              myself_agent_->getFieldOfView().getRatioOpenGl(),
                                                               myself_agent_->getFieldOfView().getClipNear(),
                                                               myself_agent_->getFieldOfView().getClipFar());
   Pose target_pose = myself_agent_->getHead()->pose() * Pose({0,0,1}, {0,0,0,1});
@@ -451,7 +451,7 @@ std::unordered_set<int> ObjectsPerceptionManager::getObjectsInCamera()
   auto view_matrix = bullet_client_->computeViewMatrix({(float)head_pose_trans[0], (float)head_pose_trans[1], (float)head_pose_trans[2]},
                                                         {(float)target_pose_trans[0], (float)target_pose_trans[1], (float)target_pose_trans[2]},
                                                         {0.,0.,1.});
-  auto images = bullet_client_->getCameraImage(100*myself_agent_->getFieldOfView().getRatio(), 100, view_matrix, proj_matrix, owds::BULLET_HARDWARE_OPENGL);
+  auto images = bullet_client_->getCameraImage(100*myself_agent_->getFieldOfView().getRatioOpenGl(), 100, view_matrix, proj_matrix, owds::BULLET_HARDWARE_OPENGL);
   return bullet_client_->getSegmentationIds(images);
 }
 
