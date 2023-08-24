@@ -27,7 +27,7 @@ public:
     double getClipFar() const { return clip_far_; }
 
     double getRatio() const { return width_ / height_; }
-    double getRatioOpenGl() const { return opengl_ratio_ }
+    double getRatioOpenGl() const { return opengl_ratio_; }
     //double getRatioOpenGl() const { return 1.4227 * std::tan(width_ / height_ * 0.6105); }
 
     /**
@@ -37,10 +37,10 @@ public:
      * @return true 
      * @return false 
      */
-    inline bool hasIn(const Pose& pose) const
+    inline bool hasIn(const Pose& pose, double margin = 0.) const
     {
-        return pose.getZ() <= clip_far_ && std::abs(pose.getOriginTilt()) <= height_ * TO_HALF_RAD &&
-               std::abs(pose.getOriginPan()) <= width_ * TO_HALF_RAD;
+        return pose.getZ() <= clip_far_ && std::abs(pose.getOriginTilt()) <= (height_ - margin*2) * TO_HALF_RAD &&
+               std::abs(pose.getOriginPan()) <= (width_ - margin*2) * TO_HALF_RAD;
     }
 
     std::string toString() const
