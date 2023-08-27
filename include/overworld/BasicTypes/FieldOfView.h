@@ -18,7 +18,7 @@ public:
                                    clip_near_(clip_near),
                                    clip_far_(clip_far)
     {
-        opengl_ratio_ = std::sqrt(2) * std::tan(width_ / height_ * 0.6116);
+        opengl_ratio_ = std::tan(width_ * TO_HALF_RAD) / std::tan(height_ * TO_HALF_RAD);
     }
 
     double getHeight() const { return height_; }
@@ -28,7 +28,6 @@ public:
 
     double getRatio() const { return width_ / height_; }
     double getRatioOpenGl() const { return opengl_ratio_; }
-    //double getRatioOpenGl() const { return 1.4227 * std::tan(width_ / height_ * 0.6105); }
 
     /**
      * @brief 
