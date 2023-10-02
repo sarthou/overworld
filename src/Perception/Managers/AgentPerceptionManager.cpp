@@ -35,7 +35,7 @@ std::map<std::string, Agent*>::iterator AgentPerceptionManager::createAgent(cons
   return it;
 }
 
-Agent* AgentPerceptionManager::UpdateAgent(BodyPart* body_part, AgentType_e type)
+Agent* AgentPerceptionManager::updateAgent(BodyPart* body_part, AgentType_e type)
 {
   if(body_part->isAgentKnown())
   {

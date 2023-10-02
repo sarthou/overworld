@@ -21,7 +21,7 @@ void ReasonerEgocentric::initialize()
   }
 }
 
-void ReasonerEgocentric::preReason(const QueryInfo_t& query_info)
+bool ReasonerEgocentric::preReason(const QueryInfo_t& query_info)
 {
   if((query_info.query_origin == query_origin_individual) &&
      (query_info.query_type == query_relation))
@@ -32,14 +32,14 @@ void ReasonerEgocentric::preReason(const QueryInfo_t& query_info)
     {
       property_ptr = isComputableProperty(query_info.predicate);
       if(property_ptr == nullptr)
-        return;
+        return false;
     }
 
     if(query_info.subject != "")
     {
       std::set<ObjectPropertyBranch_t*> valid_properties = isInDomain(query_info.subject, property_ptr);
       if(valid_properties.size() == 0)
-        return;
+        return false;
       to_compute_properties = valid_properties;
     }
       
@@ -48,7 +48,7 @@ void ReasonerEgocentric::preReason(const QueryInfo_t& query_info)
     {
       std::set<ObjectPropertyBranch_t*> valid_properties = isInRange(query_info.object, property_ptr);
       if(valid_properties.size() == 0)
-        return;
+        return false;
 
       if(to_compute_properties.size() == 0)
         to_compute_properties = valid_properties;
@@ -62,7 +62,7 @@ void ReasonerEgocentric::preReason(const QueryInfo_t& query_info)
       }
 
       if(to_compute_properties.size() == 0)
-        return;
+        return false;
     }
 
     if(to_compute_properties.size() == 0)
@@ -76,6 +76,8 @@ void ReasonerEgocentric::preReason(const QueryInfo_t& query_info)
     if(call(srv))
       updateOntology(srv.response.to_add, srv.response.to_delete);
   }
+
+  return true;
 }
 
 std::string ReasonerEgocentric::getName()

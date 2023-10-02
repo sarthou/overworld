@@ -14,7 +14,7 @@ FakeHumanPerceptionModule::FakeHumanPerceptionModule() : PerceptionModuleRosBase
 
 bool FakeHumanPerceptionModule::closeInitialization()
 {
-    ontologies_manipulator_ = new OntologiesManipulator(n_);
+    ontologies_manipulator_ = new onto::OntologiesManipulator(n_);
     ontologies_manipulator_->waitInit();
     ontologies_manipulator_->add(robot_agent_->getId());
     onto_ = ontologies_manipulator_->get(robot_agent_->getId());
@@ -51,6 +51,7 @@ bool FakeHumanPerceptionModule::perceptionCallback(const overworld::AgentPose& m
         }
         catch (const tf2::TransformException& ex) {
             ShellDisplay::error("[FakeHumanPerceptionModule]" + std::string(ex.what()));
+            return false;
         }
     }
 

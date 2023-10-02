@@ -27,7 +27,7 @@ find_package(catkin REQUIRED COMPONENTS
   cv_bridge
   pluginlib
 )
-find_package(ontologenius 0.2.12 REQUIRED)
+find_package(ontologenius 0.3.0 REQUIRED)
 find_package(Eigen3 REQUIRED NO_MODULE)
 find_package(Threads REQUIRED)
 find_package(CURL REQUIRED)
@@ -75,6 +75,7 @@ add_service_files(
   FILES
   StartStopModules.srv
   BoundingBox.srv
+  GetAgents.srv
   GetPose.srv
   GetRelations.srv
 )
@@ -257,6 +258,15 @@ target_link_libraries(${PROJECT_NAME}_bullet_test PRIVATE
                       ${PROJECT_NAME}_perception_lib
                       ${PROJECT_NAME}_utility_lib
                       ${catkin_LIBRARIES})
+
+add_executable(${PROJECT_NAME}_fov_test src/TestFiles/fov.cpp )
+target_link_libraries(${PROJECT_NAME}_fov_test PRIVATE
+                    ${PROJECT_NAME}_bullet_lib
+                    ${PROJECT_NAME}_types_lib
+                    ${PROJECT_NAME}_perception_lib
+                    ${PROJECT_NAME}_utility_lib
+                    ${PROJECT_NAME}_sender_lib
+                    ${catkin_LIBRARIES})
 
 add_executable(${PROJECT_NAME}_multi_server_test src/TestFiles/multi_server_test.cpp )
 target_link_libraries(${PROJECT_NAME}_multi_server_test PRIVATE

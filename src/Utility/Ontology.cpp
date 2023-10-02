@@ -7,7 +7,7 @@ namespace owds {
 
 namespace ontology {
 
-std::array<double, 3> getEntityColor(OntologyManipulator* onto, const std::string& indiv_name, const std::array<double, 3>& default_value)
+std::array<double, 3> getEntityColor(onto::OntologyManipulator* onto, const std::string& indiv_name, const std::array<double, 3>& default_value)
 {
   auto color = onto->individuals.getOn(indiv_name, "hasColor");
   if(color.size() != 0)
@@ -24,7 +24,7 @@ std::array<double, 3> getEntityColor(OntologyManipulator* onto, const std::strin
   return default_value;
 }
 
-Shape_t getEntityShape(OntologyManipulator* onto, const std::string& indiv_name)
+Shape_t getEntityShape(onto::OntologyManipulator* onto, const std::string& indiv_name)
 {
   auto visual_meshes = onto->individuals.getOn(indiv_name, "hasVisualMesh");
   auto collision_meshes = onto->individuals.getOn(indiv_name, "hasCollisionMesh");
@@ -77,7 +77,7 @@ Shape_t getEntityShape(OntologyManipulator* onto, const std::string& indiv_name)
   return shape;
 }
 
-double getEntityMass(OntologyManipulator* onto, const std::string& indiv_name)
+double getEntityMass(onto::OntologyManipulator* onto, const std::string& indiv_name)
 {
   auto masses = onto->individuals.getOn(indiv_name, "hasMass");
 
@@ -90,7 +90,7 @@ double getEntityMass(OntologyManipulator* onto, const std::string& indiv_name)
     return 0;
 }
 
-void addColor(OntologyManipulator* onto, const std::string& color_name, const std::string& rgb_value)
+void addColor(onto::OntologyManipulator* onto, const std::string& color_name, const std::string& rgb_value)
 {
   if(onto->individuals.exist(color_name) == false)
   {
@@ -101,7 +101,7 @@ void addColor(OntologyManipulator* onto, const std::string& color_name, const st
   }
 }
 
-void addColorToEntity(OntologyManipulator* onto, const std::string& indiv_name, const std::string& color_name)
+void addColorToEntity(onto::OntologyManipulator* onto, const std::string& indiv_name, const std::string& color_name)
 {
   onto->feeder.addProperty(indiv_name, "hasColor", color_name);
   onto->feeder.waitUpdate(1000);

@@ -14,8 +14,8 @@ public:
 
 private:
   std::string agent_name_;
-  OntologiesManipulator ontologies_manipulator_;
-  OntologyManipulator* onto_;
+  onto::OntologiesManipulator ontologies_manipulator_;
+  onto::OntologyManipulator* onto_;
 
   void addToKb(const Fact& fact) override;
   void removeFromKb(const Fact& fact) override;

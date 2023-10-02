@@ -29,6 +29,12 @@ SituationAssessor::SituationAssessor(const std::string& agent_name,
 {
   n_.setCallbackQueue(&callback_queue_);
 
+  if(is_robot_)
+  {
+    new_assessor_publisher_ = n_.advertise<std_msgs::String>("/overworld/new_assessor",5);
+    agents_list_service_ = n_.advertiseService("/overworld/getAgents", &SituationAssessor::getAgents, this);
+  }
+
   if (is_robot_)
   {
       bullet_client_ = PhysicsServers::connectPhysicsServer(owds::CONNECT_GUI);
@@ -87,6 +93,12 @@ SituationAssessor::SituationAssessor(const std::string& agent_name,
   start_modules_service_ = n_.advertiseService(agent_name_ + "/startPerceptionModules", &SituationAssessor::startModules, this);
   stop_modules_service_ = n_.advertiseService(agent_name_ + "/stopPerceptionModules", &SituationAssessor::stopModules, this);
   bounding_box_service_ = n_.advertiseService(agent_name_ + "/getBoundingBox", &SituationAssessor::getBoundingBox, this);
+  if(is_robot_)
+  {
+    auto msg = std_msgs::String();
+    msg.data = "ADD|"+agent_name_;
+    new_assessor_publisher_.publish(msg);
+  }
 }
 
 SituationAssessor::~SituationAssessor()
@@ -227,11 +239,15 @@ void SituationAssessor::assess()
   if(is_robot_)
   {
     ros_sender_->sendEntitiesToTFAndRViz(myself_agent_->getId() + "/objects_markers", objects);
+    ros_sender_->sendEntitiesToTFAndRViz(myself_agent_->getId() + "/humans_markers", body_parts);
     //bernie_sender_->sendBernie();
   }
   else
+  {
     ros_sender_->sendEntitiesToRViz(myself_agent_->getId() + "/objects_markers", objects);
   ros_sender_->sendEntitiesToRViz(myself_agent_->getId() + "/humans_markers", body_parts);
+  }
+    
 
   if(is_robot_)
     humans_process.join();
@@ -257,16 +273,16 @@ void SituationAssessor::processHumans(std::map<std::string, std::unordered_set<i
       continue;
 
     auto proj_matrix = bullet_client_->computeProjectionMatrix(human.second->getFieldOfView().getHeight(),
-                                                                human.second->getFieldOfView().getRatio(),
+                                                                human.second->getFieldOfView().getRatioOpenGl(),
                                                                 human.second->getFieldOfView().getClipNear(),
                                                                 human.second->getFieldOfView().getClipFar());
-    Pose target_pose = human.second->getHead()->pose() * Pose({1,0,0}, {0,0,0,1});
+    Pose target_pose = human.second->getHead()->pose() * Pose({0,0,1}, {0,0,0,1});
     auto head_pose_trans = human.second->getHead()->pose().arrays().first;
     auto target_pose_trans = target_pose.arrays().first;
     auto view_matrix = bullet_client_->computeViewMatrix({(float)head_pose_trans[0], (float)head_pose_trans[1], (float)head_pose_trans[2]},
                                                           {(float)target_pose_trans[0], (float)target_pose_trans[1], (float)target_pose_trans[2]},
                                                           {0.,0.,1.});
-    auto images = bullet_client_->getCameraImage(300*human.second->getFieldOfView().getRatio(), 300, view_matrix, proj_matrix, owds::BULLET_HARDWARE_OPENGL);
+    auto images = bullet_client_->getCameraImage(300*human.second->getFieldOfView().getRatioOpenGl(), 300, view_matrix, proj_matrix, owds::BULLET_HARDWARE_OPENGL);
 
     ros_sender_->sendImage(human.first + "/view", images);
     agents_segmentation_ids[human.first] = bullet_client_->getSegmentationIds(images);
@@ -323,6 +339,9 @@ std::map<std::string, HumanAssessor_t>::iterator SituationAssessor::createHumanA
   assessor->second.assessor->addAreaPerceptionModule("emulated_areas", assessor->second.areas_module);
   std::thread th(&SituationAssessor::run, assessor->second.assessor);
   assessor->second.thread = std::move(th);
+  auto msg = std_msgs::String();
+  msg.data = "ADD|"+human_name;
+  new_assessor_publisher_.publish(msg);
 
   return assessor;
 }
@@ -376,6 +395,15 @@ bool SituationAssessor::getBoundingBox(overworld::BoundingBox::Request &req, ove
     res.y = bb[1];
     res.z = bb[2];
   }
+  return true;
+}
+
+bool SituationAssessor::getAgents(overworld::GetAgents::Request &req, overworld::GetAgents::Response &res)
+{
+  (void)req;
+  res.agents.push_back(agent_name_);
+  for(auto& assessor : humans_assessors_)
+    res.agents.push_back(assessor.first);
   return true;
 }
 

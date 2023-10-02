@@ -21,7 +21,7 @@ protected:
   Agent* getAgent(const std::string& agent_name, AgentType_e type);
 
   std::map<std::string, Agent*>::iterator createAgent(const std::string& name, AgentType_e type);
-  Agent* UpdateAgent(BodyPart* body_part, AgentType_e type);
+  Agent* updateAgent(BodyPart* body_part, AgentType_e type);
   FieldOfView getFov(const std::string& agent_name);
   double getOntoValue(const std::vector<std::string>& vect, double default_value);
 };
