@@ -82,12 +82,12 @@ SituationAssessor::SituationAssessor(const std::string& agent_name,
   ros_sender_ = new ROSSender(&n_);
   if(is_robot_)
   {
-    motion_planning_pose_sender_ = new PoseSender(&n_, perception_manager_.objects_manager_);
+    objetcs_pose_sender_ = new PoseSender(&n_, perception_manager_.objects_manager_);
     bernie_sender_ =  new BernieSenders(&n_);
   }
   else
   {
-    motion_planning_pose_sender_ = nullptr;
+    objetcs_pose_sender_ = nullptr;
     bernie_sender_ = nullptr;
   }
   start_modules_service_ = n_.advertiseService(agent_name_ + "/startPerceptionModules", &SituationAssessor::startModules, this);
@@ -105,8 +105,8 @@ SituationAssessor::~SituationAssessor()
 {
   if(ros_sender_ != nullptr)
     delete ros_sender_;
-  if(motion_planning_pose_sender_ != nullptr)
-    delete motion_planning_pose_sender_;
+  if(objetcs_pose_sender_ != nullptr)
+    delete objetcs_pose_sender_;
   if (bernie_sender_ != nullptr)
     delete bernie_sender_;
   if(bullet_client_ != nullptr)

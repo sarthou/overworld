@@ -88,7 +88,7 @@ private:
   OntologeniusFactsPublisher facts_publisher_;
 
   ROSSender* ros_sender_;
-  PoseSender* motion_planning_pose_sender_;
+  PoseSender* objetcs_pose_sender_;
   BernieSenders* bernie_sender_;
 
   std::map<std::string, HumanAssessor_t> humans_assessors_;
