@@ -76,6 +76,7 @@ add_service_files(
   StartStopModules.srv
   BoundingBox.srv
   GetAgents.srv
+  GetApproachPoint.srv
   GetPose.srv
   GetRelations.srv
 )
