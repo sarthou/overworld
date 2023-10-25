@@ -200,7 +200,8 @@ target_link_libraries(${PROJECT_NAME}_sender_lib PUBLIC
                       ${catkin_LIBRARIES}
                       Bullet3 # For b3CameraImage
                       ${CURL_LIBRARIES}
-                      ${PROJECT_NAME}_types_lib)
+                      ${PROJECT_NAME}_types_lib
+                      ${PROJECT_NAME}_perception_lib)
 
 #################
 #    Plugins    #
@@ -292,3 +293,7 @@ add_dependencies(${PROJECT_NAME}_gravity_test overworld_gencpp)
 add_executable(${PROJECT_NAME}_area_test src/TestFiles/area.cpp )
 target_link_libraries(${PROJECT_NAME}_area_test PRIVATE
                       ${PROJECT_NAME}_types_lib)
+
+add_executable(${PROJECT_NAME}_approach_test src/TestFiles/approach_sender.cpp )
+target_link_libraries(${PROJECT_NAME}_approach_test PRIVATE
+                      ${PROJECT_NAME}_sender_lib)

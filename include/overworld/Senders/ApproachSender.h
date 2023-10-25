@@ -41,6 +41,8 @@ public:
 
   void setRobotName(const std::string& robot_name);
 
+  LogicalAlgebraNode constraintToTree(std::string constraint);
+
 private:
   ros::NodeHandle* n_;
   std::string robot_name_;
@@ -49,6 +51,8 @@ private:
   PerceptionManagers* managers_;
   onto::OntologyManipulator* onto_;
   
+  //LogicalAlgebraNode constraintToTree(std::string constraint);
+  size_t getIn(size_t begin, std::string& in_text, const std::string& text, char symbol_in, char symbol_out);
 };
 
 } // namespace owds
