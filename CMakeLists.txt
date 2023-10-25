@@ -190,6 +190,7 @@ target_link_libraries(${PROJECT_NAME}_facts_lib PUBLIC
                       ${PROJECT_NAME}_types_lib)
            
 add_library(${PROJECT_NAME}_sender_lib STATIC
+  src/Senders/ApproachSender.cpp
   src/Senders/ROSSender.cpp
   src/Senders/PoseSender.cpp
   src/Senders/Bernie.cpp
