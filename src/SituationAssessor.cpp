@@ -33,6 +33,7 @@ SituationAssessor::SituationAssessor(const std::string& agent_name,
   {
     new_assessor_publisher_ = n_.advertise<std_msgs::String>("/overworld/new_assessor",5);
     agents_list_service_ = n_.advertiseService("/overworld/getAgents", &SituationAssessor::getAgents, this);
+    set_simulation_service_ = n_.advertiseService("/overworld/setSimulation", &SituationAssessor::setSimulation, this);
   }
 
   if (is_robot_)
@@ -96,7 +97,7 @@ SituationAssessor::SituationAssessor(const std::string& agent_name,
   if(is_robot_)
   {
     auto msg = std_msgs::String();
-    msg.data = "ADD|"+agent_name_;
+    msg.data = "ADD|" + agent_name_;
     new_assessor_publisher_.publish(msg);
   }
 }
@@ -118,6 +119,13 @@ void SituationAssessor::stop()
   run_ = false;
   callback_queue_.disable();
   callback_queue_.clear();
+}
+
+
+void SituationAssessor::setSimulation(bool simulate)
+{
+  simulate_ = simulate;
+  perception_manager_.objects_manager_.setSimulation(simulate_);
 }
 
 void SituationAssessor::run()
@@ -245,7 +253,7 @@ void SituationAssessor::assess()
   else
   {
     ros_sender_->sendEntitiesToRViz(myself_agent_->getId() + "/objects_markers", objects);
-  ros_sender_->sendEntitiesToRViz(myself_agent_->getId() + "/humans_markers", body_parts);
+    ros_sender_->sendEntitiesToRViz(myself_agent_->getId() + "/humans_markers", body_parts);
   }
     
 
@@ -321,8 +329,8 @@ void SituationAssessor::updateHumansPerspective(const std::string& human_name,
   std::transform(areas.cbegin(), areas.cend(), std::back_inserter(seen_areas),
                  [](const auto& it) { return it.second; });
 
-  assessor_it->second.objects_module->sendPerception(seen_objects);
   assessor_it->second.humans_module->sendPerception(seen_humans);
+  assessor_it->second.objects_module->sendPerception(seen_objects);
   assessor_it->second.areas_module->sendPerception(seen_areas);
 }
 
@@ -404,6 +412,16 @@ bool SituationAssessor::getAgents(overworld::GetAgents::Request &req, overworld:
   res.agents.push_back(agent_name_);
   for(auto& assessor : humans_assessors_)
     res.agents.push_back(assessor.first);
+  return true;
+}
+
+bool SituationAssessor::setSimulation(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &res)
+{
+  std::cout << "[SituationAssessor] set simulation to " << (int)(req.data) << std::endl;
+  setSimulation(req.data);
+  for(auto& assessor : humans_assessors_)
+    assessor.second.assessor->setSimulation(req.data);
+  res.success = true;
   return true;
 }
 
