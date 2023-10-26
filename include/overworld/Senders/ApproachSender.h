@@ -19,12 +19,14 @@ enum LogicalAlgebraOperator_e
 class LogicalAlgebraNode
 {
 public:
-  LogicalAlgebraNode(LogicalAlgebraOperator_e op) : operator_(op) {}
+  explicit LogicalAlgebraNode(LogicalAlgebraOperator_e op) : operator_(op) {}
 
   void insert(const std::string& value) { values_.push_back(value); }
   void insert(const LogicalAlgebraNode& node) { nodes_.push_back(node); }
 
   bool evaluate(const std::string& entity, onto::IndividualClient* client);
+
+  void print(size_t level = 0);
 
 private:
   LogicalAlgebraOperator_e operator_;
@@ -41,9 +43,9 @@ public:
 
   void setRobotName(const std::string& robot_name);
 
-  LogicalAlgebraNode constraintToTree(std::string constraint);
-
+#ifndef OWDS_TESTS
 private:
+#endif
   ros::NodeHandle* n_;
   std::string robot_name_;
   Agent* robot_;
@@ -51,8 +53,11 @@ private:
   PerceptionManagers* managers_;
   onto::OntologyManipulator* onto_;
   
-  //LogicalAlgebraNode constraintToTree(std::string constraint);
+  LogicalAlgebraNode constraintToTree(std::string constraint);
+  LogicalAlgebraNode createAndNode(std::string constraint, const std::unordered_map<std::string, LogicalAlgebraNode>& braquet_nodes);
+  void fillNode(LogicalAlgebraNode& node, std::string constraint, const std::unordered_map<std::string, LogicalAlgebraNode>& braquet_nodes);
   size_t getIn(size_t begin, std::string& in_text, const std::string& text, char symbol_in, char symbol_out);
+  std::vector<std::string> split(const std::string& text, const std::string& delim);
 };
 
 } // namespace owds
