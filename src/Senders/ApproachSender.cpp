@@ -8,31 +8,31 @@
 
 namespace owds {
 
-bool LogicalAlgebraNode::evaluate(const std::string& entity, onto::IndividualClient* client)
+bool LogicalAlgebraNode::evaluate(const Pose& pose, AreasPerceptionManager* manager)
 {
   switch (operator_)
   {
   case logical_and:
     for(auto& value : values_)
-      if(!evaluate(entity, value, client))
+      if(!evaluate(pose, value, manager))
         return false;
     for(auto& node : nodes_)
-      if(!node.evaluate(entity, client))
+      if(!node.evaluate(pose, manager))
         return false;
     return true;
   case logical_or:
     for(auto& value : values_)
-      if(evaluate(entity, value, client))
+      if(evaluate(pose, value, manager))
         return true;
     for(auto& node : nodes_)
-      if(node.evaluate(entity, client))
+      if(node.evaluate(pose, manager))
         return true;
     return false;
   case logical_not:
     if(values_.size())
-      return !evaluate(entity, values_.front(), client);
+      return !evaluate(pose, values_.front(), manager);
     else if(nodes_.size())
-      return !nodes_.front().evaluate(entity, client);
+      return !nodes_.front().evaluate(pose, manager);
     else
       return false;
   default:
@@ -40,10 +40,13 @@ bool LogicalAlgebraNode::evaluate(const std::string& entity, onto::IndividualCli
   }
 }
 
-bool LogicalAlgebraNode::evaluate(const std::string& entity, const std::string& value, onto::IndividualClient* client)
+bool LogicalAlgebraNode::evaluate(const Pose& pose, const std::string& value, AreasPerceptionManager* manager)
 {
-  auto res = client->getOn(entity, "isInArea");
-  return (std::find(res.begin(), res.end(), value) != res.end());
+  Area* area = manager->getArea(value);
+  if(area == nullptr)
+    return false;
+
+  return area->isInside(pose);
 }
 
 void LogicalAlgebraNode::print(size_t level)

@@ -24,7 +24,7 @@ public:
   void insert(const std::string& value) { values_.push_back(value); }
   void insert(const LogicalAlgebraNode& node) { nodes_.push_back(node); }
 
-  bool evaluate(const std::string& entity, onto::IndividualClient* client);
+  bool evaluate(const Pose& pose, AreasPerceptionManager* manager);
 
   void print(size_t level = 0);
 
@@ -33,7 +33,7 @@ private:
   std::vector<std::string> values_;
   std::vector<LogicalAlgebraNode> nodes_;
 
-  bool evaluate(const std::string& entity, const std::string& value, onto::IndividualClient* client);
+  bool evaluate(const Pose& pose, const std::string& value, AreasPerceptionManager* manager);
 };
 
 class ApproachSender
