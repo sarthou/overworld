@@ -1,4 +1,5 @@
 #include "overworld/Senders/ApproachSender.h"
+#include "overworld/GetApproachPoint.h"
 
 #include "ontologenius/OntologiesManipulator.h"
 
@@ -35,7 +36,7 @@ bool LogicalAlgebraNode::evaluate(const std::string& entity, onto::IndividualCli
     else
       return false;
   default:
-    return false;
+    return true;
   }
 }
 
@@ -66,7 +67,9 @@ ApproachSender::ApproachSender(ros::NodeHandle* n, PerceptionManagers* managers)
                                                                                    robot_(nullptr),
                                                                                    managers_(managers),
                                                                                    onto_(nullptr)
-{}
+{
+  get_pose_service_ = n_->advertiseService("/overworld/getApproachPose", &ApproachSender::onGetApproachPoint, this);
+}
 
 void ApproachSender::setRobotName(const std::string& robot_name)
 {
@@ -80,10 +83,17 @@ void ApproachSender::setRobotName(const std::string& robot_name)
   robot_ = managers_->robots_manager_.getAgent(robot_name_);
 }
 
+bool PoseSender::onGetApproachPoint(overworld::GetApproachPoint::Request& req, overworld::GetApproachPoint::Response& res)
+{
+  auto constraint = LogicalAlgebraNode(logical_none);
+  if(req.area_constraints)
+    constraint = constraintToTree(req.area_constraints);
+  return true;
+}
+
 LogicalAlgebraNode ApproachSender::constraintToTree(std::string constraint)
 {
   constraint.erase(std::remove_if(constraint.begin(), constraint.end(), ::isspace),constraint.end());
-  std::cout << "in = " << constraint << std::endl;
 
   std::unordered_map<std::string, LogicalAlgebraNode> braquet_nodes;
   size_t braquet_cpt = 0;
@@ -99,7 +109,6 @@ LogicalAlgebraNode ApproachSender::constraintToTree(std::string constraint)
     braquet_pose = constraint.find("(");
   }
 
-  std::cout << "out = " << constraint << std::endl;
   auto or_statments = split(constraint, "|");
   if(or_statments.size() > 1)
   {

@@ -52,6 +52,8 @@ private:
 
   PerceptionManagers* managers_;
   onto::OntologyManipulator* onto_;
+
+  ros::ServiceServer get_pose_service_;
   
   LogicalAlgebraNode constraintToTree(std::string constraint);
   LogicalAlgebraNode createAndNode(std::string constraint, const std::unordered_map<std::string, LogicalAlgebraNode>& braquet_nodes);
