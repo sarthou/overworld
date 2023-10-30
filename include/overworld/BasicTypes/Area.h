@@ -38,6 +38,7 @@ public:
   double getHalfHeight() const { return half_height_; }
   const Pose& getCenterPose() const { return center_; }
 
+  bool isInside(const Pose& pose, bool hysteresis = true);
   bool isInside(Entity* entity);
   bool setOut(Entity* entity);
   void clearInsideEntities();
