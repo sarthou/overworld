@@ -6,6 +6,8 @@
 #include "overworld/Perception/PerceptionManagers.h"
 #include "overworld/BasicTypes/Agent.h"
 
+#include "overworld/GetApproachPoint.h"
+
 namespace owds {
 
 enum LogicalAlgebraOperator_e
@@ -54,6 +56,8 @@ private:
   onto::OntologyManipulator* onto_;
 
   ros::ServiceServer get_pose_service_;
+
+  bool onGetApproachPoint(overworld::GetApproachPoint::Request& req, overworld::GetApproachPoint::Response& res);
   
   LogicalAlgebraNode constraintToTree(std::string constraint);
   LogicalAlgebraNode createAndNode(std::string constraint, const std::unordered_map<std::string, LogicalAlgebraNode>& braquet_nodes);

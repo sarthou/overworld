@@ -1,5 +1,4 @@
 #include "overworld/Senders/ApproachSender.h"
-#include "overworld/GetApproachPoint.h"
 
 #include "ontologenius/OntologiesManipulator.h"
 
@@ -86,10 +85,10 @@ void ApproachSender::setRobotName(const std::string& robot_name)
   robot_ = managers_->robots_manager_.getAgent(robot_name_);
 }
 
-bool PoseSender::onGetApproachPoint(overworld::GetApproachPoint::Request& req, overworld::GetApproachPoint::Response& res)
+bool ApproachSender::onGetApproachPoint(overworld::GetApproachPoint::Request& req, overworld::GetApproachPoint::Response& res)
 {
   auto constraint = LogicalAlgebraNode(logical_none);
-  if(req.area_constraints)
+  if(req.area_constraints != "")
     constraint = constraintToTree(req.area_constraints);
   return true;
 }
