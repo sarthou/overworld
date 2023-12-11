@@ -68,7 +68,7 @@ ApproachSender::ApproachSender(ros::NodeHandle* n, PerceptionManagers* managers)
                                                                                    managers_(managers),
                                                                                    onto_(nullptr)
 {
-  get_pose_service_ = n_->advertiseService("/overworld/getApproachPose", &ApproachSender::onGetApproachPoint, this);
+  //get_pose_service_ = n_->advertiseService("/overworld/getApproachPose", &ApproachSender::onGetApproachPoint, this);
 }
 
 void ApproachSender::setRobotName(const std::string& robot_name)
@@ -83,13 +83,13 @@ void ApproachSender::setRobotName(const std::string& robot_name)
   robot_ = managers_->robots_manager_.getAgent(robot_name_);
 }
 
-bool PoseSender::onGetApproachPoint(overworld::GetApproachPoint::Request& req, overworld::GetApproachPoint::Response& res)
+/*bool PoseSender::onGetApproachPoint(overworld::GetApproachPoint::Request& req, overworld::GetApproachPoint::Response& res)
 {
   auto constraint = LogicalAlgebraNode(logical_none);
   if(req.area_constraints)
     constraint = constraintToTree(req.area_constraints);
   return true;
-}
+}*/
 
 LogicalAlgebraNode ApproachSender::constraintToTree(std::string constraint)
 {
