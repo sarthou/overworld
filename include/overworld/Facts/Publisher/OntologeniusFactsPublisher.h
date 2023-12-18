@@ -10,7 +10,7 @@ namespace owds {
 class OntologeniusFactsPublisher : public FactsPublisher
 {
 public:
-  OntologeniusFactsPublisher(ros::NodeHandle* n, const std::string& agent_name);
+  OntologeniusFactsPublisher(const std::string& agent_name);
 
 private:
   std::string agent_name_;

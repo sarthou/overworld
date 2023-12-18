@@ -5,6 +5,8 @@
 
 #include "overworld/GetRelations.h"
 
+#include <ros/ros.h>
+
 namespace ontologenius {
 
 class ReasonerEgocentric : public ReasonerInterface

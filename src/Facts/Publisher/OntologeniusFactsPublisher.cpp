@@ -2,9 +2,7 @@
 
 namespace owds {
 
-OntologeniusFactsPublisher::OntologeniusFactsPublisher(ros::NodeHandle* n,
-                                                       const std::string& agent_name) : agent_name_(agent_name),
-                                                                                        ontologies_manipulator_(n)
+OntologeniusFactsPublisher::OntologeniusFactsPublisher(const std::string& agent_name) : agent_name_(agent_name)
 {
   ontologies_manipulator_.waitInit();
   ontologies_manipulator_.add(agent_name_);

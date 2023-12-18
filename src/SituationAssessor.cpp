@@ -23,7 +23,7 @@ SituationAssessor::SituationAssessor(const std::string& agent_name,
                                                       simulate_(simulate),
                                                       time_step_(1.0 / assessment_frequency),
                                                       simu_step_(1.0 / simulation_frequency),
-                                                      facts_publisher_(&n_, agent_name),
+                                                      facts_publisher_(agent_name),
                                                       facts_calculator_(agent_name),
                                                       perception_manager_(&n_)
 {
