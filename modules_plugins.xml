@@ -15,9 +15,17 @@
       The module subscribe to "/peopleTrack". Remap your topic if needed.
     </description>
   </class>
+
   <class type="owds::FakeHumanPerceptionModule" base_class_type="owds::PerceptionModuleBase_<owds::BodyPart>">
     <description>
       A human perception module providing fake body parts from a ROS topic.
+      Does not take any parameter.
+    </description>
+  </class>
+
+  <class type="owds::FakeHumansPerceptionModule" base_class_type="owds::PerceptionModuleBase_<owds::BodyPart>">
+    <description>
+      A humans perception module providing fake body parts from a ROS topic.
       Does not take any parameter.
     </description>
   </class>
@@ -28,6 +36,7 @@
       This module requires a 'file' parameter being a yaml description of the assets to be loaded.
     </description>
   </class>
+  
   <class type="owds::FakeObjectPerceptionModule" base_class_type="owds::PerceptionModuleBase_<owds::Object>">
     <description>
       An object perception module providing fake objects from a ROS topic.
