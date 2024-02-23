@@ -79,5 +79,5 @@ More information about this link and tutorials to show its use will come soon.
 [Bullet-Dependency-Image]: https://img.shields.io/badge/dependencies-bullet3-yellow
 [Bullet-Dependency-Url]: https://github.com/bulletphysics/bullet3
 
-[Build-Status-Image]: https://github.com/sarthou/overworld/actions/workflows/main.yml/badge.svg
+[Build-Status-Image]: https://github.com/sarthou/overworld/actions/workflows/overworld.yml/badge.svg
 [Build-Status-Url]: https://github.com/sarthou/overworld/actions
