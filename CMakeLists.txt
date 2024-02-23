@@ -27,7 +27,7 @@ find_package(catkin REQUIRED COMPONENTS
   cv_bridge
   pluginlib
 )
-find_package(ontologenius 0.3.0 REQUIRED)
+find_package(ontologenius 0.4.1 REQUIRED)
 find_package(Eigen3 REQUIRED NO_MODULE)
 find_package(Threads REQUIRED)
 find_package(CURL REQUIRED)
