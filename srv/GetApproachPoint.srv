@@ -1,0 +1,4 @@
+string area_constraints
+string entity
+---
+geometry_msgs/PoseStamped pose

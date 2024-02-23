@@ -4,7 +4,7 @@
 #include "overworld/BasicTypes/BodyPart.h"
 #include "overworld/Perception/Modules/PerceptionModuleBase.h"
 
-#include "overworld/AgentPose.h"
+#include "overworld/AgentsPose.h"
 
 #include "ontologenius/OntologiesManipulator.h"
 
@@ -14,15 +14,15 @@
 namespace owds {
 
 
-class FakeHumanPerceptionModule : public PerceptionModuleRosBase<BodyPart, overworld::AgentPose>
+class FakeHumansPerceptionModule : public PerceptionModuleRosBase<BodyPart, overworld::AgentsPose>
 {
   public:
-    FakeHumanPerceptionModule();
+    FakeHumansPerceptionModule();
 
     virtual bool closeInitialization() override;
 
   private:
-    bool perceptionCallback(const overworld::AgentPose& msg);
+    bool perceptionCallback(const overworld::AgentsPose& msg);
 
     BodyPart createBodyPart(const std::string& human_name, const std::string& part_name);
 

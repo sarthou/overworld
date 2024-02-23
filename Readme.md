@@ -71,13 +71,13 @@ The knowledge base Ontologenius can be used as a source of information for Overw
 
 More information about this link and tutorials to show its use will come soon.
 
-[Release-Url]: https://github.com/sarthou/overworld/releases/tag/v0.1.4
-[Release-Image]: http://img.shields.io/badge/release-v0.1.4-blue
+[Release-Url]: https://github.com/sarthou/overworld/releases/tag/v0.1.5
+[Release-Image]: http://img.shields.io/badge/release-v0.1.5-blue
 
 [Ontologenius-Dependency-Image]: https://img.shields.io/badge/dependencies-ontologenius-yellow
 [Ontologenius-Dependency-Url]: https://github.com/sarthou/ontologenius
 [Bullet-Dependency-Image]: https://img.shields.io/badge/dependencies-bullet3-yellow
 [Bullet-Dependency-Url]: https://github.com/bulletphysics/bullet3
 
-[Build-Status-Image]: https://github.com/sarthou/overworld/actions/workflows/main.yml/badge.svg
+[Build-Status-Image]: https://github.com/sarthou/overworld/actions/workflows/overworld.yml/badge.svg
 [Build-Status-Url]: https://github.com/sarthou/overworld/actions

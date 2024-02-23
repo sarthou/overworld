@@ -27,7 +27,7 @@ find_package(catkin REQUIRED COMPONENTS
   cv_bridge
   pluginlib
 )
-find_package(ontologenius 0.2.12 REQUIRED)
+find_package(ontologenius 0.4.1 REQUIRED)
 find_package(Eigen3 REQUIRED NO_MODULE)
 find_package(Threads REQUIRED)
 find_package(CURL REQUIRED)
@@ -68,6 +68,7 @@ add_message_files(
   EntityPose.msg
   EntitiesPoses.msg
   AgentPose.msg
+  AgentsPose.msg
   Pose.msg
 )
 
@@ -75,6 +76,8 @@ add_service_files(
   FILES
   StartStopModules.srv
   BoundingBox.srv
+  GetAgents.srv
+  GetApproachPoint.srv
   GetPose.srv
   GetRelations.srv
 )
@@ -188,6 +191,7 @@ target_link_libraries(${PROJECT_NAME}_facts_lib PUBLIC
                       ${PROJECT_NAME}_types_lib)
            
 add_library(${PROJECT_NAME}_sender_lib STATIC
+  src/Senders/ApproachSender.cpp
   src/Senders/ROSSender.cpp
   src/Senders/PoseSender.cpp
   src/Senders/Bernie.cpp
@@ -197,7 +201,8 @@ target_link_libraries(${PROJECT_NAME}_sender_lib PUBLIC
                       ${catkin_LIBRARIES}
                       Bullet3 # For b3CameraImage
                       ${CURL_LIBRARIES}
-                      ${PROJECT_NAME}_types_lib)
+                      ${PROJECT_NAME}_types_lib
+                      ${PROJECT_NAME}_perception_lib)
 
 #################
 #    Plugins    #
@@ -209,6 +214,7 @@ add_library(overworld_modules_plugin MODULE
   src/Perception/Modules/RobotsModules/JointStatePerceptionModule.cpp
   src/Perception/Modules/HumansModules/StampedPosePerceptionModule.cpp
   src/Perception/Modules/HumansModules/FakeHumanPerceptionModule.cpp
+  src/Perception/Modules/HumansModules/FakeHumansPerceptionModule.cpp
   src/Perception/Modules/AreasModules/ObjAreasPerceptionModule.cpp
 )
 target_link_libraries(overworld_modules_plugin PUBLIC
@@ -258,6 +264,15 @@ target_link_libraries(${PROJECT_NAME}_bullet_test PRIVATE
                       ${PROJECT_NAME}_utility_lib
                       ${catkin_LIBRARIES})
 
+add_executable(${PROJECT_NAME}_fov_test src/TestFiles/fov.cpp )
+target_link_libraries(${PROJECT_NAME}_fov_test PRIVATE
+                    ${PROJECT_NAME}_bullet_lib
+                    ${PROJECT_NAME}_types_lib
+                    ${PROJECT_NAME}_perception_lib
+                    ${PROJECT_NAME}_utility_lib
+                    ${PROJECT_NAME}_sender_lib
+                    ${catkin_LIBRARIES})
+
 add_executable(${PROJECT_NAME}_multi_server_test src/TestFiles/multi_server_test.cpp )
 target_link_libraries(${PROJECT_NAME}_multi_server_test PRIVATE
                       ${PROJECT_NAME}_bullet_lib
@@ -280,3 +295,7 @@ add_dependencies(${PROJECT_NAME}_gravity_test overworld_gencpp)
 add_executable(${PROJECT_NAME}_area_test src/TestFiles/area.cpp )
 target_link_libraries(${PROJECT_NAME}_area_test PRIVATE
                       ${PROJECT_NAME}_types_lib)
+
+add_executable(${PROJECT_NAME}_approach_test src/TestFiles/approach_sender.cpp )
+target_link_libraries(${PROJECT_NAME}_approach_test PRIVATE
+                      ${PROJECT_NAME}_sender_lib)

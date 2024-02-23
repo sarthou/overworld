@@ -28,6 +28,7 @@ public:
   void registerBodyPartsManager(EntitiesPerceptionManager<BodyPart>* manager) { bodyparts_managers_.insert(manager); }
 
   const std::map<std::string, Area*>& getEntities() const { return areas_; }
+  Area* getArea(const std::string& area_id);
 
   bool update();
 

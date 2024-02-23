@@ -12,7 +12,7 @@ FakeObjectPerceptionModule::FakeObjectPerceptionModule() : PerceptionModuleRosBa
 
 bool FakeObjectPerceptionModule::closeInitialization()
 {
-  ontologies_manipulator_ = new OntologiesManipulator(n_);
+  ontologies_manipulator_ = new onto::OntologiesManipulator();
   ontologies_manipulator_->waitInit();
   std::string robot_name = robot_agent_->getId();
   ontologies_manipulator_->add(robot_name);
@@ -46,6 +46,7 @@ bool FakeObjectPerceptionModule::perceptionCallback(const overworld::EntitiesPos
     }
     catch (const tf2::TransformException& ex) {
       ShellDisplay::error("[FakeObjectPerceptionModule]" + std::string(ex.what()));
+      return false;
     }
   }
 

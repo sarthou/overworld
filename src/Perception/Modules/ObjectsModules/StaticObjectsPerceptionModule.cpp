@@ -25,7 +25,7 @@ void StaticObjectsPerceptionModule::setParameter(const std::string& parameter_na
 
 bool StaticObjectsPerceptionModule::closeInitialization()
 {
-    ontologies_manipulator_ = new OntologiesManipulator(n_);
+    ontologies_manipulator_ = new onto::OntologiesManipulator();
     std::string robot_name = robot_agent_->getId();
     if(ontologies_manipulator_->add(robot_name) == false)
     {

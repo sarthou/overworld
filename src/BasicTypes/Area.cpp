@@ -38,6 +38,29 @@ bool Area::isEmpty() const
   return (nb_entity == 0);
 }
 
+bool Area::isInside(const Pose& pose, bool hysteresis)
+{
+  if(hysteresis)
+  {
+    Entity entity_wrapper("plop");
+    entity_wrapper.updatePose(pose);
+    return isInside(&entity_wrapper);
+  }
+  else
+  {
+    if(is_circle_)
+    {
+      double entity_distance = pose.distanceTo(center_);
+      return (entity_distance <= radius_);
+    }
+    else
+    {
+      point_t entity_point(pose.getX(), pose.getY());
+      return polygon_.isInside(entity_point);
+    }
+  }
+}
+
 bool Area::isInside(Entity* entity)
 {
   if(is_circle_)
