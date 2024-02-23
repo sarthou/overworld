@@ -5,7 +5,9 @@
 
 #include <algorithm>
 
-namespace ontologenius {
+namespace overworld {
+
+using namespace ontologenius;
 
 void ReasonerEgocentric::initialize()
 {
@@ -85,7 +87,7 @@ std::string ReasonerEgocentric::getName()
   return "reasoner egocentric";
 }
 
-std::string ReasonerEgocentric::getDesciption()
+std::string ReasonerEgocentric::getDescription()
 {
   return "This reasoner is provided by Overworld. It computes egocentric relations on query demand.";
 }
@@ -233,6 +235,6 @@ void ReasonerEgocentric::updateOntology(const std::vector<overworld::Triplet>& t
   }
 }
 
-PLUGINLIB_EXPORT_CLASS(ReasonerEgocentric, ReasonerInterface)
+} // namespace overworld
 
-} // namespace ontologenius
+PLUGINLIB_EXPORT_CLASS(overworld::ReasonerEgocentric, ontologenius::ReasonerInterface)
