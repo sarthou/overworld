@@ -19,6 +19,8 @@
 
 #include <overworld/StartStopModules.h>
 #include <overworld/BoundingBox.h>
+#include <overworld/GetAgents.h>
+#include <std_srvs/SetBool.h>
 
 namespace owds {
 
@@ -55,6 +57,7 @@ public:
   void run();
   void stop();
   bool isRunning() { return run_; }
+  void setSimulation(bool simulate);
 
   void addObjectPerceptionModule(const std::string& module_name, PerceptionModuleBase_<Object>* module);
   void addHumanPerceptionModule(const std::string& module_name, PerceptionModuleBase_<BodyPart>* module);
@@ -73,7 +76,10 @@ private:
   ros::CallbackQueue callback_queue_;
   ros::ServiceServer start_modules_service_;
   ros::ServiceServer stop_modules_service_;
+  ros::ServiceServer set_simulation_service_;
   ros::ServiceServer bounding_box_service_;
+  ros::ServiceServer agents_list_service_;
+  ros::Publisher new_assessor_publisher_;
   std::atomic<bool> run_;
   double time_step_; // in second
   double simu_step_;
@@ -85,7 +91,7 @@ private:
   OntologeniusFactsPublisher facts_publisher_;
 
   ROSSender* ros_sender_;
-  PoseSender* motion_planning_pose_sender_;
+  PoseSender* objetcs_pose_sender_;
   BernieSenders* bernie_sender_;
 
   std::map<std::string, HumanAssessor_t> humans_assessors_;
@@ -108,6 +114,8 @@ private:
   template<typename T>
   bool stopModule(BasePerceptionManager<T>& manager, const std::string& module_name, int& status);
   bool getBoundingBox(overworld::BoundingBox::Request &req, overworld::BoundingBox::Response &res);
+  bool getAgents(overworld::GetAgents::Request &req, overworld::GetAgents::Response &res);
+  bool setSimulation(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &res);
 
 };
 

@@ -59,26 +59,38 @@ const Pose& Entity::pose(unsigned int id) const
     return last_poses_.at(last_poses_.size() - id - 1).pose;
 }
 
+// TODO optimize when increase => shortcut
 const Pose& Entity::pose(const ros::Time& stamp) const
 {
     if (!is_located_)
         throw UnlocatedEntityError(id_);
 
-    ros::Duration min_err = stamp - last_poses_.back().stamp;
+    auto duration_zero = ros::Duration(0);
 
-    for(size_t i = last_poses_.size() - 2; i >= 0; i--)
+    ros::Duration min_err = stamp - last_poses_.back().stamp;
+    if(min_err < duration_zero)
+        min_err = last_poses_.back().stamp - stamp;
+
+    int min_i = -1;
+
+    for(size_t i = 0; i < last_poses_.size(); i++)
     {
         auto delta = stamp - last_poses_.at(i).stamp;
+        if(delta < duration_zero)
+            delta = last_poses_.at(i).stamp - stamp;
         if(delta < min_err)
         {
             min_err = delta;
-            std::cout << "take pose at -" << i << std::endl;
+            min_i = i;
         }
-        else
-            return last_poses_.at(i + 1).pose;
     }
 
-    return last_poses_.back().pose;
+    if(min_i < 0)
+        return last_poses_.back().pose;
+    else if(min_i)
+        return last_poses_.at(min_i - 1).pose; //-1 bug
+    else
+        return last_poses_.at(min_i).pose;
 }
 
 bool Entity::hasMoved() const
@@ -91,16 +103,30 @@ bool Entity::hasMoved() const
     {
         return true;
     }
-    if (pose().distanceTo(last_poses_.at(last_poses_.size() - 2).pose) > 0.005) // 5mm
-    {
+
+    if(pose().similarTo(last_poses_.at(last_poses_.size() - 2).pose, 0.001, 0.00349066) == false) // 5mm // 0.2 degree// 0.5degree = 0.00872665
         return true;
-    }
-    if (pose().angularDistance(last_poses_.at(last_poses_.size() - 2).pose) > 0.0174533) // 1degree
-    {
-        return true;
-    }
+
     return false;
 }
+
+bool Entity::hasMoved(const ros::Time& stamp) const
+{
+    if (!is_located_)
+    {
+        throw UnlocatedEntityError(id_);
+    }
+    if (last_poses_.size() <= 1)
+    {
+        return true;
+    }
+
+    if(pose().similarTo(pose(stamp), 0.001, 0.00349066) == false) // 5mm // 0.2 degree// 0.5degree = 0.00872665
+        return true;
+
+    return false;
+}
+
 
 std::array<double, 3> Entity::computeTranslationSpeed() const
 {

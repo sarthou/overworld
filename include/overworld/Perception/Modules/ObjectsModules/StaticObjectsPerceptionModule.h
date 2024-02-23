@@ -17,8 +17,8 @@ public:
     virtual bool closeInitialization() override;
     
 private:
-    OntologiesManipulator* ontologies_manipulator_;
-    OntologyManipulator* onto_;
+    onto::OntologiesManipulator* ontologies_manipulator_;
+    onto::OntologyManipulator* onto_;
 
     std::string config_file_;
 

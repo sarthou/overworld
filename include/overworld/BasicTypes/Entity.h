@@ -39,6 +39,7 @@ public:
     const Pose& pose(const ros::Time& stamp) const;
     ros::Time lastStamp() const { return last_poses_.back().stamp; }
     bool hasMoved() const;
+    bool hasMoved(const ros::Time& stamp) const;
 
     std::array<double, 3> computeTranslationSpeed() const;
 
@@ -81,7 +82,7 @@ protected:
     bool is_true_id_;
     std::unordered_set<std::string> false_ids_;
 
-    CircularBuffer<PoseStamped_s, 10> last_poses_;
+    CircularBuffer<PoseStamped_s, 30> last_poses_;
     bool is_located_;
     int bullet_id_;
     int bullet_link_id_;

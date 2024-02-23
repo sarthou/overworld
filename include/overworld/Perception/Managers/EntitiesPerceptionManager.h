@@ -22,8 +22,7 @@ class EntitiesPerceptionManager : public BasePerceptionManager<T>
 {
     static_assert(std::is_base_of<Entity,T>::value, "T must be derived from Entity");
 public:
-    explicit EntitiesPerceptionManager(ros::NodeHandle* nh): bullet_client_(nullptr), 
-                                                             ontos_(OntologiesManipulator(nh)),
+    explicit EntitiesPerceptionManager(ros::NodeHandle* nh): bullet_client_(nullptr),
                                                              onto_(nullptr)
     {}
     virtual ~EntitiesPerceptionManager();
@@ -42,8 +41,8 @@ protected:
     BulletClient* bullet_client_;
 
     std::string myself_agent_name_;
-    OntologiesManipulator ontos_;
-    OntologyManipulator* onto_;
+    onto::OntologiesManipulator ontos_;
+    onto::OntologyManipulator* onto_;
 
     virtual void getPercepts( std::map<std::string, T>& percepts);
     virtual void reasoningOnUpdate() {}

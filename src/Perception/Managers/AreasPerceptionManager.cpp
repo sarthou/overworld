@@ -11,6 +11,15 @@ AreasPerceptionManager::~AreasPerceptionManager()
   areas_.clear();
 }
 
+Area* AreasPerceptionManager::getArea(const std::string& area_id)
+{
+  auto it = areas_.find(area_id);
+  if(it != areas_.end())
+    return it->second;
+  else
+    return nullptr;
+}
+
 bool AreasPerceptionManager::update()
 {
   if((pending_percepts_.size() == 0) && !this->shouldRun())

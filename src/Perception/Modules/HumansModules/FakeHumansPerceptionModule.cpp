@@ -1,4 +1,4 @@
-#include "overworld/Perception/Modules/HumansModules/FakeHumanPerceptionModule.h"
+#include "overworld/Perception/Modules/HumansModules/FakeHumansPerceptionModule.h"
 
 #include "overworld/Utility/ShellDisplay.h"
 
@@ -6,13 +6,13 @@
 
 namespace owds {
 
-FakeHumanPerceptionModule::FakeHumanPerceptionModule() : PerceptionModuleRosBase("/overworld/fake_human_poses"),
+FakeHumansPerceptionModule::FakeHumansPerceptionModule() : PerceptionModuleRosBase("/overworld/fake_humans_poses"),
                                                          ontologies_manipulator_(nullptr),
                                                          onto_(nullptr),
                                                          tf2_listener_(tf_buffer_)
 {}
 
-bool FakeHumanPerceptionModule::closeInitialization()
+bool FakeHumansPerceptionModule::closeInitialization()
 {
     ontologies_manipulator_ = new onto::OntologiesManipulator();
     ontologies_manipulator_->waitInit();
@@ -23,42 +23,42 @@ bool FakeHumanPerceptionModule::closeInitialization()
     return true;
 }
 
-bool FakeHumanPerceptionModule::perceptionCallback(const overworld::AgentPose& msg)
+bool FakeHumansPerceptionModule::perceptionCallback(const overworld::AgentsPose& msg)
 {
-    if (msg.parts.size() == 0)
+    if (msg.agents.size() == 0)
         return false;
+    for(auto& agent : msg.agents)
+        for(auto& part : agent.parts)
+        {
+            auto it_percept = percepts_.find(part.id);
+            if(it_percept == percepts_.end())
+                it_percept = percepts_.insert(std::make_pair(part.id, createBodyPart(agent.id, part.id))).first;
 
-    for(auto& part : msg.parts)
-    {
-        auto it_percept = percepts_.find(part.id);
-        if(it_percept == percepts_.end())
-            it_percept = percepts_.insert(std::make_pair(part.id, createBodyPart(msg.id, part.id))).first;
+            std::string frame_id = part.pose.header.frame_id;
+            if (frame_id[0] == '/')
+                frame_id = frame_id.substr(1);
 
-        std::string frame_id = part.pose.header.frame_id;
-        if (frame_id[0] == '/')
-            frame_id = frame_id.substr(1);
-
-        try {
-            geometry_msgs::PoseStamped part_in_map;
-            if(part.pose.header.frame_id != "/map")
-            {
-                geometry_msgs::TransformStamped to_map = tf_buffer_.lookupTransform("map", frame_id, part.pose.header.stamp, ros::Duration(1.0));
-                tf2::doTransform(part.pose, part_in_map, to_map);
+            try {
+                geometry_msgs::PoseStamped part_in_map;
+                if(part.pose.header.frame_id != "/map")
+                {
+                    geometry_msgs::TransformStamped to_map = tf_buffer_.lookupTransform("map", frame_id, part.pose.header.stamp, ros::Duration(1.0));
+                    tf2::doTransform(part.pose, part_in_map, to_map);
+                }
+                else
+                    part_in_map = part.pose;
+                it_percept->second.updatePose(part_in_map);
             }
-            else
-                part_in_map = part.pose;
-            it_percept->second.updatePose(part_in_map);
+            catch (const tf2::TransformException& ex) {
+                ShellDisplay::error("[FakeHumanPerceptionModule]" + std::string(ex.what()));
+                return false;
+            }
         }
-        catch (const tf2::TransformException& ex) {
-            ShellDisplay::error("[FakeHumanPerceptionModule]" + std::string(ex.what()));
-            return false;
-        }
-    }
 
     return true;
 }
 
-BodyPart FakeHumanPerceptionModule::createBodyPart(const std::string& human_name, const std::string& part_name)
+BodyPart FakeHumansPerceptionModule::createBodyPart(const std::string& human_name, const std::string& part_name)
 {
     BodyPartType_e part_type = BodyPartType_e::BODY_PART_UNKNOW;
 
@@ -106,4 +106,4 @@ BodyPart FakeHumanPerceptionModule::createBodyPart(const std::string& human_name
 
 } // namespace owds
 
-PLUGINLIB_EXPORT_CLASS(owds::FakeHumanPerceptionModule, owds::PerceptionModuleBase_<owds::BodyPart>)
+PLUGINLIB_EXPORT_CLASS(owds::FakeHumansPerceptionModule, owds::PerceptionModuleBase_<owds::BodyPart>)

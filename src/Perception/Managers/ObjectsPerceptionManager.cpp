@@ -220,14 +220,24 @@ void ObjectsPerceptionManager::reasoningOnUpdate()
 
   if(no_data_objects.size())
   {
-    if(isObjectsInFovAabb(no_data_objects))
+    auto objects_in_fov = isObjectsInFovAabb(no_data_objects);
+    if(objects_in_fov.size())
     {
       auto objects_in_camera = getObjectsInCamera();
 
-      for(auto no_data_obj : no_data_objects)
+      for(auto no_data_obj : objects_in_fov)
       {
+        // equivalent to shouldBeSeen
         if(objects_in_camera.find(no_data_obj->bulletId()) != objects_in_camera.end())
+        {
+          auto it_unseen = lost_objects_nb_frames_.find(no_data_obj->id());
+          if(it_unseen == lost_objects_nb_frames_.end())
+            it_unseen = lost_objects_nb_frames_.insert({no_data_obj->id(), 0}).first;
+
+          it_unseen->second++;
+          if(it_unseen->second > MAX_UNSEEN)
           objects_to_remove.push_back(no_data_obj);
+        }
         else
           objects_to_simulate.push_back(no_data_obj);
       }
@@ -364,10 +374,12 @@ std::vector<PointOfInterest> ObjectsPerceptionManager::getPoisInFov(Object* obje
   return pois_in_fov;
 }
 
-bool ObjectsPerceptionManager::isObjectsInFovAabb(std::vector<Object*> objects)
+std::vector<Object*> ObjectsPerceptionManager::isObjectsInFovAabb(std::vector<Object*> objects)
 {
+  std::vector<Object*> res;
   for(auto object : objects)
   {
+    size_t nb_in_fov = 0;
     std::array<Pose, 8> points = { Pose({object->getAabb().min[0], object->getAabb().min[1], object->getAabb().min[2]}, {0,0,0,1}),
                                    Pose({object->getAabb().min[0], object->getAabb().min[1], object->getAabb().max[2]}, {0,0,0,1}),
                                    Pose({object->getAabb().min[0], object->getAabb().max[1], object->getAabb().min[2]}, {0,0,0,1}),
@@ -380,12 +392,16 @@ bool ObjectsPerceptionManager::isObjectsInFovAabb(std::vector<Object*> objects)
     for(const auto& point : points)
     {
       auto point_in_head = point.transformIn(myself_agent_->getHead()->pose());
-      if (myself_agent_->getFieldOfView().hasIn(point_in_head))
-        return true;
+      if (myself_agent_->getFieldOfView().hasIn(point_in_head, 2))
+      {
+        nb_in_fov ++;
+        if(nb_in_fov >= 2)
+          res.push_back(object);
+      }
     }
   }
 
-  return false;
+  return res;
 }
 
 bool ObjectsPerceptionManager::shouldBeSeen(Object* object, const std::vector<PointOfInterest>& pois)
@@ -433,21 +449,16 @@ std::unordered_set<int> ObjectsPerceptionManager::getObjectsInCamera()
     return {};
 
   auto proj_matrix = bullet_client_->computeProjectionMatrix(myself_agent_->getFieldOfView().getHeight(),
-                                                              myself_agent_->getFieldOfView().getRatio(),
+                                                              myself_agent_->getFieldOfView().getRatioOpenGl(),
                                                               myself_agent_->getFieldOfView().getClipNear(),
                                                               myself_agent_->getFieldOfView().getClipFar());
-
-  std::array<double, 3> axes = {1,0,0};
-  if(myself_agent_->getType() == AgentType_e::ROBOT)
-    axes = {0,0,1};
-
-  Pose target_pose = myself_agent_->getHead()->pose() * Pose(axes, {0,0,0,1});
+  Pose target_pose = myself_agent_->getHead()->pose() * Pose({0,0,1}, {0,0,0,1});
   auto head_pose_trans = myself_agent_->getHead()->pose().arrays().first;
   auto target_pose_trans = target_pose.arrays().first;
   auto view_matrix = bullet_client_->computeViewMatrix({(float)head_pose_trans[0], (float)head_pose_trans[1], (float)head_pose_trans[2]},
                                                         {(float)target_pose_trans[0], (float)target_pose_trans[1], (float)target_pose_trans[2]},
                                                         {0.,0.,1.});
-  auto images = bullet_client_->getCameraImage(100*myself_agent_->getFieldOfView().getRatio(), 100, view_matrix, proj_matrix, owds::BULLET_HARDWARE_OPENGL);
+  auto images = bullet_client_->getCameraImage(100*myself_agent_->getFieldOfView().getRatioOpenGl(), 100, view_matrix, proj_matrix, owds::BULLET_HARDWARE_OPENGL);
   return bullet_client_->getSegmentationIds(images);
 }
 

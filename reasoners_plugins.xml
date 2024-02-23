@@ -1,5 +1,5 @@
 <library path="lib/liboverworld_reasoner_plugin">
-  <class type="ReasonerEgocentric" base_class_type="ReasonerInterface">
+  <class type="overworld::ReasonerEgocentric" base_class_type="ontologenius::ReasonerInterface">
     <description>This reasoner is provided by Overworld. It computes egocentric relations on query demand.</description>
   </class>
 </library>

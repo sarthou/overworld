@@ -23,11 +23,18 @@ SituationAssessor::SituationAssessor(const std::string& agent_name,
                                                       simulate_(simulate),
                                                       time_step_(1.0 / assessment_frequency),
                                                       simu_step_(1.0 / simulation_frequency),
-                                                      facts_publisher_(&n_, agent_name),
+                                                      facts_publisher_(agent_name),
                                                       facts_calculator_(agent_name),
                                                       perception_manager_(&n_)
 {
   n_.setCallbackQueue(&callback_queue_);
+
+  if(is_robot_)
+  {
+    new_assessor_publisher_ = n_.advertise<std_msgs::String>("/overworld/new_assessor",5);
+    agents_list_service_ = n_.advertiseService("/overworld/getAgents", &SituationAssessor::getAgents, this);
+    set_simulation_service_ = n_.advertiseService("/overworld/setSimulation", &SituationAssessor::setSimulation, this);
+  }
 
   if (is_robot_)
   {
@@ -76,25 +83,31 @@ SituationAssessor::SituationAssessor(const std::string& agent_name,
   ros_sender_ = new ROSSender(&n_);
   if(is_robot_)
   {
-    motion_planning_pose_sender_ = new PoseSender(&n_, perception_manager_.objects_manager_);
+    objetcs_pose_sender_ = new PoseSender(&n_, perception_manager_.objects_manager_);
     bernie_sender_ =  new BernieSenders(&n_);
   }
   else
   {
-    motion_planning_pose_sender_ = nullptr;
+    objetcs_pose_sender_ = nullptr;
     bernie_sender_ = nullptr;
   }
   start_modules_service_ = n_.advertiseService(agent_name_ + "/startPerceptionModules", &SituationAssessor::startModules, this);
   stop_modules_service_ = n_.advertiseService(agent_name_ + "/stopPerceptionModules", &SituationAssessor::stopModules, this);
   bounding_box_service_ = n_.advertiseService(agent_name_ + "/getBoundingBox", &SituationAssessor::getBoundingBox, this);
+  if(is_robot_)
+  {
+    auto msg = std_msgs::String();
+    msg.data = "ADD|" + agent_name_;
+    new_assessor_publisher_.publish(msg);
+  }
 }
 
 SituationAssessor::~SituationAssessor()
 {
   if(ros_sender_ != nullptr)
     delete ros_sender_;
-  if(motion_planning_pose_sender_ != nullptr)
-    delete motion_planning_pose_sender_;
+  if(objetcs_pose_sender_ != nullptr)
+    delete objetcs_pose_sender_;
   if (bernie_sender_ != nullptr)
     delete bernie_sender_;
   if(bullet_client_ != nullptr)
@@ -106,6 +119,13 @@ void SituationAssessor::stop()
   run_ = false;
   callback_queue_.disable();
   callback_queue_.clear();
+}
+
+
+void SituationAssessor::setSimulation(bool simulate)
+{
+  simulate_ = simulate;
+  perception_manager_.objects_manager_.setSimulation(simulate_);
 }
 
 void SituationAssessor::run()
@@ -227,11 +247,15 @@ void SituationAssessor::assess()
   if(is_robot_)
   {
     ros_sender_->sendEntitiesToTFAndRViz(myself_agent_->getId() + "/objects_markers", objects);
+    ros_sender_->sendEntitiesToTFAndRViz(myself_agent_->getId() + "/humans_markers", body_parts);
     //bernie_sender_->sendBernie();
   }
   else
+  {
     ros_sender_->sendEntitiesToRViz(myself_agent_->getId() + "/objects_markers", objects);
-  ros_sender_->sendEntitiesToRViz(myself_agent_->getId() + "/humans_markers", body_parts);
+    ros_sender_->sendEntitiesToRViz(myself_agent_->getId() + "/humans_markers", body_parts);
+  }
+    
 
   if(is_robot_)
     humans_process.join();
@@ -257,16 +281,16 @@ void SituationAssessor::processHumans(std::map<std::string, std::unordered_set<i
       continue;
 
     auto proj_matrix = bullet_client_->computeProjectionMatrix(human.second->getFieldOfView().getHeight(),
-                                                                human.second->getFieldOfView().getRatio(),
+                                                                human.second->getFieldOfView().getRatioOpenGl(),
                                                                 human.second->getFieldOfView().getClipNear(),
                                                                 human.second->getFieldOfView().getClipFar());
-    Pose target_pose = human.second->getHead()->pose() * Pose({1,0,0}, {0,0,0,1});
+    Pose target_pose = human.second->getHead()->pose() * Pose({0,0,1}, {0,0,0,1});
     auto head_pose_trans = human.second->getHead()->pose().arrays().first;
     auto target_pose_trans = target_pose.arrays().first;
     auto view_matrix = bullet_client_->computeViewMatrix({(float)head_pose_trans[0], (float)head_pose_trans[1], (float)head_pose_trans[2]},
                                                           {(float)target_pose_trans[0], (float)target_pose_trans[1], (float)target_pose_trans[2]},
                                                           {0.,0.,1.});
-    auto images = bullet_client_->getCameraImage(300*human.second->getFieldOfView().getRatio(), 300, view_matrix, proj_matrix, owds::BULLET_HARDWARE_OPENGL);
+    auto images = bullet_client_->getCameraImage(300*human.second->getFieldOfView().getRatioOpenGl(), 300, view_matrix, proj_matrix, owds::BULLET_HARDWARE_OPENGL);
 
     ros_sender_->sendImage(human.first + "/view", images);
     agents_segmentation_ids[human.first] = bullet_client_->getSegmentationIds(images);
@@ -305,8 +329,8 @@ void SituationAssessor::updateHumansPerspective(const std::string& human_name,
   std::transform(areas.cbegin(), areas.cend(), std::back_inserter(seen_areas),
                  [](const auto& it) { return it.second; });
 
-  assessor_it->second.objects_module->sendPerception(seen_objects);
   assessor_it->second.humans_module->sendPerception(seen_humans);
+  assessor_it->second.objects_module->sendPerception(seen_objects);
   assessor_it->second.areas_module->sendPerception(seen_areas);
 }
 
@@ -323,6 +347,9 @@ std::map<std::string, HumanAssessor_t>::iterator SituationAssessor::createHumanA
   assessor->second.assessor->addAreaPerceptionModule("emulated_areas", assessor->second.areas_module);
   std::thread th(&SituationAssessor::run, assessor->second.assessor);
   assessor->second.thread = std::move(th);
+  auto msg = std_msgs::String();
+  msg.data = "ADD|"+human_name;
+  new_assessor_publisher_.publish(msg);
 
   return assessor;
 }
@@ -376,6 +403,25 @@ bool SituationAssessor::getBoundingBox(overworld::BoundingBox::Request &req, ove
     res.y = bb[1];
     res.z = bb[2];
   }
+  return true;
+}
+
+bool SituationAssessor::getAgents(overworld::GetAgents::Request &req, overworld::GetAgents::Response &res)
+{
+  (void)req;
+  res.agents.push_back(agent_name_);
+  for(auto& assessor : humans_assessors_)
+    res.agents.push_back(assessor.first);
+  return true;
+}
+
+bool SituationAssessor::setSimulation(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &res)
+{
+  std::cout << "[SituationAssessor] set simulation to " << (int)(req.data) << std::endl;
+  setSimulation(req.data);
+  for(auto& assessor : humans_assessors_)
+    assessor.second.assessor->setSimulation(req.data);
+  res.success = true;
   return true;
 }
 

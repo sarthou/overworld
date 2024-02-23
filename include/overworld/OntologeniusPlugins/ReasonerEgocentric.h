@@ -5,9 +5,11 @@
 
 #include "overworld/GetRelations.h"
 
-namespace ontologenius {
+#include <ros/ros.h>
 
-class ReasonerEgocentric : public ReasonerInterface
+namespace overworld {
+
+class ReasonerEgocentric : public ontologenius::ReasonerInterface
 {
 public:
   ReasonerEgocentric() {}
@@ -15,26 +17,26 @@ public:
 
   virtual void initialize() override;
 
-  virtual void preReason(const QueryInfo_t& query_info) override;
+  virtual bool preReason(const ontologenius::QueryInfo_t& query_info) override;
 
   virtual bool implementPreReasoning() override { return true; }
 
   virtual std::string getName() override;
-  virtual std::string getDesciption() override;
+  virtual std::string getDescription() override;
 private:
-  std::unordered_set<ObjectPropertyBranch_t*> computable_properties_;
+  std::unordered_set<ontologenius::ObjectPropertyBranch_t*> computable_properties_;
   ros::NodeHandle n_;
   ros::ServiceClient overworld_client_;
 
-  ObjectPropertyBranch_t* isComputableProperty(const std::string& property);
-  std::set<ObjectPropertyBranch_t*> isInRange(const std::string& indiv, ObjectPropertyBranch_t* property);
-  std::set<ObjectPropertyBranch_t*> isInDomain(const std::string& indiv, ObjectPropertyBranch_t* property);
+  ontologenius::ObjectPropertyBranch_t* isComputableProperty(const std::string& property);
+  std::set<ontologenius::ObjectPropertyBranch_t*> isInRange(const std::string& indiv, ontologenius::ObjectPropertyBranch_t* property);
+  std::set<ontologenius::ObjectPropertyBranch_t*> isInDomain(const std::string& indiv, ontologenius::ObjectPropertyBranch_t* property);
 
-  overworld::GetRelations createRequest(const std::string& subject, const std::set<ObjectPropertyBranch_t*>& predicates, const std::string& object);
+  overworld::GetRelations createRequest(const std::string& subject, const std::set<ontologenius::ObjectPropertyBranch_t*>& predicates, const std::string& object);
   bool call(overworld::GetRelations& srv);
   void updateOntology(const std::vector<overworld::Triplet>& to_add, const std::vector<overworld::Triplet>& to_delete);
 };
 
-} // namespace ontologenius
+} // namespace overworld
 
 #endif // OVERWORLD_REASONEREGOCENTRIC_H

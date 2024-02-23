@@ -19,8 +19,8 @@ public:
   bool closeInitialization() override;
 
 private:
-  OntologiesManipulator* ontologies_manipulator_;
-  OntologyManipulator* onto_;
+  onto::OntologiesManipulator* ontologies_manipulator_;
+  onto::OntologyManipulator* onto_;
 
   tf2_ros::Buffer tf_buffer_;
   tf2_ros::TransformListener tf2_listener_;

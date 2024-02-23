@@ -45,7 +45,7 @@ private:
   void stopSimulation(Object* object, bool erase = true);
 
   std::vector<PointOfInterest> getPoisInFov(Object* object);
-  bool isObjectsInFovAabb(std::vector<Object*> objects);
+  std::vector<Object*> isObjectsInFovAabb(std::vector<Object*> objects);
   bool shouldBeSeen(Object* object, const std::vector<PointOfInterest>& pois);
   std::unordered_set<int> getObjectsInCamera();
 
