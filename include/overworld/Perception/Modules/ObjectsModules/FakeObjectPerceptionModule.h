@@ -17,6 +17,7 @@ public:
   FakeObjectPerceptionModule();
 
   bool closeInitialization() override;
+  void setParameter(const std::string& parameter_name, const std::string& parameter_value) override;
 
 private:
   onto::OntologiesManipulator* ontologies_manipulator_;
@@ -24,6 +25,9 @@ private:
 
   tf2_ros::Buffer tf_buffer_;
   tf2_ros::TransformListener tf2_listener_;
+
+  std::string topic_name_;
+  bool true_id_;
 
   virtual bool perceptionCallback(const overworld::EntitiesPoses& msg) override;
 

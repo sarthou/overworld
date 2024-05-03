@@ -4,14 +4,18 @@
 
 namespace owds {
 
-FakeObjectPerceptionModule::FakeObjectPerceptionModule() : PerceptionModuleRosBase("/overworld/fake_objects_poses"),
+FakeObjectPerceptionModule::FakeObjectPerceptionModule() : PerceptionModuleRosBase(""),
                                                             ontologies_manipulator_(nullptr),
                                                             onto_(nullptr),
-                                                            tf2_listener_(tf_buffer_)
+                                                            tf2_listener_(tf_buffer_),
+                                                            topic_name_("/overworld/fake_objects_poses"),
+                                                            true_id_(true)
 {}
 
 bool FakeObjectPerceptionModule::closeInitialization()
 {
+  setTopicName(topic_name_);
+
   ontologies_manipulator_ = new onto::OntologiesManipulator();
   ontologies_manipulator_->waitInit();
   std::string robot_name = robot_agent_->getId();
@@ -20,6 +24,16 @@ bool FakeObjectPerceptionModule::closeInitialization()
   onto_->close();
 
   return true;
+}
+
+void FakeObjectPerceptionModule::setParameter(const std::string& parameter_name, const std::string& parameter_value)
+{
+    if(parameter_name == "true_id")
+        true_id_ = (parameter_value == "true");
+    else if(parameter_name == "topic")
+      topic_name_ = parameter_value;
+    else
+        ShellDisplay::warning("[StaticObjectsPerceptionModule] Unkown parameter " + parameter_name);
 }
 
 bool FakeObjectPerceptionModule::perceptionCallback(const overworld::EntitiesPoses& msg)
@@ -55,14 +69,14 @@ bool FakeObjectPerceptionModule::perceptionCallback(const overworld::EntitiesPos
 
 Object FakeObjectPerceptionModule::createNewEntity(const std::string& id)
 {
-  Object obj(id);
+  Object obj(id, true_id_);
 
   Shape_t shape = ontology::getEntityShape(onto_, obj.id());
   if(shape.type == SHAPE_NONE)
   {
     shape.type = SHAPE_CUBE;
     shape.color = ontology::getEntityColor(onto_, obj.id(), {0.8,0.8,0.8});
-    shape.scale = {1, 1, 1};
+    shape.scale = {0.05, 0.05, 0.05};
   }
   obj.setShape(shape);
   obj.setMass(ontology::getEntityMass(onto_, obj.id()));
