@@ -35,7 +35,6 @@ private:
   bool isInContainer(Object* object_around, Object* object_in);
   bool overlapXY(const struct aabb_t& aabb_1, const struct aabb_t& aabb_2);
 
-  bool isInHand(Agent* agent);
   bool isPerceiving(Agent* agent_perceiving, Agent* agent_perceived);
 
   bool isLookingAt(Agent* agent, const std::unordered_set<int>& seen_bullet_ids, const Object* object);

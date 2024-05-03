@@ -59,7 +59,6 @@ std::vector<Fact> FactsCalculator::computeAgentsFacts(const std::map<std::string
 
   for(auto& agent_from : agents)
   {
-    //isInHand(agent_from.second); // objects already in agent's hand
     for (auto& obj: objects)
     {
       if(isValid(obj.second) == false)
@@ -189,28 +188,6 @@ bool FactsCalculator::overlapXY(const struct aabb_t& aabb_1, const struct aabb_t
     return false;
   else
     return true;
-}
-
-bool FactsCalculator::isInHand(Agent* agent)
-{
-  bool res = false;
-  if(agent->getLeftHand() != nullptr)
-    if(agent->getLeftHand()->isEmpty() == false)
-    {
-      res = true;
-      for(auto& object_name : agent->getLeftHand()->getInHand())
-        facts_.emplace_back(agent->getId(), "hasInLeftHand", object_name);
-    }
-
-  if(agent->getRightHand() != nullptr)
-    if(agent->getRightHand()->isEmpty() == false)
-    {
-      res = true;
-      for(auto& object_name : agent->getRightHand()->getInHand())
-        facts_.emplace_back(agent->getId(), "hasInRightHand", object_name);
-    }
-
-  return res;
 }
 
 bool FactsCalculator::isPerceiving(Agent* agent_perceiving, Agent* agent_perceived)
