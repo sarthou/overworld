@@ -2,6 +2,7 @@
 #define OWDS_ENTITIESPERCEPTIONMANAGER_H
 
 #include <map>
+#include <unordered_map>
 #include <string>
 #include <vector>
 
@@ -37,6 +38,8 @@ public:
 
 protected:
     std::map<std::string, T*> entities_;
+    std::map<std::string, std::vector<T>> aggregated_;
+    std::unordered_map<std::string, T> fusioned_percepts_;
     std::unordered_set<std::string> black_listed_entities_;
     BulletClient* bullet_client_;
 

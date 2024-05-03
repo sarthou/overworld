@@ -68,7 +68,7 @@ void ObjectsPerceptionManager::stepLerp(double alpha)
   }
 }
 
-std::map<std::string, Object*>::iterator ObjectsPerceptionManager::createFromPercept(const Object& percept)
+std::map<std::string, Object*>::iterator ObjectsPerceptionManager::createFromFusedPercept(const Object& percept)
 {
   auto new_object = new Object(percept);
   new_object->setInHand(nullptr);
@@ -88,74 +88,30 @@ void ObjectsPerceptionManager::getPercepts(std::map<std::string, Object>& percep
 {
   for(auto& percept : percepts)
   {
-      if(percept.second.isTrueId() == false)
-      {
-        if(merged_ids_.find(percept.first) == merged_ids_.end())
-          false_ids_to_be_merged_.insert(percept.first);
-      }
-
-      auto it = entities_.find(percept.second.id());
-      if(it == entities_.end())
-      {
-          if(percept.second.isLocated() == false)
-            continue;
-
-          it = createFromPercept(percept.second);
-      }
-
-      if(merged_ids_.find(percept.first) != merged_ids_.end())
-        continue;
-
-      // reset lost_objects_nb_frames_
-      if(percept.second.hasBeenSeen())
-        lost_objects_nb_frames_.erase(percept.first);
-
-      if(percept.second.isInHand() && (it->second->isInHand() == false))
-      {
-        // this is a big shit, I know that
-        auto hand = percept.second.getHandIn();
-        percept.second.removeFromHand();
-        hand->putInHand(it->second);
-        percept.second.setInHand(hand);
-        stopSimulation(it->second);
-      }
-      
-      if(it->second->isInHand())
-      {
-        if(it->second->getHandIn()->isInHand(it->first) == false)
-        {
-          it->second->removeFromHand();
-        }
-        else if (percept.second.hasBeenSeen() && it->second->getHandIn()->pose().distanceTo(percept.second.pose()) >= IN_HAND_DISTANCE)
-        {
-          it->second->removeFromHand();
-          updateEntityPose(it->second, percept.second.pose(), percept.second.lastStamp());
-        }
-        else if(percept.second.isLocated() == false)
-        {
-          it->second->removeFromHand();
-        }
-        else
-        {
-          updateEntityPose(it->second, it->second->getHandIn()->pose(), ros::Time::now());
-        }
-      }
-      // TODO : The following assume that an entity is perceive by only one module
-      // A true merging algorithm has to be applied
-      else if (percept.second.hasBeenSeen())
-      {
-        stopSimulation(it->second);
-        updateEntityPose(it->second, percept.second.pose(), percept.second.lastStamp());
-      }
+    std::string entity_id = percept.first;
+    if(percept.second.isTrueId() == false)
+    {
+      auto merged_id = merged_ids_.find(percept.first);
+      if(merged_id == merged_ids_.end())
+        false_ids_to_be_merged_.insert(percept.first);
       else
-      {
-        if(it->second->isLocated())
-          it->second->updatePose(it->second->pose(), ros::Time::now());
-      }
+        entity_id = merged_id->second;
+    }
+
+    auto it = aggregated_.find(entity_id);
+    if(it == aggregated_.end())
+    {
+        if(percept.second.isLocated() == false)
+          continue;
+        
+        it = aggregated_.emplace(entity_id, std::vector<Object>{percept.second}).first; 
+    }
+    else 
+      it->second.push_back(percept.second); 
   }
 }
 
-bool ObjectsPerceptionManager::souldBeReasonedOn(Object* object)
+bool ObjectsPerceptionManager::shouldBeReasonedOn(Object* object)
 {
   if(object->isStatic() == true)
     return false;
@@ -170,6 +126,77 @@ bool ObjectsPerceptionManager::souldBeReasonedOn(Object* object)
 }
 
 void ObjectsPerceptionManager::reasoningOnUpdate()
+{
+  fusioned_percepts_ = fusioner_.fuseData(aggregated_);
+  FromfusedToEntities();
+  geometricReasoning();
+}
+
+bool ObjectsPerceptionManager::HandReasoning(std::pair<const std::string, Object>& percept, const std::pair<std::string, Object*>& pair_it)
+{
+  bool hand_reasoned = false;
+
+  if(percept.second.isInHand() && (pair_it.second->isInHand() == false))
+  {
+    // this is a big shit, I know that
+    auto hand = percept.second.getHandIn();
+    percept.second.removeFromHand();
+    hand->putInHand(pair_it.second);
+    percept.second.setInHand(hand);
+    stopSimulation(pair_it.second);
+
+    hand_reasoned = true;
+  }
+
+  if(pair_it.second->isInHand())
+  {
+    if(pair_it.second->getHandIn()->isInHand(pair_it.first) == false)
+      pair_it.second->removeFromHand();
+    else if (percept.second.hasBeenSeen() && pair_it.second->getHandIn()->pose().distanceTo(percept.second.pose()) >= IN_HAND_DISTANCE)
+    {
+      pair_it.second->removeFromHand();
+      updateEntityPose(pair_it.second, percept.second.pose(), percept.second.lastStamp());
+    }
+    else if(percept.second.isLocated() == false)
+      pair_it.second->removeFromHand();
+    else
+      updateEntityPose(pair_it.second, pair_it.second->getHandIn()->pose(), ros::Time::now());
+
+    hand_reasoned = true;
+  }
+
+  return hand_reasoned;
+}
+
+void ObjectsPerceptionManager::FromfusedToEntities()
+{
+  for(auto& percept : fusioned_percepts_)
+  {
+    auto it = entities_.find(percept.second.id());
+    if(it == entities_.end())
+    {
+      if(percept.second.isLocated() == false)
+        continue;
+
+      it = createFromFusedPercept(percept.second);
+    }
+    if(percept.second.hasBeenSeen())
+      lost_objects_nb_frames_.erase(percept.first);
+    
+    if(HandReasoning(percept, *it) == false)
+    {
+      if (percept.second.hasBeenSeen())
+      {
+        stopSimulation(it->second);
+        updateEntityPose(it->second, percept.second.pose(), percept.second.lastStamp());
+      }
+      else if(it->second->isLocated())
+        it->second->updatePose(it->second->pose(), ros::Time::now());
+    }
+  }
+}
+
+void ObjectsPerceptionManager::geometricReasoning()
 {
   bullet_client_->performCollisionDetection();
   UpdateAabbs();
@@ -188,7 +215,7 @@ void ObjectsPerceptionManager::reasoningOnUpdate()
   std::vector<Object*> objects_to_simulate;
   for(auto& object : entities_)
   {
-    if(souldBeReasonedOn(object.second) == false)
+    if(shouldBeReasonedOn(object.second) == false)
     {
       if(object.second->isStatic() == false)
         lost_objects_nb_frames_.erase(object.first);
@@ -463,7 +490,7 @@ std::unordered_set<int> ObjectsPerceptionManager::getObjectsInCamera()
 }
 
 void ObjectsPerceptionManager::mergeFalseIdData()
-{
+{ 
   std::unordered_set<std::string> merged;
 
   for(auto& id : false_ids_to_be_merged_)

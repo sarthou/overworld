@@ -5,6 +5,8 @@
 #include "overworld/BasicTypes/Agent.h"
 #include "overworld/BasicTypes/Object.h"
 
+#include "overworld/Perception/DataFusion/DataFusionBase.h"
+
 namespace owds {
 
 class ObjectsPerceptionManager : public EntitiesPerceptionManager<Object>
@@ -33,11 +35,16 @@ private:
   std::map<std::string, std::string> merged_ids_;
 
   Agent* myself_agent_;
+  //pas sur de si je met un pointeur 
+  owds::DataFusionBase<Object> fusioner_;
 
-  std::map<std::string, Object*>::iterator createFromPercept(const Object& percept);
+  std::map<std::string, Object*>::iterator createFromFusedPercept(const Object& percept);
 
+  bool HandReasoning(std::pair<const std::string, Object>& percept, const std::pair<std::string, Object*>& pair_it);
   void getPercepts(std::map<std::string, Object>& percepts) override;
-  bool souldBeReasonedOn(Object* object);
+  bool shouldBeReasonedOn(Object* object);
+  void FromfusedToEntities(); 
+  void geometricReasoning(); 
   void reasoningOnUpdate() override;
 
   std::vector<Object*> simulatePhysics(const std::vector<Object*>& objects, const std::vector<Object*>& to_simulate_objetcs);
