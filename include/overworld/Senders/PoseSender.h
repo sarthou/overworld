@@ -12,13 +12,13 @@ namespace owds
 class PoseSender
 {
 public:
-    PoseSender(ros::NodeHandle* nh_, ObjectsPerceptionManager& object_perception_manager);
+  PoseSender(ros::NodeHandle* nh_, ObjectsPerceptionManager& object_perception_manager);
 
-    bool onGetPoseService(overworld::GetPose::Request& req, overworld::GetPose::Response& res);
+  bool onGetPoseService(overworld::GetPose::Request& req, overworld::GetPose::Response& res);
     
 protected:
-    ros::ServiceServer get_pose_service_;
-    ObjectsPerceptionManager& object_perception_manager_;
+  ros::ServiceServer get_pose_service_;
+  ObjectsPerceptionManager& object_perception_manager_;
 };
 
 } // namespace owds

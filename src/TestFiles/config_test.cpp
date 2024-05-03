@@ -16,8 +16,8 @@ void load()
     std::cout << "get " << plugins.size() << " plugins" << std::endl;
     for(auto& pl : plugins)
     {
-        std::cout << "- " << pl << std::endl;
-        PerceptionModuleBase_<Object>* tmp = loader.createUnmanagedInstance(pl);
+      std::cout << "- " << pl << std::endl;
+      PerceptionModuleBase_<Object>* tmp = loader.createUnmanagedInstance(pl);
     }
 }
 
@@ -26,19 +26,19 @@ void load()
 int main(int argc, char** argv)
 {
 	ros::init(argc, argv, "listener");
-    ros::NodeHandle n;
+  ros::NodeHandle n;
 
-    owds::YamlReader config;
+  owds::YamlReader config;
 
-    std::string path = ros::package::getPath("overworld") + "/config/config_example.yaml";
+  std::string path = ros::package::getPath("overworld") + "/config/config_example.yaml";
 
-    std::cout << "path = " << path << std::endl;
-    if(config.read(path) == false)
-        std::cout << "can not open configuration file" << std::endl;
-    else
-        config.display();
+  std::cout << "path = " << path << std::endl;
+  if(config.read(path) == false)
+    std::cout << "can not open configuration file" << std::endl;
+  else
+    config.display();
 
-    owds::load();
+  owds::load();
 
-    return 0;
+  return 0;
 }

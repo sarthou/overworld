@@ -24,7 +24,7 @@ void sigHandler(int signal)
 int main(int argc, char** argv)
 {
 	ros::init(argc, argv, "listener");
-    ros::NodeHandle n;
+  ros::NodeHandle n;
 	flag = false;
 
 	owds::BulletClient* client = owds::PhysicsServers::connectPhysicsServer(owds::CONNECT_GUI);
