@@ -536,7 +536,10 @@ void ObjectsPerceptionManager::mergeFalseIdData()
   }
 
   for(auto& id : merged)
+  {
     false_ids_to_be_merged_.erase(id);
+    aggregated_.erase(id);
+  }
 }
 
 void ObjectsPerceptionManager::getObjectBoundingBox(Object* object)
