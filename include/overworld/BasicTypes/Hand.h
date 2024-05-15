@@ -2,6 +2,7 @@
 #define OWDS_HAND_H
 
 #include "overworld/BasicTypes/BodyPart.h"
+#include "overworld/BasicTypes/Percept.h"
 
 #include <map>
 #include <string>
@@ -17,7 +18,7 @@ public:
   explicit Hand(const BodyPart& body_part);
 
   void putInHand(Object* object);
-  void putPerceptInHand(Object* percept);
+  void putPerceptInHand(Percept<Object>* percept);
 
   //should be remove from hand through the object function
   void removeFromHand(const std::string& object_name);
@@ -34,7 +35,7 @@ public:
 
 private:
   std::map<std::string, Object*> has_in_;
-  std::map<std::string, Object*> has_percept_in_;
+  std::map<std::string, Percept<Object>*> has_percept_in_;
 
   template<typename T>
   void putInHand(T* object, std::map<std::string, T*>& map_has_in)

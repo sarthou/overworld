@@ -32,7 +32,7 @@ bool FakeHumanPerceptionModule::perceptionCallback(const overworld::AgentPose& m
   {
     auto it_percept = percepts_.find(part.id);
     if(it_percept == percepts_.end())
-      it_percept = percepts_.insert(std::make_pair(part.id, createBodyPart(msg.id, part.id))).first;
+      it_percept = percepts_.insert(std::make_pair(part.id, createPercept(msg.id, part.id))).first;
 
     std::string frame_id = part.pose.header.frame_id;
     if (frame_id[0] == '/')
@@ -59,7 +59,7 @@ bool FakeHumanPerceptionModule::perceptionCallback(const overworld::AgentPose& m
   return true;
 }
 
-BodyPart FakeHumanPerceptionModule::createBodyPart(const std::string& human_name, const std::string& part_name)
+Percept<BodyPart> FakeHumanPerceptionModule::createPercept(const std::string& human_name, const std::string& part_name)
 {
   BodyPartType_e part_type = BodyPartType_e::BODY_PART_UNKNOW;
 
@@ -75,7 +75,7 @@ BodyPart FakeHumanPerceptionModule::createBodyPart(const std::string& human_name
   else if(std::find(types.begin(), types.end(), "Torso") != types.end())
     part_type = BodyPartType_e::BODY_PART_TORSO;
 
-  BodyPart part(part_name);
+  Percept<BodyPart> part(part_name);
   part.setAgentName(human_name);
   part.setType(part_type);
 

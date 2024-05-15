@@ -5,7 +5,7 @@
 
 namespace owds {
 
-void RobotsPerceptionManager::getPercepts( std::map<std::string, BodyPart>& percepts)
+void RobotsPerceptionManager::getPercepts( std::map<std::string, Percept<BodyPart>>& percepts)
 {
   for(auto& percept : percepts)
   {

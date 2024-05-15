@@ -19,9 +19,9 @@ bool ObjectsEmulatedPerceptionModule::perceptionCallback(const std::vector<Objec
   return true;
 }
 
-std::map<std::string,Object>::iterator ObjectsEmulatedPerceptionModule::createNewPercept(Object* object)
+std::map<std::string, Percept<Object>>::iterator ObjectsEmulatedPerceptionModule::createNewPercept(Object* object)
 {
-  Object percept(object->id());
+  Percept<Object> percept(object->id());
   Shape_t shape = object->getShape();
   percept.setShape(shape);
   percept.setMass(object->getMass());

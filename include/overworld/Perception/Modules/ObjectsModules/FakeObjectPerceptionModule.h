@@ -31,7 +31,7 @@ private:
 
   virtual bool perceptionCallback(const overworld::EntitiesPoses& msg) override;
 
-  Object createNewEntity(const std::string& id);
+  Percept<Object> createPercept(const std::string& id);
 };
 
 } // namespace owds

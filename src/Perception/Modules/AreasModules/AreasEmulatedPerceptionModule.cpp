@@ -14,9 +14,9 @@ bool AreasEmulatedPerceptionModule::perceptionCallback(const std::vector<Area*>&
   return true;
 }
 
-std::map<std::string,Area>::iterator AreasEmulatedPerceptionModule::createNewPercept(Area* area)
+std::map<std::string, Percept<Area>>::iterator AreasEmulatedPerceptionModule::createNewPercept(Area* area)
 {
-  Area percept(*area);
+  Percept<Area> percept(*area);
   percept.setOwner(nullptr);
   percept.clearInsideEntities();
   percept.setBulletIds({});

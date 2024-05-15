@@ -38,10 +38,10 @@ private:
   //pas sur de si je met un pointeur 
   owds::DataFusionBase<Object> fusioner_;
 
-  std::map<std::string, Object*>::iterator createFromFusedPercept(const Object& percept);
+  std::map<std::string, Object*>::iterator createFromFusedPercept(const Percept<Object>& percept);
 
-  bool HandReasoning(std::pair<const std::string, Object>& percept, const std::pair<std::string, Object*>& pair_it);
-  void getPercepts(std::map<std::string, Object>& percepts) override;
+  bool HandReasoning(std::pair<const std::string, Percept<Object>>& percept, const std::pair<std::string, Object*>& potential_entity);
+  void getPercepts(std::map<std::string, Percept<Object>>& percepts) override;
   bool shouldBeReasonedOn(Object* object);
   void FromfusedToEntities(); 
   void geometricReasoning(); 

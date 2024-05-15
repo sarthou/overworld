@@ -10,6 +10,7 @@
 
 #include "overworld/BasicTypes/Entity.h"
 #include "overworld/BasicTypes/Object.h"
+#include "overworld/BasicTypes/Percept.h"
 
 #include <ros/ros.h>
 #include <message_filters/subscriber.h>
@@ -32,7 +33,7 @@ public:
     method_name_ = method_name;
   }
   //Todo: const can't be used because of the reasoning on the hand
-  virtual std::unordered_map<std::string, T> fuseData(std::map<std::string, std::vector<T>>& aggregated_);
+  virtual std::unordered_map<std::string, Percept<T>> fuseData(std::map<std::string, std::vector<Percept<T>>>& aggregated_);
 
 protected:
   std::string method_name_;
@@ -42,14 +43,14 @@ protected:
 
 //Todo: const can't be used because of the reasoning on the hand
 template<typename T>
-std::unordered_map<std::string, T> DataFusionBase<T>::fuseData(std::map<std::string, std::vector<T>>& aggregated_)
+std::unordered_map<std::string, Percept<T>> DataFusionBase<T>::fuseData(std::map<std::string, std::vector<Percept<T>>>& aggregated_)
 {
-  std::unordered_map<std::string, T> fusioned_percepts;
+  std::unordered_map<std::string, Percept<T>> fusioned_percepts;
   fusioned_percepts.reserve(aggregated_.size()); 
 
   for(auto& pair: aggregated_)
   {   
-    T result = pair.second.front(); 
+    Percept<T> result = pair.second.front(); 
     std::string entity_id = pair.first; 
     for(auto& obj : pair.second)
     {   

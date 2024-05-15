@@ -15,7 +15,7 @@ void Hand::putInHand(Object* object)
   putInHand(object, has_in_);
 }
 
-void Hand::putPerceptInHand(Object* percept)
+void Hand::putPerceptInHand(Percept<Object>* percept)
 {
   putInHand(percept, has_percept_in_);
 }

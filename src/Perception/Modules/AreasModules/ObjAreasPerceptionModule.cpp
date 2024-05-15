@@ -88,7 +88,7 @@ bool ObjAreasPerceptionModule::closeInitialization()
 
 void ObjAreasPerceptionModule::addCircle(const std::string& id, const std::array<double, 3>& pose, double radius, double half_height, double hysteresis, const std::string& owner)
 {
-  Area area(id, Pose({pose[0], pose[1], pose[2]}, {0,0,0,0}), radius, half_height);
+  Percept<Area> area(id, Pose({pose[0], pose[1], pose[2]}, {0,0,0,0}), radius, half_height);
   area.setHysteresis(hysteresis);
   area.setOwnerStr(owner);
 
@@ -105,7 +105,7 @@ void ObjAreasPerceptionModule::addPolygon(const std::string& id, const std::stri
   for(auto vertex : vertexes)
     points.emplace_back(vertex[0] + pose[0], vertex[1] + pose[1]);
   Polygon polygon(points);
-  Area area(id, polygon, z_min, z_max - z_min);
+  Percept<Area> area(id, polygon, z_min, z_max - z_min);
   area.setHysteresis(hysteresis);
   area.setOwnerStr(owner);
 

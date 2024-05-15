@@ -24,7 +24,7 @@ class FakeHumanPerceptionModule : public PerceptionModuleRosBase<BodyPart, overw
   private:
     bool perceptionCallback(const overworld::AgentPose& msg);
 
-    BodyPart createBodyPart(const std::string& human_name, const std::string& part_name);
+    Percept<BodyPart> createPercept(const std::string& human_name, const std::string& part_name);
 
     onto::OntologiesManipulator* ontologies_manipulator_;
     onto::OntologyManipulator* onto_;

@@ -45,7 +45,7 @@ bool FakeObjectPerceptionModule::perceptionCallback(const overworld::EntitiesPos
   {
     auto it_percept = percepts_.find(obj.id);
     if(it_percept == percepts_.end())
-      it_percept = percepts_.insert(std::make_pair(obj.id, createNewEntity(obj.id))).first;
+      it_percept = percepts_.insert(std::make_pair(obj.id, createPercept(obj.id))).first;
 
     std::string frame_id = obj.pose.header.frame_id;
     if (frame_id[0] == '/')
@@ -67,9 +67,9 @@ bool FakeObjectPerceptionModule::perceptionCallback(const overworld::EntitiesPos
   return true;
 }
 
-Object FakeObjectPerceptionModule::createNewEntity(const std::string& id)
+Percept<Object> FakeObjectPerceptionModule::createPercept(const std::string& id)
 {
-  Object obj(id, true_id_);
+  Percept<Object> obj(id, true_id_);
 
   Shape_t shape = ontology::getEntityShape(onto_, obj.id());
   if(shape.type == SHAPE_NONE)

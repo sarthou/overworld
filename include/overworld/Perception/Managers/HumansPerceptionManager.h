@@ -13,7 +13,7 @@ public:
   Agent* getAgent(const std::string& agent_name) { return AgentPerceptionManager::getAgent(agent_name, AgentType_e::HUMAN); }
 
 private:
-  void getPercepts( std::map<std::string, BodyPart>& percepts) override;
+  void getPercepts( std::map<std::string, Percept<BodyPart>>& percepts) override;
 };
 
 } // namespace owds

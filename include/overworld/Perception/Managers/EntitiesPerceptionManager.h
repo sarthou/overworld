@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "overworld/BasicTypes/Entity.h"
+#include "overworld/BasicTypes/Percept.h"
 #include "overworld/Bullet/BulletClient.h"
 #include "overworld/Perception/Managers/BasePerceptionManager.h"
 
@@ -36,8 +37,8 @@ public:
 
 protected:
   std::map<std::string, T*> entities_;
-  std::map<std::string, std::vector<T>> aggregated_;
-  std::unordered_map<std::string, T> fusioned_percepts_;
+  std::map<std::string, std::vector<Percept<T>>> aggregated_;
+  std::unordered_map<std::string, Percept<T>> fusioned_percepts_;
   std::unordered_set<std::string> black_listed_entities_;
   BulletClient* bullet_client_;
 
@@ -45,7 +46,7 @@ protected:
   onto::OntologiesManipulator ontos_;
   onto::OntologyManipulator* onto_;
 
-  virtual void getPercepts( std::map<std::string, T>& percepts);
+  virtual void getPercepts( std::map<std::string, Percept<T>>& percepts);
   virtual void reasoningOnUpdate() {}
 
   void updateEntityPose(T* entity, const Pose& pose, const ros::Time& stamp);
@@ -92,7 +93,7 @@ T* EntitiesPerceptionManager<T>::getEntity(const std::string& entity_id) const
 }
 
 template<typename T>
-void EntitiesPerceptionManager<T>::getPercepts( std::map<std::string, T>& percepts)
+void EntitiesPerceptionManager<T>::getPercepts( std::map<std::string, Percept<T>>& percepts)
 {
   // This implementation only has test purposes
   for(auto& percept : percepts)
@@ -120,7 +121,7 @@ bool EntitiesPerceptionManager<T>::update()
 
   for(const auto& module : this->perception_modules_)
     if(module.second->isActivated() && module.second->hasBeenUpdated())
-        module.second->accessPercepts([this](std::map<std::string, T>& percepts){ this->getPercepts(percepts); });
+        module.second->accessPercepts([this](std::map<std::string, Percept<T>>& percepts){ this->getPercepts(percepts); });
 
   reasoningOnUpdate();
 

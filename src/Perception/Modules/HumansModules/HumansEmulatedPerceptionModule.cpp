@@ -18,9 +18,9 @@ bool HumansEmulatedPerceptionModule::perceptionCallback(const std::vector<BodyPa
   return true;
 }
 
-std::map<std::string,BodyPart>::iterator HumansEmulatedPerceptionModule::createNewPercept(BodyPart* object)
+std::map<std::string, Percept<BodyPart>>::iterator HumansEmulatedPerceptionModule::createNewPercept(BodyPart* object)
 {
-  BodyPart percept(object->id());
+  Percept<BodyPart> percept(object->id());
   Shape_t shape = object->getShape();
   percept.setShape(shape);
   percept.setAgentName(object->getAgentName());

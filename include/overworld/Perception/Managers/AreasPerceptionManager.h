@@ -45,7 +45,7 @@ private:
   std::set<EntitiesPerceptionManager<Object>*> objects_managers_;
   std::set<EntitiesPerceptionManager<BodyPart>*> bodyparts_managers_;
 
-  void getPercepts(std::map<std::string, Area>& percepts);
+  void getPercepts(std::map<std::string, Percept<Area>>& percepts);
 
   void solvePendingAreas();
 

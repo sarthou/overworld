@@ -15,7 +15,7 @@ public:
 private:
   virtual bool perceptionCallback(const std::vector<Object*>& msg) override;
 
-  std::map<std::string,Object>::iterator createNewPercept(Object* object);
+  std::map<std::string, Percept<Object>>::iterator createNewPercept(Object* object);
 };
 
 } // namespace owds

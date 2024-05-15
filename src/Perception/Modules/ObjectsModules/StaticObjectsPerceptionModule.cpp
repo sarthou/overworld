@@ -94,7 +94,7 @@ void StaticObjectsPerceptionModule::addObject(const std::string& name,
                                               const std::array<double,3>& color,
                                               const std::string& texture)
 {
-  Object obj(name);
+  Percept<Object> obj(name);
   Shape_t shape;
   shape.type = SHAPE_MESH;
   shape.visual_mesh_resource = visual_mesh;
@@ -123,7 +123,7 @@ void StaticObjectsPerceptionModule::addObject(const std::string& name,
     return;
   }
 
-  Object obj(name);
+  Percept<Object> obj(name);
   Shape_t shape = ontology::getEntityShape(onto_, name);
   if(shape.type == SHAPE_MESH)
   {

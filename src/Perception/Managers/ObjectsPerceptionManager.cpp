@@ -68,7 +68,7 @@ void ObjectsPerceptionManager::stepLerp(double alpha)
   }
 }
 
-std::map<std::string, Object*>::iterator ObjectsPerceptionManager::createFromFusedPercept(const Object& percept)
+std::map<std::string, Object*>::iterator ObjectsPerceptionManager::createFromFusedPercept(const Percept<Object>& percept)
 {
   auto new_object = new Object(percept);
   new_object->setInHand(nullptr);
@@ -84,7 +84,7 @@ std::map<std::string, Object*>::iterator ObjectsPerceptionManager::createFromFus
   return it;
 }
 
-void ObjectsPerceptionManager::getPercepts(std::map<std::string, Object>& percepts)
+void ObjectsPerceptionManager::getPercepts(std::map<std::string, Percept<Object>>& percepts)
 {
   for(auto& percept : percepts)
   {
@@ -104,7 +104,7 @@ void ObjectsPerceptionManager::getPercepts(std::map<std::string, Object>& percep
         if(percept.second.isLocated() == false)
           continue;
         
-        it = aggregated_.emplace(entity_id, std::vector<Object>{percept.second}).first; 
+        it = aggregated_.emplace(entity_id, std::vector<Percept<Object>>{percept.second}).first; // A voir 
     }
     else 
       it->second.push_back(percept.second); 
@@ -132,35 +132,37 @@ void ObjectsPerceptionManager::reasoningOnUpdate()
   geometricReasoning();
 }
 
-bool ObjectsPerceptionManager::HandReasoning(std::pair<const std::string, Object>& percept, const std::pair<std::string, Object*>& pair_it)
+
+
+bool ObjectsPerceptionManager::HandReasoning(std::pair<const std::string, Percept<Object>>& percept, const std::pair<std::string, Object*>& potential_entity)
 {
   bool hand_reasoned = false;
 
-  if(percept.second.isInHand() && (pair_it.second->isInHand() == false))
+  if(percept.second.isInHand() && (potential_entity.second->isInHand() == false))
   {
     // this is a big shit, I know that
     auto hand = percept.second.getHandIn();
     percept.second.removeFromHand();
-    hand->putInHand(pair_it.second);
+    hand->putInHand(potential_entity.second);
     percept.second.setInHand(hand);
-    stopSimulation(pair_it.second);
+    stopSimulation(potential_entity.second);
 
     hand_reasoned = true;
   }
 
-  if(pair_it.second->isInHand())
+  if(potential_entity.second->isInHand())
   {
-    if(pair_it.second->getHandIn()->isInHand(pair_it.first) == false)
-      pair_it.second->removeFromHand();
-    else if (percept.second.hasBeenSeen() && pair_it.second->getHandIn()->pose().distanceTo(percept.second.pose()) >= IN_HAND_DISTANCE)
+    if(potential_entity.second->getHandIn()->isInHand(potential_entity.first) == false)
+      potential_entity.second->removeFromHand();
+    else if (percept.second.hasBeenSeen() && potential_entity.second->getHandIn()->pose().distanceTo(percept.second.pose()) >= IN_HAND_DISTANCE)
     {
-      pair_it.second->removeFromHand();
-      updateEntityPose(pair_it.second, percept.second.pose(), percept.second.lastStamp());
+      potential_entity.second->removeFromHand();
+      updateEntityPose(potential_entity.second, percept.second.pose(), percept.second.lastStamp());
     }
     else if(percept.second.isLocated() == false)
-      pair_it.second->removeFromHand();
+      potential_entity.second->removeFromHand();
     else
-      updateEntityPose(pair_it.second, pair_it.second->getHandIn()->pose(), ros::Time::now());
+      updateEntityPose(potential_entity.second, potential_entity.second->getHandIn()->pose(), ros::Time::now());
 
     hand_reasoned = true;
   }

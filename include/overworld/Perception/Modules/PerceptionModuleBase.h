@@ -12,6 +12,7 @@
 #include <message_filters/sync_policies/approximate_time.h>
 
 #include "overworld/BasicTypes/Agent.h"
+#include "overworld/BasicTypes/Percept.h"
 
 #include "overworld/Bullet/PhysicsServers.h"
 
@@ -59,7 +60,7 @@ public:
   bool isActivated() { return is_activated_; }
   bool hasBeenUpdated() { return updated_; }
 
-  void accessPercepts(const std::function<void(std::map<std::string, T>&)>& accessor)
+  void accessPercepts(const std::function<void(std::map<std::string, Percept<T>>&)>& accessor)
   {
     mutex_perception_.lock();
     if(need_access_to_external_entities_)
@@ -74,7 +75,7 @@ public:
 protected:
   std::string module_name_;
 
-  std::map<std::string, T> percepts_;
+  std::map<std::string, Percept<T>> percepts_;
   std::atomic<bool> is_activated_;
   std::atomic<bool> updated_;
   std::mutex mutex_perception_;
