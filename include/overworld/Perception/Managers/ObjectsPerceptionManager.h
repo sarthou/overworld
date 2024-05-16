@@ -41,7 +41,7 @@ private:
   bool HandReasoning(std::pair<const std::string, Percept<Object>>& percept, const std::pair<std::string, Object*>& potential_entity);
   void getPercepts(std::map<std::string, Percept<Object>>& percepts) override;
   bool shouldBeReasonedOn(Object* object);
-  void FromfusedToEntities(); 
+  void fromfusedToEntities(); 
   void geometricReasoning(); 
   void reasoningOnUpdate() override;
 

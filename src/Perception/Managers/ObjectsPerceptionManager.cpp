@@ -128,7 +128,7 @@ bool ObjectsPerceptionManager::shouldBeReasonedOn(Object* object)
 void ObjectsPerceptionManager::reasoningOnUpdate()
 {
   fusioned_percepts_ = fusioner_.fuseData(aggregated_);
-  FromfusedToEntities();
+  fromfusedToEntities();
   geometricReasoning();
 }
 
@@ -164,7 +164,7 @@ bool ObjectsPerceptionManager::HandReasoning(std::pair<const std::string, Percep
   return hand_reasoned;
 }
 
-void ObjectsPerceptionManager::FromfusedToEntities()
+void ObjectsPerceptionManager::fromfusedToEntities()
 {
   for(auto& percept : fusioned_percepts_)
   {
