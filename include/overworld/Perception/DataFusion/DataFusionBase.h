@@ -1,23 +1,14 @@
 #ifndef OWDS_DATAFUSIONBASE_H
 #define OWDS_DATAFUSIONBASE_H
 
-#include <algorithm>
-#include <map>
-#include <unordered_map>
 #include <string>
 #include <vector>
-#include <functional>
+#include <unordered_map>
+#include <map>
 
-#include "overworld/BasicTypes/Entity.h"
-#include "overworld/BasicTypes/Object.h"
+#include "ontologenius/OntologiesManipulator.h"
+
 #include "overworld/BasicTypes/Percept.h"
-
-#include <ros/ros.h>
-#include <message_filters/subscriber.h>
-#include <message_filters/synchronizer.h>
-#include <message_filters/sync_policies/approximate_time.h>
-
-#include <ontologenius/OntologiesManipulator.h>
 
 namespace owds {
 
@@ -52,11 +43,11 @@ std::unordered_map<std::string, Percept<T>> DataFusionBase<T>::fuseData(std::map
   {   
     Percept<T> result = pair.second.front(); 
     std::string entity_id = pair.first; 
+
     for(auto& obj : pair.second)
-    {   
       result.merge(&obj);
-    }
-      fusioned_percepts.emplace(entity_id, result);
+    
+    fusioned_percepts.emplace(entity_id, result);
   }
   return fusioned_percepts; 
 };

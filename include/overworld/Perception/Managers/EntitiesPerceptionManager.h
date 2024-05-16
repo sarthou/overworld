@@ -16,6 +16,7 @@
 #include "overworld/Utility/RosFiles.h"
 
 #include <ontologenius/OntologiesManipulator.h>
+#include "overworld/Perception/DataFusion/DataFusionBase.h"
 
 namespace owds {
 
