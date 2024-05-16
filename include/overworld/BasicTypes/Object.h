@@ -24,7 +24,7 @@ public:
 
   // should be setted in hand through the hand
   void setInHand(Hand* hand) { hand_in_ = hand; }
-  void removeFromHand();
+  void removeFromHand() { hand_in_ = nullptr; }
   bool isInHand() const { return (hand_in_ != nullptr); }
   Hand* getHandIn() const { return hand_in_; }
 

@@ -39,7 +39,7 @@ void Object::setAllPoiUnseen()
     poi.setUnseen();
 }
 
-void Object::removeFromHand()
+/*void Object::removeFromHand()
 {
   if(hand_in_ != nullptr)
   {
@@ -48,7 +48,7 @@ void Object::removeFromHand()
   }
   else
     ShellDisplay::warning("[Object] Try to remove " + id_ + " from hand while the object is not in any hand");
-}
+}*/
 
 void Object::merge(Object* other)
 {
@@ -57,7 +57,8 @@ void Object::merge(Object* other)
   if((isInHand() == false) && other->isInHand())
   {
     auto hand = other->getHandIn();
-    other->removeFromHand();
+    hand->removeFromHand(other->id());
+    //other->removeFromHand();
     hand->putInHand(this);
   }
 }

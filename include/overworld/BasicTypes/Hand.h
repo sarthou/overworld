@@ -40,7 +40,7 @@ private:
   template<typename T>
   void putInHand(T* object, std::map<std::string, T*>& map_has_in)
   {
-     if(map_has_in.find(object->id()) == map_has_in.end())
+    if(map_has_in.find(object->id()) == map_has_in.end())
     {
       map_has_in.insert(std::make_pair(object->id(), object));
       object->setInHand(this);

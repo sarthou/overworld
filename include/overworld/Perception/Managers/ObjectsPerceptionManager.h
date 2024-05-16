@@ -5,8 +5,6 @@
 #include "overworld/BasicTypes/Agent.h"
 #include "overworld/BasicTypes/Object.h"
 
-#include "overworld/Perception/DataFusion/DataFusionBase.h"
-
 namespace owds {
 
 class ObjectsPerceptionManager : public EntitiesPerceptionManager<Object>

@@ -101,10 +101,10 @@ void ObjectsPerceptionManager::getPercepts(std::map<std::string, Percept<Object>
     auto it = aggregated_.find(entity_id);
     if(it == aggregated_.end())
     {
-        if(percept.second.isLocated() == false)
-          continue;
-        
-        it = aggregated_.emplace(entity_id, std::vector<Percept<Object>>{percept.second}).first; // A voir 
+      if(percept.second.isLocated() == false)
+        continue;
+      
+      aggregated_.emplace(entity_id, std::vector<Percept<Object>>{percept.second}).first;
     }
     else 
       it->second.push_back(percept.second); 
@@ -132,37 +132,31 @@ void ObjectsPerceptionManager::reasoningOnUpdate()
   geometricReasoning();
 }
 
-
-
-bool ObjectsPerceptionManager::HandReasoning(std::pair<const std::string, Percept<Object>>& percept, const std::pair<std::string, Object*>& potential_entity)
+bool ObjectsPerceptionManager::HandReasoning(std::pair<const std::string, Percept<Object>>& percept, const std::pair<std::string, Object*>& entity)
 {
   bool hand_reasoned = false;
 
-  if(percept.second.isInHand() && (potential_entity.second->isInHand() == false))
+  if(percept.second.isInHand() && (entity.second->isInHand() == false))
   {
-    // this is a big shit, I know that
     auto hand = percept.second.getHandIn();
-    percept.second.removeFromHand();
-    hand->putInHand(potential_entity.second);
-    percept.second.setInHand(hand);
-    stopSimulation(potential_entity.second);
+    hand->putInHand(entity.second);
+    stopSimulation(entity.second);
 
     hand_reasoned = true;
   }
 
-  if(potential_entity.second->isInHand())
+  if(entity.second->isInHand())
   {
-    if(potential_entity.second->getHandIn()->isInHand(potential_entity.first) == false)
-      potential_entity.second->removeFromHand();
-    else if (percept.second.hasBeenSeen() && potential_entity.second->getHandIn()->pose().distanceTo(percept.second.pose()) >= IN_HAND_DISTANCE)
+    auto hand = entity.second->getHandIn();
+    if (percept.second.hasBeenSeen() && hand->pose().distanceTo(percept.second.pose()) >= IN_HAND_DISTANCE)
     {
-      potential_entity.second->removeFromHand();
-      updateEntityPose(potential_entity.second, percept.second.pose(), percept.second.lastStamp());
+      hand->removeFromHand(entity.first);
+      updateEntityPose(entity.second, percept.second.pose(), percept.second.lastStamp());
     }
     else if(percept.second.isLocated() == false)
-      potential_entity.second->removeFromHand();
+      hand->removeFromHand(entity.first);
     else
-      updateEntityPose(potential_entity.second, potential_entity.second->getHandIn()->pose(), ros::Time::now());
+      updateEntityPose(entity.second, hand->pose(), ros::Time::now());
 
     hand_reasoned = true;
   }
