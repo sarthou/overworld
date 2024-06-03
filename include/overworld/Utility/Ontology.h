@@ -5,24 +5,23 @@
 #include <string>
 
 #include "ontologenius/OntologiesManipulator.h"
-
 #include "overworld/BasicTypes/Shape.h"
 
 namespace owds {
 
-namespace ontology {
+  namespace ontology {
 
-std::array<double, 3> getEntityColor(onto::OntologyManipulator* onto, const std::string& indiv_name, const std::array<double, 3>& default_value = {0.8,0.8,0.8});
+    std::array<double, 3> getEntityColor(onto::OntologyManipulator* onto, const std::string& indiv_name, const std::array<double, 3>& default_value = {0.8, 0.8, 0.8});
 
-Shape_t getEntityShape(onto::OntologyManipulator* onto, const std::string& indiv_name);
+    Shape_t getEntityShape(onto::OntologyManipulator* onto, const std::string& indiv_name);
 
-double getEntityMass(onto::OntologyManipulator* onto, const std::string& indiv_name);
+    double getEntityMass(onto::OntologyManipulator* onto, const std::string& indiv_name);
 
-void addColor(onto::OntologyManipulator* onto, const std::string& color_name, const std::string& rgb_value = "");
+    void addColor(onto::OntologyManipulator* onto, const std::string& color_name, const std::string& rgb_value = "");
 
-void addColorToEntity(onto::OntologyManipulator* onto, const std::string& indiv_name, const std::string& color_name);
+    void addColorToEntity(onto::OntologyManipulator* onto, const std::string& indiv_name, const std::string& color_name);
 
-} // namespace ontology
+  } // namespace ontology
 
 } // namespace owds
 

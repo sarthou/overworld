@@ -1,18 +1,16 @@
 #ifndef OWDS_STAMPEDPOSEPERCEPTIONMODULE_H
 #define OWDS_STAMPEDPOSEPERCEPTIONMODULE_H
 
-#include "overworld/BasicTypes/BodyPart.h"
-#include "overworld/Perception/Modules/PerceptionModuleBase.h"
-
 #include <geometry_msgs/PoseStamped.h>
 
 #include "ontologenius/OntologiesManipulator.h"
+#include "overworld/BasicTypes/BodyPart.h"
+#include "overworld/Perception/Modules/PerceptionModuleBase.h"
 
 namespace owds {
 
-
-class StampedPosePerceptionModule : public PerceptionModuleRosBase<BodyPart, geometry_msgs::PoseStamped>
-{
+  class StampedPosePerceptionModule : public PerceptionModuleRosBase<BodyPart, geometry_msgs::PoseStamped>
+  {
   public:
     StampedPosePerceptionModule();
 
@@ -27,7 +25,7 @@ class StampedPosePerceptionModule : public PerceptionModuleRosBase<BodyPart, geo
 
     std::string human_name_;
     std::string head_name_;
-};
+  };
 
 } // namespace owds
 

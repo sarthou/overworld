@@ -6,8 +6,8 @@
 #include <sensor_msgs/image_encodings.h>
 namespace owds {
 
-class BernieSenders
-{
+  class BernieSenders
+  {
   public:
     explicit BernieSenders(ros::NodeHandle* nh);
     void sendBernie();
@@ -17,15 +17,15 @@ class BernieSenders
     cv::Mat img_;
     ros::NodeHandle* nh_;
     ros::Publisher image_pub_;
-};
+  };
 
-inline size_t curl_write_data(char* ptr, size_t size, size_t nmemb, void* userdata)
-{
+  inline size_t curl_write_data(char* ptr, size_t size, size_t nmemb, void* userdata)
+  {
     std::vector<uchar>* stream = (std::vector<uchar>*)userdata;
     size_t count = size * nmemb;
     stream->insert(stream->end(), ptr, ptr + count);
     return count;
-}
+  }
 
 } // namespace owds
 

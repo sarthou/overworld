@@ -1,19 +1,18 @@
 #ifndef OWDS_JOINTSTATEPERCEPTIONMODULE_H
 #define OWDS_JOINTSTATEPERCEPTIONMODULE_H
 
-#include "overworld/BasicTypes/BodyPart.h"
-#include "overworld/Bullet/PhysicsServers.h"
-#include "overworld/Perception/Modules/PerceptionModuleBase.h"
-
 #include <sensor_msgs/JointState.h>
 #include <tf2_ros/transform_listener.h>
 
 #include "ontologenius/OntologiesManipulator.h"
+#include "overworld/BasicTypes/BodyPart.h"
+#include "overworld/Bullet/PhysicsServers.h"
+#include "overworld/Perception/Modules/PerceptionModuleBase.h"
 
 namespace owds {
 
-class JointStatePerceptionModule : public owds::PerceptionModuleRosBase<owds::BodyPart, sensor_msgs::JointState>
-{
+  class JointStatePerceptionModule : public owds::PerceptionModuleRosBase<owds::BodyPart, sensor_msgs::JointState>
+  {
   public:
     JointStatePerceptionModule();
     virtual ~JointStatePerceptionModule() = default;
@@ -21,7 +20,7 @@ class JointStatePerceptionModule : public owds::PerceptionModuleRosBase<owds::Bo
     virtual void setParameter(const std::string& parameter_name, const std::string& parameter_value) override;
     virtual bool closeInitialization() override;
 
-    virtual std::string getAgentName() override { return robot_name_; } 
+    virtual std::string getAgentName() override { return robot_name_; }
     virtual int getAgentBulletId() override { return robot_bullet_id_; }
 
   protected:
@@ -49,7 +48,7 @@ class JointStatePerceptionModule : public owds::PerceptionModuleRosBase<owds::Bo
 
     bool updateBasePose(const ros::Time& stamp = ros::Time(0));
     void loadRobotModel();
-};
+  };
 
 } // namespace owds
 

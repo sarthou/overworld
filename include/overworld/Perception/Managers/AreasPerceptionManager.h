@@ -5,57 +5,55 @@
 #include <string>
 
 #include "overworld/BasicTypes/Area.h"
-#include "overworld/BasicTypes/Object.h"
 #include "overworld/BasicTypes/BodyPart.h"
-
+#include "overworld/BasicTypes/Object.h"
 #include "overworld/Bullet/BulletClient.h"
 #include "overworld/Perception/Managers/BasePerceptionManager.h"
 #include "overworld/Perception/Managers/EntitiesPerceptionManager.h"
-
 #include "overworld/Utility/ShellDisplay.h"
 
 namespace owds {
 
-class AreasPerceptionManager : public BasePerceptionManager<Area>
-{
-public:
-  explicit AreasPerceptionManager(ros::NodeHandle* nh): bullet_client_(nullptr), drawn_(true) {}
-  ~AreasPerceptionManager();
-  
-  void setBulletClient(BulletClient* client) { bullet_client_ = client; }
+  class AreasPerceptionManager : public BasePerceptionManager<Area>
+  {
+  public:
+    explicit AreasPerceptionManager(ros::NodeHandle* nh) : bullet_client_(nullptr), drawn_(true) {}
+    ~AreasPerceptionManager();
 
-  void registerObjectsManager(EntitiesPerceptionManager<Object>* manager) { objects_managers_.insert(manager); }
-  void registerBodyPartsManager(EntitiesPerceptionManager<BodyPart>* manager) { bodyparts_managers_.insert(manager); }
+    void setBulletClient(BulletClient* client) { bullet_client_ = client; }
 
-  const std::map<std::string, Area*>& getEntities() const { return areas_; }
-  Area* getArea(const std::string& area_id);
+    void registerObjectsManager(EntitiesPerceptionManager<Object>* manager) { objects_managers_.insert(manager); }
+    void registerBodyPartsManager(EntitiesPerceptionManager<BodyPart>* manager) { bodyparts_managers_.insert(manager); }
 
-  bool update();
+    const std::map<std::string, Area*>& getEntities() const { return areas_; }
+    Area* getArea(const std::string& area_id);
 
-  bool isDrawn() { return drawn_; }
-  void drawAreas();
-  void undrawAreas();
+    bool update();
 
-private:
-  std::map<std::string, Area*> areas_;
-  std::map<std::string, Area*> pending_percepts_;
-  BulletClient* bullet_client_;
-  bool drawn_;
+    bool isDrawn() { return drawn_; }
+    void drawAreas();
+    void undrawAreas();
 
-  std::set<EntitiesPerceptionManager<Object>*> objects_managers_;
-  std::set<EntitiesPerceptionManager<BodyPart>*> bodyparts_managers_;
+  private:
+    std::map<std::string, Area*> areas_;
+    std::map<std::string, Area*> pending_percepts_;
+    BulletClient* bullet_client_;
+    bool drawn_;
 
-  void getPercepts(std::map<std::string, Percept<Area>>& percepts);
+    std::set<EntitiesPerceptionManager<Object>*> objects_managers_;
+    std::set<EntitiesPerceptionManager<BodyPart>*> bodyparts_managers_;
 
-  void solvePendingAreas();
+    void getPercepts(const std::string& module_name, std::map<std::string, Percept<Area>>& percepts);
 
-  void removeFromBullet(Area* area);
-  void addToBullet(Area* area);
-  void addPolygonToBullet(Area* area);
-  void addCircleToBullet(Area* area);
+    void solvePendingAreas();
 
-  Entity* findAreaOwner(Area* area);
-};
+    void removeFromBullet(Area* area);
+    void addToBullet(Area* area);
+    void addPolygonToBullet(Area* area);
+    void addCircleToBullet(Area* area);
+
+    Entity* findAreaOwner(Area* area);
+  };
 
 } // namespace owds
 
