@@ -13,9 +13,9 @@ public:
   Agent* getAgent(const std::string& agent_name) { return AgentPerceptionManager::getAgent(agent_name, AgentType_e::HUMAN); }
 
 private:
-  DataFusionBase<BodyPart> fusioner_;
+  DataFusionBase fusioner_;
 
-  void getPercepts(std::map<std::string, Percept<BodyPart>>& percepts) override;
+  void getPercepts(const std::string& module_name, std::map<std::string, Percept<BodyPart>>& percepts) override;
   void reasoningOnUpdate() override;
   
   void fromfusedToEntities(); 
