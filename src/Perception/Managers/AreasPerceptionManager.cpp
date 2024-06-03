@@ -27,7 +27,7 @@ bool AreasPerceptionManager::update()
 
   for(const auto& module : this->perception_modules_)
     if(module.second->isActivated() && module.second->hasBeenUpdated())
-      module.second->accessPercepts([this](std::map<std::string, Area>& percepts){ this->getPercepts(percepts); });
+      module.second->accessPercepts([this, name = module.first](std::map<std::string, Percept<Area>>& percepts){ this->getPercepts(name, percepts); });
 
   solvePendingAreas();
 
@@ -50,14 +50,14 @@ void AreasPerceptionManager::undrawAreas()
       removeFromBullet(area.second);
 }
 
-void AreasPerceptionManager::getPercepts(std::map<std::string, Area>& percepts)
+void AreasPerceptionManager::getPercepts(const std::string& module_name, std::map<std::string, Percept<Area>>& percepts)
 {
   for(auto& percept : percepts)
   {
     auto it = areas_.find(percept.second.id());
     if(it == areas_.end())
     {
-      Area* new_entity = new Area(percept.second);
+      auto* new_entity = new Area(percept.second);
       if(percept.second.isStatic() == true)
       {
         it = areas_.insert(std::pair<std::string, Area*>(percept.second.id(), new_entity)).first;

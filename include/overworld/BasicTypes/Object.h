@@ -6,11 +6,17 @@
 
 namespace owds {
 
-class Hand;
+  class Hand;
 
-class Object: public Entity
-{
-public:
+  struct HandStamped_t
+  {
+    Hand* hand;
+    ros::Time stamp;
+  };
+
+  class Object : public Entity
+  {
+  public:
     explicit Object(const std::string& id, bool is_true_id = true);
 
     void setPointsOfInterest(const std::vector<PointOfInterest>& points_of_interest);
@@ -22,13 +28,23 @@ public:
     void setStatic(bool is_static = true) { is_static_ = is_static; }
     bool isStatic() const { return is_static_; }
 
-    // should be setted in hand through the hand
+    // setInHand or removeFromHand should be done before the update pose
+    void updatePose(const Pose& pose, ros::Time stamp = ros::Time::now());
+    void updatePose(const std::array<double, 3>& translation, const std::array<double, 4>& rotation);
+    void updatePose(const std::array<double, 3>& translation, const std::array<double, 4>& rotation, ros::Time stamp);
+    void updatePose(const geometry_msgs::PoseStamped& pose);
+
+    Pose poseRaw() const;
+    Pose pose() const;
+    Pose pose(unsigned int id) const;
+    Pose pose(const ros::Time& stamp) const;
+
     void setInHand(Hand* hand) { hand_in_ = hand; }
-    void removeFromHand();
+    void removeFromHand() { hand_in_ = nullptr; }
     bool isInHand() const { return (hand_in_ != nullptr); }
     Hand* getHandIn() const { return hand_in_; }
-
-    void merge(Object* other);
+    Hand* getHandIn(unsigned int id) const;
+    Hand* getHandIn(const ros::Time& stamp) const;
 
     void setBoundingBox(const std::array<double, 3>& bb) { bounding_box_ = bb; }
     const std::array<double, 3>& getBoundingBox() const { return bounding_box_; }
@@ -47,10 +63,11 @@ public:
     void setTypes(const std::vector<std::string>& types);
     bool isA(const std::string& type);
 
-protected:
+  protected:
     std::vector<PointOfInterest> points_of_interest_;
     bool is_static_;
     Hand* hand_in_;
+    CircularBuffer<HandStamped_t, 30> last_hands_;
 
     std::array<double, 3> bounding_box_;
     std::array<double, 3> origin_offset_;
@@ -59,7 +76,7 @@ protected:
     double mass_;
 
     std::unordered_set<std::string> types_;
-};
+  };
 
 } // namespace owds
 

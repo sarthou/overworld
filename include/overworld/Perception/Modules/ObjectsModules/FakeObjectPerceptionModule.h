@@ -1,34 +1,37 @@
 #ifndef OWDS_FAKEOBJECTPERCEPTIONMODULE_H
 #define OWDS_FAKEOBJECTPERCEPTIONMODULE_H
 
-#include "overworld/BasicTypes/Object.h"
-#include "overworld/Perception/Modules/PerceptionModuleBase.h"
-
-#include "overworld/EntitiesPoses.h"
-
-#include <tf2_ros/transform_listener.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#include <tf2_ros/transform_listener.h>
+
+#include "overworld/BasicTypes/Object.h"
+#include "overworld/EntitiesPoses.h"
+#include "overworld/Perception/Modules/PerceptionModuleBase.h"
 
 namespace owds {
 
-class FakeObjectPerceptionModule : public PerceptionModuleRosBase<Object, overworld::EntitiesPoses>
-{
-public:
-  FakeObjectPerceptionModule();
+  class FakeObjectPerceptionModule : public PerceptionModuleRosBase<Object, overworld::EntitiesPoses>
+  {
+  public:
+    FakeObjectPerceptionModule();
 
-  bool closeInitialization() override;
+    bool closeInitialization() override;
+    void setParameter(const std::string& parameter_name, const std::string& parameter_value) override;
 
-private:
-  onto::OntologiesManipulator* ontologies_manipulator_;
-  onto::OntologyManipulator* onto_;
+  private:
+    onto::OntologiesManipulator* ontologies_manipulator_;
+    onto::OntologyManipulator* onto_;
 
-  tf2_ros::Buffer tf_buffer_;
-  tf2_ros::TransformListener tf2_listener_;
+    tf2_ros::Buffer tf_buffer_;
+    tf2_ros::TransformListener tf2_listener_;
 
-  virtual bool perceptionCallback(const overworld::EntitiesPoses& msg) override;
+    std::string topic_name_;
+    bool true_id_;
 
-  Object createNewEntity(const std::string& id);
-};
+    virtual bool perceptionCallback(const overworld::EntitiesPoses& msg) override;
+
+    Percept<Object> createPercept(const std::string& id);
+  };
 
 } // namespace owds
 

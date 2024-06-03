@@ -1,17 +1,16 @@
-#include <overworld/SituationAssessor.h>
-
-#include "overworld/Utility/ShellDisplay.h"
-#include "overworld/Utility/Parameters.h"
-
-#include <stdio.h>
 #include <execinfo.h>
+#include <overworld/SituationAssessor.h>
 #include <signal.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "overworld/Utility/Parameters.h"
+#include "overworld/Utility/ShellDisplay.h"
+
 void handler(int sig)
 {
-  void *array[10];
+  void* array[10];
   size_t size;
 
   size = backtrace(array, 10);

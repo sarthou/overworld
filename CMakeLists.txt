@@ -173,6 +173,7 @@ add_library(${PROJECT_NAME}_perception_lib STATIC
   src/Perception/Modules/HumansModules/HumansEmulatedPerceptionModule.cpp
   src/Perception/Modules/AreasModules/AreasEmulatedPerceptionModule.cpp
   src/Perception/PerceptionManagers.cpp
+  src/Perception/DataFusion/DataFusionBase.cpp
 )
 target_link_libraries(${PROJECT_NAME}_perception_lib PUBLIC
                       ${catkin_LIBRARIES}
@@ -299,3 +300,10 @@ target_link_libraries(${PROJECT_NAME}_area_test PRIVATE
 add_executable(${PROJECT_NAME}_approach_test src/TestFiles/approach_sender.cpp )
 target_link_libraries(${PROJECT_NAME}_approach_test PRIVATE
                       ${PROJECT_NAME}_sender_lib)
+
+
+add_executable(${PROJECT_NAME}_object_spawn src/TestFiles/object_spawn.cpp )
+target_link_libraries(${PROJECT_NAME}_object_spawn PRIVATE
+                      ${PROJECT_NAME}_sender_lib
+                      ${catkin_LIBRARIES}
+                      ${ontologenius_LIBRARIES})
