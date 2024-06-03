@@ -173,6 +173,7 @@ add_library(${PROJECT_NAME}_perception_lib STATIC
   src/Perception/Modules/HumansModules/HumansEmulatedPerceptionModule.cpp
   src/Perception/Modules/AreasModules/AreasEmulatedPerceptionModule.cpp
   src/Perception/PerceptionManagers.cpp
+  src/Perception/DataFusion/DataFusionBase.cpp
 )
 target_link_libraries(${PROJECT_NAME}_perception_lib PUBLIC
                       ${catkin_LIBRARIES}

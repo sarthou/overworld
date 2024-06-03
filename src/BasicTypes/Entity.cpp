@@ -43,7 +43,7 @@ void Entity::replacePose(const Pose& pose)
   last_poses_.replace_back({pose, lastStamp()});
 }
 
-const Pose& Entity::pose() const
+Pose Entity::pose() const
 {
   if (!is_located_){
     throw UnlocatedEntityError(id_);
@@ -51,7 +51,7 @@ const Pose& Entity::pose() const
   return last_poses_.back().pose;
 }
 
-const Pose& Entity::pose(unsigned int id) const
+Pose Entity::pose(unsigned int id) const
 {
   if (!is_located_)
     throw UnlocatedEntityError(id_);
@@ -60,7 +60,7 @@ const Pose& Entity::pose(unsigned int id) const
 }
 
 // TODO optimize when increase => shortcut
-const Pose& Entity::pose(const ros::Time& stamp) const
+Pose Entity::pose(const ros::Time& stamp) const
 {
   if (!is_located_)
     throw UnlocatedEntityError(id_);
@@ -180,7 +180,7 @@ double Entity::getAabbVolume() const
     return (aabb_.max[0] - aabb_.min[0]) * (aabb_.max[1] - aabb_.min[1]) * (aabb_.max[2] - aabb_.min[2]);
 }
 
-void Entity::merge(const Entity* other)
+void Entity::merge(const Entity* other, bool update_pose)
 {
   if(other->hasShape())
   {
@@ -190,12 +190,14 @@ void Entity::merge(const Entity* other)
       shape_ = other->getShape();
   }
 
-  if(other->isLocated())
+  if(update_pose && other->isLocated())
   {
-    if(isLocated() == false)
+    if((isLocated() == false) ||
+       (other->getNbFrameUnseen() <= getNbFrameUnseen()))
+    {
       updatePose(other->pose());
-    else if(getNbFrameUnseen() >= other->getNbFrameUnseen())
-      updatePose(other->pose());
+      setNbFrameUnseen(other->getNbFrameUnseen());
+    }
   }
 }
 
