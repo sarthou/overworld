@@ -6,60 +6,77 @@
 
 namespace owds {
 
-class Hand;
+  class Hand;
 
-class Object: public Entity
-{
-public:
-  explicit Object(const std::string& id, bool is_true_id = true);
+  struct HandStamped_t
+  {
+    Hand* hand;
+    ros::Time stamp;
+  };
 
-  void setPointsOfInterest(const std::vector<PointOfInterest>& points_of_interest);
-  void addPointOfInterest(const PointOfInterest& point_of_interest);
-  void emptyPointsOfInterest();
-  const std::vector<PointOfInterest>& getPointsOfInterest() const;
-  void setAllPoiUnseen();
+  class Object : public Entity
+  {
+  public:
+    explicit Object(const std::string& id, bool is_true_id = true);
 
-  void setStatic(bool is_static = true) { is_static_ = is_static; }
-  bool isStatic() const { return is_static_; }
+    void setPointsOfInterest(const std::vector<PointOfInterest>& points_of_interest);
+    void addPointOfInterest(const PointOfInterest& point_of_interest);
+    void emptyPointsOfInterest();
+    const std::vector<PointOfInterest>& getPointsOfInterest() const;
+    void setAllPoiUnseen();
 
-  // should be setted in hand through the hand
-  void setInHand(Hand* hand) { hand_in_ = hand; }
-  void removeFromHand() { hand_in_ = nullptr; }
-  bool isInHand() const { return (hand_in_ != nullptr); }
-  Hand* getHandIn() const { return hand_in_; }
+    void setStatic(bool is_static = true) { is_static_ = is_static; }
+    bool isStatic() const { return is_static_; }
 
-  void merge(Object* other);
+    // setInHand or removeFromHand should be done before the update pose
+    void updatePose(const Pose& pose, ros::Time stamp = ros::Time::now());
+    void updatePose(const std::array<double, 3>& translation, const std::array<double, 4>& rotation);
+    void updatePose(const std::array<double, 3>& translation, const std::array<double, 4>& rotation, ros::Time stamp);
+    void updatePose(const geometry_msgs::PoseStamped& pose);
 
-  void setBoundingBox(const std::array<double, 3>& bb) { bounding_box_ = bb; }
-  const std::array<double, 3>& getBoundingBox() const { return bounding_box_; }
-  double getBbVolume() const;
-  void setOriginOffset(const std::array<double, 3>& origin_offset) { origin_offset_ = origin_offset; }
-  const std::array<double, 3>& getOriginOffset() const { return origin_offset_; }
-  void computeCorners();
-  std::vector<Pose> getCorners() const { return corners_; }
+    Pose poseRaw() const;
+    Pose pose() const;
+    Pose pose(unsigned int id) const;
+    Pose pose(const ros::Time& stamp) const;
 
-  double getMinDistanceTo(const Object& other);
+    void setInHand(Hand* hand) { hand_in_ = hand; }
+    void removeFromHand() { hand_in_ = nullptr; }
+    bool isInHand() const { return (hand_in_ != nullptr); }
+    Hand* getHandIn() const { return hand_in_; }
+    Hand* getHandIn(unsigned int id) const;
+    Hand* getHandIn(const ros::Time& stamp) const;
 
-  void setMass(double mass) { mass_ = mass; }
-  void setDefaultMass(double density = 500.0); // shape and aabb should exist to compute the default mass
-  double getMass() const { return mass_; }
+    void setBoundingBox(const std::array<double, 3>& bb) { bounding_box_ = bb; }
+    const std::array<double, 3>& getBoundingBox() const { return bounding_box_; }
+    double getBbVolume() const;
+    void setOriginOffset(const std::array<double, 3>& origin_offset) { origin_offset_ = origin_offset; }
+    const std::array<double, 3>& getOriginOffset() const { return origin_offset_; }
+    void computeCorners();
+    std::vector<Pose> getCorners() const { return corners_; }
 
-  void setTypes(const std::vector<std::string>& types);
-  bool isA(const std::string& type);
+    double getMinDistanceTo(const Object& other);
 
-protected:
-  std::vector<PointOfInterest> points_of_interest_;
-  bool is_static_;
-  Hand* hand_in_;
+    void setMass(double mass) { mass_ = mass; }
+    void setDefaultMass(double density = 500.0); // shape and aabb should exist to compute the default mass
+    double getMass() const { return mass_; }
 
-  std::array<double, 3> bounding_box_;
-  std::array<double, 3> origin_offset_;
-  std::vector<Pose> corners_;
+    void setTypes(const std::vector<std::string>& types);
+    bool isA(const std::string& type);
 
-  double mass_;
+  protected:
+    std::vector<PointOfInterest> points_of_interest_;
+    bool is_static_;
+    Hand* hand_in_;
+    CircularBuffer<HandStamped_t, 30> last_hands_;
 
-  std::unordered_set<std::string> types_;
-};
+    std::array<double, 3> bounding_box_;
+    std::array<double, 3> origin_offset_;
+    std::vector<Pose> corners_;
+
+    double mass_;
+
+    std::unordered_set<std::string> types_;
+  };
 
 } // namespace owds
 

@@ -39,28 +39,118 @@ void Object::setAllPoiUnseen()
     poi.setUnseen();
 }
 
-/*void Object::removeFromHand()
+void Object::updatePose(const Pose& pose, ros::Time stamp)
 {
-  if(hand_in_ != nullptr)
-  {
-    hand_in_->removeFromHand(id_);
-    hand_in_ = nullptr;
-  }
+  Entity::updatePose(pose, stamp);
+  HandStamped_t hand;
+  hand.hand = hand_in_;
+  hand.stamp = stamp;
+  last_hands_.push_back(hand);
+}
+
+void Object::updatePose(const std::array<double, 3>& translation, const std::array<double, 4>& rotation)
+{
+  Entity::updatePose(translation, rotation);
+  HandStamped_t hand;
+  hand.hand = hand_in_;
+  hand.stamp = ros::Time::now();
+  last_hands_.push_back(hand);
+}
+
+void Object::updatePose(const std::array<double, 3>& translation, const std::array<double, 4>& rotation, ros::Time stamp)
+{
+  Entity::updatePose(translation, rotation, stamp);
+  HandStamped_t hand;
+  hand.hand = hand_in_;
+  hand.stamp = stamp;
+  last_hands_.push_back(hand);
+}
+
+void Object::updatePose(const geometry_msgs::PoseStamped& pose)
+{
+  Entity::updatePose(pose);
+  HandStamped_t hand;
+  hand.hand = hand_in_;
+  hand.stamp = ros::Time::now();
+  last_hands_.push_back(hand);
+}
+
+Pose Object::poseRaw() const
+{
+  return Entity::pose();
+}
+
+Pose Object::pose() const
+{
+  if(hand_in_ == nullptr)
+    return Entity::pose();
   else
-    ShellDisplay::warning("[Object] Try to remove " + id_ + " from hand while the object is not in any hand");
-}*/
-
-void Object::merge(Object* other)
-{
-  Entity::merge(other);
-
-  if((isInHand() == false) && other->isInHand())
   {
-    auto hand = other->getHandIn();
-    hand->removeFromHand(other->id());
-    //other->removeFromHand();
-    hand->putInHand(this);
+    Pose hand_pose = hand_in_->pose();
+    Pose object_pose = hand_pose * Entity::pose();
+    return object_pose;
   }
+}
+
+Pose Object::pose(unsigned int id) const
+{
+  Hand* hand = getHandIn(id);
+  if(hand == nullptr)
+    return Entity::pose();
+  else
+  {
+    Pose hand_pose = hand->pose(id);
+    Pose object_pose = hand_pose * Entity::pose(id);
+    return object_pose;
+  }
+}
+
+Pose Object::pose(const ros::Time& stamp) const
+{
+  Hand* hand = getHandIn(stamp);
+  if(hand == nullptr)
+    return Entity::pose(stamp);
+  else
+  {
+    Pose hand_pose = hand->pose(stamp);
+    Pose object_pose = hand_pose * Entity::pose(stamp);
+    return object_pose;
+  }
+}
+
+Hand* Object::getHandIn(unsigned int id) const
+{
+  return last_hands_.at(last_hands_.size() - id - 1).hand;
+}
+
+Hand* Object::getHandIn(const ros::Time& stamp) const
+{
+  auto duration_zero = ros::Duration(0);
+
+  ros::Duration min_err = stamp - last_hands_.back().stamp;
+  if(min_err < duration_zero)
+    min_err = last_hands_.back().stamp - stamp;
+
+  int min_i = -1;
+
+  for(size_t i = 0; i < last_hands_.size(); i++)
+  {
+    auto delta = stamp - last_hands_.at(i).stamp;
+    if(delta < duration_zero)
+        delta = last_hands_.at(i).stamp - stamp;
+    if(delta < min_err)
+    {
+        min_err = delta;
+        min_i = i;
+    }
+  }
+
+  if(min_i < 0)
+      return last_hands_.back().hand;
+  else if(min_i)
+      return last_hands_.at(min_i - 1).hand; //-1 bug
+  else
+      return last_hands_.at(min_i).hand;
 }
 
 double Object::getBbVolume() const
