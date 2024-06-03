@@ -27,17 +27,18 @@ class Entity
 public:
   explicit Entity(const std::string& id, bool is_true_id = true);
 
-  void updatePose(const Pose& pose, ros::Time stamp = ros::Time::now());
-  void updatePose(const std::array<double, 3>& translation, const std::array<double, 4>& rotation);
-  void updatePose(const std::array<double, 3>& translation, const std::array<double, 4>& rotation, ros::Time stamp);
-  void updatePose(const geometry_msgs::PoseStamped& pose);
+  virtual void updatePose(const Pose& pose, ros::Time stamp = ros::Time::now());
+  virtual void updatePose(const std::array<double, 3>& translation, const std::array<double, 4>& rotation);
+  virtual void updatePose(const std::array<double, 3>& translation, const std::array<double, 4>& rotation, ros::Time stamp);
+  virtual void updatePose(const geometry_msgs::PoseStamped& pose);
   void replacePose(const Pose& pose);
   void unsetPose() { is_located_ = false; }
   bool isLocated() const { return is_located_; }
-  const Pose& pose() const;
-  const Pose& pose(unsigned int id) const;
-  const Pose& pose(const ros::Time& stamp) const;
+  virtual Pose pose() const;
+  virtual Pose pose(unsigned int id) const;
+  virtual Pose pose(const ros::Time& stamp) const;
   ros::Time lastStamp() const { return last_poses_.back().stamp; }
+  void clearPoses() { last_poses_.empty(); }
   bool hasMoved() const;
   bool hasMoved(const ros::Time& stamp) const;
 
@@ -67,10 +68,11 @@ public:
 
   void setSeen() { nb_frame_unseen_ = 0; }
   void setUnseen() { if(nb_frame_unseen_ < 100) nb_frame_unseen_++; }
+  void setNbFrameUnseen(size_t nb) { nb_frame_unseen_ = nb; }
   bool hasBeenSeen() const { return (nb_frame_unseen_ == 0); }
   size_t getNbFrameUnseen() const { return nb_frame_unseen_; }
 
-  void merge(const Entity* other);
+  void merge(const Entity* other, bool update_pose = true);
 
   geometry_msgs::TransformStamped toTfTransform() const;
   const visualization_msgs::Marker& toMarker(int id, double lifetime, const std::string& ns);
