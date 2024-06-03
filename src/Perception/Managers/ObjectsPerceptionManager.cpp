@@ -512,10 +512,6 @@ namespace owds {
       if(to_be_merged != nullptr)
       {
         merged.insert(false_id);
-        /*// TODO remove
-          to_be_merged->merge(false_obj->second);
-        */
-
         to_be_merged->addFalseId(false_id);
         merged_ids_.insert(std::make_pair(false_id, to_be_merged->id()));
       }

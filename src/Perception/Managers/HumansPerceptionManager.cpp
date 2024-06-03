@@ -10,7 +10,7 @@ namespace owds {
     for(auto& percept : percepts)
     {
       std::string part_id = percept.first;
-      if(percept.second.isLocated()) // TODO consider human disparition
+      if(percept.second.isLocated()) //TODO consider human disparition
       {
         auto it = aggregated_.find(part_id);
         if(it == aggregated_.end())
@@ -21,7 +21,6 @@ namespace owds {
     }
   }
 
-  // TODO verify
   void HumansPerceptionManager::fromfusedToEntities()
   {
     for(auto& percept : fusioned_percepts_)

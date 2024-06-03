@@ -84,7 +84,7 @@ namespace owds {
         min_i = i;
       }
     }
-
+    
     if(min_i < 0)
       return last_poses_.back().pose;
     else if(min_i)
