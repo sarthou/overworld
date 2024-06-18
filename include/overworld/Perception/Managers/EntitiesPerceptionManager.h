@@ -156,7 +156,9 @@ namespace owds {
     {
     case SHAPE_CUBE:
     {
-      visual_id = bullet_client_->createVisualShapeBox(entity->getShape().scale,
+      visual_id = bullet_client_->createVisualShapeBox({entity->getShape().scale[0] / 2.,
+                                                        entity->getShape().scale[1] / 2.,
+                                                        entity->getShape().scale[2] / 2.},
                                                        {entity->getShape().color[0],
                                                         entity->getShape().color[1],
                                                         entity->getShape().color[2],
