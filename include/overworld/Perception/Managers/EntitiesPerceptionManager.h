@@ -120,7 +120,7 @@ namespace owds {
       entity.second->setUnseen();
 
     for(const auto& module : this->perception_modules_)
-      if(module.second->isActivated() && module.second->hasBeenUpdated()) 
+      if(module.second->isActivated() /*&& module.second->hasBeenUpdated()*/) // TODO try a way to not check all modules
         module.second->accessPercepts([this, name = module.first](std::map<std::string, Percept<T>>& percepts) { this->getPercepts(name, percepts); });
 
     reasoningOnUpdate();
