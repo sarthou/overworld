@@ -1,0 +1,61 @@
+#ifndef OWDS_GRAPHICS_BGFX_RENDERER_H
+#define OWDS_GRAPHICS_BGFX_RENDERER_H
+
+#include <memory>
+
+#include "overworld/Graphics/Base/Renderer.h"
+
+namespace owds {
+  class Actor;
+  class ShapeBox;
+  class ShapeCapsule;
+  class ShapeCustomMesh;
+  class ShapeCylinder;
+  class ShapeSphere;
+  class Model;
+  class Mesh;
+} // namespace owds
+
+namespace owds::bgfx {
+  class Camera;
+  class Context;
+
+  class Renderer final : public owds::Renderer
+  {
+  public:
+    Renderer();
+    ~Renderer() override;
+
+    bool initialize(const owds::Window& window) override;
+    void cleanup() override;
+    void notifyPreReset() override;
+    void notifyPostReset() override;
+    void notifyResize(std::uint32_t new_width, std::uint32_t new_height) override;
+
+    void runSanityChecks() override;
+    void commit() override;
+
+    owds::Camera& createCamera(const std::string& alias_name, owds::World& world) override;
+
+    using owds::Renderer::createCamera;
+
+  protected:
+    void commitCamera(const owds::bgfx::Camera& camera);
+    void commitWorld(const owds::World& world);
+    void queueActorBatch(const owds::Actor& actor, const owds::ShapeBox& box);
+    void queueActorBatch(const owds::Actor& actor, const owds::ShapeCapsule& box);
+    void queueActorBatch(const owds::Actor& actor, const owds::ShapeCustomMesh& box);
+    void queueActorBatch(const owds::Actor& actor, const owds::ShapeCylinder& box);
+    void queueActorBatch(const owds::Actor& actor, const owds::ShapeSphere& box);
+
+    void tryCacheModel(const owds::Model& model);
+    void queueModelBatch(const owds::Model& model, const std::array<float, 16>& model_mat);
+
+    void render(std::uint64_t state);
+    void renderInstanced(std::uint64_t state);
+
+    std::unique_ptr<Context> ctx_;
+  };
+} // namespace owds::bgfx
+
+#endif // OWDS_GRAPHICS_BGFX_RENDERER_H
