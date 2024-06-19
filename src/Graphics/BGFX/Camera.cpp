@@ -4,6 +4,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "overworld/Graphics/BGFX/API.h"
+#include "overworld/Helper/BitCast.h"
 #include "overworld/Helper/GlmMath.h"
 
 namespace owds::bgfx {
@@ -81,10 +82,12 @@ namespace owds::bgfx {
 
   void Camera::setOutputAA(const owds::ViewAntiAliasing_e aa_setting)
   {
+    (void)aa_setting; // todo
   }
 
   void Camera::setOutputFPS(const std::uint64_t desired_target_fps)
   {
+    (void)desired_target_fps; // todo
   }
 
   void Camera::setOutputResolution(const std::array<float, 2>& resolution)
@@ -101,6 +104,7 @@ namespace owds::bgfx {
 
   void Camera::setCaptureCallback(std::function<void(const std::vector<owds::Color>&)> callback)
   {
+    (void)callback; // todo
   }
 
   void Camera::finalize()
@@ -110,6 +114,8 @@ namespace owds::bgfx {
 
   void Camera::setPositionAndOrientation(const std::array<float, 3>& position, const std::array<float, 3>& orientation)
   {
+    (void)position;    // todo
+    (void)orientation; // todo
   }
 
   void Camera::setPositionAndLookAt(const std::array<float, 3>& eye_position, const std::array<float, 3>& dst_position)

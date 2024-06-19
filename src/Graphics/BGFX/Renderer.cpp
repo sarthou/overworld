@@ -103,14 +103,14 @@ namespace owds::bgfx {
       return false;
     }
 
-    const auto caps = ::bgfx::getCaps();
+    // const auto caps = ::bgfx::getCaps();
     // ctx_->instanced_rendering_supported = caps->supported & BGFX_CAPS_INSTANCING;
 
     ::bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x443355FF, 1.0f, 0);
 
-    auto type = ::bgfx::getRendererType();
-    ::bgfx::ShaderHandle vsh = ::bgfx::createEmbeddedShader(s_owds_embedded_shaders, type, "vs_default");
-    ::bgfx::ShaderHandle fsh = ::bgfx::createEmbeddedShader(s_owds_embedded_shaders, type, "fs_default");
+    const auto type = ::bgfx::getRendererType();
+    const auto vsh = ::bgfx::createEmbeddedShader(s_owds_embedded_shaders, type, "vs_default");
+    const auto fsh = ::bgfx::createEmbeddedShader(s_owds_embedded_shaders, type, "fs_default");
     ctx_->loaded_programs_["default"] = ::bgfx::createProgram(vsh, fsh, true);
     ctx_->is_initialized_ = true;
 
@@ -199,32 +199,7 @@ namespace owds::bgfx {
 
   void Renderer::commitCamera(const owds::bgfx::Camera& camera)
   {
-    const bx::Vec3 at = {0.0f, 0.0f, 0.0f};
-    const bx::Vec3 eye = {0.0f, 0.0f, -35.0f};
-
-    // Set view and projection matrix for view 0.
-    {
-      glm::mat view = glm::lookAt({7.0f, 5.0f, -25.0f}, {0, 0, 0}, glm::vec3(0, 1, 0));
-
-      // float view[16];
-      // bx::mtxLookAt(view, eye, at);
-
-      glm::mat proj = glm::mat4x4(1);
-
-      static float fov = 100.f;
-
-      if(::bgfx::getCaps()->homogeneousDepth)
-      {
-        //proj = glm::perspectiveLH_NO(glm::radians(fov), float(ctx_->width_) / float(ctx_->height_), 0.1f, 1000.0f);
-      }
-      else
-      {
-        //proj = glm::perspectiveLH_ZO(glm::radians(fov), float(ctx_->width_) / float(ctx_->height_), 0.1f, 1000.0f);
-      }
-
-      // ::bgfx::setViewTransform(0, glm::value_ptr(view), glm::value_ptr(camera.proj_matrix_));
-    }
-
+    (void)camera;
     ::bgfx::touch(0);
     if(ctx_->instanced_rendering_supported)
     {
@@ -240,10 +215,10 @@ namespace owds::bgfx {
   {
     for(const auto& actor : world.getActors())
     {
-      std::visit([this, &actor](auto& shape) {
-        queueActorBatch(actor, shape);
-      },
-                 actor.get().collision_shape_);
+      for(const auto& shape : actor.get().visual_shapes_)
+      {
+        std::visit([this, &actor](const auto& shape_resolv) { queueActorBatch(actor, shape_resolv); }, shape);
+      }
     }
   }
 
@@ -257,6 +232,8 @@ namespace owds::bgfx {
 
   void Renderer::queueActorBatch(const owds::Actor& actor, const owds::ShapeCapsule& shape)
   {
+    (void)actor; // todo
+    (void)shape; // todo
   }
 
   void Renderer::queueActorBatch(const owds::Actor& actor, const owds::ShapeCustomMesh& shape)
@@ -275,8 +252,17 @@ namespace owds::bgfx {
     queueModelBatch(shape.cylinder_model_, FromM4(model_mat));
   }
 
+  void Renderer::queueActorBatch(const owds::Actor& actor, const owds::ShapeDummy& shape)
+  {
+    (void)actor; // todo
+    (void)shape; // todo
+    assert(false && "Visual shape cannot be dummy!");
+  }
+
   void Renderer::queueActorBatch(const owds::Actor& actor, const owds::ShapeSphere& shape)
   {
+    (void)actor; // todo
+    (void)shape; // todo
   }
 
   void Renderer::tryCacheModel(const owds::Model& model)
@@ -292,10 +278,10 @@ namespace owds::bgfx {
 
       ctx_->cached_meshes_.emplace(
         mesh.id_, owds::bgfx::MeshHandle{
-                    .vbh_ = ::bgfx::createVertexBuffer(
+                    ::bgfx::createVertexBuffer(
                       ::bgfx::makeRef(mesh.vertices_.data(), mesh.vertices_.size() * sizeof(mesh.vertices_[0])),
                       Vertex::getMSLayout()),
-                    .ibh_ = ::bgfx::createIndexBuffer(
+                    ::bgfx::createIndexBuffer(
                       ::bgfx::makeRef(mesh.indices_.data(), mesh.indices_.size() * sizeof(mesh.indices_[0])),
                       BGFX_BUFFER_INDEX32)});
     }
