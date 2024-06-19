@@ -9,11 +9,6 @@ Clone the dev git repository into your ros2 workspace
 git clone -b dev https://github.com/jevans-laas/overworld-indev-engine.git
 ```
 
-Go into the directory
-```
-cd overworld-indev-engine/
-```
-
 Make sure your system is up-to-date
 ```
 sudo apt update
