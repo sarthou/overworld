@@ -28,8 +28,8 @@ namespace owds::glfw3 {
   WindowPlatformData Window::getPlatformData() const
   {
     return {
-      .native_display_type_ = reinterpret_cast<void*>(glfwGetX11Display()),
-      .native_window_handle_ = reinterpret_cast<void*>(glfwGetX11Window(ctx_->glfw_window_))};
+      reinterpret_cast<void*>(glfwGetX11Display()),
+      reinterpret_cast<void*>(glfwGetX11Window(ctx_->glfw_window_))};
   }
 
   void Window::doPollEvents(owds::Renderer& renderer)
