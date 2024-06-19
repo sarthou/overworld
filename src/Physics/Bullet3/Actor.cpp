@@ -17,12 +17,20 @@ namespace owds::bullet3 {
 
   Actor::~Actor() noexcept
   {
-    ctx_.bt_scene_->removeRigidBody(bt_actor_.get());
+    if(bt_actor_)
+    {
+      ctx_.bt_scene_->removeRigidBody(bt_actor_.get());
+    }
   }
 
   void Actor::setup()
   {
-    std::visit([this](auto& elem) { setup(elem); }, collision_shape_);
+    std::visit([this](auto& elem) { setupPhysicsShape(elem); }, collision_shape_);
+
+    if(!bt_geometry_)
+    {
+      return;
+    }
 
     const auto default_mass = 1.f;
 
@@ -42,6 +50,8 @@ namespace owds::bullet3 {
 
   void Actor::setPhysicsEnabled(const bool enabled)
   {
+    assert(bt_actor_);
+
     if(enabled)
     {
       // todo: logic for re-enabling physics
@@ -57,6 +67,8 @@ namespace owds::bullet3 {
 
   void Actor::setSimulationEnabled(const bool enabled)
   {
+    assert(bt_actor_);
+
     if(is_simulation_enabled_ == enabled)
     {
       return;
@@ -74,6 +86,8 @@ namespace owds::bullet3 {
 
   void Actor::setMass(const float mass_kg)
   {
+    assert(bt_actor_);
+
     btVector3 bt_local_inertia(0, 0, 0);
     bt_geometry_->calculateLocalInertia(mass_kg, bt_local_inertia);
     bt_actor_->setMassProps(mass_kg, bt_local_inertia);
@@ -81,21 +95,29 @@ namespace owds::bullet3 {
 
   void Actor::setStaticFriction(const float coefficient)
   {
+    assert(bt_actor_);
+
     bt_actor_->setFriction(coefficient);
   }
 
   void Actor::setDynamicFriction(const float coefficient)
   {
-    // uhhhh...
+    assert(bt_actor_);
+
+    (void) coefficient; // todo: uhhhh...
   }
 
   void Actor::setRestitution(const float coefficient)
   {
+    assert(bt_actor_);
+
     bt_actor_->setRestitution(coefficient);
   }
 
   void Actor::setPositionAndOrientation(const std::array<float, 3>& position, const std::array<float, 3>& orientation)
   {
+    assert(bt_actor_);
+
     const auto orientation_quat = glm::quat(owds::BitCast<glm::vec3>(orientation));
     const auto bt_transform = btTransform(
       btQuaternion(
@@ -113,6 +135,8 @@ namespace owds::bullet3 {
 
   std::array<float, 16> Actor::getModelMatrix() const
   {
+    assert(bt_actor_);
+
     const auto bt_transform = bt_actor_->getWorldTransform();
     const auto bt_origin = bt_transform.getOrigin();
     const auto bt_orientation = bt_transform.getRotation();
@@ -138,9 +162,10 @@ namespace owds::bullet3 {
 
   std::pair<std::array<float, 3>, std::array<float, 3>> Actor::getPositionAndOrientation() const
   {
+    assert(false && "not implemented");
   }
 
-  void Actor::setup(const owds::ShapeBox& shape)
+  void Actor::setupPhysicsShape(const owds::ShapeBox& shape)
   {
     bt_geometry_ = std::make_unique<btBoxShape>(btVector3(
       static_cast<btScalar>(shape.half_extents_[0]),
@@ -148,19 +173,19 @@ namespace owds::bullet3 {
       static_cast<btScalar>(shape.half_extents_[2])));
   }
 
-  void Actor::setup(const owds::ShapeCapsule& shape)
+  void Actor::setupPhysicsShape(const owds::ShapeCapsule& shape)
   {
     bt_geometry_ = std::make_unique<btCapsuleShape>(
       static_cast<btScalar>(shape.radius_),
       static_cast<btScalar>(shape.height_));
   }
 
-  void Actor::setup(const owds::ShapeCustomMesh& shape)
+  void Actor::setupPhysicsShape(const owds::ShapeCustomMesh& shape)
   {
-    // todo: handle custom meshes
+    (void) shape; // todo: handle custom meshes
   }
 
-  void Actor::setup(const owds::ShapeCylinder& shape)
+  void Actor::setupPhysicsShape(const owds::ShapeCylinder& shape)
   {
     bt_geometry_ = std::make_unique<btCylinderShape>(btVector3(
       static_cast<btScalar>(shape.radius_),
@@ -168,7 +193,12 @@ namespace owds::bullet3 {
       static_cast<btScalar>(shape.radius_)));
   }
 
-  void Actor::setup(const owds::ShapeSphere& shape)
+  void Actor::setupPhysicsShape(const owds::ShapeDummy& shape)
+  {
+    (void) shape;
+  }
+
+  void Actor::setupPhysicsShape(const owds::ShapeSphere& shape)
   {
     bt_geometry_ = std::make_unique<btSphereShape>(
       static_cast<btScalar>(shape.radius_));
