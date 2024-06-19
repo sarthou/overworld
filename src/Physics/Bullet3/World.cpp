@@ -28,8 +28,7 @@ namespace owds::bullet3 {
 
   owds::Actor& World::createActor(const owds::Shape& collision_shape, const std::vector<owds::Shape>& visual_shapes)
   {
-    auto actor = std::make_unique<owds::bullet3::Actor>(*ctx_, collision_shape);
-    actor->visual_shapes_ = visual_shapes;
+    auto actor = std::make_unique<owds::bullet3::Actor>(*ctx_, collision_shape, visual_shapes);
     actor->setup();
     const auto actor_ptr = actor.get();
     return *(ctx_->actors_[actor_ptr] = std::move(actor), actor_ptr);

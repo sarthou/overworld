@@ -20,7 +20,11 @@ namespace owds::physx {
     friend class JointRevolute;
 
   public:
-    Actor(owds::physx::Context& ctx, const owds::Shape& shape);
+    Actor(
+      owds::physx::Context& ctx,
+      const owds::Shape& collision_shape,
+      const std::vector<owds::Shape>& visual_shapes);
+
     ~Actor() noexcept override;
 
     Actor(const Actor& other) = delete;

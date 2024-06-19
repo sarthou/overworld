@@ -32,7 +32,7 @@ namespace owds::physx {
 
   owds::Actor& World::createActor(const owds::Shape& collision_shape, const std::vector<owds::Shape>& visual_shapes)
   {
-    auto actor = std::make_unique<owds::physx::Actor>(*ctx_, collision_shape);
+    auto actor = std::make_unique<owds::physx::Actor>(*ctx_, collision_shape, visual_shapes);
     actor->visual_shapes_ = visual_shapes;
     actor->setup();
     const auto actor_ptr = actor.get();

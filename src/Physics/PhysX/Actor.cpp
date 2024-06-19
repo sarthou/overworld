@@ -9,8 +9,11 @@
 #include "overworld/Physics/PhysX/SharedContext.h"
 
 namespace owds::physx {
-  Actor::Actor(owds::physx::Context& ctx, const owds::Shape& shape)
-    : owds::Actor(shape),
+  Actor::Actor(
+    owds::physx::Context& ctx,
+    const owds::Shape& collision_shape,
+    const std::vector<owds::Shape>& visual_shapes)
+    : owds::Actor(collision_shape, visual_shapes),
       ctx_(ctx)
   {
     ctx_.queued_actors_registration_.emplace_back(this);
@@ -27,7 +30,7 @@ namespace owds::physx {
 
     px_material_ = sdk->createMaterial(0.5f, 0.5f, 0.5f);
 
-    std::visit(([this](auto& elem) { setup(elem); }), shape_);
+    std::visit(([this](auto& elem) { setup(elem); }), collision_shape_);
 
     px_actor_ = sdk->createRigidDynamic(::physx::PxTransform(::physx::PxVec3(0, 20, 0)));
 

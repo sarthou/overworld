@@ -243,7 +243,7 @@ namespace owds::bgfx {
       std::visit([this, &actor](auto& shape) {
         queueActorBatch(actor, shape);
       },
-                 actor.get().shape_);
+                 actor.get().collision_shape_);
     }
   }
 

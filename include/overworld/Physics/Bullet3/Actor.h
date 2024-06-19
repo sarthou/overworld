@@ -20,7 +20,11 @@ namespace owds::bullet3 {
     friend class JointRevolute;
 
   public:
-    Actor(owds::bullet3::Context& ctx, const owds::Shape& shape);
+    Actor(
+      owds::bullet3::Context& ctx,
+      const owds::Shape& collision_shape,
+      const std::vector<owds::Shape>& visual_shapes);
+
     ~Actor() noexcept override;
 
     Actor(const Actor& other) = delete;

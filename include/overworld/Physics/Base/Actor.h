@@ -3,6 +3,7 @@
 
 #include <array>
 #include <set>
+#include <vector>
 
 #include "overworld/Shapes/Shape.h"
 
@@ -11,8 +12,12 @@ namespace owds {
 
   class Actor
   {
+    friend class Joint;
+
   protected:
-    explicit Actor(const owds::Shape& shape);
+    explicit Actor(
+      const owds::Shape& collision_shape,
+      const std::vector<owds::Shape>& visual_shapes);
 
   public:
     virtual ~Actor() noexcept;
@@ -55,13 +60,22 @@ namespace owds {
      */
     virtual void setPositionAndOrientation(const std::array<float, 3>& position, const std::array<float, 3>& orientation) = 0;
 
+    /**
+     * @return todo: document this
+     */
     [[nodiscard]] virtual std::array<float, 16> getModelMatrix() const = 0;
+
+    /**
+     *
+     * @return todo: document this
+     */
     [[nodiscard]] virtual std::pair<std::array<float, 3>, std::array<float, 3>> getPositionAndOrientation() const = 0;
 
     // Each actor is associated with a non-zero, unique id.
     const std::size_t unique_id_{};
+    const owds::Shape collision_shape_;
+    const std::vector<owds::Shape> visual_shapes_;
 
-    owds::Shape shape_;
     std::set<owds::Joint*> joints_;
   };
 } // namespace owds

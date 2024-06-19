@@ -7,8 +7,11 @@
 #include "overworld/Physics/Bullet3/Context.h"
 
 namespace owds::bullet3 {
-  Actor::Actor(owds::bullet3::Context& ctx, const owds::Shape& shape)
-    : owds::Actor(shape),
+  Actor::Actor(
+    owds::bullet3::Context& ctx,
+    const owds::Shape& collision_shape,
+    const std::vector<owds::Shape>& visual_shapes)
+    : owds::Actor(collision_shape, visual_shapes),
       ctx_(ctx)
   {}
 
@@ -19,7 +22,7 @@ namespace owds::bullet3 {
 
   void Actor::setup()
   {
-    std::visit([this](auto& elem) { setup(elem); }, shape_);
+    std::visit([this](auto& elem) { setup(elem); }, collision_shape_);
 
     const auto default_mass = 1.f;
 
