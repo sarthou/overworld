@@ -7,6 +7,7 @@
 #include "overworld/Shapes/ShapeCapsule.h"
 #include "overworld/Shapes/ShapeCustomMesh.h"
 #include "overworld/Shapes/ShapeCylinder.h"
+#include "overworld/Shapes/ShapeDummy.h"
 #include "overworld/Shapes/ShapeSphere.h"
 
 namespace owds {
@@ -15,6 +16,7 @@ namespace owds {
     ShapeCapsule,
     ShapeCustomMesh,
     ShapeCylinder,
+    ShapeDummy,
     ShapeSphere>;
 }
 
