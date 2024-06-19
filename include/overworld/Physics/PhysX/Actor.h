@@ -46,11 +46,12 @@ namespace owds::physx {
     [[nodiscard]] std::array<float, 16> getModelMatrix() const override;
     [[nodiscard]] std::pair<std::array<float, 3>, std::array<float, 3>> getPositionAndOrientation() const override;
 
-    void setup(const owds::ShapeBox& shape);
-    void setup(const owds::ShapeCapsule& shape);
-    void setup(const owds::ShapeCustomMesh& shape);
-    void setup(const owds::ShapeCylinder& shape);
-    void setup(const owds::ShapeSphere& shape);
+    void setupPhysicsShape(const owds::ShapeBox& shape);
+    void setupPhysicsShape(const owds::ShapeCapsule& shape);
+    void setupPhysicsShape(const owds::ShapeCustomMesh& shape);
+    void setupPhysicsShape(const owds::ShapeCylinder& shape);
+    void setupPhysicsShape(const owds::ShapeDummy& shape);
+    void setupPhysicsShape(const owds::ShapeSphere& shape);
 
     owds::physx::Context& ctx_;
     std::vector<owds::Shape> visual_shapes_;
