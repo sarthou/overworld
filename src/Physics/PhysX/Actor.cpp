@@ -30,7 +30,7 @@ namespace owds::physx {
 
     px_material_ = sdk->createMaterial(0.5f, 0.5f, 0.5f);
 
-    std::visit(([this](auto& elem) { setup(elem); }), collision_shape_);
+    std::visit(([this](auto& elem) { setupPhysicsShape(elem); }), collision_shape_);
 
     px_actor_ = sdk->createRigidDynamic(::physx::PxTransform(::physx::PxVec3(0, 20, 0)));
 
@@ -131,7 +131,7 @@ namespace owds::physx {
       owds::BitCast<std::array<float, 3>>(euler_angles)};
   }
 
-  void Actor::setup(const owds::ShapeBox& shape)
+  void Actor::setupPhysicsShape(const owds::ShapeBox& shape)
   {
     px_geometries_.emplace_back(std::make_unique<::physx::PxBoxGeometry>(
       static_cast<::physx::PxReal>(shape.half_extents_[0]),
@@ -139,14 +139,14 @@ namespace owds::physx {
       static_cast<::physx::PxReal>(shape.half_extents_[2])));
   }
 
-  void Actor::setup(const owds::ShapeCapsule& shape)
+  void Actor::setupPhysicsShape(const owds::ShapeCapsule& shape)
   {
     px_geometries_.emplace_back(std::make_unique<::physx::PxCapsuleGeometry>(
       static_cast<::physx::PxReal>(shape.radius_),
       static_cast<::physx::PxReal>(shape.height_) / 2));
   }
 
-  void Actor::setup(const owds::ShapeCustomMesh& shape)
+  void Actor::setupPhysicsShape(const owds::ShapeCustomMesh& shape)
   {
     auto params = ::physx::PxCookingParams(::physx::PxTolerancesScale());
     params.convexMeshCookingType = ::physx::PxConvexMeshCookingType::eQUICKHULL;
@@ -257,15 +257,20 @@ namespace owds::physx {
     }
   }
 
-  void Actor::setup(const owds::ShapeCylinder& shape)
+  void Actor::setupPhysicsShape(const owds::ShapeCylinder& shape)
   {
-    setup(owds::ShapeCustomMesh{
-      .scale_ = std::array<float, 3>{shape.radius_, shape.height_, shape.radius_},
-      .custom_model_ = shape.cylinder_model_
+    setupPhysicsShape(owds::ShapeCustomMesh{
+      std::array<float, 3>{shape.radius_, shape.height_, shape.radius_},
+      shape.cylinder_model_
     });
   }
 
-  void Actor::setup(const owds::ShapeSphere& shape)
+  void Actor::setupPhysicsShape(const owds::ShapeDummy& shape)
+  {
+    (void) shape;
+  }
+
+  void Actor::setupPhysicsShape(const owds::ShapeSphere& shape)
   {
     px_geometries_.emplace_back(std::make_unique<::physx::PxSphereGeometry>(
       static_cast<::physx::PxReal>(shape.radius_)));
