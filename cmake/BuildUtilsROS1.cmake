@@ -45,9 +45,10 @@ function(owds_add_generic TARGET)
             CXX_STANDARD 17
             CXX_STANDARD_REQUIRED ON)
 
-    target_compile_options(${TARGET}
-            PRIVATE
-            -Wall -Wextra)
+    target_compile_options(${TARGET_NAME}
+        PRIVATE
+            $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
+            $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -Wpedantic -Werror>)
 
     target_enable_sanitizers(${TARGET})
 endfunction(owds_add_generic)

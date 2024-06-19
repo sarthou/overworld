@@ -60,7 +60,8 @@ function(owds_add_generic TARGET)
 
     target_compile_options(${TARGET}
         PRIVATE
-            -Wall -Wextra)
+            $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
+            $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -Wpedantic -Werror>)
 
     owds_enable_sanitization(${TARGET})
 endfunction(owds_add_generic)
