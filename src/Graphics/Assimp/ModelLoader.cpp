@@ -9,11 +9,11 @@
 #include "overworld/Graphics/Base/Model.h"
 
 namespace owds::assimp {
-  owds::Mesh processMesh(const aiMesh* mesh, const aiScene* scene)
+  owds::Mesh processMesh(const aiMesh* mesh)
   {
     owds::Mesh out_mesh{};
 
-    for(auto i = 0; i < mesh->mNumVertices; i++)
+    for(auto i = 0u; i < mesh->mNumVertices; i++)
     {
       Vertex vertex{};
 
@@ -39,27 +39,27 @@ namespace owds::assimp {
       out_mesh.vertices_.emplace_back(vertex);
     }
 
-    for(auto i = 0; i < mesh->mNumFaces; i++)
+    for(auto i = 0u; i < mesh->mNumFaces; i++)
     {
       const aiFace face = mesh->mFaces[i];
 
-      for(auto j = 0; j < face.mNumIndices; j++)
+      for(auto j = 0u; j < face.mNumIndices; j++)
       {
         out_mesh.indices_.emplace_back(face.mIndices[j]);
       }
     }
 
-    return std::move(out_mesh);
+    return out_mesh;
   }
 
   void processNode(owds::Model& out, const aiNode* node, const aiScene* scene)
   {
-    for(auto i = 0; i < node->mNumMeshes; i++)
+    for(auto i = 0u; i < node->mNumMeshes; i++)
     {
-      out.meshes_.emplace_back(processMesh(scene->mMeshes[node->mMeshes[i]], scene));
+      out.meshes_.emplace_back(processMesh(scene->mMeshes[node->mMeshes[i]]));
     }
 
-    for(auto i = 0; i < node->mNumChildren; i++)
+    for(auto i = 0u; i < node->mNumChildren; i++)
     {
       processNode(out, node->mChildren[i], scene);
     }
