@@ -11,6 +11,7 @@ namespace owds {
   class ShapeCapsule;
   class ShapeCustomMesh;
   class ShapeCylinder;
+  class ShapeDummy;
   class ShapeSphere;
   class Model;
   class Mesh;
@@ -42,11 +43,12 @@ namespace owds::bgfx {
   protected:
     void commitCamera(const owds::bgfx::Camera& camera);
     void commitWorld(const owds::World& world);
-    void queueActorBatch(const owds::Actor& actor, const owds::ShapeBox& box);
-    void queueActorBatch(const owds::Actor& actor, const owds::ShapeCapsule& box);
-    void queueActorBatch(const owds::Actor& actor, const owds::ShapeCustomMesh& box);
-    void queueActorBatch(const owds::Actor& actor, const owds::ShapeCylinder& box);
-    void queueActorBatch(const owds::Actor& actor, const owds::ShapeSphere& box);
+    void queueActorBatch(const owds::Actor& actor, const owds::ShapeBox& shape);
+    void queueActorBatch(const owds::Actor& actor, const owds::ShapeCapsule& shape);
+    void queueActorBatch(const owds::Actor& actor, const owds::ShapeCustomMesh& shape);
+    void queueActorBatch(const owds::Actor& actor, const owds::ShapeCylinder& shape);
+    void queueActorBatch(const owds::Actor& actor, const owds::ShapeDummy& shape);
+    void queueActorBatch(const owds::Actor& actor, const owds::ShapeSphere& shape);
 
     void tryCacheModel(const owds::Model& model);
     void queueModelBatch(const owds::Model& model, const std::array<float, 16>& model_mat);
