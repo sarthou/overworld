@@ -47,6 +47,13 @@ namespace owds::bullet3 {
     const std::array<float, 3>& joint1_position,
     const std::array<float, 3>& joint1_orientation)
   {
+    (void) actor0;
+    (void) joint0_position;
+    (void) joint0_orientation;
+    (void) actor1;
+    (void) joint1_position;
+    (void) joint1_orientation;
+    assert(false && "not implemented");
   }
 
   owds::JointContinuous& World::createJointContinuous(
@@ -57,6 +64,13 @@ namespace owds::bullet3 {
     const std::array<float, 3>& joint1_position,
     const std::array<float, 3>& joint1_orientation)
   {
+    (void) actor0;
+    (void) joint0_position;
+    (void) joint0_orientation;
+    (void) actor1;
+    (void) joint1_position;
+    (void) joint1_orientation;
+    assert(false && "not implemented");
   }
 
   owds::JointPrismatic& World::createJointPrismatic(
@@ -91,6 +105,13 @@ namespace owds::bullet3 {
     const std::array<float, 3>& joint1_position,
     const std::array<float, 3>& joint1_orientation)
   {
+    (void) actor0;
+    (void) joint0_position;
+    (void) joint0_orientation;
+    (void) actor1;
+    (void) joint1_position;
+    (void) joint1_orientation;
+    assert(false && "not implemented");
   }
 
   owds::JointFloating& World::createJointFloating(
@@ -101,6 +122,13 @@ namespace owds::bullet3 {
     const std::array<float, 3>& joint1_position,
     const std::array<float, 3>& joint1_orientation)
   {
+    (void) actor0;
+    (void) joint0_position;
+    (void) joint0_orientation;
+    (void) actor1;
+    (void) joint1_position;
+    (void) joint1_orientation;
+    assert(false && "not implemented");
   }
 
   owds::JointPlanar& World::createJointPlanar(
@@ -111,6 +139,13 @@ namespace owds::bullet3 {
     const std::array<float, 3>& joint1_position,
     const std::array<float, 3>& joint1_orientation)
   {
+    (void) actor0;
+    (void) joint0_position;
+    (void) joint0_orientation;
+    (void) actor1;
+    (void) joint1_position;
+    (void) joint1_orientation;
+    assert(false && "not implemented");
   }
 
   void World::setGravity(const std::array<float, 3>& gravity)
