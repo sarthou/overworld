@@ -4,6 +4,7 @@
 #include <array>
 #include <filesystem>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "overworld/Shapes/Shape.h"
@@ -11,7 +12,7 @@
 namespace urdf {
   class Link;
   class Joint;
-}
+} // namespace urdf
 
 namespace owds {
   class Actor;
@@ -30,7 +31,7 @@ namespace owds {
     explicit World(const std::filesystem::path& base_assets_path);
 
   public:
-    virtual ~World() = default;
+    virtual ~World();
 
     [[nodiscard]] virtual std::string getBackendName() const = 0;
     [[nodiscard]] virtual std::string getFullyQualifiedBackendName() const = 0;
@@ -57,7 +58,7 @@ namespace owds {
       const owds::Shape& collision_shape,
       const std::vector<owds::Shape>& visual_shapes) = 0;
 
-    [[nodiscard]] owds::Robot& loadRobot(const std::string& path);
+    [[nodiscard]] owds::Robot& loadRobotFromDescription(const std::string& path);
 
     /**
      * @return
@@ -199,6 +200,7 @@ namespace owds {
     owds::Model& preloaded_box_model_;
     owds::Model& preloaded_cylinder_model_;
     owds::Model& preloaded_sphere_model_;
+    std::unordered_map<owds::Robot*, std::unique_ptr<owds::Robot>> loaded_robots_;
   };
 } // namespace owds
 
