@@ -12,6 +12,7 @@
 namespace urdf {
   class Link;
   class Joint;
+  class Geometry;
 } // namespace urdf
 
 namespace owds {
@@ -87,10 +88,10 @@ namespace owds {
     virtual owds::JointRevolute& createJointRevolute [[nodiscard]] (
       owds::Actor& actor0,
       const std::array<float, 3>& joint0_position,
-      const std::array<float, 3>& joint0_orientation,
+      const std::array<float, 4>& joint0_orientation,
       owds::Actor& actor1,
       const std::array<float, 3>& joint1_position,
-      const std::array<float, 3>& joint1_orientation) = 0;
+      const std::array<float, 4>& joint1_orientation) = 0;
 
     /**
      * A continuous hinge joint that rotates around the axis and has no upper and lower limits.
@@ -104,10 +105,10 @@ namespace owds {
     virtual owds::JointContinuous& createJointContinuous [[nodiscard]] (
       owds::Actor& actor0,
       const std::array<float, 3>& joint0_position,
-      const std::array<float, 3>& joint0_orientation,
+      const std::array<float, 4>& joint0_orientation,
       owds::Actor& actor1,
       const std::array<float, 3>& joint1_position,
-      const std::array<float, 3>& joint1_orientation) = 0;
+      const std::array<float, 4>& joint1_orientation) = 0;
 
     /**
      * A sliding joint that slides along the axis, and has a limited range specified by the upper and lower limits.
@@ -122,10 +123,10 @@ namespace owds {
     virtual owds::JointPrismatic& createJointPrismatic [[nodiscard]] (
       owds::Actor& actor0,
       const std::array<float, 3>& joint0_position,
-      const std::array<float, 3>& joint0_orientation,
+      const std::array<float, 4>& joint0_orientation,
       owds::Actor& actor1,
       const std::array<float, 3>& joint1_position,
-      const std::array<float, 3>& joint1_orientation) = 0;
+      const std::array<float, 4>& joint1_orientation) = 0;
 
     /**
      * All degrees of freedom are locked.
@@ -140,10 +141,10 @@ namespace owds {
     virtual owds::JointFixed& createJointFixed [[nodiscard]] (
       owds::Actor& actor0,
       const std::array<float, 3>& joint0_position,
-      const std::array<float, 3>& joint0_orientation,
+      const std::array<float, 4>& joint0_orientation,
       owds::Actor& actor1,
       const std::array<float, 3>& joint1_position,
-      const std::array<float, 3>& joint1_orientation) = 0;
+      const std::array<float, 4>& joint1_orientation) = 0;
 
     /**
      * This joint allows motion for all 6 degrees of freedom.
@@ -158,10 +159,10 @@ namespace owds {
     virtual owds::JointFloating& createJointFloating [[nodiscard]] (
       owds::Actor& actor0,
       const std::array<float, 3>& joint0_position,
-      const std::array<float, 3>& joint0_orientation,
+      const std::array<float, 4>& joint0_orientation,
       owds::Actor& actor1,
       const std::array<float, 3>& joint1_position,
-      const std::array<float, 3>& joint1_orientation) = 0;
+      const std::array<float, 4>& joint1_orientation) = 0;
 
     /**
      * This joint allows motion in a plane perpendicular to the axis.
@@ -175,10 +176,10 @@ namespace owds {
     virtual owds::JointPlanar& createJointPlanar [[nodiscard]] (
       owds::Actor& actor0,
       const std::array<float, 3>& joint0_position,
-      const std::array<float, 3>& joint0_orientation,
+      const std::array<float, 4>& joint0_orientation,
       owds::Actor& actor1,
       const std::array<float, 3>& joint1_position,
-      const std::array<float, 3>& joint1_orientation) = 0;
+      const std::array<float, 4>& joint1_orientation) = 0;
 
     /**
      * @param gravity Self-explanatory.
@@ -192,9 +193,10 @@ namespace owds {
 
   protected:
     void processLinks(owds::Robot& robot, const urdf::Link& link);
-    void processLink(owds::Robot& robot, const urdf::Link& link);
+    void processLink(owds::Robot& robot, const urdf::Link& urdf_link);
     void processJoints(owds::Robot& robot, const urdf::Link& link);
     void processJoint(owds::Robot& robot, const urdf::Joint& joint);
+    owds::Shape processShape(const urdf::Geometry& shape);
 
     std::filesystem::path base_assets_path_;
     owds::Model& preloaded_box_model_;
