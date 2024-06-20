@@ -173,6 +173,7 @@ bgfx_compile_shader_to_header(
 owds_add_library(owds_graphics
     "src/Graphics/Assimp/ModelLoader.cpp"
     "src/Graphics/Base/Mesh.cpp"
+    "src/Graphics/Base/Model.cpp"
     "src/Graphics/Base/ModelManager.cpp"
     "src/Graphics/Base/Renderer.cpp"
     "src/Graphics/BGFX/Camera.cpp"
