@@ -6,6 +6,9 @@
 namespace owds {
   class Model;
 
+  /**
+   * todo: Turns out we don't need this I think
+   */
   class ShapeCapsule
   {
   public:
