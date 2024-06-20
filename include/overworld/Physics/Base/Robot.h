@@ -3,7 +3,6 @@
 
 #include <string>
 #include <unordered_map>
-#include <functional>
 
 namespace owds {
   class Actor;
@@ -12,7 +11,7 @@ namespace owds {
   {
   public:
     std::string name_;
-    std::unordered_map<std::string, std::reference_wrapper<Actor>> links_;
+    std::unordered_map<std::string, Actor*> links_;
   };
 } // namespace owds
 
