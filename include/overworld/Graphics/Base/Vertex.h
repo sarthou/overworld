@@ -12,7 +12,6 @@ namespace owds {
     std::array<float, 3> position_;
     std::array<float, 3> normal_;
     std::array<float, 2> uv_;
-    owds::Color rgba_;
   };
 } // namespace owds
 
