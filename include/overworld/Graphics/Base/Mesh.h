@@ -13,7 +13,7 @@ namespace owds {
 
     explicit Mesh(std::size_t id);
 
-    // As for actor, each mesh is associated with a non-zero, unique id.
+    // As for actors, each mesh is associated with a non-zero, unique id.
     const std::size_t id_;
 
     std::string name_ {};
