@@ -1,6 +1,8 @@
 #ifndef OWDS_GRAPHICS_BASE_COLOR_H
 #define OWDS_GRAPHICS_BASE_COLOR_H
 
+#include <cstdint>
+
 namespace owds {
   class Color
   {
