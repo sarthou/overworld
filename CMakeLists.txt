@@ -213,6 +213,7 @@ endif ()
 owds_add_ros_library(owds_physics
     "src/Physics/Base/Joints/Joint.cpp"
     "src/Physics/Base/Actor.cpp"
+    "src/Physics/Base/Robot.cpp"
     "src/Physics/Base/World.cpp"
     ${OWDS_PHYSICS_SRC})
 
