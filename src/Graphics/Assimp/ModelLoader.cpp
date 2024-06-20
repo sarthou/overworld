@@ -35,8 +35,6 @@ namespace owds::assimp {
           mesh->mTextureCoords[0][i].y};
       }
 
-      vertex.rgba_ = {255, 255, 255, 255};
-
       out_mesh.vertices_.emplace_back(vertex);
     }
 
@@ -57,6 +55,14 @@ namespace owds::assimp {
   {
     for(auto i = 0u; i < node->mNumMeshes; i++)
     {
+      if (scene->mNumTextures > 0)
+      {
+        const auto& tex = scene->mTextures[0];
+        out.texture_path_ = tex->mFilename.C_Str();
+        out.texture_width_ = tex->mWidth;
+        out.texture_height_ = tex->mHeight;
+      }
+
       out.meshes_.emplace_back(processMesh(scene->mMeshes[node->mMeshes[i]]));
     }
 
@@ -90,7 +96,7 @@ namespace owds::assimp {
 
   std::unique_ptr<owds::Model> ModelLoader::load(const std::filesystem::path& path) const
   {
-    auto model = std::make_unique<owds::Model>();
+    auto model = std::make_unique<owds::Model>(owds::Model::create());
     model->source_path_ = path.string();
 
     if(!loadModel(*model, path))

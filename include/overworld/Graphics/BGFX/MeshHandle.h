@@ -7,6 +7,7 @@ namespace owds::bgfx {
   class MeshHandle
   {
   public:
+    ::bgfx::TextureHandle tex_{};
     ::bgfx::VertexBufferHandle vbh_{};
     ::bgfx::IndexBufferHandle ibh_{};
   };

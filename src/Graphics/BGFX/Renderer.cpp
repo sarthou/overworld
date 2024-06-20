@@ -114,7 +114,21 @@ namespace owds::bgfx {
     ctx_->loaded_programs_["default"] = ::bgfx::createProgram(vsh, fsh, true);
     ctx_->is_initialized_ = true;
 
-    ctx_->loaded_uniforms_["u_color"] = ::bgfx::createUniform("u_color", ::bgfx::UniformType::Vec4);
+    ctx_->loaded_uniforms_["u_tex_color"] = ::bgfx::createUniform("u_tex_color", ::bgfx::UniformType::Sampler);
+    ctx_->loaded_uniforms_["u_seg_color"] = ::bgfx::createUniform("u_seg_color", ::bgfx::UniformType::Vec4);
+
+    owds::Color white_pixel { 255, 255, 255, 255 };
+
+    const auto mem = ::bgfx::makeRef(&white_pixel, sizeof white_pixel);
+
+    ctx_->white_tex_ = ::bgfx::createTexture2D(
+      1,
+      1,
+      true,
+      1,
+      ::bgfx::TextureFormat::RGBA8,
+      0,
+      mem);
 
     ::bgfx::setDebug(BGFX_DEBUG_STATS);
 
@@ -163,7 +177,7 @@ namespace owds::bgfx {
       ctx_->cached_world_list_.emplace(std::addressof(camera->currently_viewed_world_.get()));
     }
 
-    for(auto& [mesh_id, batch] : ctx_->current_mesh_batches_)
+    for(auto& [tex, batch] : ctx_->current_mesh_batches_)
     {
       batch.clear();
     }
@@ -200,12 +214,12 @@ namespace owds::bgfx {
   void Renderer::commitCamera(const owds::bgfx::Camera& camera)
   {
     constexpr auto state = 0 |
-                       BGFX_STATE_WRITE_RGB |
-                       BGFX_STATE_WRITE_A |
-                       BGFX_STATE_WRITE_Z |
-                       BGFX_STATE_DEPTH_TEST_LESS |
-                       BGFX_STATE_CULL_CCW |
-                       BGFX_STATE_MSAA;
+                           BGFX_STATE_WRITE_RGB |
+                           BGFX_STATE_WRITE_A |
+                           BGFX_STATE_WRITE_Z |
+                           BGFX_STATE_DEPTH_TEST_LESS |
+                           BGFX_STATE_CULL_CCW |
+                           BGFX_STATE_MSAA;
 
     (void)camera;
     ::bgfx::touch(0);
@@ -275,6 +289,19 @@ namespace owds::bgfx {
 
   void Renderer::tryCacheModel(const owds::Model& model)
   {
+    auto tex = ctx_->white_tex_;
+
+    if (!model.texture_path_.empty())
+    {
+      printf("req tex path: %s\n", model.texture_path_.c_str());
+      /*tex = ::bgfx::createTexture2D(
+                       model.texture_width_,
+                       model.texture_height_,
+                       true,
+                       4,
+                       ::bgfx::TextureFormat::RGBA8);*/
+    }
+
     for(const auto& mesh : model.meshes_)
     {
       if(ctx_->cached_meshes_.count(mesh.id_))
@@ -286,12 +313,14 @@ namespace owds::bgfx {
 
       ctx_->cached_meshes_.emplace(
         mesh.id_, owds::bgfx::MeshHandle{
+                    tex,
                     ::bgfx::createVertexBuffer(
                       ::bgfx::makeRef(mesh.vertices_.data(), mesh.vertices_.size() * sizeof(mesh.vertices_[0])),
                       Vertex::getMSLayout()),
                     ::bgfx::createIndexBuffer(
                       ::bgfx::makeRef(mesh.indices_.data(), mesh.indices_.size() * sizeof(mesh.indices_[0])),
                       BGFX_BUFFER_INDEX32)});
+      ctx_->cached_textures_[model.id_] = tex;
     }
   }
 
@@ -301,7 +330,7 @@ namespace owds::bgfx {
 
     for(auto& mesh : model.meshes_)
     {
-      auto& mesh_batch = ctx_->current_mesh_batches_[mesh.id_];
+      auto& mesh_batch = ctx_->current_mesh_batches_[model.id_][mesh.id_];
 
       mesh_batch.emplace_back(owds::InstanceData{
         model_mat,
@@ -313,50 +342,59 @@ namespace owds::bgfx {
   {
     srand(0);
 
-    for(auto& [mesh_id, transforms] : ctx_->current_mesh_batches_)
+    for(auto& [model_id, batch] : ctx_->current_mesh_batches_)
     {
-      auto& mesh = ctx_->cached_meshes_[mesh_id];
+      ::bgfx::setTexture(0, ctx_->loaded_uniforms_["u_tex_color"], ctx_->cached_textures_[model_id]);
 
-      for(auto& transform : transforms)
+      for(auto& [mesh_id, transforms] : batch)
       {
-        ::bgfx::setTransform(transform.mvp_.data(), 1);
+        const auto& mesh = ctx_->cached_meshes_[mesh_id];
 
-        auto u_color = glm::vec4(
-          0.1f + rand() % 200 / 128.f,
-          0.1f + rand() % 200 / 128.f,
-          0.1f + rand() % 200 / 128.f,
-          1);
+        for(const auto& transform : transforms)
+        {
+          ::bgfx::setTransform(transform.mvp_.data(), 1);
 
-        ::bgfx::setUniform(ctx_->loaded_uniforms_["u_color"], glm::value_ptr(u_color));
+          auto u_seg_color = glm::vec4(
+            0.1f + rand() % 200 / 128.f,
+            0.1f + rand() % 200 / 128.f,
+            0.1f + rand() % 200 / 128.f,
+            1);
 
-        ::bgfx::setVertexBuffer(0, mesh.vbh_);
-        ::bgfx::setIndexBuffer(mesh.ibh_);
+          ::bgfx::setUniform(ctx_->loaded_uniforms_["u_seg_color"], glm::value_ptr(u_seg_color));
 
-        ::bgfx::setState(state);
-        ::bgfx::submit(0, ctx_->loaded_programs_["default"]);
+          ::bgfx::setVertexBuffer(0, mesh.vbh_);
+          ::bgfx::setIndexBuffer(mesh.ibh_);
+
+          ::bgfx::setState(state);
+          ::bgfx::submit(0, ctx_->loaded_programs_["default"]);
+        }
       }
     }
   }
 
   void Renderer::renderInstanced(const std::uint64_t state)
   {
-    // todo
-    for(auto& [mesh_id, transforms] : ctx_->current_mesh_batches_)
+    for(auto& [model_id, batch] : ctx_->current_mesh_batches_)
     {
-      auto& mesh = ctx_->cached_meshes_[mesh_id];
+      ::bgfx::setTexture(0, ctx_->loaded_uniforms_["u_tex_color"], ctx_->cached_textures_[model_id]);
 
-      ::bgfx::InstanceDataBuffer idb{};
-      ::bgfx::allocInstanceDataBuffer(&idb, transforms.size(), sizeof(transforms[0]));
+      for(auto& [mesh_id, transforms] : batch)
+      {
+        auto& mesh = ctx_->cached_meshes_[mesh_id];
 
-      std::memcpy(idb.data, transforms.data(), transforms.size() * sizeof(transforms[0]));
+        ::bgfx::InstanceDataBuffer idb{};
+        ::bgfx::allocInstanceDataBuffer(&idb, transforms.size(), sizeof(transforms[0]));
 
-      ::bgfx::setVertexBuffer(0, mesh.vbh_);
-      ::bgfx::setIndexBuffer(mesh.ibh_);
+        std::memcpy(idb.data, transforms.data(), transforms.size() * sizeof(transforms[0]));
 
-      ::bgfx::setInstanceDataBuffer(&idb);
+        ::bgfx::setVertexBuffer(0, mesh.vbh_);
+        ::bgfx::setIndexBuffer(mesh.ibh_);
 
-      ::bgfx::setState(state);
-      ::bgfx::submit(0, ctx_->loaded_programs_["default"]);
+        ::bgfx::setInstanceDataBuffer(&idb);
+
+        ::bgfx::setState(state);
+        ::bgfx::submit(0, ctx_->loaded_programs_["default"]);
+      }
     }
   }
 } // namespace owds::bgfx
