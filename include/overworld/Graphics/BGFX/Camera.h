@@ -23,7 +23,7 @@ namespace owds::bgfx {
     float field_of_view_ = 1.f;
     std::array<float, 3> world_eye_position_{};
     std::array<float, 3> world_eye_front_{};
-    std::array<float, 3> world_eye_up_ = {0.f, 1.f, 0.f};
+    std::array<float, 3> world_eye_up_ = {0.f, 0., 1.f};
     std::array<float, 16> view_matrix_;
     std::array<float, 16> proj_matrix_;
     std::reference_wrapper<owds::World> currently_viewed_world_;

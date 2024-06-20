@@ -21,7 +21,7 @@ namespace owds::physx {
 
     // Create new scene
     auto sceneDesc = ::physx::PxSceneDesc(shared_ctx_->px_physics_->getTolerancesScale());
-    sceneDesc.gravity = ::physx::PxVec3(0.0f, -9.81f, 0.0f);
+    sceneDesc.gravity = ::physx::PxVec3(0.0f, 0, -9.81f);
     sceneDesc.cpuDispatcher = shared_ctx_->px_dispatcher_.get();
     sceneDesc.filterShader = ::physx::PxDefaultSimulationFilterShader;
     sceneDesc.cudaContextManager = shared_ctx_->px_cuda_context_manager_.get();
@@ -38,7 +38,7 @@ namespace owds::physx {
       nvPvdClient->setScenePvdFlag(::physx::PxPvdSceneFlag::eTRANSMIT_SCENEQUERIES, true);
     }
 
-    const auto groundPlane = PxCreatePlane(*shared_ctx_->px_physics_, ::physx::PxPlane(0, 1, 0, 0), *shared_ctx_->px_default_material_);
+    const auto groundPlane = PxCreatePlane(*shared_ctx_->px_physics_, ::physx::PxPlane(0, 0, 1, 0), *shared_ctx_->px_default_material_);
     px_scene_->addActor(*groundPlane);
 
     minimize_memory_footprint_ = minimize_memory_footprint;
