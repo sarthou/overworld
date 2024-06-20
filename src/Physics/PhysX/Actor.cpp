@@ -67,7 +67,13 @@ namespace owds::physx {
 
   void Actor::setMass(const float mass_kg)
   {
-    px_actor_->setMass(static_cast<::physx::PxReal>(mass_kg));
+    if (mass_kg <= 0)
+    {
+      setPhysicsEnabled(false);
+    } else
+    {
+      px_actor_->setMass(static_cast<::physx::PxReal>(mass_kg));
+    }
   }
 
   void Actor::setStaticFriction(const float coefficient)
@@ -85,10 +91,8 @@ namespace owds::physx {
     px_material_->setRestitution(coefficient);
   }
 
-  void Actor::setPositionAndOrientation(const std::array<float, 3>& position, const std::array<float, 3>& orientation)
+  void Actor::setPositionAndOrientation(const std::array<float, 3>& position, const std::array<float, 4>& orientation)
   {
-    const auto orientation_quat = glm::quat(owds::BitCast<glm::vec3>(orientation));
-
     const auto px_transform =
       ::physx::PxTransform(
         ::physx::PxVec3(
@@ -96,10 +100,10 @@ namespace owds::physx {
           static_cast<::physx::PxReal>(position[1]),
           static_cast<::physx::PxReal>(position[2])),
         ::physx::PxQuat(
-          static_cast<::physx::PxReal>(orientation_quat.x),
-          static_cast<::physx::PxReal>(orientation_quat.y),
-          static_cast<::physx::PxReal>(orientation_quat.z),
-          static_cast<::physx::PxReal>(orientation_quat.w)));
+          static_cast<::physx::PxReal>(orientation[0]),
+          static_cast<::physx::PxReal>(orientation[1]),
+          static_cast<::physx::PxReal>(orientation[2]),
+          static_cast<::physx::PxReal>(orientation[3])));
 
     if(is_kinematic_)
     {
@@ -148,6 +152,8 @@ namespace owds::physx {
 
   void Actor::setupPhysicsShape(const owds::ShapeCustomMesh& shape)
   {
+    printf("setupPhysicsShape '%s'\n", shape.custom_model_.get().source_path_.c_str());
+
     auto params = ::physx::PxCookingParams(::physx::PxTolerancesScale());
     params.convexMeshCookingType = ::physx::PxConvexMeshCookingType::eQUICKHULL;
     params.midphaseDesc = ::physx::PxMeshMidPhase::eBVH34;
@@ -170,6 +176,14 @@ namespace owds::physx {
 
     for(const auto& mesh : shape.custom_model_.get().meshes_)
     {
+      printf("Processing mesh '%s'\n", mesh.name_.c_str());
+
+      if (mesh.vertices_.size() < 4)
+      {
+        printf("Ignoring! Less than 4 vertices..\n");
+        continue;
+      }
+
       const auto& s_ctx = owds::physx::Context::shared_ctx_;
 
       if(!s_ctx->px_cached_meshes.count(mesh.id_))
@@ -234,7 +248,7 @@ namespace owds::physx {
           assert(false && "eFAILURE");
           break;
         case ResultTy::eNON_GPU_COMPATIBLE:
-          assert(false && "eNON_GPU_COMPATIBLE");
+          // assert(false && "eNON_GPU_COMPATIBLE");
           break;
         }
 

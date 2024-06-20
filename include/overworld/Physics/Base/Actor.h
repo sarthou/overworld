@@ -58,7 +58,7 @@ namespace owds {
      * @param position Absolute position.
      * @param orientation Absolute rotation, in radians.
      */
-    virtual void setPositionAndOrientation(const std::array<float, 3>& position, const std::array<float, 3>& orientation) = 0;
+    virtual void setPositionAndOrientation(const std::array<float, 3>& position, const std::array<float, 4>& orientation) = 0;
 
     /**
      * @return todo: document this

@@ -47,10 +47,10 @@ namespace owds::physx {
   owds::JointRevolute& World::createJointRevolute(
     owds::Actor& actor0,
     const std::array<float, 3>& joint0_position,
-    const std::array<float, 3>& joint0_orientation,
+    const std::array<float, 4>& joint0_orientation,
     owds::Actor& actor1,
     const std::array<float, 3>& joint1_position,
-    const std::array<float, 3>& joint1_orientation)
+    const std::array<float, 4>& joint1_orientation)
   {
     auto joint = std::make_unique<owds::physx::JointRevolute>(
       *ctx_,
@@ -71,10 +71,10 @@ namespace owds::physx {
   owds::JointContinuous& World::createJointContinuous(
     owds::Actor& actor0,
     const std::array<float, 3>& joint0_position,
-    const std::array<float, 3>& joint0_orientation,
+    const std::array<float, 4>& joint0_orientation,
     owds::Actor& actor1,
     const std::array<float, 3>& joint1_position,
-    const std::array<float, 3>& joint1_orientation)
+    const std::array<float, 4>& joint1_orientation)
   {
     auto joint = std::make_unique<owds::physx::JointContinuous>(
       *ctx_,
@@ -95,10 +95,10 @@ namespace owds::physx {
   owds::JointPrismatic& World::createJointPrismatic(
     owds::Actor& actor0,
     const std::array<float, 3>& joint0_position,
-    const std::array<float, 3>& joint0_orientation,
+    const std::array<float, 4>& joint0_orientation,
     owds::Actor& actor1,
     const std::array<float, 3>& joint1_position,
-    const std::array<float, 3>& joint1_orientation)
+    const std::array<float, 4>& joint1_orientation)
   {
     auto joint = std::make_unique<owds::physx::JointPrismatic>(
       *ctx_,
@@ -119,10 +119,10 @@ namespace owds::physx {
   owds::JointFixed& World::createJointFixed(
     owds::Actor& actor0,
     const std::array<float, 3>& joint0_position,
-    const std::array<float, 3>& joint0_orientation,
+    const std::array<float, 4>& joint0_orientation,
     owds::Actor& actor1,
     const std::array<float, 3>& joint1_position,
-    const std::array<float, 3>& joint1_orientation)
+    const std::array<float, 4>& joint1_orientation)
   {
     auto joint = std::make_unique<owds::physx::JointFixed>(
       *ctx_,
@@ -143,10 +143,10 @@ namespace owds::physx {
   owds::JointFloating& World::createJointFloating(
     owds::Actor& actor0,
     const std::array<float, 3>& joint0_position,
-    const std::array<float, 3>& joint0_orientation,
+    const std::array<float, 4>& joint0_orientation,
     owds::Actor& actor1,
     const std::array<float, 3>& joint1_position,
-    const std::array<float, 3>& joint1_orientation)
+    const std::array<float, 4>& joint1_orientation)
   {
     auto joint = std::make_unique<owds::physx::JointFloating>(
       *ctx_,
@@ -167,10 +167,10 @@ namespace owds::physx {
   owds::JointPlanar& World::createJointPlanar [[nodiscard]] (
     owds::Actor& actor0,
     const std::array<float, 3>& joint0_position,
-    const std::array<float, 3>& joint0_orientation,
+    const std::array<float, 4>& joint0_orientation,
     owds::Actor& actor1,
     const std::array<float, 3>& joint1_position,
-    const std::array<float, 3>& joint1_orientation)
+    const std::array<float, 4>& joint1_orientation)
   {
     auto joint = std::make_unique<owds::physx::JointPlanar>(
       *ctx_,

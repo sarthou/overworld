@@ -15,8 +15,8 @@ namespace owds::physx {
   void JointFixed::setup()
   {
     const auto& sdk = owds::physx::Context::shared_ctx_->px_physics_;
-    const auto quat_orientation0 = glm::quat(ToV3(location_.joint0_orientation_));
-    const auto quat_orientation1 = glm::quat(ToV3(location_.joint1_orientation_));
+    const auto quat_orientation0 = ToQT(location_.joint0_orientation_);
+    const auto quat_orientation1 = ToQT(location_.joint1_orientation_);
 
     joint_ = ::physx::PxFixedJointCreate(
       *sdk,
