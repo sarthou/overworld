@@ -1,10 +1,13 @@
 #include "overworld/Physics/Base/World.h"
 
 #include <cassert>
+#include <overworld/Physics/Base/World.h>
 #include <urdf/model.h>
 
 #include "overworld/Compat/ROS.h"
+#include "overworld/Graphics/Base/Material.h"
 #include "overworld/Graphics/Base/ModelManager.h"
+#include "overworld/Helper/ROS.h"
 #include "overworld/Physics/Base/Actor.h"
 #include "overworld/Physics/Base/Robot.h"
 
@@ -75,6 +78,11 @@ namespace owds {
 
     robot_ptr->name_ = urdf_model.name_;
 
+    for(auto& [name, material] : urdf_model.materials_)
+    {
+      processMaterial(*robot_ptr, *material);
+    }
+
     for(auto& [name, link] : urdf_model.links_)
     {
       processLinks(*robot_ptr, *link);
@@ -91,6 +99,21 @@ namespace owds {
     }
 
     return *robot_ptr;
+  }
+
+  void World::processMaterial(owds::Robot& robot, const urdf::Material& urdf_material)
+  {
+    auto material = std::make_unique<owds::Material>();
+    auto material_ptr = material.get();
+
+    material_ptr->color_rgba_ = {
+      static_cast<std::uint8_t>(urdf_material.color.r * 255.f),
+      static_cast<std::uint8_t>(urdf_material.color.g * 255.f),
+      static_cast<std::uint8_t>(urdf_material.color.b * 255.f),
+      static_cast<std::uint8_t>(urdf_material.color.a * 255.f)};
+    material_ptr->texture_path_ = owds::rosPkgPathToPath(urdf_material.texture_filename);
+
+
   }
 
   void World::processLinks(owds::Robot& robot, const urdf::Link& link)
@@ -112,7 +135,7 @@ namespace owds {
 
     if(urdf_link.collision)
     {
-      collision_shape = processShape(*urdf_link.collision->geometry);
+      collision_shape = convertShape(*urdf_link.collision->geometry);
     }
 
     assert(urdf_link.collision_array.size() <= 1 && "Links with multiple collision shapes are not supported at this moment.");
@@ -121,7 +144,7 @@ namespace owds {
 
     for(auto& visual_geometry : urdf_link.visual_array)
     {
-      visual_shapes.emplace_back(processShape(*visual_geometry->geometry));
+      visual_shapes.emplace_back(convertShape(*visual_geometry->geometry));
     }
 
     auto& link = createActor(collision_shape, visual_shapes);
@@ -208,7 +231,7 @@ namespace owds {
     }
   }
 
-  owds::Shape World::processShape(const urdf::Geometry& shape)
+  owds::Shape World::convertShape(const urdf::Geometry& shape)
   {
     switch(shape.type)
     {
@@ -234,22 +257,8 @@ namespace owds {
     case urdf::Geometry::MESH:
     {
       auto& mesh = dynamic_cast<const urdf::Mesh&>(shape);
-      const auto url_handler = mesh.filename.substr(0, 10);
 
-      assert(url_handler == "package://");
-
-      const auto total_path = mesh.filename.substr(10);
-
-      auto parent_path = std::filesystem::path(total_path);
-      while(parent_path.has_parent_path())
-      {
-        parent_path = parent_path.parent_path();
-      }
-
-      const auto assets_path = compat::owds_ros::getShareDirectory(parent_path.string());
-      const auto relative_path = total_path.substr(parent_path.string().size() + 1);
-
-      return createShapeFromModel(assets_path + "/" + relative_path,
+      return createShapeFromModel(owds::rosPkgPathToPath(mesh.filename),
                                   {static_cast<float>(mesh.scale.x),
                                    static_cast<float>(mesh.scale.y),
                                    static_cast<float>(mesh.scale.z)});

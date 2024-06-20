@@ -10,6 +10,7 @@
 #include "overworld/Shapes/Shape.h"
 
 namespace urdf {
+  class Material;
   class Link;
   class Joint;
   class Geometry;
@@ -25,6 +26,7 @@ namespace owds {
   class JointPlanar;
   class JointFloating;
   class Model;
+  class Material;
 
   class World
   {
@@ -192,17 +194,19 @@ namespace owds {
     virtual void stepSimulation(float delta_ms) = 0;
 
   protected:
+    void processMaterial(owds::Robot& robot, const urdf::Material& urdf_material);
     void processLinks(owds::Robot& robot, const urdf::Link& link);
     void processLink(owds::Robot& robot, const urdf::Link& urdf_link);
     void processJoints(owds::Robot& robot, const urdf::Link& link);
     void processJoint(owds::Robot& robot, const urdf::Joint& joint);
-    owds::Shape processShape(const urdf::Geometry& shape);
+    owds::Shape convertShape(const urdf::Geometry& shape);
 
     std::filesystem::path base_assets_path_;
     owds::Model& preloaded_box_model_;
     owds::Model& preloaded_cylinder_model_;
     owds::Model& preloaded_sphere_model_;
     std::unordered_map<owds::Robot*, std::unique_ptr<owds::Robot>> loaded_robots_;
+    std::unordered_map<owds::Material*, std::unique_ptr<owds::Material>> loaded_materials_;
   };
 } // namespace owds
 
