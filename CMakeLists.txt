@@ -16,6 +16,14 @@ endif()
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED on)
 
+option(OWDS_USE_PHYSX "Use PhysX instead of Bullet3" ON)
+
+if(DEFINED ENV{OWDS_USE_PHYSX})
+    set(OWDS_USE_PHYSX $ENV{OWDS_USE_PHYSX})
+else ()
+    message(WARNING "The environment variable 'OWDS_USE_PHYSX' is not set, assuming value = 1")
+endif ()
+
 if(NOT DEFINED ENV{ROS_VERSION})
     message(FATAL_ERROR "Please source your ROS1 / ROS2 environment before running cmake")
 endif()
@@ -54,37 +62,45 @@ find_package(glm CONFIG REQUIRED)
 include(FetchContent)
 include(CheckLanguage)
 
-check_language(CUDA)
+if (OWDS_USE_PHYSX)
+    ######################################################################
+    ## PhysX may be used as an alternative engine for better simulation ##
+    ## performance and GPU hardware acceleration if cuda is available.  ##
+    ######################################################################
+    FetchContent_Declare(
+        PhysX
+        GIT_REPOSITORY "https://github.com/NVIDIA-Omniverse/PhysX.git"
+        GIT_TAG        "106.0-physx-5.4.0"
+    )
+    FetchContent_GetProperties(PhysX)
 
-######################################################################
-## PhysX may be used as an alternative engine for better simulation ##
-## performance and GPU hardware acceleration if cuda is available.  ##
-######################################################################
-FetchContent_Declare(
-    PhysX
-    GIT_REPOSITORY "https://github.com/NVIDIA-Omniverse/PhysX.git"
-    GIT_TAG        "106.0-physx-5.4.0"
-)
-FetchContent_GetProperties(PhysX)
+    if(NOT physx_POPULATED)
+        FetchContent_Populate(PhysX)
+        message(STATUS "PhysX source dir: ${physx_SOURCE_DIR}")
+        message(STATUS "PhysX binary dir: ${physx_BINARY_DIR}")
 
-if(NOT physx_POPULATED)
-    FetchContent_Populate(PhysX)
-    message(STATUS "PhysX source dir: ${physx_SOURCE_DIR}")
-    message(STATUS "PhysX binary dir: ${physx_BINARY_DIR}")
+        # Hardcoded for now..
+        set(PHYSX_ROOT_DIR ${physx_SOURCE_DIR}/physx/)
+        set(TARGET_BUILD_PLATFORM "linux")
 
-    # Hardcoded for now..
-    set(PHYSX_ROOT_DIR ${physx_SOURCE_DIR}/physx/)
-    set(TARGET_BUILD_PLATFORM "linux")
+        # Dirty hack, please look away just for this one
+        macro(physx_workaround VAR access value current_list_file stack)
+            if ("${access}" STREQUAL "MODIFIED_ACCESS")
+                set(${VAR} 0)
+            endif ()
+        endmacro()
+        variable_watch(PUBLIC_RELEASE physx_workaround)
 
-    set(PX_GENERATE_STATIC_LIBRARIES 1)
-    set(PUBLIC_RELEASE CACHE STRING 1)
-    set(PX_BUILDPVDRUNTIME 1)
-    set(PX_BUILDSNIPPETS 0) # No we don't want any fancy demos :c
+        set(PX_GENERATE_SOURCE_DISTRO 1)
+        set(PX_GENERATE_STATIC_LIBRARIES 1)
+        set(PX_BUILDPVDRUNTIME 1)
+        set(PX_BUILDSNIPPETS 0) # No we don't want any fancy demos :c
 
-    set(PX_OUTPUT_LIB_DIR ${CMAKE_CURRENT_BINARY_DIR})
-    set(PX_OUTPUT_BIN_DIR ${CMAKE_CURRENT_BINARY_DIR})
+        set(PX_OUTPUT_LIB_DIR ${CMAKE_CURRENT_BINARY_DIR})
+        set(PX_OUTPUT_BIN_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
-    add_subdirectory(${physx_SOURCE_DIR}/physx/compiler/public/ ${physx_BINARY_DIR}/physx/)
+        add_subdirectory(${physx_SOURCE_DIR}/physx/compiler/public/ ${physx_BINARY_DIR}/physx/)
+    endif()
 endif()
 
 ######################################################################
@@ -137,10 +153,10 @@ owds_add_ros_library(overworld_compat "src/Compat/ROS.cpp")
 ###################################
 
 set(owds_vert_shaders
-        "shaders/vs_default.sc")
+    "shaders/vs_default.sc")
 
 set(owds_frag_shaders
-        "shaders/fs_default.sc")
+    "shaders/fs_default.sc")
 
 bgfx_compile_shader_to_header(
     TYPE VERTEX
@@ -173,39 +189,53 @@ target_compile_definitions(owds_graphics PUBLIC GLM_FORCE_LEFT_HANDED)
 
 ###################################
 
+if (OWDS_USE_PHYSX)
+    set(OWDS_PHYSICS_SRC
+        "src/Physics/PhysX/Joints/JointContinuous.cpp"
+        "src/Physics/PhysX/Joints/JointFixed.cpp"
+        "src/Physics/PhysX/Joints/JointFloating.cpp"
+        "src/Physics/PhysX/Joints/JointPlanar.cpp"
+        "src/Physics/PhysX/Joints/JointPrismatic.cpp"
+        "src/Physics/PhysX/Joints/JointRevolute.cpp"
+        "src/Physics/PhysX/Actor.cpp"
+        "src/Physics/PhysX/Context.cpp"
+        "src/Physics/PhysX/SharedContext.cpp"
+        "src/Physics/PhysX/World.cpp")
+else ()
+    set(OWDS_PHYSICS_SRC
+        "src/Physics/Bullet3/Joints/JointFixed.cpp"
+        "src/Physics/Bullet3/Joints/JointPrismatic.cpp"
+        "src/Physics/Bullet3/Actor.cpp"
+        "src/Physics/Bullet3/Context.cpp"
+        "src/Physics/Bullet3/World.cpp")
+endif ()
+
 owds_add_ros_library(owds_physics
     "src/Physics/Base/Joints/Joint.cpp"
     "src/Physics/Base/Actor.cpp"
     "src/Physics/Base/World.cpp"
-    "src/Physics/Bullet3/Joints/JointFixed.cpp"
-    "src/Physics/Bullet3/Joints/JointPrismatic.cpp"
-    "src/Physics/Bullet3/Actor.cpp"
-    "src/Physics/Bullet3/Context.cpp"
-    "src/Physics/Bullet3/World.cpp"
-    "src/Physics/PhysX/Joints/JointContinuous.cpp"
-    "src/Physics/PhysX/Joints/JointFixed.cpp"
-    "src/Physics/PhysX/Joints/JointFloating.cpp"
-    "src/Physics/PhysX/Joints/JointPlanar.cpp"
-    "src/Physics/PhysX/Joints/JointPrismatic.cpp"
-    "src/Physics/PhysX/Joints/JointRevolute.cpp"
-    "src/Physics/PhysX/Actor.cpp"
-    "src/Physics/PhysX/Context.cpp"
-    "src/Physics/PhysX/SharedContext.cpp"
-    "src/Physics/PhysX/World.cpp")
+    ${OWDS_PHYSICS_SRC})
 
-target_compile_definitions(owds_physics PUBLIC _DEBUG PX_ENABLE_ASSERTS)
-target_include_directories(owds_physics PUBLIC ${BULLET_INCLUDE_DIR})
-
-target_link_libraries(owds_physics
+target_compile_definitions(owds_physics
     PUBLIC
-        ${BULLET_LIBRARIES}
-        PhysX
-        PhysXCommon
-        PhysXCooking
-        PhysXExtensions
-        PhysXFoundation
-        PhysXPvdSDK
-        cuda)
+        _DEBUG
+        PX_ENABLE_ASSERTS
+        $<$<BOOL:${OWDS_USE_PHYSX}>:OWDS_USE_PHYSX>)
+
+if (OWDS_USE_PHYSX)
+    target_link_libraries(owds_physics
+        PUBLIC
+            PhysX
+            PhysXCommon
+            PhysXCooking
+            PhysXExtensions
+            PhysXFoundation
+            PhysXPvdSDK
+            cuda)
+else ()
+    target_include_directories(owds_physics PUBLIC ${BULLET_INCLUDE_DIR})
+    target_link_libraries(owds_physics PUBLIC ${BULLET_LIBRARIES})
+endif ()
 
 ###################################
 
