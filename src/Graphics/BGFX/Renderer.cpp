@@ -199,15 +199,23 @@ namespace owds::bgfx {
 
   void Renderer::commitCamera(const owds::bgfx::Camera& camera)
   {
+    constexpr auto state = 0 |
+                       BGFX_STATE_WRITE_RGB |
+                       BGFX_STATE_WRITE_A |
+                       BGFX_STATE_WRITE_Z |
+                       BGFX_STATE_DEPTH_TEST_LESS |
+                       BGFX_STATE_CULL_CCW |
+                       BGFX_STATE_MSAA;
+
     (void)camera;
     ::bgfx::touch(0);
     if(ctx_->instanced_rendering_supported)
     {
-      renderInstanced(BGFX_STATE_DEFAULT);
+      renderInstanced(state);
     }
     else
     {
-      render(BGFX_STATE_DEFAULT);
+      render(state);
     }
   }
 
@@ -254,8 +262,8 @@ namespace owds::bgfx {
 
   void Renderer::queueActorBatch(const owds::Actor& actor, const owds::ShapeDummy& shape)
   {
-    (void)actor; // todo
-    (void)shape; // todo
+    (void)actor;
+    (void)shape;
     assert(false && "Visual shape cannot be dummy!");
   }
 
@@ -274,7 +282,7 @@ namespace owds::bgfx {
         return;
       }
 
-      printf("Uploaded mesh to GPU from '%s'\n", model.source_path_.c_str());
+      printf("Uploaded mesh to GPU with id %lu from '%s'\n", mesh.id_, model.source_path_.c_str());
 
       ctx_->cached_meshes_.emplace(
         mesh.id_, owds::bgfx::MeshHandle{
