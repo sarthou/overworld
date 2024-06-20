@@ -11,7 +11,8 @@
 namespace owds::assimp {
   owds::Mesh processMesh(const aiMesh* mesh)
   {
-    owds::Mesh out_mesh{};
+    owds::Mesh out_mesh = owds::Mesh::create();
+    out_mesh.name_ = mesh->mName.C_Str();
 
     for(auto i = 0u; i < mesh->mNumVertices; i++)
     {
