@@ -1,14 +1,21 @@
 #ifndef OWDS_HELPER_GLMMATH_H
 #define OWDS_HELPER_GLMMATH_H
 
-#include <glm/gtc/type_ptr.hpp>
 #include <cstring>
+#include <glm/gtc/type_ptr.hpp>
 
 namespace owds {
   inline glm::vec3 ToV3(const std::array<float, 3>& in)
   {
     glm::vec3 out;
     std::memcpy(glm::value_ptr(out), std::addressof(in), sizeof(float) * 3);
+    return out;
+  }
+
+  inline glm::quat ToQT(const std::array<float, 4>& in)
+  {
+    glm::quat out;
+    std::memcpy(glm::value_ptr(out), std::addressof(in), sizeof(float) * 4);
     return out;
   }
 
@@ -32,6 +39,6 @@ namespace owds {
     std::memcpy(std::addressof(out), glm::value_ptr(in), sizeof(float) * 16);
     return out;
   }
-}
+} // namespace owds
 
 #endif // OWDS_HELPER_GLMMATH_H
