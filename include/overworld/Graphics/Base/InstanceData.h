@@ -1,8 +1,6 @@
 #ifndef OWDS_GRAPHICS_BASE_INSTANCEDATA_H
 #define OWDS_GRAPHICS_BASE_INSTANCEDATA_H
 
-#include <eigen3/Eigen/Eigen>
-
 #include "overworld/Graphics/Base/Color.h"
 
 namespace owds {
