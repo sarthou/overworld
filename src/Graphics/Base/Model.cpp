@@ -5,9 +5,9 @@ namespace owds {
 
   Model Model::create()
   {
-    return Model(s_global_id_counter_++);
+    return Model(static_cast<Id>(s_global_id_counter_++));
   }
 
-  Model::Model(const std::size_t id) : id_(id)
+  Model::Model(const Id id) : id_(id)
   {}
 } // namespace owds

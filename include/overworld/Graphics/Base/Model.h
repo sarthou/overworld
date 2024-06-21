@@ -4,22 +4,22 @@
 #include <string>
 
 #include "overworld/Graphics/Base/Mesh.h"
+#include "overworld/Graphics/Base/Material.h"
 
 namespace owds {
   class Model
   {
   public:
+    enum class Id : std::size_t {};
+
     static Model create();
 
-    explicit Model(std::size_t id);
+    explicit Model(Id id);
 
     // As for actors, each model is associated with a non-zero, unique id.
-    const std::size_t id_;
+    const Id id_;
 
     std::string source_path_{};
-    std::string texture_path_{};
-    std::uint16_t texture_width_{};
-    std::uint16_t texture_height_{};
     std::vector<owds::Mesh> meshes_{};
   };
 } // namespace owds

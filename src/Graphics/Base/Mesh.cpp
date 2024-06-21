@@ -5,9 +5,9 @@ namespace owds {
 
   Mesh Mesh::create()
   {
-    return Mesh(s_global_id_counter_++);
+    return Mesh(static_cast<Id>(s_global_id_counter_++));
   }
 
-  Mesh::Mesh(const std::size_t id) : id_(id)
+  Mesh::Mesh(const Id id) : id_(id)
   {}
 } // namespace owds
