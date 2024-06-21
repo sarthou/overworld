@@ -152,8 +152,6 @@ namespace owds::physx {
 
   void Actor::setupPhysicsShape(const owds::ShapeCustomMesh& shape)
   {
-    printf("setupPhysicsShape '%s'\n", shape.custom_model_.get().source_path_.c_str());
-
     auto params = ::physx::PxCookingParams(::physx::PxTolerancesScale());
     params.convexMeshCookingType = ::physx::PxConvexMeshCookingType::eQUICKHULL;
     params.midphaseDesc = ::physx::PxMeshMidPhase::eBVH34;
@@ -176,11 +174,11 @@ namespace owds::physx {
 
     for(const auto& mesh : shape.custom_model_.get().meshes_)
     {
-      printf("Processing mesh '%s'\n", mesh.name_.c_str());
-
       if (mesh.vertices_.size() < 4)
       {
-        printf("Ignoring! Less than 4 vertices..\n");
+        printf("[%s:%s] Ignoring! Less than 4 vertices..\n",
+          shape.custom_model_.get().source_path_.c_str(),
+          mesh.name_.c_str());
         continue;
       }
 
@@ -236,7 +234,6 @@ namespace owds::physx {
         switch(result)
         {
         case ResultTy::eSUCCESS:
-          printf("Created mesh\n");
           break;
         case ResultTy::eZERO_AREA_TEST_FAILED:
           assert(false && "eZERO_AREA_TEST_FAILED");
@@ -275,6 +272,7 @@ namespace owds::physx {
   {
     setupPhysicsShape(owds::ShapeCustomMesh{
       std::array<float, 3>{shape.radius_, shape.height_, shape.radius_},
+      {},
       shape.cylinder_model_
     });
   }
