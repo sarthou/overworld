@@ -34,6 +34,8 @@ namespace owds::bgfx {
     std::vector<std::reference_wrapper<owds::Camera>> camera_refs_;
     std::set<owds::World*> cached_world_list_;
 
+    bool render_collision_models_ = false;
+
     std::unordered_map<std::string, std::reference_wrapper<owds::bgfx::Camera>> named_cameras_;
     std::unordered_map<std::string, ::bgfx::ProgramHandle> loaded_programs_;
     std::unordered_map<std::string, ::bgfx::UniformHandle> loaded_uniforms_;

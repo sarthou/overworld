@@ -13,6 +13,8 @@ namespace owds::glfw3 {
         std::uint32_t height_ = 480;
         bool has_size_changed_ = false;
         GLFWwindow* glfw_window_ {};
+        std::vector<std::reference_wrapper<owds::Camera>> cached_camera_refs_;
+        std::size_t active_camera_index = 0;
 
         Context() = default;
         ~Context() noexcept = default;

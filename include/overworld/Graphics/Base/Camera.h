@@ -73,6 +73,11 @@ namespace owds {
      * @param dst_position The position where to look at.
      */
     virtual void setPositionAndLookAt(const std::array<float, 3>& eye_position, const std::array<float, 3>& dst_position) = 0;
+
+    virtual void processUserKeyboardInput(float delta_time, int key, bool is_down) = 0;
+    virtual void processUserMouseBtnInput(float delta_time, char btn, bool is_down) = 0;
+    virtual void processUserMouseInput(float delta_time, float x, float y) = 0;
+    virtual void update() = 0;
   };
 } // namespace owds
 

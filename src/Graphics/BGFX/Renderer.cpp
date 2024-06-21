@@ -121,7 +121,7 @@ namespace owds::bgfx {
     ctx_->loaded_uniforms_["u_tex_color"] = ::bgfx::createUniform("u_tex_color", ::bgfx::UniformType::Sampler);
     ctx_->loaded_uniforms_["u_seg_color"] = ::bgfx::createUniform("u_seg_color", ::bgfx::UniformType::Vec4);
 
-    const owds::Color white_pixel{255, 255, 255, 255};
+    static owds::Color white_pixel{255, 255, 255, 255};
 
     ctx_->white_tex_ = ::bgfx::createTexture2D(
       1,
@@ -131,8 +131,6 @@ namespace owds::bgfx {
       ::bgfx::TextureFormat::RGBA8,
       0,
       ::bgfx::makeRef(&white_pixel, sizeof white_pixel));
-
-    ::bgfx::setDebug(BGFX_DEBUG_STATS);
 
     return true;
   }
@@ -230,7 +228,10 @@ namespace owds::bgfx {
                            BGFX_STATE_CULL_CCW |
                            BGFX_STATE_MSAA;
 
-    (void)camera;
+    ::bgfx::setDebug(camera.show_debug_stats_ ? BGFX_DEBUG_STATS : 0);
+
+    ctx_->render_collision_models_ = camera.render_collision_models_;
+
     ::bgfx::touch(0);
     if(ctx_->instanced_rendering_supported)
     {
@@ -246,9 +247,15 @@ namespace owds::bgfx {
   {
     for(const auto& actor : world.getActors())
     {
-      for(const auto& shape : actor.get().visual_shapes_)
+      if (ctx_->render_collision_models_)
       {
-        std::visit([this, &actor](const auto& shape_resolv) { queueActorBatch(actor, shape_resolv); }, shape);
+        std::visit([this, &actor](const auto& shape_resolv) { queueActorBatch(actor, shape_resolv); }, actor.get().collision_shape_);
+      } else
+      {
+        for(const auto& shape : actor.get().visual_shapes_)
+        {
+          std::visit([this, &actor](const auto& shape_resolv) { queueActorBatch(actor, shape_resolv); }, shape);
+        }
       }
     }
   }
@@ -287,7 +294,6 @@ namespace owds::bgfx {
   {
     (void)actor;
     (void)shape;
-    assert(false && "Visual shape cannot be dummy!");
   }
 
   void Renderer::queueActorBatch(const owds::Actor& actor, const owds::ShapeSphere& shape)
@@ -339,6 +345,7 @@ namespace owds::bgfx {
           ::bgfx::TextureFormat::RGBA8,
           0,
           ::bgfx::makeRef(pixels, width * height * sizeof(owds::Color), [](void* _ptr, void* _userData) {
+            (void) _userData;
             stbi_image_free(_ptr);
           }));
 
