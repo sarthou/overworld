@@ -62,11 +62,11 @@ find_package(glm CONFIG REQUIRED)
 include(FetchContent)
 include(CheckLanguage)
 
+######################################################################
+## PhysX may be used as an alternative engine for better simulation ##
+## performance and GPU hardware acceleration if cuda is available.  ##
+######################################################################
 if (OWDS_USE_PHYSX)
-    ######################################################################
-    ## PhysX may be used as an alternative engine for better simulation ##
-    ## performance and GPU hardware acceleration if cuda is available.  ##
-    ######################################################################
     FetchContent_Declare(
         PhysX
         GIT_REPOSITORY "https://github.com/NVIDIA-Omniverse/PhysX.git"
@@ -113,12 +113,13 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(BGFX)
 
-owds_depend_package(std_msgs)
-owds_depend_package(sensor_msgs)
-owds_depend_package(visualization_msgs)
-owds_depend_package(geometry_msgs)
-owds_depend_package(ontologenius)
+owds_depend_msg_package(std_msgs)
+owds_depend_msg_package(sensor_msgs)
+owds_depend_msg_package(visualization_msgs)
+owds_depend_msg_package(geometry_msgs)
+owds_depend_msg_package(ontologenius)
 owds_depend_package(urdf)
+owds_depend_package(message_filters)
 
 ######################################################################
 ## Declare ROS messages, services and actions (if any)              ##
@@ -148,15 +149,15 @@ owds_generate_interfaces()
 
 ###################################
 
-owds_add_ros_library(overworld_compat "src/Compat/ROS.cpp")
+owds_add_ros_library(overworld_compat src/Compat/ROS.cpp)
 
 ###################################
 
-set(owds_vert_shaders
-    "shaders/vs_default.sc")
+set(overworld_vert_shaders
+    shaders/vs_default.sc)
 
-set(owds_frag_shaders
-    "shaders/fs_default.sc")
+set(overworld_frag_shaders
+    shaders/fs_default.sc)
 
 bgfx_compile_shader_to_header(
     TYPE VERTEX
@@ -170,62 +171,62 @@ bgfx_compile_shader_to_header(
     VARYING_DEF ${CMAKE_SOURCE_DIR}/shaders/defs/varying.def.sc
     OUTPUT_DIR ${CMAKE_BINARY_DIR}/include/generated/shaders/)
 
-owds_add_library(owds_graphics
-    "src/Graphics/Assimp/ModelLoader.cpp"
-    "src/Graphics/Base/Mesh.cpp"
-    "src/Graphics/Base/Model.cpp"
-    "src/Graphics/Base/ModelManager.cpp"
-    "src/Graphics/Base/Renderer.cpp"
-    "src/Graphics/BGFX/Camera.cpp"
-    "src/Graphics/BGFX/Context.cpp"
-    "src/Graphics/BGFX/Renderer.cpp"
-    "src/Graphics/BGFX/Vertex.cpp"
-    "src/Graphics/GLFW3/Window.cpp"
+owds_add_library(overworld_graphics
+    src/Graphics/Assimp/ModelLoader.cpp
+    src/Graphics/Base/Mesh.cpp
+    src/Graphics/Base/Model.cpp
+    src/Graphics/Base/ModelManager.cpp
+    src/Graphics/Base/Renderer.cpp
+    src/Graphics/BGFX/Camera.cpp
+    src/Graphics/BGFX/Context.cpp
+    src/Graphics/BGFX/Renderer.cpp
+    src/Graphics/BGFX/Vertex.cpp
+    src/Graphics/GLFW3/Window.cpp
     ${owds_vert_shaders}
     ${owds_frag_shaders})
 
-target_include_directories(owds_graphics PUBLIC ${CMAKE_BINARY_DIR}/include/generated/shaders/)
-target_link_libraries(owds_graphics PUBLIC assimp bgfx bx glfw)
-target_compile_definitions(owds_graphics PUBLIC GLM_FORCE_LEFT_HANDED)
+target_include_directories(overworld_graphics PUBLIC ${CMAKE_BINARY_DIR}/include/generated/shaders/)
+target_link_libraries(overworld_graphics PUBLIC assimp bgfx bx glfw)
+target_compile_definitions(overworld_graphics PUBLIC GLM_FORCE_LEFT_HANDED)
 
 ###################################
 
 if (OWDS_USE_PHYSX)
     set(OWDS_PHYSICS_SRC
-        "src/Physics/PhysX/Joints/JointContinuous.cpp"
-        "src/Physics/PhysX/Joints/JointFixed.cpp"
-        "src/Physics/PhysX/Joints/JointFloating.cpp"
-        "src/Physics/PhysX/Joints/JointPlanar.cpp"
-        "src/Physics/PhysX/Joints/JointPrismatic.cpp"
-        "src/Physics/PhysX/Joints/JointRevolute.cpp"
-        "src/Physics/PhysX/Actor.cpp"
-        "src/Physics/PhysX/Context.cpp"
-        "src/Physics/PhysX/SharedContext.cpp"
-        "src/Physics/PhysX/World.cpp")
+        src/Physics/PhysX/Joints/JointContinuous.cpp
+        src/Physics/PhysX/Joints/JointFixed.cpp
+        src/Physics/PhysX/Joints/JointFloating.cpp
+        src/Physics/PhysX/Joints/JointPlanar.cpp
+        src/Physics/PhysX/Joints/JointPrismatic.cpp
+        src/Physics/PhysX/Joints/JointRevolute.cpp
+        src/Physics/PhysX/Actor.cpp
+        src/Physics/PhysX/Context.cpp
+        src/Physics/PhysX/SharedContext.cpp
+        src/Physics/PhysX/World.cpp)
 else ()
     set(OWDS_PHYSICS_SRC
-        "src/Physics/Bullet3/Joints/JointFixed.cpp"
-        "src/Physics/Bullet3/Joints/JointPrismatic.cpp"
-        "src/Physics/Bullet3/Actor.cpp"
-        "src/Physics/Bullet3/Context.cpp"
-        "src/Physics/Bullet3/World.cpp")
+        src/Physics/Bullet3/Joints/JointFixed.cpp
+        src/Physics/Bullet3/Joints/JointPrismatic.cpp
+        src/Physics/Bullet3/Actor.cpp
+        src/Physics/Bullet3/Context.cpp
+        src/Physics/Bullet3/World.cpp)
 endif ()
 
-owds_add_ros_library(owds_physics
-    "src/Physics/Base/Joints/Joint.cpp"
-    "src/Physics/Base/Actor.cpp"
-    "src/Physics/Base/Robot.cpp"
-    "src/Physics/Base/World.cpp"
+owds_add_ros_library(overworld_physics
+    src/Physics/Base/Joints/Joint.cpp
+    src/Physics/Base/Actor.cpp
+    src/Physics/Base/Robot.cpp
+    src/Physics/Base/World.cpp
     ${OWDS_PHYSICS_SRC})
 
-target_compile_definitions(owds_physics
+target_compile_definitions(overworld_physics
     PUBLIC
         _DEBUG
         PX_ENABLE_ASSERTS
         $<$<BOOL:${OWDS_USE_PHYSX}>:OWDS_USE_PHYSX>)
 
 if (OWDS_USE_PHYSX)
-    target_link_libraries(owds_physics
+    target_link_libraries(overworld_physics
         PUBLIC
             PhysX
             PhysXCommon
@@ -235,19 +236,126 @@ if (OWDS_USE_PHYSX)
             PhysXPvdSDK
             cuda)
 else ()
-    target_include_directories(owds_physics PUBLIC ${BULLET_INCLUDE_DIR})
-    target_link_libraries(owds_physics PUBLIC ${BULLET_LIBRARIES})
+    target_include_directories(overworld_physics PUBLIC ${BULLET_INCLUDE_DIR})
+    target_link_libraries(overworld_physics PUBLIC ${BULLET_LIBRARIES})
 endif ()
 
 ###################################
 
-owds_add_ros_executable(owds_test1 src/Nodes/Test1.cpp)
-
-target_link_libraries(owds_test1 PUBLIC owds_graphics owds_physics)
+owds_add_ros_library(overworld_utility_lib
+    src/Utility/YamlReader.cpp
+    src/Utility/Ontology.cpp
+    src/Utility/RosFiles.cpp
+    src/Utility/Wavefront.cpp)
 
 ###################################
 
-owds_install_executables(owds_test1)
+owds_add_library(overworld_bullet_lib
+    src/Bullet/PhysicsServers.cpp
+    src/Bullet/BulletClient.cpp)
+
+###################################
+
+owds_add_library(overworld_types_lib
+    src/Geometry/Pose.cpp
+    src/Geometry/Polygon.cpp
+    src/BasicTypes/Area.cpp
+    src/BasicTypes/Entity.cpp
+    src/BasicTypes/BodyPart.cpp
+    src/BasicTypes/Object.cpp
+    src/BasicTypes/Hand.cpp)
+
+###################################
+
+owds_add_library(overworld_perception_lib
+    src/Perception/Managers/AgentPerceptionManager.cpp
+    src/Perception/Managers/AreasPerceptionManager.cpp
+    src/Perception/Managers/ObjectsPerceptionManager.cpp
+    src/Perception/Managers/RobotsPerceptionManager.cpp
+    src/Perception/Managers/HumansPerceptionManager.cpp
+    src/Perception/Modules/ObjectsModules/ObjectsEmulatedPerceptionModule.cpp
+    src/Perception/Modules/HumansModules/HumansEmulatedPerceptionModule.cpp
+    src/Perception/Modules/AreasModules/AreasEmulatedPerceptionModule.cpp
+    src/Perception/PerceptionManagers.cpp
+    src/Perception/DataFusion/DataFusionBase.cpp)
+
+###################################
+
+owds_add_ros_library(overworld_facts_lib
+    src/Facts/Publisher/FactsPublisher.cpp
+    src/Facts/Publisher/OntologeniusFactsPublisher.cpp
+    src/Facts/FactsCalculator.cpp)
+
+###################################
+
+owds_add_ros_library(overworld_sender_lib
+    src/Senders/ApproachSender.cpp
+    src/Senders/ROSSender.cpp
+    src/Senders/PoseSender.cpp
+    src/Senders/Bernie.cpp
+    src/Senders/RelationsSender.cpp)
+
+###################################
+
+owds_add_library(overworld_modules_plugin
+    src/Perception/Modules/ObjectsModules/StaticObjectsPerceptionModule.cpp
+    src/Perception/Modules/ObjectsModules/FakeObjectPerceptionModule.cpp
+    src/Perception/Modules/RobotsModules/JointStatePerceptionModule.cpp
+    src/Perception/Modules/HumansModules/StampedPosePerceptionModule.cpp
+    src/Perception/Modules/HumansModules/FakeHumanPerceptionModule.cpp
+    src/Perception/Modules/HumansModules/FakeHumansPerceptionModule.cpp
+    src/Perception/Modules/AreasModules/ObjAreasPerceptionModule.cpp)
+
+###################################
+
+add_library(overworld_reasoner_plugin
+    src/OntologeniusPlugins/ReasonerEgocentric.cpp)
+
+###################################
+
+owds_add_ros_executable(overworld_node
+    src/Nodes/overworld.cpp
+    src/SituationAssessor.cpp)
+
+target_link_libraries(overworld_node
+    PRIVATE
+        overworld_perception_lib
+        overworld_sender_lib
+        overworld_facts_lib)
+
+###################################
+
+owds_add_ros_executable(plugins
+    src/Nodes/plugins.cpp)
+
+target_link_libraries(plugins
+    PRIVATE
+        overworld_bullet_lib)
+
+###################################
+
+owds_add_ros_executable(teleop
+    src/Nodes/teleop.cpp)
+
+###################################
+
+
+###################################
+
+
+
+###################################
+
+owds_add_ros_executable(overworld_test1 src/Nodes/Test1.cpp)
+
+target_link_libraries(overworld_test1
+    PUBLIC
+        overworld_graphics
+        overworld_physics)
+
+###################################
+
+owds_install_executables(overworld_test1)
 
 ###################################
 
