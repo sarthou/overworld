@@ -2,6 +2,7 @@
 #define OWDS_SHAPES_SPHERE_H
 
 #include <memory>
+#include "overworld/Graphics/Base/Color.h"
 
 namespace owds {
   class Model;
@@ -10,6 +11,7 @@ namespace owds {
   {
   public:
     float radius_{};
+    owds::Color color_rgba_;
     std::reference_wrapper<owds::Model> sphere_model_;
   };
 } // namespace owds

@@ -2,6 +2,7 @@
 #define OWDS_SHAPES_CYLINDER_H
 
 #include <memory>
+#include "overworld/Graphics/Base/Color.h"
 
 namespace owds {
   class Model;
@@ -11,6 +12,7 @@ namespace owds {
   public:
     float radius_{};
     float height_{};
+    owds::Color color_rgba_;
     std::reference_wrapper<owds::Model>  cylinder_model_;
   };
 } // namespace owds
