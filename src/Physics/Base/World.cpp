@@ -24,47 +24,47 @@ namespace owds {
 
   World::~World() = default;
 
-  owds::Shape World::createShapeBox(const std::array<float, 3>& half_extents)
+  owds::Shape World::createShapeBox(const owds::Color& color, const std::array<float, 3>& half_extents)
   {
     return owds::ShapeBox{
       half_extents,
+      color,
       preloaded_box_model_};
   }
 
-  owds::Shape World::createShapeCapsule(const float radius, const float height)
+  owds::Shape World::createShapeCapsule(const owds::Color& color, const float radius, const float height)
   {
     return owds::ShapeCapsule{
       radius,
       height,
+      color,
       preloaded_cylinder_model_,
       preloaded_sphere_model_};
   }
 
-  owds::Shape World::createShapeCylinder(const float radius, const float height)
+  owds::Shape World::createShapeCylinder(const owds::Color& color, const float radius, const float height)
   {
     return owds::ShapeCylinder{
       radius,
       height,
+      color,
       preloaded_cylinder_model_};
   }
 
-  owds::Shape World::createShapeSphere(const float radius)
+  owds::Shape World::createShapeSphere(const owds::Color& color, const float radius)
   {
     return owds::ShapeSphere{
       radius,
+      color,
       preloaded_sphere_model_};
   }
 
-  owds::Shape World::createShapeFromModel(const std::string& path, const std::array<float, 3>& scale)
+  owds::Shape World::createShapeFromModel(const owds::Material& material, const std::string& path, const std::array<float, 3>& scale)
   {
     return owds::ShapeCustomMesh{
       scale,
+      material,
       owds::ModelManager::get().load(path)};
-  }
-
-  owds::Actor& World::createActor(const owds::Shape& shape)
-  {
-    return createActor(shape, {shape});
   }
 
   owds::Robot& World::loadRobotFromDescription(const std::string& path)
@@ -103,39 +103,42 @@ namespace owds {
 
   void World::processMaterial(owds::Robot& robot, const urdf::Material& urdf_material)
   {
-    auto material = std::make_unique<owds::Material>();
-    auto material_ptr = material.get();
-
-    material_ptr->color_rgba_ = {
-      static_cast<std::uint8_t>(urdf_material.color.r * 255.f),
-      static_cast<std::uint8_t>(urdf_material.color.g * 255.f),
-      static_cast<std::uint8_t>(urdf_material.color.b * 255.f),
-      static_cast<std::uint8_t>(urdf_material.color.a * 255.f)};
-    material_ptr->texture_path_ = owds::rosPkgPathToPath(urdf_material.texture_filename);
-
-
+    robot.materials_[urdf_material.name] = {
+      !urdf_material.texture_filename.empty() ?
+        owds::Color{255,                                                      255, 255, 255}
+        :
+        owds::Color{static_cast<std::uint8_t>(urdf_material.color.r * 255.f),
+                    static_cast<std::uint8_t>(urdf_material.color.g * 255.f),
+                    static_cast<std::uint8_t>(urdf_material.color.b * 255.f),
+                    static_cast<std::uint8_t>(urdf_material.color.a * 255.f)               },
+      urdf_material.texture_filename.empty() ?
+        "" :
+        owds::rosPkgPathToPath(urdf_material.texture_filename)
+    };
   }
 
-  void World::processLinks(owds::Robot& robot, const urdf::Link& link)
+  void World::processLinks(owds::Robot& robot, const urdf::Link& urdf_link)
   {
-    for(auto& child_link : link.child_links)
+    for(auto& child_link : urdf_link.child_links)
     {
       processLinks(robot, *child_link);
     }
 
-    processLink(robot, link);
+    processLink(robot, urdf_link);
   }
 
   void World::processLink(owds::Robot& robot, const urdf::Link& urdf_link)
   {
     (void)robot;
 
+    auto& material = robot.materials_[urdf_link.visual->material_name];
+
     owds::Shape collision_shape = owds::ShapeDummy();
     std::vector<owds::Shape> visual_shapes;
 
     if(urdf_link.collision)
     {
-      collision_shape = convertShape(*urdf_link.collision->geometry);
+      collision_shape = convertShape(material, *urdf_link.collision->geometry);
     }
 
     assert(urdf_link.collision_array.size() <= 1 && "Links with multiple collision shapes are not supported at this moment.");
@@ -144,7 +147,7 @@ namespace owds {
 
     for(auto& visual_geometry : urdf_link.visual_array)
     {
-      visual_shapes.emplace_back(convertShape(*visual_geometry->geometry));
+      visual_shapes.emplace_back(convertShape(material, *visual_geometry->geometry));
     }
 
     auto& link = createActor(collision_shape, visual_shapes);
@@ -165,26 +168,26 @@ namespace owds {
     robot.links_[urdf_link.name] = std::addressof(link);
   }
 
-  void World::processJoints(owds::Robot& robot, const urdf::Link& link)
+  void World::processJoints(owds::Robot& robot, const urdf::Link& urdf_link)
   {
-    for(const auto& joint : link.child_joints)
+    for(const auto& joint : urdf_link.child_joints)
     {
       processJoint(robot, *joint);
     }
 
-    for(const auto& child_link : link.child_links)
+    for(const auto& child_link : urdf_link.child_links)
     {
       processJoints(robot, *child_link);
     }
   }
 
-  void World::processJoint(owds::Robot& robot, const urdf::Joint& joint)
+  void World::processJoint(owds::Robot& robot, const urdf::Joint& urdf_joint)
   {
-    auto& link0 = *robot.links_.at(joint.parent_link_name);
-    auto& link1 = *robot.links_.at(joint.child_link_name);
+    auto& link0 = *robot.links_.at(urdf_joint.parent_link_name);
+    auto& link1 = *robot.links_.at(urdf_joint.child_link_name);
 
     // joint.parent_to_joint_origin_transform;
-    switch(joint.type)
+    switch(urdf_joint.type)
     {
     case urdf::Joint::REVOLUTE:
     {
@@ -192,10 +195,10 @@ namespace owds {
         link0,
         {},
         {
-          static_cast<float>(joint.parent_to_joint_origin_transform.rotation.x),
-          static_cast<float>(joint.parent_to_joint_origin_transform.rotation.y),
-          static_cast<float>(joint.parent_to_joint_origin_transform.rotation.z),
-          static_cast<float>(joint.parent_to_joint_origin_transform.rotation.w),
+          static_cast<float>(urdf_joint.parent_to_joint_origin_transform.rotation.x),
+          static_cast<float>(urdf_joint.parent_to_joint_origin_transform.rotation.y),
+          static_cast<float>(urdf_joint.parent_to_joint_origin_transform.rotation.z),
+          static_cast<float>(urdf_joint.parent_to_joint_origin_transform.rotation.w),
         },
         link1,
         {},
@@ -231,34 +234,38 @@ namespace owds {
     }
   }
 
-  owds::Shape World::convertShape(const urdf::Geometry& shape)
+  owds::Shape World::convertShape(const owds::Material& material, const urdf::Geometry& urdf_shape)
   {
-    switch(shape.type)
+    switch(urdf_shape.type)
     {
     case urdf::Geometry::SPHERE:
     {
-      auto& sphere = dynamic_cast<const urdf::Sphere&>(shape);
-      return createShapeSphere(static_cast<float>(sphere.radius));
+      auto& sphere = dynamic_cast<const urdf::Sphere&>(urdf_shape);
+      return createShapeSphere(material.color_rgba_,
+                               static_cast<float>(sphere.radius));
     }
     case urdf::Geometry::BOX:
     {
-      auto& box = dynamic_cast<const urdf::Box&>(shape);
-      return createShapeBox({static_cast<float>(box.dim.x),
+      auto& box = dynamic_cast<const urdf::Box&>(urdf_shape);
+      return createShapeBox(material.color_rgba_,
+                            {static_cast<float>(box.dim.x),
                              static_cast<float>(box.dim.y),
                              static_cast<float>(box.dim.z)});
     }
     case urdf::Geometry::CYLINDER:
     {
       // I hope the cylinder is ok
-      auto& cylinder = dynamic_cast<const urdf::Cylinder&>(shape);
-      return createShapeCylinder(static_cast<float>(cylinder.radius),
+      auto& cylinder = dynamic_cast<const urdf::Cylinder&>(urdf_shape);
+      return createShapeCylinder(material.color_rgba_,
+                                 static_cast<float>(cylinder.radius),
                                  static_cast<float>(cylinder.length));
     }
     case urdf::Geometry::MESH:
     {
-      auto& mesh = dynamic_cast<const urdf::Mesh&>(shape);
+      auto& mesh = dynamic_cast<const urdf::Mesh&>(urdf_shape);
 
-      return createShapeFromModel(owds::rosPkgPathToPath(mesh.filename),
+      return createShapeFromModel(material,
+                                  owds::rosPkgPathToPath(mesh.filename),
                                   {static_cast<float>(mesh.scale.x),
                                    static_cast<float>(mesh.scale.y),
                                    static_cast<float>(mesh.scale.z)});

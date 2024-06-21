@@ -49,13 +49,11 @@ namespace owds {
      * Additionally, there are non-standard but commonly used geometries such as:
      * - Capsule(s) / Pill(s)
      */
-    [[nodiscard]] owds::Shape createShapeBox(const std::array<float, 3>& half_extents);
-    [[nodiscard]] owds::Shape createShapeCapsule(float radius, float height);
-    [[nodiscard]] owds::Shape createShapeCylinder(float radius, float height);
-    [[nodiscard]] owds::Shape createShapeSphere(float radius);
-    [[nodiscard]] owds::Shape createShapeFromModel(const std::string& path, const std::array<float, 3>& scale);
-
-    [[nodiscard]] owds::Actor& createActor(const owds::Shape& shape);
+    [[nodiscard]] owds::Shape createShapeBox(const owds::Color& color, const std::array<float, 3>& half_extents);
+    [[nodiscard]] owds::Shape createShapeCapsule(const owds::Color& color, float radius, float height);
+    [[nodiscard]] owds::Shape createShapeCylinder(const owds::Color& color, float radius, float height);
+    [[nodiscard]] owds::Shape createShapeSphere(const owds::Color& color, float radius);
+    [[nodiscard]] owds::Shape createShapeFromModel(const owds::Material& material, const std::string& path, const std::array<float, 3>& scale);
 
     [[nodiscard]] virtual owds::Actor& createActor(
       const owds::Shape& collision_shape,
@@ -195,18 +193,17 @@ namespace owds {
 
   protected:
     void processMaterial(owds::Robot& robot, const urdf::Material& urdf_material);
-    void processLinks(owds::Robot& robot, const urdf::Link& link);
+    void processLinks(owds::Robot& robot, const urdf::Link& urdf_link);
     void processLink(owds::Robot& robot, const urdf::Link& urdf_link);
-    void processJoints(owds::Robot& robot, const urdf::Link& link);
-    void processJoint(owds::Robot& robot, const urdf::Joint& joint);
-    owds::Shape convertShape(const urdf::Geometry& shape);
+    void processJoints(owds::Robot& robot, const urdf::Link& urdf_link);
+    void processJoint(owds::Robot& robot, const urdf::Joint& urdf_joint);
+    owds::Shape convertShape(const owds::Material& material, const urdf::Geometry& urdf_shape);
 
     std::filesystem::path base_assets_path_;
     owds::Model& preloaded_box_model_;
     owds::Model& preloaded_cylinder_model_;
     owds::Model& preloaded_sphere_model_;
     std::unordered_map<owds::Robot*, std::unique_ptr<owds::Robot>> loaded_robots_;
-    std::unordered_map<owds::Material*, std::unique_ptr<owds::Material>> loaded_materials_;
   };
 } // namespace owds
 
