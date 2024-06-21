@@ -41,9 +41,12 @@ namespace owds::bgfx {
     bool is_dragging_mouse_ = false;
 
     bool key_state_front_ = false;
-    bool key_state_down_ = false;
+    bool key_state_back_ = false;
     bool key_state_left_ = false;
     bool key_state_right_ = false;
+
+    bool key_state_up_ = false;
+    bool key_state_down_ = false;
 
     std::bitset<16> mouse_btn_states_{};
 

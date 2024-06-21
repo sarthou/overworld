@@ -1,5 +1,6 @@
 #include "overworld/Graphics/BGFX/Camera.h"
 
+#include <GLFW/glfw3.h>
 #include <cstdio>
 #include <glm/gtc/packing.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -7,8 +8,6 @@
 #include "overworld/Graphics/BGFX/API.h"
 #include "overworld/Helper/BitCast.h"
 #include "overworld/Helper/GlmMath.h"
-
-#include <GLFW/glfw3.h>
 
 namespace owds::bgfx {
   Camera::Camera(owds::World& world)
@@ -138,18 +137,26 @@ namespace owds::bgfx {
     world_eye_right_.x = glm::cos(view_angles_.x + d90);
     world_eye_right_.y = glm::sin(view_angles_.x + d90);
     world_eye_right_.z = 0.f;
+
+    world_eye_up_ = glm::cross(world_eye_front_, world_eye_right_);
   }
 
   void Camera::processUserKeyboardInput(const float delta_time, const int key, const bool is_down)
   {
-    switch (key)
+    switch(key)
     {
     case GLFW_KEY_F1: show_debug_stats_ = is_down; break;
     case GLFW_KEY_F2: render_collision_models_ = is_down; break;
-    case GLFW_KEY_UP:    key_state_front_ = is_down; break;
-    case GLFW_KEY_DOWN:  key_state_down_  = is_down; break;
-    case GLFW_KEY_LEFT:  key_state_left_  = is_down; break;
+    case GLFW_KEY_W:
+    case GLFW_KEY_UP: key_state_front_ = is_down; break;
+    case GLFW_KEY_S:
+    case GLFW_KEY_DOWN: key_state_back_ = is_down; break;
+    case GLFW_KEY_A:
+    case GLFW_KEY_LEFT: key_state_left_ = is_down; break;
+    case GLFW_KEY_D:
     case GLFW_KEY_RIGHT: key_state_right_ = is_down; break;
+    case GLFW_KEY_SPACE: key_state_up_ = is_down; break;
+    case GLFW_KEY_LEFT_SHIFT: key_state_down_ = is_down; break;
     }
 
     (void)delta_time;
@@ -165,7 +172,7 @@ namespace owds::bgfx {
     {
     case 1:
     {
-      if (is_down)
+      if(is_down)
       {
         mouse_drag_start_position_ = mouse_current_position;
       }
@@ -186,7 +193,7 @@ namespace owds::bgfx {
     (void)delta_time;
     mouse_current_position = {x, y};
 
-    if (mouse_btn_states_[1])
+    if(mouse_btn_states_[1])
     {
       const auto delta = (mouse_current_position - mouse_drag_start_position_) * 0.001f;
       mouse_drag_start_position_ = mouse_current_position;
@@ -200,10 +207,18 @@ namespace owds::bgfx {
 
   void Camera::update()
   {
-    if (key_state_front_) world_eye_position_ += world_eye_front_ * 0.1f;
-    if (key_state_down_) world_eye_position_ -= world_eye_front_ * 0.1f;
-    if (key_state_right_) world_eye_position_ += world_eye_right_ * 0.1f;
-    if (key_state_left_) world_eye_position_ -= world_eye_right_ * 0.1f;
+    if(key_state_front_)
+      world_eye_position_ += world_eye_front_ * 0.1f;
+    if(key_state_back_)
+      world_eye_position_ -= world_eye_front_ * 0.1f;
+    if(key_state_right_)
+      world_eye_position_ += world_eye_right_ * 0.1f;
+    if(key_state_left_)
+      world_eye_position_ -= world_eye_right_ * 0.1f;
+    if(key_state_up_)
+      world_eye_position_ += world_eye_up_ * 0.1f;
+    if(key_state_down_)
+      world_eye_position_ -= world_eye_up_ * 0.1f;
 
     // world_eye_right_
   }
