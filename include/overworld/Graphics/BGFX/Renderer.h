@@ -15,6 +15,7 @@ namespace owds {
   class ShapeSphere;
   class Model;
   class Mesh;
+  class Material;
 } // namespace owds
 
 namespace owds::bgfx {
@@ -50,13 +51,13 @@ namespace owds::bgfx {
     void queueActorBatch(const owds::Actor& actor, const owds::ShapeDummy& shape);
     void queueActorBatch(const owds::Actor& actor, const owds::ShapeSphere& shape);
 
-    void tryCacheModel(const owds::Model& model);
-    void queueModelBatch(const owds::Model& model, const std::array<float, 16>& model_mat);
+    void tryCacheModel(const owds::Model& model, const owds::Material& material);
+    void queueModelBatch(const owds::Model& model, const owds::Material& material, const std::array<float, 16>& model_mat);
 
     void render(std::uint64_t state);
     void renderInstanced(std::uint64_t state);
 
-    std::unique_ptr<Context> ctx_;
+    std::unique_ptr<owds::bgfx::Context> ctx_;
   };
 } // namespace owds::bgfx
 
