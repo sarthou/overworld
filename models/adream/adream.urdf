@@ -2,11 +2,11 @@
 <robot name="adream">
 
   <material name="wall_material">
-    <texture filename="package://overworld/models/texture/adream_wall_texture.png"/>
+    <texture filename="package://overworld/models/textures/adream_wall_texture.png"/>
   </material>
 
   <material name="floor_material">
-    <texture filename="package://overworld/models/texture/adream_floor_texture.png"/>
+    <texture filename="package://overworld/models/textures/adream_floor_texture.png"/>
   </material>
 
   <link concave="yes" name="adream_walls">
