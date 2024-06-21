@@ -129,9 +129,13 @@ namespace owds {
 
   void World::processLink(owds::Robot& robot, const urdf::Link& urdf_link)
   {
-    (void)robot;
-
-    auto& material = robot.materials_[urdf_link.visual->material_name];
+    const auto material_name = urdf_link.visual->material_name;
+    const auto material = material_name.empty() ?
+                            owds::Material{
+                              owds::Color{255, 255, 255, 255},
+                              ""
+    } :
+                            robot.materials_.at(urdf_link.visual->material_name);
 
     owds::Shape collision_shape = owds::ShapeDummy();
     std::vector<owds::Shape> visual_shapes;
