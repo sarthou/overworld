@@ -3,6 +3,7 @@
 #include <bx/bx.h>
 #include <bx/file.h>
 #include <bx/readerwriter.h>
+#include <fstream>
 #include <glm/gtc/packing.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/quaternion.hpp>
@@ -16,6 +17,9 @@
 #include "overworld/Helper/GlmMath.h"
 #include "overworld/Physics/Base/Actor.h"
 #include "overworld/Physics/Base/World.h"
+
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
 namespace owds::bgfx {
   namespace implementation {
@@ -117,18 +121,16 @@ namespace owds::bgfx {
     ctx_->loaded_uniforms_["u_tex_color"] = ::bgfx::createUniform("u_tex_color", ::bgfx::UniformType::Sampler);
     ctx_->loaded_uniforms_["u_seg_color"] = ::bgfx::createUniform("u_seg_color", ::bgfx::UniformType::Vec4);
 
-    owds::Color white_pixel { 255, 255, 255, 255 };
-
-    const auto mem = ::bgfx::makeRef(&white_pixel, sizeof white_pixel);
+    const owds::Color white_pixel{255, 255, 255, 255};
 
     ctx_->white_tex_ = ::bgfx::createTexture2D(
       1,
       1,
-      true,
+      false,
       1,
       ::bgfx::TextureFormat::RGBA8,
       0,
-      mem);
+      ::bgfx::makeRef(&white_pixel, sizeof white_pixel));
 
     ::bgfx::setDebug(BGFX_DEBUG_STATS);
 
@@ -177,7 +179,7 @@ namespace owds::bgfx {
       ctx_->cached_world_list_.emplace(std::addressof(camera->currently_viewed_world_.get()));
     }
 
-    for(auto& [tex, batch] : ctx_->current_mesh_batches_)
+    for(auto& [id, batch] : ctx_->current_mesh_batches_)
     {
       batch.clear();
     }
@@ -249,7 +251,7 @@ namespace owds::bgfx {
     const auto size_mat = glm::scale(glm::mat4(1.f), ToV3(shape.half_extents_));
     const auto model_mat = ToM4(actor.getModelMatrix()) * size_mat;
 
-    queueModelBatch(shape.box_model_, FromM4(model_mat));
+    queueModelBatch(shape.box_model_, {shape.color_rgba_, ""}, FromM4(model_mat));
   }
 
   void Renderer::queueActorBatch(const owds::Actor& actor, const owds::ShapeCapsule& shape)
@@ -263,7 +265,7 @@ namespace owds::bgfx {
     const auto size_mat = glm::scale(glm::mat4(1.f), ToV3(shape.scale_));
     const auto model_mat = ToM4(actor.getModelMatrix()) * size_mat;
 
-    queueModelBatch(shape.custom_model_, FromM4(model_mat));
+    queueModelBatch(shape.custom_model_, shape.material_, FromM4(model_mat));
   }
 
   void Renderer::queueActorBatch(const owds::Actor& actor, const owds::ShapeCylinder& shape)
@@ -271,7 +273,7 @@ namespace owds::bgfx {
     const auto size_mat = glm::scale(glm::mat4(1.f), glm::vec3(shape.radius_, shape.height_, shape.radius_));
     const auto model_mat = ToM4(actor.getModelMatrix()) * size_mat;
 
-    queueModelBatch(shape.cylinder_model_, FromM4(model_mat));
+    queueModelBatch(shape.cylinder_model_, {shape.color_rgba_, ""}, FromM4(model_mat));
   }
 
   void Renderer::queueActorBatch(const owds::Actor& actor, const owds::ShapeDummy& shape)
@@ -287,32 +289,61 @@ namespace owds::bgfx {
     (void)shape; // todo
   }
 
-  void Renderer::tryCacheModel(const owds::Model& model)
+  void Renderer::tryCacheModel(const owds::Model& model, const owds::Material& material)
   {
+    if(model.meshes_.empty())
+    {
+      return;
+    }
+
+    if(ctx_->cached_meshes_.count(model.meshes_.front().id_))
+    {
+      return;
+    }
+
     auto tex = ctx_->white_tex_;
 
-    if (!model.texture_path_.empty())
+    if(!material.texture_path_.empty())
     {
-      printf("req tex path: %s\n", model.texture_path_.c_str());
-      /*tex = ::bgfx::createTexture2D(
-                       model.texture_width_,
-                       model.texture_height_,
-                       true,
-                       4,
-                       ::bgfx::TextureFormat::RGBA8);*/
+      if(!ctx_->loaded_textures_.count(material.texture_path_))
+      {
+        std::ifstream t(material.texture_path_, std::ios::binary);
+        assert(t.good());
+
+        std::string data((std::istreambuf_iterator(t)), std::istreambuf_iterator<char>());
+        assert(!data.empty());
+
+        int width, height, channels;
+        auto pixels = reinterpret_cast<owds::Color*>(stbi_load_from_memory(
+          reinterpret_cast<stbi_uc*>(data.data()),
+          static_cast<int>(data.size()),
+          &width,
+          &height,
+          &channels,
+          4));
+
+        assert(pixels);
+
+        tex = ::bgfx::createTexture2D(
+          width,
+          height,
+          false,
+          1,
+          ::bgfx::TextureFormat::RGBA8,
+          0,
+          ::bgfx::makeRef(pixels, width * height * sizeof(owds::Color)));
+
+        ctx_->loaded_textures_[material.texture_path_] = tex;
+
+        // stbi_image_free(pixels); todo: do not forget to free this
+      }
     }
 
     for(const auto& mesh : model.meshes_)
     {
-      if(ctx_->cached_meshes_.count(mesh.id_))
-      {
-        return;
-      }
-
-      printf("Uploaded mesh to GPU with id %lu from '%s'\n", mesh.id_, model.source_path_.c_str());
-
       ctx_->cached_meshes_.emplace(
         mesh.id_, owds::bgfx::MeshHandle{
+                    material.color_rgba_,
                     tex,
                     ::bgfx::createVertexBuffer(
                       ::bgfx::makeRef(mesh.vertices_.data(), mesh.vertices_.size() * sizeof(mesh.vertices_[0])),
@@ -320,19 +351,16 @@ namespace owds::bgfx {
                     ::bgfx::createIndexBuffer(
                       ::bgfx::makeRef(mesh.indices_.data(), mesh.indices_.size() * sizeof(mesh.indices_[0])),
                       BGFX_BUFFER_INDEX32)});
-      ctx_->cached_textures_[model.id_] = tex;
     }
   }
 
-  void Renderer::queueModelBatch(const owds::Model& model, const std::array<float, 16>& model_mat)
+  void Renderer::queueModelBatch(const owds::Model& model, const owds::Material& material, const std::array<float, 16>& model_mat)
   {
-    tryCacheModel(model);
+    tryCacheModel(model, material);
 
     for(auto& mesh : model.meshes_)
     {
-      auto& mesh_batch = ctx_->current_mesh_batches_[model.id_][mesh.id_];
-
-      mesh_batch.emplace_back(owds::InstanceData{
+      ctx_->current_mesh_batches_[model.id_][mesh.id_].emplace_back(owds::InstanceData{
         model_mat,
         {}});
     }
@@ -344,21 +372,26 @@ namespace owds::bgfx {
 
     for(auto& [model_id, batch] : ctx_->current_mesh_batches_)
     {
-      ::bgfx::setTexture(0, ctx_->loaded_uniforms_["u_tex_color"], ctx_->cached_textures_[model_id]);
-
       for(auto& [mesh_id, transforms] : batch)
       {
         const auto& mesh = ctx_->cached_meshes_[mesh_id];
+
+        ::bgfx::setTexture(0, ctx_->loaded_uniforms_["u_tex_color"], mesh.tex_);
 
         for(const auto& transform : transforms)
         {
           ::bgfx::setTransform(transform.mvp_.data(), 1);
 
           auto u_seg_color = glm::vec4(
-            0.1f + rand() % 200 / 128.f,
-            0.1f + rand() % 200 / 128.f,
-            0.1f + rand() % 200 / 128.f,
-            1);
+            static_cast<float>(mesh.color_rgba_.r_) / 255.f,
+            static_cast<float>(mesh.color_rgba_.g_) / 255.f,
+            static_cast<float>(mesh.color_rgba_.b_) / 255.f,
+            static_cast<float>(mesh.color_rgba_.a_) / 255.f) /*glm::vec4(
+                                                             0.1f + rand() % 200 / 128.f,
+                                                             0.1f + rand() % 200 / 128.f,
+                                                             0.1f + rand() % 200 / 128.f,
+                                                             1)*/
+            ;
 
           ::bgfx::setUniform(ctx_->loaded_uniforms_["u_seg_color"], glm::value_ptr(u_seg_color));
 
@@ -376,11 +409,11 @@ namespace owds::bgfx {
   {
     for(auto& [model_id, batch] : ctx_->current_mesh_batches_)
     {
-      ::bgfx::setTexture(0, ctx_->loaded_uniforms_["u_tex_color"], ctx_->cached_textures_[model_id]);
-
       for(auto& [mesh_id, transforms] : batch)
       {
         auto& mesh = ctx_->cached_meshes_[mesh_id];
+
+        ::bgfx::setTexture(0, ctx_->loaded_uniforms_["u_tex_color"], mesh.tex_);
 
         ::bgfx::InstanceDataBuffer idb{};
         ::bgfx::allocInstanceDataBuffer(&idb, transforms.size(), sizeof(transforms[0]));
