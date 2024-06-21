@@ -10,6 +10,7 @@
 #include "overworld/Graphics/BGFX/API.h"
 #include "overworld/Graphics/BGFX/MeshHandle.h"
 #include "overworld/Graphics/Base/InstanceData.h"
+#include "overworld/Graphics/Base/Model.h"
 
 namespace owds {
   class Window;
@@ -34,14 +35,12 @@ namespace owds::bgfx {
     std::unordered_map<std::string, std::reference_wrapper<owds::bgfx::Camera>> named_cameras_;
     std::unordered_map<std::string, ::bgfx::ProgramHandle> loaded_programs_;
     std::unordered_map<std::string, ::bgfx::UniformHandle> loaded_uniforms_;
+    std::unordered_map<std::string, ::bgfx::TextureHandle> loaded_textures_;
 
     ::bgfx::TextureHandle white_tex_{};
 
-    std::unordered_map<std::size_t, owds::bgfx::MeshHandle> cached_meshes_;
-    std::unordered_map<std::size_t, ::bgfx::TextureHandle> cached_textures_;
-
-    // todo: Stuff this into owds::bgfx::Camera since this assumes we only have a single view.
-    std::unordered_map<std::size_t, std::unordered_map<std::size_t, std::vector<owds::InstanceData>>> current_mesh_batches_;
+    std::unordered_map<owds::Mesh::Id, owds::bgfx::MeshHandle> cached_meshes_;
+    std::unordered_map<owds::Model::Id, std::unordered_map<owds::Mesh::Id, std::vector<owds::InstanceData>>> current_mesh_batches_;
 
     Context();
     ~Context();

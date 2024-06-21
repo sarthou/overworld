@@ -5,6 +5,7 @@
 #include <string>
 #include <unordered_map>
 
+#include "overworld/Graphics/Base/Mesh.h"
 #include "overworld/Physics/PhysX/API.h"
 
 namespace owds::physx {
@@ -22,7 +23,7 @@ namespace owds::physx {
     PxPtr<::physx::PxCudaContextManager> px_cuda_context_manager_;
     PxPtr<::physx::PxMaterial> px_default_material_;
 
-    std::unordered_map<std::size_t, PxPtr<::physx::PxConvexMesh>> px_cached_meshes;
+    std::unordered_map<owds::Mesh::Id, PxPtr<::physx::PxConvexMesh>> px_cached_meshes;
 
     explicit SharedContext(const std::string& debugger_address);
     ~SharedContext() noexcept;
