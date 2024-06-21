@@ -32,7 +32,7 @@ namespace owds::assimp {
       {
         vertex.uv_ = {
           mesh->mTextureCoords[0][i].x,
-          mesh->mTextureCoords[0][i].y};
+          1.f - mesh->mTextureCoords[0][i].y}; // flip
       }
 
       out_mesh.vertices_.emplace_back(vertex);
@@ -55,14 +55,6 @@ namespace owds::assimp {
   {
     for(auto i = 0u; i < node->mNumMeshes; i++)
     {
-      if (scene->mNumTextures > 0)
-      {
-        const auto& tex = scene->mTextures[0];
-        out.texture_path_ = tex->mFilename.C_Str();
-        out.texture_width_ = tex->mWidth;
-        out.texture_height_ = tex->mHeight;
-      }
-
       out.meshes_.emplace_back(processMesh(scene->mMeshes[node->mMeshes[i]]));
     }
 
