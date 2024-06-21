@@ -14,8 +14,17 @@ find_package(TinyXML2 REQUIRED)
 ##  ROS specific configuration   ##
 ###################################
 
+set(OWDS_ROS2_DEPS "")
+set(OWDS_ROS2_DEPS_MSGS "")
+
 macro(owds_depend_package PKG)
     find_package(${PKG} REQUIRED)
+    list(APPEND OWDS_ROS2_DEPS ${PKG})
+endmacro()
+
+macro(owds_depend_msg_package PKG)
+    owds_depend_package(${PKG})
+    list(APPEND OWDS_ROS2_DEPS_MSGS ${PKG})
 endmacro()
 
 set(TMP_INTERFACES "overworld")
@@ -38,7 +47,7 @@ macro(owds_queue_services_generation)
 endmacro(owds_queue_services_generation)
 
 macro(owds_generate_interfaces)
-    list(APPEND TMP_INTERFACES DEPENDENCIES builtin_interfaces std_msgs geometry_msgs ontologenius)
+    list(APPEND TMP_INTERFACES DEPENDENCIES ${OWDS_ROS2_DEPS_MSGS})
 
     rosidl_generate_interfaces(${TMP_INTERFACES})
 
@@ -67,14 +76,7 @@ function(owds_add_generic TARGET)
 endfunction(owds_add_generic)
 
 function(owds_add_ros_generic TARGET)
-    ament_target_dependencies(${TARGET}
-        PUBLIC
-            rclcpp
-            pluginlib
-            builtin_interfaces
-            std_msgs
-            urdf
-            ontologenius)
+    ament_target_dependencies(${TARGET} PUBLIC ${OWDS_ROS2_DEPS})
 
     target_link_libraries(${TARGET} PUBLIC
             ontologenius::ontologenius_lib
