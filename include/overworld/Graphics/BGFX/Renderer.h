@@ -39,6 +39,8 @@ namespace owds::bgfx {
 
     owds::Camera& createCamera(const std::string& alias_name, owds::World& world) override;
 
+    std::vector<std::reference_wrapper<owds::Camera>> getCameras() override;
+
     using owds::Renderer::createCamera;
 
   protected:

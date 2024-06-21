@@ -27,8 +27,11 @@ namespace owds {
 
     /**
      * @param alias_name This parameter is optional, leave empty if undesired.
+     * @param world
      */
     virtual owds::Camera& createCamera(const std::string& alias_name, owds::World& world) = 0;
+
+    virtual std::vector<std::reference_wrapper<owds::Camera>> getCameras() = 0;
 
     /**
      * Helper function

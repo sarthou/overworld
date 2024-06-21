@@ -15,6 +15,7 @@
 namespace owds {
   class Window;
   class World;
+  class Camera;
 } // namespace owds
 
 namespace owds::bgfx {
@@ -30,6 +31,7 @@ namespace owds::bgfx {
     bool has_size_changed_ = false;
     bool instanced_rendering_supported = false;
     std::vector<std::unique_ptr<owds::bgfx::Camera>> cameras_;
+    std::vector<std::reference_wrapper<owds::Camera>> camera_refs_;
     std::set<owds::World*> cached_world_list_;
 
     std::unordered_map<std::string, std::reference_wrapper<owds::bgfx::Camera>> named_cameras_;

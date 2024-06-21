@@ -205,12 +205,19 @@ namespace owds::bgfx {
 
     const auto& camera = ctx_->cameras_.emplace_back(std::make_unique<owds::bgfx::Camera>(world));
 
+    ctx_->camera_refs_.emplace_back(*camera);
+
     if(!alias_name.empty())
     {
       ctx_->named_cameras_.emplace(alias_name, std::ref(*camera));
     }
 
     return *camera;
+  }
+
+  std::vector<std::reference_wrapper<owds::Camera>> Renderer::getCameras()
+  {
+    return ctx_->camera_refs_;
   }
 
   void Renderer::commitCamera(const owds::bgfx::Camera& camera)
@@ -314,7 +321,7 @@ namespace owds::bgfx {
         assert(!data.empty());
 
         int width, height, channels;
-        auto pixels = reinterpret_cast<owds::Color*>(stbi_load_from_memory(
+        const auto pixels = reinterpret_cast<owds::Color*>(stbi_load_from_memory(
           reinterpret_cast<stbi_uc*>(data.data()),
           static_cast<int>(data.size()),
           &width,
@@ -331,11 +338,11 @@ namespace owds::bgfx {
           1,
           ::bgfx::TextureFormat::RGBA8,
           0,
-          ::bgfx::makeRef(pixels, width * height * sizeof(owds::Color)));
+          ::bgfx::makeRef(pixels, width * height * sizeof(owds::Color), [](void* _ptr, void* _userData) {
+            stbi_image_free(_ptr);
+          }));
 
         ctx_->loaded_textures_[material.texture_path_] = tex;
-
-        // stbi_image_free(pixels); todo: do not forget to free this
       }
     }
 
