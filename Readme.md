@@ -15,7 +15,7 @@ First of all, we need to install [bullet3](https://github.com/bulletphysics/bull
 You can install it where you want on your computer but avoid installing it in your catkin workspace.
 
 ```
-git clone git@github.com:bulletphysics/bullet3.git
+git clone https://github.com/bulletphysics/bullet3.git
 cd bullet3
 mkdir build && mkdir install
 export BULLET_PATH=$(pwd)
@@ -37,8 +37,8 @@ To install Overworld, you just have to clone it and Ontologenius in the src fold
 
 ```
 cd src
-git clone git@github.com:sarthou/ontologenius.git
-git clone git@github.com:sarthou/overworld.git
+git clone https://github.com/sarthou/ontologenius.git
+git clone https://github.com/sarthou/overworld.git
 cd ..
 catkin_make # or catkin build
 ```
