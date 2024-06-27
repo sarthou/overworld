@@ -129,13 +129,8 @@ namespace owds {
 
   void World::processLink(owds::Robot& robot, const urdf::Link& urdf_link)
   {
-    const auto material_name = urdf_link.visual->material_name;
-    const auto material = material_name.empty() ?
-                            owds::Material{
-                              owds::Color{255, 255, 255, 255},
-                              ""
-    } :
-                            robot.materials_.at(urdf_link.visual->material_name);
+    const auto material_name = urdf_link.visual ? urdf_link.visual->material_name : "";
+    const auto material = material_name.empty() ? owds::Material{owds::Color{255, 255, 255, 255}, ""} : robot.materials_.at(material_name);
 
     owds::Shape collision_shape = owds::ShapeDummy();
     std::vector<owds::Shape> visual_shapes;
@@ -187,15 +182,16 @@ namespace owds {
 
   void World::processJoint(owds::Robot& robot, const urdf::Joint& urdf_joint)
   {
-    auto& link0 = *robot.links_.at(urdf_joint.parent_link_name);
-    auto& link1 = *robot.links_.at(urdf_joint.child_link_name);
+    (void) robot;
+    // auto& link0 = *robot.links_.at(urdf_joint.parent_link_name);
+    // auto& link1 = *robot.links_.at(urdf_joint.child_link_name);
 
     // joint.parent_to_joint_origin_transform;
     switch(urdf_joint.type)
     {
     case urdf::Joint::REVOLUTE:
     {
-      createJointRevolute(
+      /*createJointRevolute(
         link0,
         {},
         {
@@ -206,7 +202,7 @@ namespace owds {
         },
         link1,
         {},
-        {});
+        {});*/
 
       break;
     }
