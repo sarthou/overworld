@@ -1,6 +1,5 @@
-# Ubuntu 20.04 should be at cmake 3.16
+# Ubuntu 20.04 should have at least cmake 3.16
 cmake_minimum_required(VERSION 3.16)
-set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 project(overworld)
 
 # Why not use cmake_policy? See: https://gitlab.kitware.com/cmake/cmake/-/issues/20312.
@@ -11,6 +10,8 @@ if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.27")
     # Get rid of the dev warnings spam from python_ament_cmake
     cmake_policy(SET CMP0148 OLD)
 endif()
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 # Default to C++17 for all targets
 set(CMAKE_CXX_STANDARD 17)
@@ -28,7 +29,7 @@ if(NOT DEFINED ENV{ROS_VERSION})
     message(FATAL_ERROR "Please source your ROS1 / ROS2 environment before running cmake")
 endif()
 
-# Some dependencies won't compile (cough cough PhysX..) unless if a valid value for CMAKE_BUILD_TYPE is set
+# Some dependencies won't compile (cough cough PhysX..) unless if a "valid" value for CMAKE_BUILD_TYPE is set
 if(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
     message("Colcon does not specify the value of CMAKE_BUILD_TYPE by default, defaulting to 'Debug'")
     set(CMAKE_BUILD_TYPE Debug)
@@ -49,7 +50,7 @@ endif()
 ## - Bullet3: Primary physics engine                               ##
 ## - Eigen3: For hardcore math nerds                               ##
 ## - glm: Also for math nerds, but only used in the graphics &     ##
-##        physics engines.                                         ##
+##        physics engine glue                                      ##
 #####################################################################
 
 find_package(PkgConfig REQUIRED)
@@ -78,6 +79,13 @@ if (OWDS_USE_PHYSX)
         FetchContent_Populate(PhysX)
         message(STATUS "PhysX source dir: ${physx_SOURCE_DIR}")
         message(STATUS "PhysX binary dir: ${physx_BINARY_DIR}")
+
+        # todo: figure out this doesn't work
+        # We need to call this script so that packman can download NVidia's proprietary PhysXgpu shared binary
+        execute_process(
+            WORKING_DIRECTORY "${physx_SOURCE_DIR}/physx/"
+            COMMAND "yes 1 | generate_projects.sh"
+            COMMAND_ECHO STDOUT)
 
         # Hardcoded for now..
         set(PHYSX_ROOT_DIR ${physx_SOURCE_DIR}/physx/)
@@ -161,13 +169,13 @@ set(overworld_frag_shaders
 
 bgfx_compile_shader_to_header(
     TYPE VERTEX
-    SHADERS ${owds_vert_shaders}
+    SHADERS ${overworld_vert_shaders}
     VARYING_DEF ${CMAKE_SOURCE_DIR}/shaders/defs/varying.def.sc
     OUTPUT_DIR ${CMAKE_BINARY_DIR}/include/generated/shaders/)
 
 bgfx_compile_shader_to_header(
     TYPE FRAGMENT
-    SHADERS ${owds_frag_shaders}
+    SHADERS ${overworld_frag_shaders}
     VARYING_DEF ${CMAKE_SOURCE_DIR}/shaders/defs/varying.def.sc
     OUTPUT_DIR ${CMAKE_BINARY_DIR}/include/generated/shaders/)
 
@@ -182,8 +190,8 @@ owds_add_library(overworld_graphics
     src/Graphics/BGFX/Renderer.cpp
     src/Graphics/BGFX/Vertex.cpp
     src/Graphics/GLFW3/Window.cpp
-    ${owds_vert_shaders}
-    ${owds_frag_shaders})
+    ${overworld_vert_shaders}
+    ${overworld_frag_shaders})
 
 target_include_directories(overworld_graphics PUBLIC ${CMAKE_BINARY_DIR}/include/generated/shaders/)
 target_link_libraries(overworld_graphics PUBLIC assimp bgfx bx glfw)
