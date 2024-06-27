@@ -67,10 +67,11 @@ namespace owds::physx {
 
   void Actor::setMass(const float mass_kg)
   {
-    if (mass_kg <= 0)
+    if(mass_kg <= 0)
     {
       setPhysicsEnabled(false);
-    } else
+    }
+    else
     {
       px_actor_->setMass(static_cast<::physx::PxReal>(mass_kg));
     }
@@ -150,13 +151,14 @@ namespace owds::physx {
       static_cast<::physx::PxReal>(shape.height_) / 2));
   }
 
-  void Actor::setupPhysicsShape(const owds::ShapeCustomMesh& shape)
+  static auto createPxCookingParams(
+    const bool minimize_memory_footprint)
   {
     auto params = ::physx::PxCookingParams(::physx::PxTolerancesScale());
     params.convexMeshCookingType = ::physx::PxConvexMeshCookingType::eQUICKHULL;
     params.midphaseDesc = ::physx::PxMeshMidPhase::eBVH34;
-    params.suppressTriangleMeshRemapTable = true;
-    params.buildGPUData = !ctx_.minimize_memory_footprint_;
+    params.suppressTriangleMeshRemapTable = minimize_memory_footprint;
+    params.buildGPUData = !minimize_memory_footprint;
     params.meshPreprocessParams &= ~static_cast<::physx::PxMeshPreprocessingFlags>(
       ::physx::PxMeshPreprocessingFlag::eDISABLE_CLEAN_MESH);
     params.meshPreprocessParams &= ~static_cast<::physx::PxMeshPreprocessingFlags>(
@@ -168,27 +170,89 @@ namespace owds::physx {
 
     // Cooking mesh with less triangles per leaf produces larger meshes with better runtime performance
     // and worse cooking performance. Cooking time is better when more triangles per leaf are used.
-    params.midphaseDesc.mBVH34Desc.numPrimsPerLeaf = 2;
-    params.midphaseDesc.mBVH34Desc.buildStrategy = ::physx::PxBVH34BuildStrategy::eSAH;
-    params.midphaseDesc.mBVH34Desc.quantized = ctx_.minimize_memory_footprint_;
+    params.midphaseDesc.mBVH34Desc.numPrimsPerLeaf = 15;
+    params.midphaseDesc.mBVH34Desc.buildStrategy = ::physx::PxBVH34BuildStrategy::eFAST;
+    params.midphaseDesc.mBVH34Desc.quantized = minimize_memory_footprint;
+    return params;
+  }
+
+  static auto createPxTriangleMesh(
+    const ::physx::PxCookingParams& cooking_params,
+    const std::vector<::physx::PxVec3>& vertices,
+    const std::vector<std::uint32_t>& indices)
+  {
+    auto sdf_desc = ::physx::PxSDFDesc();
+    sdf_desc.spacing = 0.05f;
+    sdf_desc.subgridSize = 6;
+    sdf_desc.bitsPerSubgridPixel = ::physx::PxSdfBitsPerSubgridPixel::e16_BIT_PER_PIXEL;
+    sdf_desc.numThreadsForSdfConstruction = 16;
+    assert(sdf_desc.isValid());
+
+    auto mesh_desc = ::physx::PxTriangleMeshDesc();
+    mesh_desc.points.count = vertices.size();
+    mesh_desc.points.stride = sizeof(vertices[0]);
+    mesh_desc.points.data = vertices.data();
+    mesh_desc.triangles.count = indices.size() / 3;
+    mesh_desc.triangles.stride = sizeof(indices[0]) * 3;
+    mesh_desc.triangles.data = indices.data();
+    mesh_desc.sdfDesc = &sdf_desc;
+    assert(mesh_desc.isValid());
+
+    // assert(PxValidateConvexMesh(params, mesh_desc));
+
+    ::physx::PxDefaultMemoryOutputStream writeBuffer;
+    ::physx::PxTriangleMeshCookingResult::Enum result;
+
+    assert(PxCookTriangleMesh(cooking_params, mesh_desc, writeBuffer, &result));
+
+    using ResultTy = decltype(result);
+
+    switch(result)
+    {
+    case ResultTy::eSUCCESS:
+      break;
+    case ResultTy::eLARGE_TRIANGLE:
+      assert(false && "eLARGE_TRIANGLE");
+      break;
+    case ResultTy::eEMPTY_MESH:
+      assert(false && "eEMPTY_MESH");
+      break;
+    case ResultTy::eFAILURE:
+      assert(false && "eFAILURE");
+      break;
+    }
+
+    ::physx::PxDefaultMemoryInputData readBuffer(writeBuffer.getData(), writeBuffer.getSize());
+
+    const auto& sdk = owds::physx::Context::shared_ctx_->px_physics_;
+    const auto px_mesh = sdk->createTriangleMesh(readBuffer);
+
+    assert(px_mesh);
+
+    return px_mesh;
+  }
+
+  void Actor::setupPhysicsShape(const owds::ShapeCustomMesh& shape)
+  {
+    const auto& s_ctx = owds::physx::Context::shared_ctx_;
+
+    const auto params = createPxCookingParams(ctx_.minimize_memory_footprint_);
 
     for(const auto& mesh : shape.custom_model_.get().meshes_)
     {
-      if (mesh.vertices_.size() < 4)
-      {
-        printf("[%s:%s] Ignoring! Less than 4 vertices..\n",
-          shape.custom_model_.get().source_path_.c_str(),
-          mesh.name_.c_str());
-        continue;
-      }
-
-      const auto& s_ctx = owds::physx::Context::shared_ctx_;
-
       if(!s_ctx->px_cached_meshes.count(mesh.id_))
       {
-        std::vector<::physx::PxVec3> vertices;
+        if(mesh.vertices_.size() < 4)
+        {
+          printf("[%s:%s] Ignoring! Less than 4 vertices..\n",
+                 shape.custom_model_.get().source_path_.c_str(),
+                 mesh.name_.c_str());
+          continue;
+        }
 
+        std::vector<::physx::PxVec3> vertices;
         vertices.reserve(mesh.vertices_.size());
+
         for(const auto& vertex : mesh.vertices_)
         {
           vertices.emplace_back(
@@ -197,70 +261,11 @@ namespace owds::physx {
             vertex.position_[2]);
         }
 
-        std::vector<::physx::PxU32> indices;
-
-        indices.reserve(mesh.indices_.size());
-        for(const auto& idx : mesh.indices_)
-        {
-          indices.emplace_back(idx);
-        }
-
-        auto sdf_desc = ::physx::PxSDFDesc();
-        sdf_desc.spacing = 0.05f;
-        sdf_desc.subgridSize = 6;
-        sdf_desc.bitsPerSubgridPixel = ::physx::PxSdfBitsPerSubgridPixel::e16_BIT_PER_PIXEL;
-        sdf_desc.numThreadsForSdfConstruction = 16;
-        assert(sdf_desc.isValid());
-
-        auto mesh_desc = ::physx::PxConvexMeshDesc();
-        mesh_desc.points.count = vertices.size();
-        mesh_desc.points.stride = sizeof(vertices[0]);
-        mesh_desc.points.data = vertices.data();
-        mesh_desc.indices.count = indices.size();
-        mesh_desc.indices.stride = sizeof(indices[0]);
-        mesh_desc.indices.data = indices.data();
-        mesh_desc.flags = ::physx::PxConvexFlag::eCOMPUTE_CONVEX;
-        assert(mesh_desc.isValid());
-
-        // assert(PxValidateConvexMesh(params, mesh_desc));
-
-        ::physx::PxDefaultMemoryOutputStream writeBuffer;
-        ::physx::PxConvexMeshCookingResult::Enum result;
-
-        assert(PxCookConvexMesh(params, mesh_desc, writeBuffer, &result));
-
-        using ResultTy = decltype(result);
-
-        switch(result)
-        {
-        case ResultTy::eSUCCESS:
-          break;
-        case ResultTy::eZERO_AREA_TEST_FAILED:
-          assert(false && "eZERO_AREA_TEST_FAILED");
-          break;
-        case ResultTy::ePOLYGONS_LIMIT_REACHED:
-          assert(false && "ePOLYGONS_LIMIT_REACHED");
-          break;
-        case ResultTy::eFAILURE:
-          assert(false && "eFAILURE");
-          break;
-        case ResultTy::eNON_GPU_COMPATIBLE:
-          // assert(false && "eNON_GPU_COMPATIBLE");
-          break;
-        }
-
-        ::physx::PxDefaultMemoryInputData readBuffer(writeBuffer.getData(), writeBuffer.getSize());
-
-        const auto& sdk = owds::physx::Context::shared_ctx_->px_physics_;
-        const auto px_mesh = sdk->createConvexMesh(readBuffer);
-
-        assert(px_mesh);
-
-        s_ctx->px_cached_meshes[mesh.id_] = px_mesh;
+        s_ctx->px_cached_meshes[mesh.id_] = createPxTriangleMesh(params, vertices, mesh.indices_);
       }
 
-      px_geometries_.emplace_back(std::make_unique<::physx::PxConvexMeshGeometry>(
-        s_ctx->px_cached_meshes.at(mesh.id_).get(),
+      px_geometries_.emplace_back(std::make_unique<::physx::PxTriangleMeshGeometry>(
+        s_ctx->px_cached_meshes[mesh.id_].get(),
         ::physx::PxMeshScale(::physx::PxVec3(
           static_cast<::physx::PxReal>(shape.scale_[0]),
           static_cast<::physx::PxReal>(shape.scale_[1]),
@@ -279,7 +284,7 @@ namespace owds::physx {
 
   void Actor::setupPhysicsShape(const owds::ShapeDummy& shape)
   {
-    (void) shape;
+    (void)shape;
   }
 
   void Actor::setupPhysicsShape(const owds::ShapeSphere& shape)
