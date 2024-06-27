@@ -124,6 +124,12 @@ namespace owds::bgfx {
   {
     world_eye_position_ = ToV3(eye_position);
     world_eye_front_ = ToV3(dst_position) - ToV3(eye_position);
+
+    const auto XY = glm::sqrt(glm::pow(world_eye_front_.x, 2) + glm::pow(world_eye_front_.y, 2));
+
+    view_angles_.x = glm::atan(world_eye_front_.y, world_eye_front_.x);
+    view_angles_.y = glm::atan(world_eye_front_.z, static_cast<float>(XY));
+
     updateViewMatrix();
   }
 
