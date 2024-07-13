@@ -1,17 +1,25 @@
 #include "overworld/Graphics/BGFX/Camera.h"
 
 #include <GLFW/glfw3.h>
+#include <array>
+#include <cstdint>
 #include <cstdio>
+#include <functional>
 #include <glm/gtc/packing.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <iostream>
 
 #include "overworld/Graphics/BGFX/API.h"
+#include "overworld/Graphics/Base/CameraProjection.h"
+#include "overworld/Graphics/Base/CameraView.h"
+#include "overworld/Graphics/Base/Color.h"
+#include "overworld/Graphics/Base/ViewAntiAliasing.h"
 #include "overworld/Helper/BitCast.h"
 #include "overworld/Helper/GlmMath.h"
 
 namespace owds::bgfx {
-  Camera::Camera(owds::World& world)
-    : currently_viewed_world_(world) {}
+  Camera::Camera(owds::World& world) : currently_viewed_world_(world)
+  {}
 
   void Camera::updateViewMatrix()
   {
@@ -111,40 +119,45 @@ namespace owds::bgfx {
 
   void Camera::finalize()
   {
-    updateViewMatrix();
+    recomputeDirectionVector();
+    updateMatrices();
   }
 
   void Camera::setPositionAndOrientation(const std::array<float, 3>& position, const std::array<float, 3>& orientation)
   {
-    (void)position;    // todo
-    (void)orientation; // todo
+    // to verify
+    world_eye_position_ = ToV3(position);
+    view_angles_.x = orientation[2]; // yaw
+    view_angles_.y = orientation[1]; // pitch
+    recomputeDirectionVector();
   }
 
   void Camera::setPositionAndLookAt(const std::array<float, 3>& eye_position, const std::array<float, 3>& dst_position)
   {
     world_eye_position_ = ToV3(eye_position);
-    world_eye_front_ = ToV3(dst_position) - ToV3(eye_position);
+    world_eye_front_ = ToV3(dst_position) - world_eye_position_;
 
-    const auto XY = glm::sqrt(glm::pow(world_eye_front_.x, 2) + glm::pow(world_eye_front_.y, 2));
+    const auto xy = glm::sqrt(glm::pow(world_eye_front_.x, 2) + glm::pow(world_eye_front_.y, 2));
 
-    view_angles_.x = glm::atan(world_eye_front_.y, world_eye_front_.x);
-    view_angles_.y = glm::atan(world_eye_front_.z, static_cast<float>(XY));
+    view_angles_.x = glm::degrees(glm::atan(world_eye_front_.y, world_eye_front_.x));
+    view_angles_.y = glm::degrees(glm::atan(world_eye_front_.z, static_cast<float>(xy)));
 
+    recomputeDirectionVector();
     updateViewMatrix();
   }
 
   void Camera::recomputeDirectionVector()
   {
-    world_eye_front_.x = glm::cos(view_angles_.x) * glm::cos(view_angles_.y);
-    world_eye_front_.y = glm::sin(view_angles_.x) * glm::cos(view_angles_.y);
-    world_eye_front_.z = glm::sin(view_angles_.y);
+    glm::vec3 world_up(0.0f, 0.0f, 1.0f);
 
-    const auto d90 = glm::pi<float>() / 2.f;
-    world_eye_right_.x = glm::cos(view_angles_.x + d90);
-    world_eye_right_.y = glm::sin(view_angles_.x + d90);
-    world_eye_right_.z = 0.f;
+    glm::vec3 front;
+    front.x = cos(glm::radians(view_angles_.x)) * cos(glm::radians(view_angles_.y));
+    front.y = sin(glm::radians(view_angles_.x)) * cos(glm::radians(view_angles_.y));
+    front.z = sin(glm::radians(view_angles_.y));
 
-    world_eye_up_ = glm::cross(world_eye_front_, world_eye_right_);
+    world_eye_front_ = glm::normalize(front);
+    world_eye_right_ = -glm::normalize(glm::cross(world_eye_front_, world_up)); // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
+    world_eye_up_ = glm::normalize(glm::cross(-world_eye_right_, world_eye_front_));
   }
 
   void Camera::processUserKeyboardInput(const float delta_time, const int key, const bool is_down)
@@ -176,7 +189,17 @@ namespace owds::bgfx {
 
     switch(btn)
     {
-    case 1:
+    case 1: // right
+    {
+      if(is_down)
+      {
+        mouse_drag_start_position_ = mouse_current_position;
+      }
+
+      is_dragging_mouse_ = is_down;
+      break;
+    }
+    case 2: // middle
     {
       if(is_down)
       {
@@ -201,14 +224,36 @@ namespace owds::bgfx {
 
     if(mouse_btn_states_[1])
     {
-      const auto delta = (mouse_current_position - mouse_drag_start_position_) * 0.001f;
+      const auto delta = (mouse_current_position - mouse_drag_start_position_) * mouse_rotation_sensitivity_;
       mouse_drag_start_position_ = mouse_current_position;
 
-      view_angles_.x += delta.x;
-      view_angles_.y -= delta.y;
+      view_angles_.x += delta.x; // yaw
+      view_angles_.y -= delta.y; // pitch
+
+      if(view_angles_.y > 89.0f)
+        view_angles_.y = 89.0f;
+      if(view_angles_.y < -89.0f)
+        view_angles_.y = -89.0f;
 
       recomputeDirectionVector();
     }
+    else if(mouse_btn_states_[2])
+    {
+      const auto delta = (mouse_current_position - mouse_drag_start_position_) * (mouse_translate_sensitivity_ * 0.5f);
+      mouse_drag_start_position_ = mouse_current_position;
+
+      world_eye_position_ -= world_eye_right_ * delta.x;
+      world_eye_position_ += world_eye_up_ * delta.y;
+
+      recomputeDirectionVector();
+    }
+  }
+
+  void Camera::processUserMouseScroll(float delta_time, float xoffset, float yoffset)
+  {
+    (void)delta_time;
+    (void)xoffset;
+    world_eye_position_ += world_eye_front_ * (yoffset * mouse_scroll_sensitivity_);
   }
 
   void Camera::update()
@@ -225,8 +270,6 @@ namespace owds::bgfx {
       world_eye_position_ += world_eye_up_ * 0.1f;
     if(key_state_down_)
       world_eye_position_ -= world_eye_up_ * 0.1f;
-
-    // world_eye_right_
   }
 
 } // namespace owds::bgfx

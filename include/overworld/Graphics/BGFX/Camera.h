@@ -23,7 +23,7 @@ namespace owds::bgfx {
     owds::CameraProjection_e projection_type_{};
     std::array<float, 2> view_dimensions_{};
     float aspect_ratio_{};
-    float field_of_view_ = 1.f;
+    float field_of_view_ = 0.785398; // 45 deg
     glm::vec3 world_eye_position_{};
     glm::vec3 world_eye_front_{};
     glm::vec3 world_eye_right_{};
@@ -34,7 +34,7 @@ namespace owds::bgfx {
     bool show_debug_stats_ = false;
     bool render_collision_models_ = false;
 
-    glm::vec2 view_angles_{};
+    glm::vec2 view_angles_{-90.0f, 0.0f}; // yaw/pitch in deg
 
     glm::vec2 mouse_current_position{};
     glm::vec2 mouse_drag_start_position_{};
@@ -49,6 +49,10 @@ namespace owds::bgfx {
     bool key_state_down_ = false;
 
     std::bitset<16> mouse_btn_states_{};
+
+    float mouse_rotation_sensitivity_ = 0.1;
+    float mouse_translate_sensitivity_ = 0.035;
+    float mouse_scroll_sensitivity_ = 0.2;
 
     explicit Camera(owds::World& world);
 
@@ -73,7 +77,11 @@ namespace owds::bgfx {
     void processUserKeyboardInput(float delta_time, int key, bool is_down) override;
     void processUserMouseBtnInput(float delta_time, char btn, bool is_down) override;
     void processUserMouseInput(float delta_time, float x, float y) override;
+    void processUserMouseScroll(float delta_time, float xoffset, float yoffset) override;
     void update() override;
+
+  private:
+    // glm::mat3 to_z_up_;
   };
 } // namespace owds::bgfx
 

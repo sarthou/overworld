@@ -21,6 +21,7 @@ namespace owds::glfw3 {
       ctx_->height_ = height;
       ctx_->has_size_changed_ = true;
     });
+
     glfwSetKeyCallback(ctx_->glfw_window_, [](GLFWwindow* window, const int key, const int scancode, const int action, const int mods) {
       (void)scancode;
       (void)mods;
@@ -43,6 +44,7 @@ namespace owds::glfw3 {
 
       camera.processUserKeyboardInput(0.f, key, action == GLFW_PRESS);
     });
+
     glfwSetCursorPosCallback(ctx_->glfw_window_, [](GLFWwindow* window, const double xpos, const double ypos) {
       const auto user_ptr = glfwGetWindowUserPointer(window);
 
@@ -57,6 +59,22 @@ namespace owds::glfw3 {
 
       camera.processUserMouseInput(0.f, static_cast<float>(xpos), static_cast<float>(ypos));
     });
+
+    glfwSetScrollCallback(ctx_->glfw_window_, [](GLFWwindow* window, double xoffset, double yoffset) {
+      const auto user_ptr = glfwGetWindowUserPointer(window);
+
+      const auto& ctx_ = reinterpret_cast<owds::glfw3::Window*>(user_ptr)->ctx_;
+
+      if(ctx_->cached_camera_refs_.empty())
+      {
+        return;
+      }
+
+      auto& camera = ctx_->cached_camera_refs_[ctx_->active_camera_index].get();
+
+      camera.processUserMouseScroll(0.f, static_cast<float>(xoffset), static_cast<float>(yoffset));
+    });
+
     glfwSetMouseButtonCallback(ctx_->glfw_window_, [](GLFWwindow* window, const int button, const int action, int mods) {
       (void)mods;
 

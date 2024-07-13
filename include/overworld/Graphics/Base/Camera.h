@@ -9,6 +9,7 @@
 #include "overworld/Graphics/Base/ViewAntiAliasing.h"
 
 namespace owds {
+
   class Camera
   {
   public:
@@ -77,6 +78,7 @@ namespace owds {
     virtual void processUserKeyboardInput(float delta_time, int key, bool is_down) = 0;
     virtual void processUserMouseBtnInput(float delta_time, char btn, bool is_down) = 0;
     virtual void processUserMouseInput(float delta_time, float x, float y) = 0;
+    virtual void processUserMouseScroll(float delta_time, float xoffset, float yoffset) = 0;
     virtual void update() = 0;
   };
 } // namespace owds
