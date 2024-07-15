@@ -3,6 +3,8 @@
 
 #include <memory>
 
+#include "overworld/Graphics/BGFX/Light/AmbientLight.h"
+#include "overworld/Graphics/BGFX/Light/PointLights.h"
 #include "overworld/Graphics/Base/Renderer.h"
 
 namespace owds {
@@ -24,6 +26,9 @@ namespace owds::bgfx {
 
   class Renderer final : public owds::Renderer
   {
+    AmbientLight ambient_light_; // todo to move
+    PointLights point_lights_;   // todo to move
+
   public:
     Renderer();
     ~Renderer() override;
@@ -56,7 +61,7 @@ namespace owds::bgfx {
     void tryCacheModel(const owds::Model& model, const owds::Material& material);
     void queueModelBatch(const owds::Model& model, const owds::Material& material, const std::array<float, 16>& model_mat);
 
-    void render(std::uint64_t state);
+    void render(std::uint64_t state, const owds::bgfx::Camera& camera);
     void renderInstanced(std::uint64_t state);
 
     std::unique_ptr<owds::bgfx::Context> ctx_;

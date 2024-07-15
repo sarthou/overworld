@@ -118,8 +118,30 @@ namespace owds::bgfx {
     ctx_->loaded_programs_["default"] = ::bgfx::createProgram(vsh, fsh, true);
     ctx_->is_initialized_ = true;
 
-    ctx_->loaded_uniforms_["u_tex_color"] = ::bgfx::createUniform("u_tex_color", ::bgfx::UniformType::Sampler);
-    ctx_->loaded_uniforms_["u_seg_color"] = ::bgfx::createUniform("u_seg_color", ::bgfx::UniformType::Vec4);
+    ctx_->loaded_uniforms_["material_texture_diffuse"] = ::bgfx::createUniform("material_texture_diffuse", ::bgfx::UniformType::Sampler);
+    ctx_->loaded_uniforms_["material_texture_specular"] = ::bgfx::createUniform("material_texture_specular", ::bgfx::UniformType::Sampler);
+    ctx_->loaded_uniforms_["material_color"] = ::bgfx::createUniform("material_color", ::bgfx::UniformType::Vec4);
+    ctx_->loaded_uniforms_["material_shininess"] = ::bgfx::createUniform("material_shininess", ::bgfx::UniformType::Vec4);
+    ctx_->loaded_uniforms_["material_specular"] = ::bgfx::createUniform("material_specular", ::bgfx::UniformType::Vec4);
+
+    ambient_light_.registerUniforms(ctx_->loaded_uniforms_);
+    point_lights_.registerUniforms(ctx_->loaded_uniforms_);
+
+    ambient_light_ = AmbientLight(glm::vec4(-0.2f, -1.0f, -0.3f, 0.0f),
+                                  glm::vec4(1.0f, 0.976f, 0.898f, 1.0f),
+                                  0.4, 0.5, 1.0);
+
+    point_lights_.addLight(glm::vec3(2.0f, -2.0f, 1.0f),
+                           glm::vec4(1.0f, 1.0f, 1.0f, 1.0f),
+                           0.5, 0.5, 1.0,
+                           glm::vec3(1.0f, 0.35f, 0.44f));
+
+    point_lights_.addLight(glm::vec3(10.0f, -2.0f, 1.0f),
+                           glm::vec4(0.0f, 1.0f, 1.0f, 1.0f),
+                           0.5, 0.5, 1.0,
+                           glm::vec3(1.0f, 0.35f, 0.44f));
+
+    ctx_->loaded_uniforms_["view_position"] = ::bgfx::createUniform("view_position", ::bgfx::UniformType::Vec4);
 
     static owds::Color white_pixel{255, 255, 255, 255};
 
@@ -225,8 +247,8 @@ namespace owds::bgfx {
                            BGFX_STATE_WRITE_A |
                            BGFX_STATE_WRITE_Z |
                            BGFX_STATE_DEPTH_TEST_LESS |
-                           BGFX_STATE_CULL_CCW |
-                           BGFX_STATE_MSAA;
+                           BGFX_STATE_CULL_CCW; // |
+                                                // BGFX_STATE_MSAA;
 
     ::bgfx::setDebug(camera.show_debug_stats_ ? BGFX_DEBUG_STATS : 0);
 
@@ -239,7 +261,7 @@ namespace owds::bgfx {
     }
     else
     {
-      render(state);
+      render(state, camera);
     }
   }
 
@@ -247,10 +269,11 @@ namespace owds::bgfx {
   {
     for(const auto& actor : world.getActors())
     {
-      if (ctx_->render_collision_models_)
+      if(ctx_->render_collision_models_)
       {
         std::visit([this, &actor](const auto& shape_resolv) { queueActorBatch(actor, shape_resolv); }, actor.get().collision_shape_);
-      } else
+      }
+      else
       {
         for(const auto& shape : actor.get().visual_shapes_)
         {
@@ -345,7 +368,7 @@ namespace owds::bgfx {
           ::bgfx::TextureFormat::RGBA8,
           0,
           ::bgfx::makeRef(pixels, width * height * sizeof(owds::Color), [](void* _ptr, void* _userData) {
-            (void) _userData;
+            (void)_userData;
             stbi_image_free(_ptr);
           }));
 
@@ -380,9 +403,15 @@ namespace owds::bgfx {
     }
   }
 
-  void Renderer::render(const std::uint64_t state)
+  void Renderer::render(const std::uint64_t state, const owds::bgfx::Camera& camera)
   {
     srand(0);
+
+    ambient_light_.setUniforms(ctx_->loaded_uniforms_);
+    point_lights_.setUniforms(ctx_->loaded_uniforms_);
+
+    auto view_position = glm::vec4(camera.world_eye_position_, 0.0f);
+    ::bgfx::setUniform(ctx_->loaded_uniforms_["view_position"], glm::value_ptr(view_position));
 
     for(auto& [model_id, batch] : ctx_->current_mesh_batches_)
     {
@@ -390,13 +419,17 @@ namespace owds::bgfx {
       {
         const auto& mesh = ctx_->cached_meshes_[mesh_id];
 
-        ::bgfx::setTexture(0, ctx_->loaded_uniforms_["u_tex_color"], mesh.tex_);
+        ::bgfx::setTexture(0, ctx_->loaded_uniforms_["material_texture_diffuse"], mesh.tex_);
+        auto material_shininess = glm::vec4(64.f, 0.f, 0.f, 0.f);
+        ::bgfx::setUniform(ctx_->loaded_uniforms_["material_shininess"], glm::value_ptr(material_shininess));
+        auto material_specular = glm::vec4(0.1f, 0.f, 0.f, 0.f);
+        ::bgfx::setUniform(ctx_->loaded_uniforms_["material_specular"], glm::value_ptr(material_specular));
 
         for(const auto& transform : transforms)
         {
           ::bgfx::setTransform(transform.mvp_.data(), 1);
 
-          auto u_seg_color = glm::vec4(
+          auto material_color = glm::vec4(
             static_cast<float>(mesh.color_rgba_.r_) / 255.f,
             static_cast<float>(mesh.color_rgba_.g_) / 255.f,
             static_cast<float>(mesh.color_rgba_.b_) / 255.f,
@@ -407,7 +440,7 @@ namespace owds::bgfx {
                                                              1)*/
             ;
 
-          ::bgfx::setUniform(ctx_->loaded_uniforms_["u_seg_color"], glm::value_ptr(u_seg_color));
+          ::bgfx::setUniform(ctx_->loaded_uniforms_["material_color"], glm::value_ptr(material_color));
 
           ::bgfx::setVertexBuffer(0, mesh.vbh_);
           ::bgfx::setIndexBuffer(mesh.ibh_);
@@ -427,7 +460,7 @@ namespace owds::bgfx {
       {
         auto& mesh = ctx_->cached_meshes_[mesh_id];
 
-        ::bgfx::setTexture(0, ctx_->loaded_uniforms_["u_tex_color"], mesh.tex_);
+        ::bgfx::setTexture(0, ctx_->loaded_uniforms_["material_texture_diffuse"], mesh.tex_);
 
         ::bgfx::InstanceDataBuffer idb{};
         ::bgfx::allocInstanceDataBuffer(&idb, transforms.size(), sizeof(transforms[0]));
