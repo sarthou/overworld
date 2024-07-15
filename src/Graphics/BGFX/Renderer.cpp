@@ -134,7 +134,7 @@ namespace owds::bgfx {
     point_lights_.addLight(glm::vec3(2.0f, -2.0f, 1.0f),
                            glm::vec4(1.0f, 1.0f, 1.0f, 1.0f),
                            0.5, 0.5, 1.0,
-                           glm::vec3(1.0f, 0.35f, 0.44f));
+                           10.f);
 
     point_lights_.addLight(glm::vec3(10.0f, -2.0f, 1.0f),
                            glm::vec4(0.0f, 1.0f, 1.0f, 1.0f),

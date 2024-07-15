@@ -39,6 +39,24 @@ namespace owds {
       return id;
     }
 
+    std::size_t addLight(const glm::vec3& position,
+                         const glm::vec4& color = glm::vec4(1.0),
+                         float ambient_strength = 1.0f,
+                         float diffuse_strength = 1.0f,
+                         float specular_strength = 1.0f,
+                         float attenuation_radius = 10.f)
+    {
+      size_t id = findAvailableId();
+      setPosition(id, position);
+      colors_[id] = color;
+      setAmbientStrength(id, ambient_strength);
+      setDiffuseStrength(id, diffuse_strength);
+      setSpecularStrength(id, specular_strength);
+      setAttenuation(id, attenuation_radius);
+
+      return id;
+    }
+
     void removeLight(std::size_t id)
     {
       removeId(id);
@@ -66,6 +84,11 @@ namespace owds {
     void setAttenuation(std::size_t id, const glm::vec3& attenuation)
     {
       attenuations_[id] = glm::vec4(attenuation, 0.0f);
+    }
+
+    void setAttenuation(std::size_t id, float radius)
+    {
+      attenuations_[id] = glm::vec4(1.0f, 2.0 / radius, 1.0 / (radius * radius), 0.0f);
     }
 
     void setAmbientStrength(std::size_t id, float strength)
