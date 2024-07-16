@@ -3,10 +3,12 @@
 #include <bx/bx.h>
 #include <bx/file.h>
 #include <bx/readerwriter.h>
+#include <cstdint>
 #include <fstream>
 #include <glm/gtc/packing.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/quaternion.hpp>
+#include <string>
 
 #include "overworld/Graphics/BGFX/Camera.h"
 #include "overworld/Graphics/BGFX/Context.h"
@@ -254,7 +256,7 @@ namespace owds::bgfx {
 
     ctx_->render_collision_models_ = camera.render_collision_models_;
 
-    ::bgfx::touch(0);
+    ::bgfx::touch(0); // Submit an empty primitive for rendering. Uniforms and draw state will be applied but no geometry will be submitted.
     if(ctx_->instanced_rendering_supported)
     {
       renderInstanced(state);
@@ -349,7 +351,7 @@ namespace owds::bgfx {
         std::string data((std::istreambuf_iterator(t)), std::istreambuf_iterator<char>());
         assert(!data.empty());
 
-        int width, height, channels;
+        int width = 0, height = 0, channels = 0;
         const auto pixels = reinterpret_cast<owds::Color*>(stbi_load_from_memory(
           reinterpret_cast<stbi_uc*>(data.data()),
           static_cast<int>(data.size()),
@@ -433,12 +435,11 @@ namespace owds::bgfx {
             static_cast<float>(mesh.color_rgba_.r_) / 255.f,
             static_cast<float>(mesh.color_rgba_.g_) / 255.f,
             static_cast<float>(mesh.color_rgba_.b_) / 255.f,
-            static_cast<float>(mesh.color_rgba_.a_) / 255.f) /*glm::vec4(
+            static_cast<float>(mesh.color_rgba_.a_) / 255.f); /*glm::vec4(
                                                              0.1f + rand() % 200 / 128.f,
                                                              0.1f + rand() % 200 / 128.f,
                                                              0.1f + rand() % 200 / 128.f,
                                                              1)*/
-            ;
 
           ::bgfx::setUniform(ctx_->loaded_uniforms_["material_color"], glm::value_ptr(material_color));
 

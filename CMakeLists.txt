@@ -1,5 +1,6 @@
 # Ubuntu 20.04 should have at least cmake 3.16
 cmake_minimum_required(VERSION 3.16)
+set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 project(overworld)
 
 # Why not use cmake_policy? See: https://gitlab.kitware.com/cmake/cmake/-/issues/20312.
@@ -11,8 +12,6 @@ if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.27")
     cmake_policy(SET CMP0148 OLD)
 endif()
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
-
 # Default to C++17 for all targets
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED on)
@@ -21,9 +20,9 @@ option(OWDS_USE_PHYSX "Use PhysX instead of Bullet3" ON)
 
 if(DEFINED ENV{OWDS_USE_PHYSX})
     set(OWDS_USE_PHYSX $ENV{OWDS_USE_PHYSX})
-else ()
+else()
     message(WARNING "The environment variable 'OWDS_USE_PHYSX' is not set, assuming value = 1")
-endif ()
+endif()
 
 if(NOT DEFINED ENV{ROS_VERSION})
     message(FATAL_ERROR "Please source your ROS1 / ROS2 environment before running cmake")
@@ -43,16 +42,15 @@ elseif($ENV{ROS_VERSION} STREQUAL "2")
     include(cmake/BuildUtilsROS2.cmake)
 endif()
 
-#####################################################################
-## Import packaged libraries:                                      ##
-## - OpenCV: For computer vision related tasks                     ##
-## - Assimp: For loading 3D models                                 ##
-## - Bullet3: Primary physics engine                               ##
-## - Eigen3: For hardcore math nerds                               ##
-## - glm: Also for math nerds, but only used in the graphics &     ##
-##        physics engine glue                                      ##
-#####################################################################
-
+# ####################################################################
+# # Import packaged libraries:                                      ##
+# # - OpenCV: For computer vision related tasks                     ##
+# # - Assimp: For loading 3D models                                 ##
+# # - Bullet3: Primary physics engine                               ##
+# # - Eigen3: For hardcore math nerds                               ##
+# # - glm: Also for math nerds, but only used in the graphics &     ##
+# #        physics engine glue                                      ##
+# ####################################################################
 find_package(PkgConfig REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(assimp REQUIRED)
@@ -63,15 +61,15 @@ find_package(glm CONFIG REQUIRED)
 include(FetchContent)
 include(CheckLanguage)
 
-######################################################################
-## PhysX may be used as an alternative engine for better simulation ##
-## performance and GPU hardware acceleration if cuda is available.  ##
-######################################################################
-if (OWDS_USE_PHYSX)
+# #####################################################################
+# # PhysX may be used as an alternative engine for better simulation ##
+# # performance and GPU hardware acceleration if cuda is available.  ##
+# #####################################################################
+if(OWDS_USE_PHYSX)
     FetchContent_Declare(
         PhysX
         GIT_REPOSITORY "https://github.com/NVIDIA-Omniverse/PhysX.git"
-        GIT_TAG        "106.0-physx-5.4.0"
+        GIT_TAG "106.0-physx-5.4.0"
     )
     FetchContent_GetProperties(PhysX)
 
@@ -93,10 +91,11 @@ if (OWDS_USE_PHYSX)
 
         # Dirty hack, please look away just for this one
         macro(physx_workaround VAR access value current_list_file stack)
-            if ("${access}" STREQUAL "MODIFIED_ACCESS")
+            if("${access}" STREQUAL "MODIFIED_ACCESS")
                 set(${VAR} 0)
-            endif ()
+            endif()
         endmacro()
+
         variable_watch(PUBLIC_RELEASE physx_workaround)
 
         set(PX_GENERATE_SOURCE_DISTRO 1)
@@ -111,13 +110,13 @@ if (OWDS_USE_PHYSX)
     endif()
 endif()
 
-######################################################################
-## BGFX to render all of our 3D graphics                            ##
-######################################################################
+# #####################################################################
+# # BGFX to render all of our 3D graphics                            ##
+# #####################################################################
 FetchContent_Declare(
     BGFX
     GIT_REPOSITORY "https://github.com/bkaradzic/bgfx.cmake.git"
-    GIT_TAG        "c2b7416a58a8610eecba5f6e3940e30c1b64e1f9"
+    GIT_TAG "c2b7416a58a8610eecba5f6e3940e30c1b64e1f9"
 )
 FetchContent_MakeAvailable(BGFX)
 
@@ -129,10 +128,9 @@ owds_depend_msg_package(ontologenius)
 owds_depend_package(urdf)
 owds_depend_package(message_filters)
 
-######################################################################
-## Declare ROS messages, services and actions (if any)              ##
-######################################################################
-
+# #####################################################################
+# # Declare ROS messages, services and actions (if any)              ##
+# #####################################################################
 owds_queue_messages_generation(
     AgentPose.msg
     AgentsPose.msg
@@ -151,12 +149,11 @@ owds_queue_services_generation(
 
 owds_generate_interfaces()
 
-######################################################################
-## Compile all the individual components found in overworld         ##
-######################################################################
+# #####################################################################
+# # Compile all the individual components found in overworld         ##
+# #####################################################################
 
-###################################
-
+# ##################################
 owds_add_ros_library(overworld_compat src/Compat/ROS.cpp)
 
 # ##################################
@@ -199,10 +196,10 @@ owds_add_library(overworld_graphics
 target_include_directories(overworld_graphics PUBLIC ${CMAKE_BINARY_DIR}/include/generated/shaders/)
 target_link_libraries(overworld_graphics PUBLIC assimp bgfx bx glfw)
 target_compile_definitions(overworld_graphics PUBLIC GLM_FORCE_LEFT_HANDED)
+target_compile_options(overworld_graphics PRIVATE $<$<CXX_COMPILER_ID:Clang>:-Wno-gnu-zero-variadic-macro-arguments>)
 
-###################################
-
-if (OWDS_USE_PHYSX)
+# ##################################
+if(OWDS_USE_PHYSX)
     set(OWDS_PHYSICS_SRC
         src/Physics/PhysX/Joints/JointContinuous.cpp
         src/Physics/PhysX/Joints/JointFixed.cpp
@@ -214,14 +211,14 @@ if (OWDS_USE_PHYSX)
         src/Physics/PhysX/Context.cpp
         src/Physics/PhysX/SharedContext.cpp
         src/Physics/PhysX/World.cpp)
-else ()
+else()
     set(OWDS_PHYSICS_SRC
         src/Physics/Bullet3/Joints/JointFixed.cpp
         src/Physics/Bullet3/Joints/JointPrismatic.cpp
         src/Physics/Bullet3/Actor.cpp
         src/Physics/Bullet3/Context.cpp
         src/Physics/Bullet3/World.cpp)
-endif ()
+endif()
 
 owds_add_ros_library(overworld_physics
     src/Physics/Base/Joints/Joint.cpp
@@ -236,7 +233,7 @@ target_compile_definitions(overworld_physics
         PX_ENABLE_ASSERTS
         $<$<BOOL:${OWDS_USE_PHYSX}>:OWDS_USE_PHYSX>)
 
-if (OWDS_USE_PHYSX)
+if(OWDS_USE_PHYSX)
     target_link_libraries(overworld_physics
         PUBLIC
             PhysX
@@ -246,10 +243,10 @@ if (OWDS_USE_PHYSX)
             PhysXFoundation
             PhysXPvdSDK
             cuda)
-else ()
+else()
     target_include_directories(overworld_physics PUBLIC ${BULLET_INCLUDE_DIR})
     target_link_libraries(overworld_physics PUBLIC ${BULLET_LIBRARIES})
-endif ()
+endif()
 
 ###################################
 
@@ -350,13 +347,9 @@ owds_add_ros_executable(teleop
 
 ###################################
 
+# ##################################
 
-###################################
-
-
-
-###################################
-
+# ##################################
 owds_add_ros_executable(overworld_test1 src/Nodes/Test1.cpp)
 
 target_link_libraries(overworld_test1
@@ -364,12 +357,10 @@ target_link_libraries(overworld_test1
         overworld_graphics
         overworld_physics)
 
-###################################
-
+# ##################################
 owds_install_executables(overworld_test1)
 
-###################################
-
+# ##################################
 owds_export_extra_directory(docs/)
 owds_export_extra_directory(models/)
 owds_finalize()

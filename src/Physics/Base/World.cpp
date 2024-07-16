@@ -1,10 +1,14 @@
 #include "overworld/Physics/Base/World.h"
 
+#include <array>
 #include <cassert>
+#include <cstdint>
 #include <overworld/Physics/Base/World.h>
+#include <string>
 #include <urdf/model.h>
 
 #include "overworld/Compat/ROS.h"
+#include "overworld/Graphics/Base/Color.h"
 #include "overworld/Graphics/Base/Material.h"
 #include "overworld/Graphics/Base/ModelManager.h"
 #include "overworld/Helper/ROS.h"
@@ -130,7 +134,11 @@ namespace owds {
   void World::processLink(owds::Robot& robot, const urdf::Link& urdf_link)
   {
     const auto material_name = urdf_link.visual ? urdf_link.visual->material_name : "";
-    const auto material = material_name.empty() ? owds::Material{owds::Color{255, 255, 255, 255}, ""} : robot.materials_.at(material_name);
+    const auto material = material_name.empty() ? owds::Material{
+                                                    owds::Color{255, 255, 255, 255},
+                                                    ""
+    } :
+                                                  robot.materials_.at(material_name);
 
     owds::Shape collision_shape = owds::ShapeDummy();
     std::vector<owds::Shape> visual_shapes;
@@ -182,7 +190,7 @@ namespace owds {
 
   void World::processJoint(owds::Robot& robot, const urdf::Joint& urdf_joint)
   {
-    (void) robot;
+    (void)robot;
     // auto& link0 = *robot.links_.at(urdf_joint.parent_link_name);
     // auto& link1 = *robot.links_.at(urdf_joint.child_link_name);
 

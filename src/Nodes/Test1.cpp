@@ -1,9 +1,8 @@
 #include <overworld/Graphics/Assimp/ModelLoader.h>
+#include <overworld/Graphics/BGFX/Renderer.h>
 #include <overworld/Graphics/Base/Camera.h>
 #include <overworld/Graphics/Base/ModelManager.h>
-#include <overworld/Graphics/BGFX/Renderer.h>
 #include <overworld/Graphics/GLFW3/Window.h>
-
 #include <overworld/Physics/Base/Joints/JointPrismatic.h>
 
 #if !OWDS_USE_PHYSX
@@ -40,13 +39,13 @@ int main()
   cam.setProjection(owds::CameraProjection_e::perspective);
   cam.setFieldOfView(80.f);
   cam.setOutputAA(owds::ViewAntiAliasing_e::msaa_x8);
-  cam.setOutputResolution({ 640, 480 });
-  cam.setPositionAndLookAt({ 5, 25, 30 }, { 0, 0, 0 });
+  cam.setOutputResolution({640, 480});
+  cam.setPositionAndLookAt({0, 0, 5}, {0, 0, 0});
   cam.finalize();
 
-  (void) world.loadRobotFromDescription("models/adream/adream.urdf");
+  (void)world.loadRobotFromDescription("models/adream/adream.urdf");
 
-  cam.setPositionAndLookAt({ 5, 25, 20 }, { 0, 0, 0 });
+  cam.setPositionAndLookAt({5, 5, 5}, {0, 0, 0});
 
   while(!window.isCloseRequested())
   {

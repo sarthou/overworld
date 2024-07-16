@@ -9,7 +9,9 @@ namespace owds {
   class Mesh
   {
   public:
-    enum class Id : std::size_t {};
+    enum class Id : std::size_t
+    {
+    };
 
     static Mesh create();
 
@@ -18,7 +20,7 @@ namespace owds {
     // As for actors, each mesh is associated with a non-zero, unique id.
     const Id id_;
 
-    std::string name_ {};
+    std::string name_;
     std::vector<owds::Vertex> vertices_{};
     std::vector<std::uint32_t> indices_{};
   };

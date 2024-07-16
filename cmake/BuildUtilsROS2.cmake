@@ -1,6 +1,6 @@
-################################################
-##          Find macros and libraries         ##
-################################################
+# ###############################################
+# #          Find macros and libraries         ##
+# ###############################################
 
 find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_python REQUIRED)
@@ -10,10 +10,9 @@ find_package(rclcpp REQUIRED)
 find_package(pluginlib REQUIRED)
 find_package(TinyXML2 REQUIRED)
 
-###################################
-##  ROS specific configuration   ##
-###################################
-
+# ##################################
+# #  ROS specific configuration   ##
+# ##################################
 set(OWDS_ROS2_DEPS "")
 set(OWDS_ROS2_DEPS_MSGS "")
 
@@ -35,13 +34,13 @@ function(owds_enable_sanitization TARGET)
 endfunction()
 
 macro(owds_queue_messages_generation)
-    foreach (MSG ${ARGN})
+    foreach(MSG ${ARGN})
         list(APPEND TMP_INTERFACES "msg/${MSG}")
-    endforeach ()
+    endforeach()
 endmacro(owds_queue_messages_generation)
 
 macro(owds_queue_services_generation)
-    foreach (SRV ${ARGN})
+    foreach(SRV ${ARGN})
         list(APPEND TMP_INTERFACES "srv/${SRV}")
     endforeach()
 endmacro(owds_queue_services_generation)
@@ -55,10 +54,9 @@ macro(owds_generate_interfaces)
     rosidl_get_typesupport_target(cpp_typesupport_target ${PROJECT_NAME} rosidl_typesupport_cpp)
 endmacro(owds_generate_interfaces)
 
-###################################
-##             Build             ##
-###################################
-
+# ##################################
+# #             Build             ##
+# ##################################
 function(owds_add_generic TARGET)
     set_target_properties(${TARGET}
         PROPERTIES
@@ -80,6 +78,7 @@ function(owds_add_ros_generic TARGET)
 
     target_link_libraries(${TARGET} PUBLIC
             ontologenius::ontologenius_lib
+
             # todo: I feel like I shouldn't be doing this ^
             ${cpp_typesupport_target})
 
@@ -143,10 +142,11 @@ endfunction(owds_add_ros_executable)
 function(owds_install_libs)
     install(
         TARGETS ${ARGN}
-        EXPORT  overworld
+        EXPORT overworld
         ARCHIVE DESTINATION lib
         LIBRARY DESTINATION lib
         RUNTIME DESTINATION bin
+
         # INCLUDES DESTINATION include
         DESTINATION lib/${PROJECT_NAME})
 endfunction(owds_install_libs)
