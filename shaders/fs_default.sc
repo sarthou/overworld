@@ -24,6 +24,8 @@ uniform vec4 nb_point_light; // float
 
 uniform vec4 view_position; // vec3
 
+#define GAMMA 2.2f
+
 vec4 CalcDirLight(vec3 light_direction, vec4 light_ambient,
                   vec4 light_diffuse, vec4 light_specular,
                   vec3 normal, vec3 view_dir, vec2 texcoord0);
@@ -50,6 +52,7 @@ void main()
                                v_position, norm, view_dir, v_texcoord0);  
 
   gl_FragColor = result;
+  gl_FragColor.rgb = pow(result.rgb, vec3(1.0f/GAMMA));
 }
 
 vec4 CalcDirLight(vec3 light_direction, vec4 light_ambient,
@@ -57,11 +60,11 @@ vec4 CalcDirLight(vec3 light_direction, vec4 light_ambient,
                   vec3 normal, vec3 view_dir, vec2 texcoord0)
 {
   vec3 light_dir = normalize(-light_direction.xyz);
+  vec3 halfway_dir = normalize(light_dir + view_dir);
   // diffuse shading
   float diff = max(dot(normal, light_dir), 0.0);
   // specular shading
-  vec3 reflect_dir = reflect(-light_dir, normal);
-  float spec = pow(max(dot(view_dir, reflect_dir), 0.0), material_shininess.x);
+  float spec = pow(max(dot(view_dir, halfway_dir), 0.0), material_shininess.x);
   // combine results
   vec4 ambient  = light_ambient * texture2D(material_texture_diffuse, texcoord0) * material_color;
   vec4 diffuse  = light_diffuse  * diff * texture2D(material_texture_diffuse, texcoord0);
@@ -79,11 +82,11 @@ vec4 CalcPointLight(vec3 light_position, vec4 light_ambient,
                     vec3 frag_pose, vec3 normal, vec3 view_dir, vec2 texcoord0)
 {
   vec3 light_dir = normalize(light_position - frag_pose);
+  vec3 halfway_dir = normalize(light_dir + view_dir);
   // diffuse shading
   float diff = max(dot(normal, light_dir), 0.0);
   // specular shading
-  vec3 reflect_dir = reflect(-light_dir, normal);
-  float spec = pow(max(dot(view_dir, reflect_dir), 0.0), material_shininess.x);
+  float spec = pow(max(dot(view_dir, halfway_dir), 0.0), material_shininess.x);
   // attenuation
   float distance    = length(light_position - frag_pose);
   float attenuation = 1.0 / (light_attenuation.x + light_attenuation.y * distance + 

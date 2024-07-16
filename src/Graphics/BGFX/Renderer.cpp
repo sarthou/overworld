@@ -129,11 +129,11 @@ namespace owds::bgfx {
 
     ambient_light_ = AmbientLight(glm::vec4(-0.2f, -1.0f, -0.3f, 0.0f),
                                   glm::vec4(1.0f, 0.976f, 0.898f, 1.0f),
-                                  0.4, 0.5, 1.0);
+                                  0.3, 0.5, 1.0);
 
     point_lights_.addLight(glm::vec3(2.0f, -2.0f, 1.0f),
                            glm::vec4(1.0f, 1.0f, 1.0f, 1.0f),
-                           0.5, 0.5, 1.0,
+                           0.4, 0.5, 1.0,
                            10.f);
 
     point_lights_.addLight(glm::vec3(10.0f, -2.0f, 1.0f),
@@ -366,7 +366,7 @@ namespace owds::bgfx {
           false,
           1,
           ::bgfx::TextureFormat::RGBA8,
-          0,
+          BGFX_TEXTURE_SRGB,
           ::bgfx::makeRef(pixels, width * height * sizeof(owds::Color), [](void* _ptr, void* _userData) {
             (void)_userData;
             stbi_image_free(_ptr);
