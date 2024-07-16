@@ -124,8 +124,8 @@ namespace owds::bgfx {
     ctx_->loaded_uniforms_["material_shininess"] = ::bgfx::createUniform("material_shininess", ::bgfx::UniformType::Vec4);
     ctx_->loaded_uniforms_["material_specular"] = ::bgfx::createUniform("material_specular", ::bgfx::UniformType::Vec4);
 
-    ambient_light_.registerUniforms(ctx_->loaded_uniforms_);
-    point_lights_.registerUniforms(ctx_->loaded_uniforms_);
+    AmbientLight::registerUniforms(ctx_->loaded_uniforms_);
+    PointLights::registerUniforms(ctx_->loaded_uniforms_);
 
     ambient_light_ = AmbientLight(glm::vec4(-0.2f, -1.0f, -0.3f, 0.0f),
                                   glm::vec4(1.0f, 0.976f, 0.898f, 1.0f),

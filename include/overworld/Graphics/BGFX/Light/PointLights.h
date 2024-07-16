@@ -16,7 +16,7 @@ namespace owds::bgfx {
   public:
     PointLights() = default;
 
-    void registerUniforms(std::unordered_map<std::string, ::bgfx::UniformHandle>& loaded_uniforms)
+    static void registerUniforms(std::unordered_map<std::string, ::bgfx::UniformHandle>& loaded_uniforms)
     {
       loaded_uniforms["point_light_position"] = ::bgfx::createUniform("point_light_position", ::bgfx::UniformType::Vec4, MAX_POINT_LIGHTS);
       loaded_uniforms["point_light_ambient"] = ::bgfx::createUniform("point_light_ambient", ::bgfx::UniformType::Vec4, MAX_POINT_LIGHTS);

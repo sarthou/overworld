@@ -26,7 +26,7 @@ namespace owds::bgfx {
                                                                       specular_strength)
     {}
 
-    void registerUniforms(std::unordered_map<std::string, ::bgfx::UniformHandle>& loaded_uniforms)
+    static void registerUniforms(std::unordered_map<std::string, ::bgfx::UniformHandle>& loaded_uniforms)
     {
       loaded_uniforms["dir_light_direction"] = ::bgfx::createUniform("dir_light_direction", ::bgfx::UniformType::Vec4);
       loaded_uniforms["dir_light_ambient"] = ::bgfx::createUniform("dir_light_ambient", ::bgfx::UniformType::Vec4);
