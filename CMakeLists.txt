@@ -159,13 +159,16 @@ owds_generate_interfaces()
 
 owds_add_ros_library(overworld_compat src/Compat/ROS.cpp)
 
-###################################
-
+# ##################################
 set(overworld_vert_shaders
-    shaders/vs_default.sc)
+    shaders/vs_default.sc
+    shaders/vs_simple_shadows.sc
+    shaders/vs_skybox.sc)
 
 set(overworld_frag_shaders
-    shaders/fs_default.sc)
+    shaders/fs_default.sc
+    shaders/fs_simple_shadows.sc
+    shaders/fs_skybox.sc)
 
 bgfx_compile_shader_to_header(
     TYPE VERTEX
