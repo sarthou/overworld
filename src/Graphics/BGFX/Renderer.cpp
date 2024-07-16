@@ -1,8 +1,5 @@
 #include "overworld/Graphics/BGFX/Renderer.h"
 
-#include <bx/bx.h>
-#include <bx/file.h>
-#include <bx/readerwriter.h>
 #include <cstdint>
 #include <fstream>
 #include <glm/gtc/packing.hpp>
@@ -11,8 +8,6 @@
 #include <string>
 
 #include "overworld/Graphics/BGFX/Camera.h"
-#include "overworld/Graphics/BGFX/Context.h"
-#include "overworld/Graphics/BGFX/EmbeddedAssets.h"
 #include "overworld/Graphics/BGFX/Vertex.h"
 #include "overworld/Graphics/Base/Model.h"
 #include "overworld/Graphics/Base/Window.h"
@@ -24,66 +19,14 @@
 #include "stb_image.h"
 
 namespace owds::bgfx {
-  namespace implementation {
-    std::unique_ptr<bx::FileReader> file_reader_ = std::make_unique<bx::FileReader>();
 
-    static const ::bgfx::Memory* loadMem(bx::FileReaderI* _reader, const bx::FilePath& _filePath)
-    {
-      if(bx::open(_reader, _filePath))
-      {
-        uint32_t size = (uint32_t)bx::getSize(_reader);
-        const ::bgfx::Memory* mem = ::bgfx::alloc(size + 1);
-        bx::read(_reader, mem->data, size, bx::ErrorAssert{});
-        bx::close(_reader);
-        mem->data[mem->size - 1] = '\0';
-        return mem;
-      }
+  Renderer::Renderer()
+  {}
 
-      BX_ASSERT(false, "Failed to load file.");
-
-      return nullptr;
-    }
-
-    static ::bgfx::ShaderHandle loadShader(bx::FileReaderI* _reader, const bx::StringView& _name)
-    {
-      bx::FilePath filePath("../resources/shaders/compiled/");
-
-      switch(::bgfx::getRendererType())
-      {
-      case ::bgfx::RendererType::OpenGL:
-        filePath.join("glsl");
-        break;
-      case ::bgfx::RendererType::OpenGLES:
-        filePath.join("essl");
-        break;
-      case ::bgfx::RendererType::Vulkan:
-        filePath.join("spirv");
-        break;
-      default:
-        BX_ASSERT(false, "You should not be here!");
-        break;
-      }
-
-      char fileName[512];
-      bx::strCopy(fileName, BX_COUNTOF(fileName), _name);
-      bx::strCat(fileName, BX_COUNTOF(fileName), ".bin");
-
-      filePath.join(fileName);
-
-      ::bgfx::ShaderHandle handle = ::bgfx::createShader(loadMem(_reader, filePath.getCPtr()));
-      ::bgfx::setName(handle, _name.getPtr(), _name.getLength());
-
-      return handle;
-    }
-
-    ::bgfx::ShaderHandle loadShader(const bx::StringView& _name)
-    {
-      return loadShader(file_reader_.get(), _name);
-    }
-  } // namespace implementation
-
-  Renderer::Renderer() : ctx_(std::make_unique<owds::bgfx::Context>()) {}
-  Renderer::~Renderer() = default;
+  Renderer::~Renderer()
+  {
+    delete ctx_.render_camera_;
+  }
 
   ::bgfx::VertexBufferHandle test_vbh;
   ::bgfx::IndexBufferHandle test_ibh;
@@ -98,9 +41,9 @@ namespace owds::bgfx {
 
     ::bgfx::Init init;
     init.type = ::bgfx::RendererType::OpenGL;
-    init.resolution.width = ctx_->width_;
-    init.resolution.height = ctx_->height_;
-    init.resolution.reset = ctx_->flags_;
+    init.resolution.width = ctx_.width_;
+    init.resolution.height = ctx_.height_;
+    init.resolution.reset = ctx_.flags_;
     init.vendorId = BGFX_PCI_ID_NONE;
     init.platformData = pd;
 
@@ -110,24 +53,24 @@ namespace owds::bgfx {
     }
 
     // const auto caps = ::bgfx::getCaps();
-    // ctx_->instanced_rendering_supported = caps->supported & BGFX_CAPS_INSTANCING;
+    // ctx_.instanced_rendering_supported = caps->supported & BGFX_CAPS_INSTANCING;
 
     ::bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x443355FF, 1.0f, 0);
 
-    const auto type = ::bgfx::getRendererType();
-    const auto vsh = ::bgfx::createEmbeddedShader(s_owds_embedded_shaders, type, "vs_default");
-    const auto fsh = ::bgfx::createEmbeddedShader(s_owds_embedded_shaders, type, "fs_default");
-    ctx_->loaded_programs_["default"] = ::bgfx::createProgram(vsh, fsh, true);
-    ctx_->is_initialized_ = true;
+    ctx_.shaders_.emplace(std::piecewise_construct, std::make_tuple("default"), std::make_tuple("vs_default", "fs_default"));
+    ctx_.shaders_.emplace(std::piecewise_construct, std::make_tuple("skybox"), std::make_tuple("vs_skybox", "fs_skybox"));
+    ctx_.shaders_.emplace(std::piecewise_construct, std::make_tuple("simple_shadows"), std::make_tuple("vs_simple_shadows", "fs_simple_shadows"));
+    ctx_.is_initialized_ = true;
+    ctx_.render_camera_ = new owds::bgfx::Camera();
 
-    ctx_->loaded_uniforms_["material_texture_diffuse"] = ::bgfx::createUniform("material_texture_diffuse", ::bgfx::UniformType::Sampler);
-    ctx_->loaded_uniforms_["material_texture_specular"] = ::bgfx::createUniform("material_texture_specular", ::bgfx::UniformType::Sampler);
-    ctx_->loaded_uniforms_["material_color"] = ::bgfx::createUniform("material_color", ::bgfx::UniformType::Vec4);
-    ctx_->loaded_uniforms_["material_shininess"] = ::bgfx::createUniform("material_shininess", ::bgfx::UniformType::Vec4);
-    ctx_->loaded_uniforms_["material_specular"] = ::bgfx::createUniform("material_specular", ::bgfx::UniformType::Vec4);
+    ctx_.loaded_uniforms_["material_texture_diffuse"] = ::bgfx::createUniform("material_texture_diffuse", ::bgfx::UniformType::Sampler);
+    ctx_.loaded_uniforms_["material_texture_specular"] = ::bgfx::createUniform("material_texture_specular", ::bgfx::UniformType::Sampler);
+    ctx_.loaded_uniforms_["material_color"] = ::bgfx::createUniform("material_color", ::bgfx::UniformType::Vec4);
+    ctx_.loaded_uniforms_["material_shininess"] = ::bgfx::createUniform("material_shininess", ::bgfx::UniformType::Vec4);
+    ctx_.loaded_uniforms_["material_specular"] = ::bgfx::createUniform("material_specular", ::bgfx::UniformType::Vec4);
 
-    AmbientLight::registerUniforms(ctx_->loaded_uniforms_);
-    PointLights::registerUniforms(ctx_->loaded_uniforms_);
+    AmbientLight::registerUniforms(ctx_.loaded_uniforms_);
+    PointLights::registerUniforms(ctx_.loaded_uniforms_);
 
     ambient_light_ = AmbientLight(glm::vec4(-0.2f, -1.0f, -0.3f, 0.0f),
                                   glm::vec4(1.0f, 0.976f, 0.898f, 1.0f),
@@ -143,11 +86,11 @@ namespace owds::bgfx {
                            0.5, 0.5, 1.0,
                            glm::vec3(1.0f, 0.35f, 0.44f));
 
-    ctx_->loaded_uniforms_["view_position"] = ::bgfx::createUniform("view_position", ::bgfx::UniformType::Vec4);
+    ctx_.loaded_uniforms_["view_position"] = ::bgfx::createUniform("view_position", ::bgfx::UniformType::Vec4);
 
     static owds::Color white_pixel{255, 255, 255, 255};
 
-    ctx_->white_tex_ = ::bgfx::createTexture2D(
+    ctx_.white_tex_ = ::bgfx::createTexture2D(
       1,
       1,
       false,
@@ -176,9 +119,9 @@ namespace owds::bgfx {
 
   void Renderer::notifyResize(const std::uint32_t new_width, const std::uint32_t new_height)
   {
-    ctx_->width_ = new_width;
-    ctx_->height_ = new_height;
-    ctx_->has_size_changed_ = true;
+    ctx_.width_ = new_width;
+    ctx_.height_ = new_height;
+    ctx_.has_size_changed_ = true;
   }
 
   void Renderer::runSanityChecks()
@@ -188,50 +131,47 @@ namespace owds::bgfx {
 
   void Renderer::commit()
   {
-    if(ctx_->has_size_changed_)
+    if(ctx_.has_size_changed_)
     {
-      ctx_->has_size_changed_ = false;
-      ::bgfx::reset(ctx_->width_, ctx_->height_, ctx_->flags_);
+      ctx_.has_size_changed_ = false;
+      ::bgfx::reset(ctx_.width_, ctx_.height_, ctx_.flags_);
     }
 
-    ctx_->cached_world_list_.clear();
-
-    for(const auto& camera : ctx_->cameras_)
-    {
-      ctx_->cached_world_list_.emplace(std::addressof(camera->currently_viewed_world_.get()));
-    }
-
-    for(auto& [id, batch] : ctx_->current_mesh_batches_)
+    for(auto& [id, batch] : ctx_.current_mesh_batches_)
     {
       batch.clear();
     }
 
-    for(const auto& world : ctx_->cached_world_list_)
-    {
-      commitWorld(*world);
-    }
+    commitWorld(*(ctx_.world_));
 
-    for(const auto& camera : ctx_->cameras_)
+    ctx_.render_camera_->setOutputResolution({static_cast<float>(ctx_.width_), static_cast<float>(ctx_.height_)});
+    ctx_.render_camera_->updateMatrices();
+    commitCamera(*ctx_.render_camera_);
+
+    for(const auto& camera : ctx_.cameras_)
     {
-      camera->setOutputResolution({static_cast<float>(ctx_->width_), static_cast<float>(ctx_->height_)});
-      camera->updateMatrices();
       commitCamera(*camera);
     }
 
     ::bgfx::frame();
   }
 
-  owds::Camera& Renderer::createCamera(const std::string& alias_name, owds::World& world)
+  void Renderer::attachWorld(World& world)
   {
-    assert(ctx_->is_initialized_ && "The renderer must be initialized before creating a camera");
+    ctx_.world_ = std::addressof(world);
+  }
 
-    const auto& camera = ctx_->cameras_.emplace_back(std::make_unique<owds::bgfx::Camera>(world));
+  owds::Camera& Renderer::createCamera(const std::string& alias_name)
+  {
+    assert(ctx_.is_initialized_ && "The renderer must be initialized before creating a camera");
 
-    ctx_->camera_refs_.emplace_back(*camera);
+    const auto& camera = ctx_.cameras_.emplace_back(std::make_unique<owds::bgfx::Camera>());
+
+    ctx_.camera_refs_.emplace_back(*camera);
 
     if(!alias_name.empty())
     {
-      ctx_->named_cameras_.emplace(alias_name, std::ref(*camera));
+      ctx_.named_cameras_.emplace(alias_name, std::ref(*camera));
     }
 
     return *camera;
@@ -239,7 +179,12 @@ namespace owds::bgfx {
 
   std::vector<std::reference_wrapper<owds::Camera>> Renderer::getCameras()
   {
-    return ctx_->camera_refs_;
+    return ctx_.camera_refs_;
+  }
+
+  owds::Camera* Renderer::getRenderCamera()
+  {
+    return ctx_.render_camera_;
   }
 
   void Renderer::commitCamera(const owds::bgfx::Camera& camera)
@@ -254,10 +199,10 @@ namespace owds::bgfx {
 
     ::bgfx::setDebug(camera.show_debug_stats_ ? BGFX_DEBUG_STATS : 0);
 
-    ctx_->render_collision_models_ = camera.render_collision_models_;
+    ctx_.render_collision_models_ = camera.render_collision_models_;
 
     ::bgfx::touch(0); // Submit an empty primitive for rendering. Uniforms and draw state will be applied but no geometry will be submitted.
-    if(ctx_->instanced_rendering_supported)
+    if(ctx_.instanced_rendering_supported)
     {
       renderInstanced(state);
     }
@@ -271,7 +216,7 @@ namespace owds::bgfx {
   {
     for(const auto& actor : world.getActors())
     {
-      if(ctx_->render_collision_models_)
+      if(ctx_.render_collision_models_)
       {
         std::visit([this, &actor](const auto& shape_resolv) { queueActorBatch(actor, shape_resolv); }, actor.get().collision_shape_);
       }
@@ -334,16 +279,16 @@ namespace owds::bgfx {
       return;
     }
 
-    if(ctx_->cached_meshes_.count(model.meshes_.front().id_))
+    if(ctx_.cached_meshes_.count(model.meshes_.front().id_))
     {
       return;
     }
 
-    auto tex = ctx_->white_tex_;
+    auto tex = ctx_.white_tex_;
 
     if(!material.texture_path_.empty())
     {
-      if(!ctx_->loaded_textures_.count(material.texture_path_))
+      if(!ctx_.loaded_textures_.count(material.texture_path_))
       {
         std::ifstream t(material.texture_path_, std::ios::binary);
         assert(t.good());
@@ -374,13 +319,13 @@ namespace owds::bgfx {
             stbi_image_free(_ptr);
           }));
 
-        ctx_->loaded_textures_[material.texture_path_] = tex;
+        ctx_.loaded_textures_[material.texture_path_] = tex;
       }
     }
 
     for(const auto& mesh : model.meshes_)
     {
-      ctx_->cached_meshes_.emplace(
+      ctx_.cached_meshes_.emplace(
         mesh.id_, owds::bgfx::MeshHandle{
                     material.color_rgba_,
                     tex,
@@ -399,7 +344,7 @@ namespace owds::bgfx {
 
     for(auto& mesh : model.meshes_)
     {
-      ctx_->current_mesh_batches_[model.id_][mesh.id_].emplace_back(owds::InstanceData{
+      ctx_.current_mesh_batches_[model.id_][mesh.id_].emplace_back(owds::InstanceData{
         model_mat,
         {}});
     }
@@ -409,23 +354,23 @@ namespace owds::bgfx {
   {
     srand(0);
 
-    ambient_light_.setUniforms(ctx_->loaded_uniforms_);
-    point_lights_.setUniforms(ctx_->loaded_uniforms_);
+    ambient_light_.setUniforms(ctx_.loaded_uniforms_);
+    point_lights_.setUniforms(ctx_.loaded_uniforms_);
 
-    auto view_position = glm::vec4(camera.world_eye_position_, 0.0f);
-    ::bgfx::setUniform(ctx_->loaded_uniforms_["view_position"], glm::value_ptr(view_position));
+    auto view_position = glm::vec4(camera.getPosition(), 0.0f);
+    ::bgfx::setUniform(ctx_.loaded_uniforms_["view_position"], glm::value_ptr(view_position));
 
-    for(auto& [model_id, batch] : ctx_->current_mesh_batches_)
+    for(auto& [model_id, batch] : ctx_.current_mesh_batches_)
     {
       for(auto& [mesh_id, transforms] : batch)
       {
-        const auto& mesh = ctx_->cached_meshes_[mesh_id];
+        const auto& mesh = ctx_.cached_meshes_[mesh_id];
 
-        ::bgfx::setTexture(0, ctx_->loaded_uniforms_["material_texture_diffuse"], mesh.tex_);
+        ::bgfx::setTexture(0, ctx_.loaded_uniforms_["material_texture_diffuse"], mesh.tex_);
         auto material_shininess = glm::vec4(64.f, 0.f, 0.f, 0.f);
-        ::bgfx::setUniform(ctx_->loaded_uniforms_["material_shininess"], glm::value_ptr(material_shininess));
+        ::bgfx::setUniform(ctx_.loaded_uniforms_["material_shininess"], glm::value_ptr(material_shininess));
         auto material_specular = glm::vec4(0.1f, 0.f, 0.f, 0.f);
-        ::bgfx::setUniform(ctx_->loaded_uniforms_["material_specular"], glm::value_ptr(material_specular));
+        ::bgfx::setUniform(ctx_.loaded_uniforms_["material_specular"], glm::value_ptr(material_specular));
 
         for(const auto& transform : transforms)
         {
@@ -441,13 +386,13 @@ namespace owds::bgfx {
                                                              0.1f + rand() % 200 / 128.f,
                                                              1)*/
 
-          ::bgfx::setUniform(ctx_->loaded_uniforms_["material_color"], glm::value_ptr(material_color));
+          ::bgfx::setUniform(ctx_.loaded_uniforms_["material_color"], glm::value_ptr(material_color));
 
           ::bgfx::setVertexBuffer(0, mesh.vbh_);
           ::bgfx::setIndexBuffer(mesh.ibh_);
 
           ::bgfx::setState(state);
-          ::bgfx::submit(0, ctx_->loaded_programs_["default"]);
+          ctx_.shaders_.at("default").submit(0);
         }
       }
     }
@@ -455,13 +400,13 @@ namespace owds::bgfx {
 
   void Renderer::renderInstanced(const std::uint64_t state)
   {
-    for(auto& [model_id, batch] : ctx_->current_mesh_batches_)
+    for(auto& [model_id, batch] : ctx_.current_mesh_batches_)
     {
       for(auto& [mesh_id, transforms] : batch)
       {
-        auto& mesh = ctx_->cached_meshes_[mesh_id];
+        auto& mesh = ctx_.cached_meshes_[mesh_id];
 
-        ::bgfx::setTexture(0, ctx_->loaded_uniforms_["material_texture_diffuse"], mesh.tex_);
+        ::bgfx::setTexture(0, ctx_.loaded_uniforms_["material_texture_diffuse"], mesh.tex_);
 
         ::bgfx::InstanceDataBuffer idb{};
         ::bgfx::allocInstanceDataBuffer(&idb, transforms.size(), sizeof(transforms[0]));
@@ -474,7 +419,7 @@ namespace owds::bgfx {
         ::bgfx::setInstanceDataBuffer(&idb);
 
         ::bgfx::setState(state);
-        ::bgfx::submit(0, ctx_->loaded_programs_["default"]);
+        ctx_.shaders_.at("default").submit(0);
       }
     }
   }

@@ -7,24 +7,24 @@
 #include <cstdint>
 
 namespace owds::glfw3 {
-    class Context {
-    public:
-        std::uint32_t width_ = 640;
-        std::uint32_t height_ = 480;
-        bool has_size_changed_ = false;
-        GLFWwindow* glfw_window_ {};
-        std::vector<std::reference_wrapper<owds::Camera>> cached_camera_refs_;
-        std::size_t active_camera_index = 0;
+  class Context
+  {
+  public:
+    std::uint32_t width_ = 640;
+    std::uint32_t height_ = 480;
+    bool has_size_changed_ = false;
+    GLFWwindow* glfw_window_ = nullptr;
+    owds::Camera* camera_ = nullptr;
 
-        Context() = default;
-        ~Context() noexcept = default;
+    Context() = default;
+    ~Context() noexcept = default;
 
-        Context(const Context& other) = delete;
-        Context& operator=(const Context& other) = delete;
+    Context(const Context& other) = delete;
+    Context& operator=(const Context& other) = delete;
 
-        Context(Context&& other) = delete;
-        Context& operator=(Context&& other) = delete;
-    };
-}
+    Context(Context&& other) = delete;
+    Context& operator=(Context&& other) = delete;
+  };
+} // namespace owds::glfw3
 
 #endif // OWDS_GRAPHICS_GLFW3_CONTEXT_H

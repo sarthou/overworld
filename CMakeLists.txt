@@ -184,9 +184,7 @@ owds_add_library(overworld_graphics
     src/Graphics/Base/Mesh.cpp
     src/Graphics/Base/Model.cpp
     src/Graphics/Base/ModelManager.cpp
-    src/Graphics/Base/Renderer.cpp
     src/Graphics/BGFX/Camera.cpp
-    src/Graphics/BGFX/Context.cpp
     src/Graphics/BGFX/Renderer.cpp
     src/Graphics/BGFX/Vertex.cpp
     src/Graphics/GLFW3/Window.cpp

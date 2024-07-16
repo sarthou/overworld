@@ -9,6 +9,7 @@
 
 #include "overworld/Graphics/BGFX/API.h"
 #include "overworld/Graphics/BGFX/MeshHandle.h"
+#include "overworld/Graphics/BGFX/Shader.h"
 #include "overworld/Graphics/Base/InstanceData.h"
 #include "overworld/Graphics/Base/Model.h"
 
@@ -32,12 +33,13 @@ namespace owds::bgfx {
     bool instanced_rendering_supported = false;
     std::vector<std::unique_ptr<owds::bgfx::Camera>> cameras_;
     std::vector<std::reference_wrapper<owds::Camera>> camera_refs_;
-    std::set<owds::World*> cached_world_list_;
+    owds::bgfx::Camera* render_camera_ = nullptr;
+    owds::World* world_ = nullptr;
 
     bool render_collision_models_ = false;
 
     std::unordered_map<std::string, std::reference_wrapper<owds::bgfx::Camera>> named_cameras_;
-    std::unordered_map<std::string, ::bgfx::ProgramHandle> loaded_programs_;
+    std::unordered_map<std::string, owds::bgfx::Shader> shaders_;
     std::unordered_map<std::string, ::bgfx::UniformHandle> loaded_uniforms_;
     std::unordered_map<std::string, ::bgfx::TextureHandle> loaded_textures_;
 
@@ -46,8 +48,7 @@ namespace owds::bgfx {
     std::unordered_map<owds::Mesh::Id, owds::bgfx::MeshHandle> cached_meshes_;
     std::unordered_map<owds::Model::Id, std::unordered_map<owds::Mesh::Id, std::vector<owds::InstanceData>>> current_mesh_batches_;
 
-    Context();
-    ~Context();
+    Context() = default;
 
     Context(const Context& other) = delete;
     Context& operator=(const Context& other) = delete;

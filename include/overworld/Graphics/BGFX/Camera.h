@@ -17,12 +17,11 @@ namespace owds {
 namespace owds::bgfx {
   class Camera final : public owds::Camera
   {
-  public:
+  private:
     ::bgfx::ViewId id_{};
     owds::CameraView_e view_type_{};
     owds::CameraProjection_e projection_type_{};
     std::array<float, 2> view_dimensions_{};
-    float aspect_ratio_{};
     float field_of_view_ = 0.785398; // 45 deg
     glm::vec3 world_eye_position_{};
     glm::vec3 world_eye_front_{};
@@ -30,13 +29,10 @@ namespace owds::bgfx {
     glm::vec3 world_eye_up_ = {0.f, 0., 1.f};
     std::array<float, 16> view_matrix_;
     std::array<float, 16> proj_matrix_;
-    std::reference_wrapper<owds::World> currently_viewed_world_;
-    bool show_debug_stats_ = false;
-    bool render_collision_models_ = false;
 
     glm::vec2 view_angles_{-90.0f, 0.0f}; // yaw/pitch in deg
 
-    glm::vec2 mouse_current_position{};
+    glm::vec2 mouse_current_position_{};
     glm::vec2 mouse_drag_start_position_{};
     bool is_dragging_mouse_ = false;
 
@@ -54,7 +50,11 @@ namespace owds::bgfx {
     float mouse_translate_sensitivity_ = 0.035;
     float mouse_scroll_sensitivity_ = 0.2;
 
-    explicit Camera(owds::World& world);
+  public:
+    bool show_debug_stats_ = false;
+    bool render_collision_models_ = false;
+
+    Camera() = default;
 
     void updateViewMatrix();
     void updateProjectionMatrix();
@@ -79,6 +79,8 @@ namespace owds::bgfx {
     void processUserMouseInput(float delta_time, float x, float y) override;
     void processUserMouseScroll(float delta_time, float xoffset, float yoffset) override;
     void update() override;
+
+    glm::vec3 getPosition() const { return world_eye_position_; }
 
   private:
     // glm::mat3 to_z_up_;

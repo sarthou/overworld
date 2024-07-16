@@ -1,8 +1,10 @@
 #ifndef OWDS_GRAPHICS_BASE_RENDERER_H
 #define OWDS_GRAPHICS_BASE_RENDERER_H
 
+#include <cstdint>
 #include <functional>
 #include <string>
+#include <vector>
 
 namespace owds {
   class Window;
@@ -27,16 +29,11 @@ namespace owds {
 
     /**
      * @param alias_name This parameter is optional, leave empty if undesired.
-     * @param world
      */
-    virtual owds::Camera& createCamera(const std::string& alias_name, owds::World& world) = 0;
+    virtual owds::Camera& createCamera(const std::string& alias_name) = 0;
 
     virtual std::vector<std::reference_wrapper<owds::Camera>> getCameras() = 0;
-
-    /**
-     * Helper function
-     */
-    void createCamera(const std::string& alias_name, owds::World& world, const std::function<void(Camera&)>& creator_func);
+    virtual owds::Camera* getRenderCamera() = 0;
   };
 } // namespace owds
 

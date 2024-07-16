@@ -18,8 +18,6 @@
 #include "overworld/Helper/GlmMath.h"
 
 namespace owds::bgfx {
-  Camera::Camera(owds::World& world) : currently_viewed_world_(world)
-  {}
 
   void Camera::updateViewMatrix()
   {
@@ -193,7 +191,7 @@ namespace owds::bgfx {
     {
       if(is_down)
       {
-        mouse_drag_start_position_ = mouse_current_position;
+        mouse_drag_start_position_ = mouse_current_position_;
       }
 
       is_dragging_mouse_ = is_down;
@@ -203,7 +201,7 @@ namespace owds::bgfx {
     {
       if(is_down)
       {
-        mouse_drag_start_position_ = mouse_current_position;
+        mouse_drag_start_position_ = mouse_current_position_;
       }
 
       is_dragging_mouse_ = is_down;
@@ -220,12 +218,12 @@ namespace owds::bgfx {
   void Camera::processUserMouseInput(const float delta_time, const float x, const float y)
   {
     (void)delta_time;
-    mouse_current_position = {x, y};
+    mouse_current_position_ = {x, y};
 
     if(mouse_btn_states_[1])
     {
-      const auto delta = (mouse_current_position - mouse_drag_start_position_) * mouse_rotation_sensitivity_;
-      mouse_drag_start_position_ = mouse_current_position;
+      const auto delta = (mouse_current_position_ - mouse_drag_start_position_) * mouse_rotation_sensitivity_;
+      mouse_drag_start_position_ = mouse_current_position_;
 
       view_angles_.x += delta.x; // yaw
       view_angles_.y -= delta.y; // pitch
@@ -239,8 +237,8 @@ namespace owds::bgfx {
     }
     else if(mouse_btn_states_[2])
     {
-      const auto delta = (mouse_current_position - mouse_drag_start_position_) * (mouse_translate_sensitivity_ * 0.5f);
-      mouse_drag_start_position_ = mouse_current_position;
+      const auto delta = (mouse_current_position_ - mouse_drag_start_position_) * (mouse_translate_sensitivity_ * 0.5f);
+      mouse_drag_start_position_ = mouse_current_position_;
 
       world_eye_position_ -= world_eye_right_ * delta.x;
       world_eye_position_ += world_eye_up_ * delta.y;

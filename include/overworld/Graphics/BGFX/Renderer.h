@@ -3,6 +3,7 @@
 
 #include <memory>
 
+#include "overworld/Graphics/BGFX/Context.h"
 #include "overworld/Graphics/BGFX/Light/AmbientLight.h"
 #include "overworld/Graphics/BGFX/Light/PointLights.h"
 #include "overworld/Graphics/Base/Renderer.h"
@@ -22,7 +23,6 @@ namespace owds {
 
 namespace owds::bgfx {
   class Camera;
-  class Context;
 
   class Renderer final : public owds::Renderer
   {
@@ -42,9 +42,11 @@ namespace owds::bgfx {
     void runSanityChecks() override;
     void commit() override;
 
-    owds::Camera& createCamera(const std::string& alias_name, owds::World& world) override;
+    void attachWorld(World& world);
+    owds::Camera& createCamera(const std::string& alias_name) override;
 
     std::vector<std::reference_wrapper<owds::Camera>> getCameras() override;
+    owds::Camera* getRenderCamera() override;
 
     using owds::Renderer::createCamera;
 
@@ -64,7 +66,7 @@ namespace owds::bgfx {
     void render(std::uint64_t state, const owds::bgfx::Camera& camera);
     void renderInstanced(std::uint64_t state);
 
-    std::unique_ptr<owds::bgfx::Context> ctx_;
+    owds::bgfx::Context ctx_;
   };
 } // namespace owds::bgfx
 

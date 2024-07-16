@@ -10,6 +10,7 @@ namespace owds {
   {
   public:
     virtual ~Window() = default;
+
     [[nodiscard]] virtual WindowPlatformData getPlatformData() const = 0;
     virtual void doPollEvents(owds::Renderer& renderer) = 0;
     [[nodiscard]] virtual bool isCloseRequested() const = 0;

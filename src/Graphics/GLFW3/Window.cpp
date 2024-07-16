@@ -1,11 +1,14 @@
 #include "overworld/Graphics/GLFW3/Window.h"
 
+#include <GLFW/glfw3.h>
+#include <memory>
 #include <overworld/Graphics/Base/Camera.h>
 
 #include "overworld/Graphics/Base/Renderer.h"
 #include "overworld/Graphics/GLFW3/Context.h"
 
 namespace owds::glfw3 {
+
   Window::Window() : ctx_(std::make_unique<owds::glfw3::Context>())
   {
     glfwInit();
@@ -14,87 +17,55 @@ namespace owds::glfw3 {
 
     glfwSetWindowUserPointer(ctx_->glfw_window_, this);
     glfwSetWindowSizeCallback(ctx_->glfw_window_, [](GLFWwindow* window, const int width, const int height) {
-      const auto user_ptr = glfwGetWindowUserPointer(window);
+      auto* const user_ptr = glfwGetWindowUserPointer(window);
 
-      const auto& ctx_ = static_cast<owds::glfw3::Window*>(user_ptr)->ctx_;
-      ctx_->width_ = width;
-      ctx_->height_ = height;
-      ctx_->has_size_changed_ = true;
+      const auto& ctx = static_cast<owds::glfw3::Window*>(user_ptr)->ctx_;
+      ctx->width_ = width;
+      ctx->height_ = height;
+      ctx->has_size_changed_ = true;
     });
 
     glfwSetKeyCallback(ctx_->glfw_window_, [](GLFWwindow* window, const int key, const int scancode, const int action, const int mods) {
       (void)scancode;
       (void)mods;
 
-      const auto user_ptr = glfwGetWindowUserPointer(window);
-
       if(action == GLFW_REPEAT)
-      {
         return;
-      }
 
+      auto* const user_ptr = glfwGetWindowUserPointer(window);
       const auto& ctx_ = static_cast<owds::glfw3::Window*>(user_ptr)->ctx_;
 
-      if(ctx_->cached_camera_refs_.empty())
-      {
-        return;
-      }
-
-      auto& camera = ctx_->cached_camera_refs_[ctx_->active_camera_index].get();
-
-      camera.processUserKeyboardInput(0.f, key, action == GLFW_PRESS);
+      if(ctx_->camera_ != nullptr)
+        ctx_->camera_->processUserKeyboardInput(0.f, key, action == GLFW_PRESS);
     });
 
     glfwSetCursorPosCallback(ctx_->glfw_window_, [](GLFWwindow* window, const double xpos, const double ypos) {
-      const auto user_ptr = glfwGetWindowUserPointer(window);
-
+      auto* const user_ptr = glfwGetWindowUserPointer(window);
       const auto& ctx_ = reinterpret_cast<owds::glfw3::Window*>(user_ptr)->ctx_;
 
-      if(ctx_->cached_camera_refs_.empty())
-      {
-        return;
-      }
-
-      auto& camera = ctx_->cached_camera_refs_[ctx_->active_camera_index].get();
-
-      camera.processUserMouseInput(0.f, static_cast<float>(xpos), static_cast<float>(ypos));
+      if(ctx_->camera_ != nullptr)
+        ctx_->camera_->processUserMouseInput(0.f, static_cast<float>(xpos), static_cast<float>(ypos));
     });
 
     glfwSetScrollCallback(ctx_->glfw_window_, [](GLFWwindow* window, double xoffset, double yoffset) {
-      const auto user_ptr = glfwGetWindowUserPointer(window);
-
+      auto* const user_ptr = glfwGetWindowUserPointer(window);
       const auto& ctx_ = reinterpret_cast<owds::glfw3::Window*>(user_ptr)->ctx_;
 
-      if(ctx_->cached_camera_refs_.empty())
-      {
-        return;
-      }
-
-      auto& camera = ctx_->cached_camera_refs_[ctx_->active_camera_index].get();
-
-      camera.processUserMouseScroll(0.f, static_cast<float>(xoffset), static_cast<float>(yoffset));
+      if(ctx_->camera_ != nullptr)
+        ctx_->camera_->processUserMouseScroll(0.f, static_cast<float>(xoffset), static_cast<float>(yoffset));
     });
 
     glfwSetMouseButtonCallback(ctx_->glfw_window_, [](GLFWwindow* window, const int button, const int action, int mods) {
       (void)mods;
 
-      const auto user_ptr = glfwGetWindowUserPointer(window);
-
       if(action == GLFW_REPEAT)
-      {
         return;
-      }
 
+      auto* const user_ptr = glfwGetWindowUserPointer(window);
       const auto& ctx_ = reinterpret_cast<owds::glfw3::Window*>(user_ptr)->ctx_;
 
-      if(ctx_->cached_camera_refs_.empty())
-      {
-        return;
-      }
-
-      auto& camera = ctx_->cached_camera_refs_[ctx_->active_camera_index].get();
-
-      camera.processUserMouseBtnInput(0.f, button, action == GLFW_PRESS);
+      if(ctx_->camera_ != nullptr)
+        ctx_->camera_->processUserMouseBtnInput(0.f, button, action == GLFW_PRESS);
     });
   }
 
@@ -115,12 +86,9 @@ namespace owds::glfw3 {
   {
     glfwPollEvents();
 
-    ctx_->cached_camera_refs_ = renderer.getCameras();
-
-    for(auto& cam : ctx_->cached_camera_refs_)
-    {
-      cam.get().update();
-    }
+    ctx_->camera_ = renderer.getRenderCamera();
+    if(ctx_->camera_ != nullptr)
+      ctx_->camera_->update();
 
     if(ctx_->has_size_changed_)
     {

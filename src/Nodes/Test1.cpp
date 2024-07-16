@@ -32,20 +32,21 @@ int main()
 
   DefaultEngine world(owds::compat::owds_ros::getShareDirectory("overworld"));
 
-  auto& cam = renderer.createCamera("john", world);
+  renderer.attachWorld(world);
+
+  // auto& cam = renderer.createCamera("john");
   renderer.runSanityChecks();
 
-  cam.setCameraView(owds::CameraView_e::segmented_view);
-  cam.setProjection(owds::CameraProjection_e::perspective);
-  cam.setFieldOfView(80.f);
-  cam.setOutputAA(owds::ViewAntiAliasing_e::msaa_x8);
-  cam.setOutputResolution({640, 480});
-  cam.setPositionAndLookAt({0, 0, 5}, {0, 0, 0});
-  cam.finalize();
+  auto* cam = renderer.getRenderCamera();
+  cam->setCameraView(owds::CameraView_e::segmented_view);
+  cam->setProjection(owds::CameraProjection_e::perspective);
+  cam->setFieldOfView(80.f);
+  cam->setOutputAA(owds::ViewAntiAliasing_e::msaa_x8);
+  cam->setOutputResolution({640, 480});
+  cam->setPositionAndLookAt({5, 5, 5}, {0, 0, 0});
+  cam->finalize();
 
   (void)world.loadRobotFromDescription("models/adream/adream.urdf");
-
-  cam.setPositionAndLookAt({5, 5, 5}, {0, 0, 0});
 
   while(!window.isCloseRequested())
   {
