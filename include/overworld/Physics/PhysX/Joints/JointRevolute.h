@@ -1,7 +1,7 @@
 #ifndef OWDS_PHYSICS_PHYSX_JOINTS_JOINTREVOLUTE_H
 #define OWDS_PHYSICS_PHYSX_JOINTS_JOINTREVOLUTE_H
 
-#include "overworld/Physics/Base/Joints/JointRevolute.h"
+#include "overworld/Engine/Common/Urdf/Joints/JointRevolute.h"
 #include "overworld/Physics/PhysX/API.h"
 
 namespace owds::physx {

@@ -1,6 +1,6 @@
 #include "overworld/Physics/PhysX/World.h"
 
-#include "overworld/Physics/Base/Joints/Joint.h"
+#include "overworld/Engine/Common/Urdf/Joints/Joint.h"
 #include "overworld/Physics/PhysX/Actor.h"
 #include "overworld/Physics/PhysX/Context.h"
 #include "overworld/Physics/PhysX/Joints/JointContinuous.h"

@@ -1,7 +1,7 @@
-#ifndef OWDS_PHYSICS_BASE_JOINTS_JOINT_H
-#define OWDS_PHYSICS_BASE_JOINTS_JOINT_H
+#ifndef OWDS_COMMON_JOINTS_JOINT_H
+#define OWDS_COMMON_JOINTS_JOINT_H
 
-#include "overworld/Physics/Base/JointLocation.h"
+#include "overworld/Engine/Common/Urdf/JointLocation.h"
 
 namespace owds {
   class Joint
@@ -25,4 +25,4 @@ namespace owds {
   };
 } // namespace owds
 
-#endif // OWDS_PHYSICS_BASE_JOINTS_JOINT_H
+#endif // OWDS_COMMON_JOINTS_JOINT_H

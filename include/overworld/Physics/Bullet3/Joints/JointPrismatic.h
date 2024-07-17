@@ -3,7 +3,7 @@
 
 #include <memory>
 
-#include "overworld/Physics/Base/Joints/JointPrismatic.h"
+#include "overworld/Engine/Common/Urdf/Joints/JointPrismatic.h"
 #include "overworld/Physics/Bullet3/API.h"
 
 namespace owds::bullet3 {
@@ -23,6 +23,7 @@ namespace owds::bullet3 {
     void remove() override;
 
     void setLimits(float lower_distance_limit, float upper_distance_limit) override;
+
   protected:
     owds::bullet3::Context& ctx_;
     std::unique_ptr<btGeneric6DofConstraint> joint_;

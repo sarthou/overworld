@@ -1,7 +1,7 @@
-#ifndef OWDS_PHYSICS_BASE_JOINTS_JOINTREVOLUTE_H
-#define OWDS_PHYSICS_BASE_JOINTS_JOINTREVOLUTE_H
+#ifndef OWDS_COMMON_JOINTS_JOINTREVOLUTE_H
+#define OWDS_COMMON_JOINTS_JOINTREVOLUTE_H
 
-#include "overworld/Physics/Base/Joints/Joint.h"
+#include "overworld/Engine/Common/Urdf/Joints/Joint.h"
 
 namespace owds {
   /**
@@ -15,4 +15,4 @@ namespace owds {
   };
 } // namespace owds
 
-#endif // OWDS_PHYSICS_BASE_JOINTS_JOINTREVOLUTE_H
+#endif // OWDS_COMMON_JOINTS_JOINTREVOLUTE_H

@@ -1,7 +1,7 @@
 #ifndef OWDS_PHYSICS_PHYSX_JOINTS_JOINTFLOATING_H
 #define OWDS_PHYSICS_PHYSX_JOINTS_JOINTFLOATING_H
 
-#include "overworld/Physics/Base/Joints/JointFloating.h"
+#include "overworld/Engine/Common/Urdf/Joints/JointFloating.h"
 #include "overworld/Physics/PhysX/API.h"
 
 namespace owds::physx {

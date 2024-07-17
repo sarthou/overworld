@@ -1,5 +1,5 @@
-#ifndef OWDS_PHYSICS_BASE_ACTOR_H
-#define OWDS_PHYSICS_BASE_ACTOR_H
+#ifndef OWDS_COMMON_ACTOR_H
+#define OWDS_COMMON_ACTOR_H
 
 #include <array>
 #include <set>
@@ -80,4 +80,4 @@ namespace owds {
   };
 } // namespace owds
 
-#endif // OWDS_PHYSICS_BASE_ACTOR_H
+#endif // OWDS_COMMON_ACTOR_H

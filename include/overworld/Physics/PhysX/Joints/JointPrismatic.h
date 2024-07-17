@@ -1,7 +1,7 @@
 #ifndef OWDS_PHYSICS_PHYSX_JOINTS_JOINTPRISMATIC_H
 #define OWDS_PHYSICS_PHYSX_JOINTS_JOINTPRISMATIC_H
 
-#include "overworld/Physics/Base/Joints/JointPrismatic.h"
+#include "overworld/Engine/Common/Urdf/Joints/JointPrismatic.h"
 #include "overworld/Physics/PhysX/API.h"
 
 namespace owds::physx {
@@ -20,6 +20,7 @@ namespace owds::physx {
     void remove() override;
 
     void setLimits(float lower_distance_limit, float upper_distance_limit) override;
+
   protected:
     owds::physx::Context& ctx_;
     PxPtr<::physx::PxD6Joint> joint_;

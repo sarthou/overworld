@@ -1,8 +1,8 @@
+#include <overworld/Engine/Common/Urdf/Joints/JointPrismatic.h>
 #include <overworld/Graphics/Assimp/ModelLoader.h>
 #include <overworld/Graphics/BGFX/Renderer.h>
 #include <overworld/Graphics/Base/Camera.h>
 #include <overworld/Graphics/GLFW3/Window.h>
-#include <overworld/Physics/Base/Joints/JointPrismatic.h>
 
 #include "overworld/Engine/Common/Models/ModelManager.h"
 

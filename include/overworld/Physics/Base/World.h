@@ -18,7 +18,7 @@ namespace urdf {
 
 namespace owds {
   class Actor;
-  class Robot;
+  class Urdf;
   class JointRevolute;
   class JointContinuous;
   class JointPrismatic;
@@ -59,7 +59,7 @@ namespace owds {
       const owds::Shape& collision_shape,
       const std::vector<owds::Shape>& visual_shapes) = 0;
 
-    [[nodiscard]] owds::Robot& loadRobotFromDescription(const std::string& path);
+    [[nodiscard]] owds::Urdf& loadRobotFromDescription(const std::string& path);
 
     /**
      * @return
@@ -192,18 +192,18 @@ namespace owds {
     virtual void stepSimulation(float delta_ms) = 0;
 
   protected:
-    void processMaterial(owds::Robot& robot, const urdf::Material& urdf_material);
-    void processLinks(owds::Robot& robot, const urdf::Link& urdf_link);
-    void processLink(owds::Robot& robot, const urdf::Link& urdf_link);
-    void processJoints(owds::Robot& robot, const urdf::Link& urdf_link);
-    void processJoint(owds::Robot& robot, const urdf::Joint& urdf_joint);
+    void processMaterial(owds::Urdf& robot, const urdf::Material& urdf_material);
+    void processLinks(owds::Urdf& robot, const urdf::Link& urdf_link);
+    void processLink(owds::Urdf& robot, const urdf::Link& urdf_link);
+    void processJoints(owds::Urdf& robot, const urdf::Link& urdf_link);
+    void processJoint(owds::Urdf& robot, const urdf::Joint& urdf_joint);
     owds::Shape convertShape(const owds::Material& material, const urdf::Geometry& urdf_shape);
 
     std::filesystem::path base_assets_path_;
     owds::Model& preloaded_box_model_;
     owds::Model& preloaded_cylinder_model_;
     owds::Model& preloaded_sphere_model_;
-    std::unordered_map<owds::Robot*, std::unique_ptr<owds::Robot>> loaded_robots_;
+    std::unordered_map<owds::Urdf*, std::unique_ptr<owds::Urdf>> loaded_robots_;
   };
 } // namespace owds
 

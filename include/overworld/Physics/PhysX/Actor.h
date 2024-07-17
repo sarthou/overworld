@@ -4,7 +4,7 @@
 #include <memory>
 #include <vector>
 
-#include "overworld/Physics/Base/Actor.h"
+#include "overworld/Engine/Common/Urdf/Actor.h"
 #include "overworld/Physics/PhysX/API.h"
 
 namespace owds::physx {

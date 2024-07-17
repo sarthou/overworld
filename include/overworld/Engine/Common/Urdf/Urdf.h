@@ -1,5 +1,5 @@
-#ifndef OWDS_PHYSICS_BASE_ROBOT_H
-#define OWDS_PHYSICS_BASE_ROBOT_H
+#ifndef OWDS_COMMON_URDF_H
+#define OWDS_COMMON_URDF_H
 
 #include <string>
 #include <unordered_map>
@@ -10,11 +10,11 @@ namespace owds {
   class Actor;
   class Material;
 
-  class Robot
+  class Urdf
   {
   public:
-    Robot();
-    ~Robot() noexcept;
+    Urdf();
+    ~Urdf() noexcept;
 
     std::string name_;
     std::unordered_map<std::string, owds::Actor*> links_;
@@ -22,4 +22,4 @@ namespace owds {
   };
 } // namespace owds
 
-#endif // OWDS_PHYSICS_BASE_ROBOT_H
+#endif // OWDS_COMMON_URDF_H

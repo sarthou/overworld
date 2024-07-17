@@ -3,7 +3,7 @@
 
 #include <memory>
 
-#include "overworld/Physics/Base/Joints/JointFixed.h"
+#include "overworld/Engine/Common/Urdf/Joints/JointFixed.h"
 #include "overworld/Physics/Bullet3/API.h"
 
 namespace owds::bullet3 {

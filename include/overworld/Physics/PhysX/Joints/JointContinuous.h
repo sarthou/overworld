@@ -1,7 +1,7 @@
 #ifndef OWDS_PHYSICS_PHYSX_JOINTS_JOINTCONTINUOUS_H
 #define OWDS_PHYSICS_PHYSX_JOINTS_JOINTCONTINUOUS_H
 
-#include "overworld/Physics/Base/Joints/JointContinuous.h"
+#include "overworld/Engine/Common/Urdf/Joints/JointContinuous.h"
 #include "overworld/Physics/PhysX/API.h"
 
 namespace owds::physx {

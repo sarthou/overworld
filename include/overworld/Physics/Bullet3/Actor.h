@@ -4,7 +4,7 @@
 #include <memory>
 #include <vector>
 
-#include "overworld/Physics/Base/Actor.h"
+#include "overworld/Engine/Common/Urdf/Actor.h"
 #include "overworld/Physics/Bullet3/API.h"
 
 namespace owds::bullet3 {

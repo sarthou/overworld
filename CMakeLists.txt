@@ -159,7 +159,10 @@ owds_add_ros_library(overworld_compat src/Compat/ROS.cpp)
 owds_add_library(overworld_engine_common
     src/Engine/Common/Models/Mesh.cpp
     src/Engine/Common/Models/Model.cpp
-    src/Engine/Common/Models/ModelManager.cpp)
+    src/Engine/Common/Models/ModelManager.cpp
+    src/Engine/Common/Urdf/Joints/Joint.cpp
+    src/Engine/Common/Urdf/Urdf.cpp
+    src/Engine/Common/Urdf/Actor.cpp)
 
 # ##################################
 set(overworld_vert_shaders
@@ -221,9 +224,6 @@ else()
 endif()
 
 owds_add_ros_library(overworld_physics
-    src/Physics/Base/Joints/Joint.cpp
-    src/Physics/Base/Actor.cpp
-    src/Physics/Base/Robot.cpp
     src/Physics/Base/World.cpp
     ${OWDS_PHYSICS_SRC})
 

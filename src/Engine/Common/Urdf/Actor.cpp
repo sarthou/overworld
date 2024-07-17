@@ -1,6 +1,6 @@
-#include "overworld/Physics/Base/Actor.h"
+#include "overworld/Engine/Common/Urdf/Actor.h"
 
-#include "overworld/Physics/Base/Joints/Joint.h"
+#include "overworld/Engine/Common/Urdf/Joints/Joint.h"
 
 namespace owds {
 

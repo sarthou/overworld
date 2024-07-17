@@ -11,9 +11,9 @@
 #include "overworld/Engine/Common/Models/Color.h"
 #include "overworld/Engine/Common/Models/Material.h"
 #include "overworld/Engine/Common/Models/ModelManager.h"
+#include "overworld/Engine/Common/Urdf/Actor.h"
+#include "overworld/Engine/Common/Urdf/Urdf.h"
 #include "overworld/Helper/ROS.h"
-#include "overworld/Physics/Base/Actor.h"
-#include "overworld/Physics/Base/Robot.h"
 
 namespace owds {
   World::World(const std::filesystem::path& base_assets_path)
@@ -71,12 +71,12 @@ namespace owds {
       owds::ModelManager::get().load(path)};
   }
 
-  owds::Robot& World::loadRobotFromDescription(const std::string& path)
+  owds::Urdf& World::loadRobotFromDescription(const std::string& path)
   {
     urdf::Model urdf_model;
     assert(urdf_model.initFile((base_assets_path_ / path).string()));
 
-    auto robot = std::make_unique<owds::Robot>();
+    auto robot = std::make_unique<owds::Urdf>();
     const auto robot_ptr = robot.get();
     loaded_robots_[robot_ptr] = std::move(robot);
 
@@ -105,7 +105,7 @@ namespace owds {
     return *robot_ptr;
   }
 
-  void World::processMaterial(owds::Robot& robot, const urdf::Material& urdf_material)
+  void World::processMaterial(owds::Urdf& robot, const urdf::Material& urdf_material)
   {
     robot.materials_[urdf_material.name] = {
       !urdf_material.texture_filename.empty() ?
@@ -121,7 +121,7 @@ namespace owds {
     };
   }
 
-  void World::processLinks(owds::Robot& robot, const urdf::Link& urdf_link)
+  void World::processLinks(owds::Urdf& robot, const urdf::Link& urdf_link)
   {
     for(auto& child_link : urdf_link.child_links)
     {
@@ -131,7 +131,7 @@ namespace owds {
     processLink(robot, urdf_link);
   }
 
-  void World::processLink(owds::Robot& robot, const urdf::Link& urdf_link)
+  void World::processLink(owds::Urdf& robot, const urdf::Link& urdf_link)
   {
     const auto material_name = urdf_link.visual ? urdf_link.visual->material_name : "";
     const auto material = material_name.empty() ? owds::Material{
@@ -175,7 +175,7 @@ namespace owds {
     robot.links_[urdf_link.name] = std::addressof(link);
   }
 
-  void World::processJoints(owds::Robot& robot, const urdf::Link& urdf_link)
+  void World::processJoints(owds::Urdf& robot, const urdf::Link& urdf_link)
   {
     for(const auto& joint : urdf_link.child_joints)
     {
@@ -188,7 +188,7 @@ namespace owds {
     }
   }
 
-  void World::processJoint(owds::Robot& robot, const urdf::Joint& urdf_joint)
+  void World::processJoint(owds::Urdf& robot, const urdf::Joint& urdf_joint)
   {
     (void)robot;
     // auto& link0 = *robot.links_.at(urdf_joint.parent_link_name);

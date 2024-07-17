@@ -1,7 +1,7 @@
 #include "overworld/Physics/Bullet3/World.h"
 
 #include "overworld/Engine/Common/Shapes/Shape.h"
-#include "overworld/Physics/Base/JointLocation.h"
+#include "overworld/Engine/Common/Urdf/JointLocation.h"
 #include "overworld/Physics/Bullet3/Actor.h"
 #include "overworld/Physics/Bullet3/Context.h"
 #include "overworld/Physics/Bullet3/Joints/JointPrismatic.h"

@@ -1,7 +1,7 @@
-#ifndef OWDS_PHYSICS_BASE_JOINTS_JOINTPRISMATIC_H
-#define OWDS_PHYSICS_BASE_JOINTS_JOINTPRISMATIC_H
+#ifndef OWDS_COMMON_JOINTS_JOINTPRISMATIC_H
+#define OWDS_COMMON_JOINTS_JOINTPRISMATIC_H
 
-#include "overworld/Physics/Base/Joints/Joint.h"
+#include "overworld/Engine/Common/Urdf/Joints/Joint.h"
 
 namespace owds {
   /**
@@ -17,4 +17,4 @@ namespace owds {
   };
 } // namespace owds
 
-#endif // OWDS_PHYSICS_BASE_JOINTS_JOINTPRISMATIC_H
+#endif // OWDS_COMMON_JOINTS_JOINTPRISMATIC_H

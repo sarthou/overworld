@@ -1,6 +1,6 @@
 #include "overworld/Physics/Bullet3/Context.h"
 
-#include "overworld/Physics/Base/Joints/Joint.h"
+#include "overworld/Engine/Common/Urdf/Joints/Joint.h"
 #include "overworld/Physics/Bullet3/Actor.h"
 
 namespace owds::bullet3 {
