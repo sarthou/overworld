@@ -1,7 +1,7 @@
-#include "overworld/Graphics/Base/ModelManager.h"
+#include "overworld/Engine/Common/Models/ModelManager.h"
 
 #include "overworld/Engine/Common/Models/Model.h"
-#include "overworld/Graphics/Base/ModelLoader.h"
+#include "overworld/Engine/Common/Models/ModelLoader.h"
 
 namespace owds {
   ModelManager::ModelManager() = default;

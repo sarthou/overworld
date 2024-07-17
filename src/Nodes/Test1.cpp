@@ -1,9 +1,10 @@
 #include <overworld/Graphics/Assimp/ModelLoader.h>
 #include <overworld/Graphics/BGFX/Renderer.h>
 #include <overworld/Graphics/Base/Camera.h>
-#include <overworld/Graphics/Base/ModelManager.h>
 #include <overworld/Graphics/GLFW3/Window.h>
 #include <overworld/Physics/Base/Joints/JointPrismatic.h>
+
+#include "overworld/Engine/Common/Models/ModelManager.h"
 
 #if !OWDS_USE_PHYSX
 #include <overworld/Physics/Bullet3/Actor.h>

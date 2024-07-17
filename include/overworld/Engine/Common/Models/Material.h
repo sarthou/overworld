@@ -1,5 +1,5 @@
-#ifndef OWDS_GRAPHICS_BASE_MATERIAL_H
-#define OWDS_GRAPHICS_BASE_MATERIAL_H
+#ifndef OWDS_COMMON_BASE_MATERIAL_H
+#define OWDS_COMMON_BASE_MATERIAL_H
 
 #include <string>
 
@@ -14,4 +14,4 @@ namespace owds {
   };
 } // namespace owds
 
-#endif // OWDS_GRAPHICS_BASE_MATERIAL_H
+#endif // OWDS_COMMON_BASE_MATERIAL_H

@@ -158,7 +158,8 @@ owds_add_ros_library(overworld_compat src/Compat/ROS.cpp)
 
 owds_add_library(overworld_engine_common
     src/Engine/Common/Models/Mesh.cpp
-    src/Engine/Common/Models/Model.cpp)
+    src/Engine/Common/Models/Model.cpp
+    src/Engine/Common/Models/ModelManager.cpp)
 
 # ##################################
 set(overworld_vert_shaders
@@ -185,7 +186,6 @@ bgfx_compile_shader_to_header(
 
 owds_add_library(overworld_graphics
     src/Graphics/Assimp/ModelLoader.cpp
-    src/Graphics/Base/ModelManager.cpp
     src/Graphics/BGFX/Camera.cpp
     src/Graphics/BGFX/Renderer.cpp
     src/Graphics/BGFX/Vertex.cpp

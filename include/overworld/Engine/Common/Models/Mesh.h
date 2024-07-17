@@ -1,5 +1,5 @@
-#ifndef OWDS_GRAPHICS_BASE_MESH_H
-#define OWDS_GRAPHICS_BASE_MESH_H
+#ifndef OWDS_COMMON_BASE_MESH_H
+#define OWDS_COMMON_BASE_MESH_H
 
 #include <vector>
 
@@ -26,4 +26,4 @@ namespace owds {
   };
 } // namespace owds
 
-#endif // OWDS_GRAPHICS_BASE_MESH_H
+#endif // OWDS_COMMON_BASE_MESH_H

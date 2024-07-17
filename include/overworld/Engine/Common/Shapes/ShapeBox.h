@@ -1,5 +1,5 @@
-#ifndef OWDS_SHAPES_BOX_H
-#define OWDS_SHAPES_BOX_H
+#ifndef OWDS_COMMON_BOX_H
+#define OWDS_COMMON_BOX_H
 
 #include <array>
 #include <memory>
@@ -18,4 +18,4 @@ namespace owds {
   };
 } // namespace owds
 
-#endif // OWDS_SHAPES_BOX_H
+#endif // OWDS_COMMON_BOX_H

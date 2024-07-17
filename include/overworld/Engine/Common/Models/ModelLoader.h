@@ -1,5 +1,5 @@
-#ifndef OWDS_GRAPHICS_BASE_MODELLOADER_H
-#define OWDS_GRAPHICS_BASE_MODELLOADER_H
+#ifndef OWDS_COMMON_MODELLOADER_H
+#define OWDS_COMMON_MODELLOADER_H
 
 #include <filesystem>
 #include <memory>
@@ -16,4 +16,4 @@ namespace owds {
   };
 } // namespace owds
 
-#endif // OWDS_GRAPHICS_BASE_MODELLOADER_H
+#endif // OWDS_COMMON_MODELLOADER_H

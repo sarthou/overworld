@@ -1,5 +1,5 @@
-#ifndef OWDS_GRAPHICS_AMBIENT_LIGHT_H
-#define OWDS_GRAPHICS_AMBIENT_LIGHT_H
+#ifndef OWDS_COMMON_AMBIENT_LIGHT_H
+#define OWDS_COMMON_AMBIENT_LIGHT_H
 
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
@@ -99,4 +99,4 @@ namespace owds {
 
 } // namespace owds
 
-#endif // OWDS_GRAPHICS_AMBIENT_LIGHT_H
+#endif // OWDS_COMMON_AMBIENT_LIGHT_H

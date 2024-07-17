@@ -1,5 +1,5 @@
-#ifndef OWDS_SHAPES_DUMMY_H
-#define OWDS_SHAPES_DUMMY_H
+#ifndef OWDS_COMMON_DUMMY_H
+#define OWDS_COMMON_DUMMY_H
 
 namespace owds {
   class ShapeDummy
@@ -8,4 +8,4 @@ namespace owds {
   };
 } // namespace owds
 
-#endif // OWDS_SHAPES_DUMMY_H
+#endif // OWDS_COMMON_DUMMY_H

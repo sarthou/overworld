@@ -10,7 +10,7 @@
 #include "overworld/Compat/ROS.h"
 #include "overworld/Engine/Common/Models/Color.h"
 #include "overworld/Engine/Common/Models/Material.h"
-#include "overworld/Graphics/Base/ModelManager.h"
+#include "overworld/Engine/Common/Models/ModelManager.h"
 #include "overworld/Helper/ROS.h"
 #include "overworld/Physics/Base/Actor.h"
 #include "overworld/Physics/Base/Robot.h"

@@ -1,5 +1,5 @@
-#ifndef OWDS_GRAPHICS_POINT_LIGHTS_H
-#define OWDS_GRAPHICS_POINT_LIGHTS_H
+#ifndef OWDS_COMMON_POINT_LIGHTS_H
+#define OWDS_COMMON_POINT_LIGHTS_H
 
 #include <array>
 #include <cstddef>
@@ -188,4 +188,4 @@ namespace owds {
 
 } // namespace owds
 
-#endif // OWDS_GRAPHICS_POINT_LIGHTS_H
+#endif // OWDS_COMMON_POINT_LIGHTS_H

@@ -1,5 +1,5 @@
-#ifndef OWDS_GRAPHICS_BASE_COLOR_H
-#define OWDS_GRAPHICS_BASE_COLOR_H
+#ifndef OWDS_COMMON_BASE_COLOR_H
+#define OWDS_COMMON_BASE_COLOR_H
 
 #include <cstdint>
 
@@ -12,6 +12,6 @@ namespace owds {
     std::uint8_t b_;
     std::uint8_t a_;
   };
-}
+} // namespace owds
 
-#endif // OWDS_GRAPHICS_BASE_COLOR_H
+#endif // OWDS_COMMON_BASE_COLOR_H

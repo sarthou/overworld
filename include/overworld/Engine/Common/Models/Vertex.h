@@ -1,5 +1,5 @@
-#ifndef OWDS_BASE_VERTEX_H
-#define OWDS_BASE_VERTEX_H
+#ifndef OWDS_COMMON_VERTEX_H
+#define OWDS_COMMON_VERTEX_H
 
 #include <eigen3/Eigen/Eigen>
 
@@ -15,4 +15,4 @@ namespace owds {
   };
 } // namespace owds
 
-#endif // OWDS_BASE_VERTEX_H
+#endif // OWDS_COMMON_VERTEX_H

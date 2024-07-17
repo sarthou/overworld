@@ -1,5 +1,7 @@
 #include "overworld/Engine/Common/Models/Mesh.h"
 
+#include <cstddef>
+
 namespace owds {
   static std::size_t s_global_id_counter_ = 1;
 

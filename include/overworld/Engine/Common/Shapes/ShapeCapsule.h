@@ -1,5 +1,5 @@
-#ifndef OWDS_SHAPES_CAPSULE_H
-#define OWDS_SHAPES_CAPSULE_H
+#ifndef OWDS_COMMON_CAPSULE_H
+#define OWDS_COMMON_CAPSULE_H
 
 #include <memory>
 
@@ -22,4 +22,4 @@ namespace owds {
   };
 } // namespace owds
 
-#endif // OWDS_SHAPES_CAPSULE_H
+#endif // OWDS_COMMON_CAPSULE_H

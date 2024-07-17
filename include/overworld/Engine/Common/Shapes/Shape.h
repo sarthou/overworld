@@ -1,5 +1,5 @@
-#ifndef OWDS_SHAPES_SHAPE_H
-#define OWDS_SHAPES_SHAPE_H
+#ifndef OWDS_COMMON_SHAPE_H
+#define OWDS_COMMON_SHAPE_H
 
 #include <variant>
 
@@ -22,4 +22,4 @@ namespace owds {
     ShapeSphere>;
 }
 
-#endif // OWDS_SHAPES_SHAPE_H
+#endif // OWDS_COMMON_SHAPE_H

@@ -1,5 +1,5 @@
-#ifndef OWDS_SHAPES_CUSTOMMESH_H
-#define OWDS_SHAPES_CUSTOMMESH_H
+#ifndef OWDS_COMMON_CUSTOMMESH_H
+#define OWDS_COMMON_CUSTOMMESH_H
 
 #include <array>
 #include <memory>
@@ -21,4 +21,4 @@ namespace owds {
   };
 } // namespace owds
 
-#endif // OWDS_SHAPES_CUSTOMMESH_H
+#endif // OWDS_COMMON_CUSTOMMESH_H

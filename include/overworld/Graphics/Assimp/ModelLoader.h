@@ -1,7 +1,7 @@
 #ifndef OWDS_GRAPHICS_ASSIMP_MODELLOADER_H
 #define OWDS_GRAPHICS_ASSIMP_MODELLOADER_H
 
-#include "overworld/Graphics/Base/ModelLoader.h"
+#include "overworld/Engine/Common/Models/ModelLoader.h"
 
 namespace owds::assimp {
   class ModelLoader final : public owds::ModelLoader

@@ -1,5 +1,5 @@
-#ifndef OWDS_SHAPES_SKYBOX_H
-#define OWDS_SHAPES_SKYBOX_H
+#ifndef OWDS_COMMON_SKYBOX_H
+#define OWDS_COMMON_SKYBOX_H
 
 #include <memory>
 
@@ -16,4 +16,4 @@ namespace owds {
   };
 } // namespace owds
 
-#endif // OWDS_SHAPES_SKYBOX_H
+#endif // OWDS_COMMON_SKYBOX_H
