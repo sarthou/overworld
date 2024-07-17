@@ -156,6 +156,10 @@ owds_generate_interfaces()
 # ##################################
 owds_add_ros_library(overworld_compat src/Compat/ROS.cpp)
 
+owds_add_library(overworld_engine_common
+    src/Engine/Common/Models/Mesh.cpp
+    src/Engine/Common/Models/Model.cpp)
+
 # ##################################
 set(overworld_vert_shaders
     shaders/vs_default.sc
@@ -181,8 +185,6 @@ bgfx_compile_shader_to_header(
 
 owds_add_library(overworld_graphics
     src/Graphics/Assimp/ModelLoader.cpp
-    src/Graphics/Base/Mesh.cpp
-    src/Graphics/Base/Model.cpp
     src/Graphics/Base/ModelManager.cpp
     src/Graphics/BGFX/Camera.cpp
     src/Graphics/BGFX/Renderer.cpp
@@ -192,7 +194,7 @@ owds_add_library(overworld_graphics
     ${overworld_frag_shaders})
 
 target_include_directories(overworld_graphics PUBLIC ${CMAKE_BINARY_DIR}/include/generated/shaders/)
-target_link_libraries(overworld_graphics PUBLIC assimp bgfx bx glfw)
+target_link_libraries(overworld_graphics PUBLIC overworld_engine_common assimp bgfx bx glfw)
 target_compile_definitions(overworld_graphics PUBLIC GLM_FORCE_LEFT_HANDED)
 target_compile_options(overworld_graphics PRIVATE $<$<CXX_COMPILER_ID:Clang>:-Wno-gnu-zero-variadic-macro-arguments>)
 
