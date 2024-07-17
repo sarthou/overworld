@@ -281,4 +281,66 @@ namespace owds {
       assert(false && "Unrecognized/unsupported shape");
     }
   }
+
+  void World::setAmbientLight(const std::array<float, 3>& direction,
+                              const std::array<float, 3>& color,
+                              float ambient_strength,
+                              float diffuse_strength,
+                              float specular_strength)
+  {
+    ambient_light_ = AmbientLight(glm::vec3(direction[0], direction[1], direction[2]),
+                                  glm::vec3(color[0], color[1], color[2]),
+                                  ambient_strength, diffuse_strength, specular_strength);
+  }
+
+  void World::setAmbientLightDirection(const std::array<float, 3>& direction)
+  {
+    ambient_light_.setDirection(glm::vec3(direction[0], direction[1], direction[2]));
+  }
+
+  void World::setAmbientLightColor(const std::array<float, 3>& color)
+  {
+    ambient_light_.setColor(glm::vec3(color[0], color[1], color[2]));
+  }
+
+  void World::setAmbientLightAmbientStrength(float ambient_strength)
+  {
+    ambient_light_.setAmbientStrength(ambient_strength);
+  }
+
+  std::size_t World::addPointLight(const std::array<float, 3>& position,
+                                   const std::array<float, 3>& color,
+                                   float ambient_strength,
+                                   float diffuse_strength,
+                                   float specular_strength,
+                                   float attenuation_radius)
+  {
+    return point_lights_.addLight(glm::vec3(position[0], position[1], position[2]),
+                                  glm::vec3(color[0], color[1], color[2]),
+                                  ambient_strength,
+                                  diffuse_strength,
+                                  specular_strength,
+                                  attenuation_radius);
+  }
+
+  void World::removePointLight(std::size_t id)
+  {
+    point_lights_.removeLight(id);
+  }
+
+  void World::setPointLightColor(std::size_t id, const glm::vec3& color)
+  {
+    point_lights_.setColor(id, glm::vec3(color[0], color[1], color[2]));
+  }
+
+  void World::setPointLightPosition(std::size_t id, const glm::vec3& position)
+  {
+    point_lights_.setPosition(id, glm::vec3(position[0], position[1], position[2]));
+  }
+
+  void World::setPointLightAmbientStrength(std::size_t id, float strength)
+  {
+    point_lights_.setAmbientStrength(id, strength);
+  }
+
 } // namespace owds

@@ -4,8 +4,6 @@
 #include <memory>
 
 #include "overworld/Graphics/BGFX/Context.h"
-#include "overworld/Graphics/BGFX/Light/AmbientLight.h"
-#include "overworld/Graphics/BGFX/Light/PointLights.h"
 #include "overworld/Graphics/Base/Renderer.h"
 
 namespace owds {
@@ -26,9 +24,6 @@ namespace owds::bgfx {
 
   class Renderer final : public owds::Renderer
   {
-    AmbientLight ambient_light_; // todo to move
-    PointLights point_lights_;   // todo to move
-
   public:
     Renderer();
     ~Renderer() override;
@@ -65,6 +60,9 @@ namespace owds::bgfx {
 
     void render(std::uint64_t state, const owds::bgfx::Camera& camera);
     void renderInstanced(std::uint64_t state);
+
+    void initLightUniforms();
+    void setLightUniforms(World* world);
 
     owds::bgfx::Context ctx_;
   };

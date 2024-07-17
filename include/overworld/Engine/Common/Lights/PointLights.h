@@ -67,9 +67,9 @@ namespace owds {
       computeSpecular(id);
     }
 
-    void setColor(std::size_t id, const glm::vec4& color)
+    void setColor(std::size_t id, const glm::vec3& color)
     {
-      colors_[id] = color;
+      colors_[id] = glm::vec4(color, 1.0f);
       computeAmbient(id);
       computeDiffuse(id);
       computeSpecular(id);

@@ -69,22 +69,7 @@ namespace owds::bgfx {
     ctx_.loaded_uniforms_["material_shininess"] = ::bgfx::createUniform("material_shininess", ::bgfx::UniformType::Vec4);
     ctx_.loaded_uniforms_["material_specular"] = ::bgfx::createUniform("material_specular", ::bgfx::UniformType::Vec4);
 
-    AmbientLight::registerUniforms(ctx_.loaded_uniforms_);
-    PointLights::registerUniforms(ctx_.loaded_uniforms_);
-
-    ambient_light_ = AmbientLight(glm::vec4(-0.2f, -1.0f, -0.3f, 0.0f),
-                                  glm::vec4(1.0f, 0.976f, 0.898f, 1.0f),
-                                  0.3, 0.5, 1.0);
-
-    point_lights_.addLight(glm::vec3(2.0f, -2.0f, 1.0f),
-                           glm::vec3(1.0f, 1.0f, 1.0f),
-                           0.4, 0.5, 1.0,
-                           10.f);
-
-    point_lights_.addLight(glm::vec3(10.0f, -2.0f, 1.0f),
-                           glm::vec3(0.0f, 1.0f, 1.0f),
-                           0.5, 0.5, 1.0,
-                           glm::vec3(1.0f, 0.35f, 0.44f));
+    initLightUniforms();
 
     ctx_.loaded_uniforms_["view_position"] = ::bgfx::createUniform("view_position", ::bgfx::UniformType::Vec4);
 
@@ -354,8 +339,7 @@ namespace owds::bgfx {
   {
     srand(0);
 
-    ambient_light_.setUniforms(ctx_.loaded_uniforms_);
-    point_lights_.setUniforms(ctx_.loaded_uniforms_);
+    setLightUniforms(ctx_.world_);
 
     auto view_position = glm::vec4(camera.getPosition(), 0.0f);
     ::bgfx::setUniform(ctx_.loaded_uniforms_["view_position"], glm::value_ptr(view_position));
@@ -423,4 +407,38 @@ namespace owds::bgfx {
       }
     }
   }
+
+  void Renderer::initLightUniforms()
+  {
+    ctx_.loaded_uniforms_["dir_light_direction"] = ::bgfx::createUniform("dir_light_direction", ::bgfx::UniformType::Vec4);
+    ctx_.loaded_uniforms_["dir_light_ambient"] = ::bgfx::createUniform("dir_light_ambient", ::bgfx::UniformType::Vec4);
+    ctx_.loaded_uniforms_["dir_light_diffuse"] = ::bgfx::createUniform("dir_light_diffuse", ::bgfx::UniformType::Vec4);
+    ctx_.loaded_uniforms_["dir_light_specular"] = ::bgfx::createUniform("dir_light_specular", ::bgfx::UniformType::Vec4);
+
+    ctx_.loaded_uniforms_["point_light_position"] = ::bgfx::createUniform("point_light_position", ::bgfx::UniformType::Vec4, PointLights::MAX_POINT_LIGHTS);
+    ctx_.loaded_uniforms_["point_light_ambient"] = ::bgfx::createUniform("point_light_ambient", ::bgfx::UniformType::Vec4, PointLights::MAX_POINT_LIGHTS);
+    ctx_.loaded_uniforms_["point_light_diffuse"] = ::bgfx::createUniform("point_light_diffuse", ::bgfx::UniformType::Vec4, PointLights::MAX_POINT_LIGHTS);
+    ctx_.loaded_uniforms_["point_light_specular"] = ::bgfx::createUniform("point_light_specular", ::bgfx::UniformType::Vec4, PointLights::MAX_POINT_LIGHTS);
+    ctx_.loaded_uniforms_["point_light_attenuation"] = ::bgfx::createUniform("point_light_attenuation", ::bgfx::UniformType::Vec4, PointLights::MAX_POINT_LIGHTS);
+    ctx_.loaded_uniforms_["nb_point_light"] = ::bgfx::createUniform("nb_point_light", ::bgfx::UniformType::Vec4);
+  }
+
+  void Renderer::setLightUniforms(World* world)
+  {
+    if(world == nullptr)
+      return;
+
+    ::bgfx::setUniform(ctx_.loaded_uniforms_["dir_light_ambient"], glm::value_ptr(getAmbientLight(world).getAmbient()));
+    ::bgfx::setUniform(ctx_.loaded_uniforms_["dir_light_diffuse"], glm::value_ptr(getAmbientLight(world).getDiffuse()));
+    ::bgfx::setUniform(ctx_.loaded_uniforms_["dir_light_specular"], glm::value_ptr(getAmbientLight(world).getSpecular()));
+    ::bgfx::setUniform(ctx_.loaded_uniforms_["dir_light_direction"], glm::value_ptr(getAmbientLight(world).getDirection()));
+
+    ::bgfx::setUniform(ctx_.loaded_uniforms_["point_light_ambient"], glm::value_ptr(getPointLights(world).getAmbients().at(0)), PointLights::MAX_POINT_LIGHTS);
+    ::bgfx::setUniform(ctx_.loaded_uniforms_["point_light_diffuse"], glm::value_ptr(getPointLights(world).getDiffuses().at(0)), PointLights::MAX_POINT_LIGHTS);
+    ::bgfx::setUniform(ctx_.loaded_uniforms_["point_light_specular"], glm::value_ptr(getPointLights(world).getSpeculars().at(0)), PointLights::MAX_POINT_LIGHTS);
+    ::bgfx::setUniform(ctx_.loaded_uniforms_["point_light_position"], glm::value_ptr(getPointLights(world).getPositions().at(0)), PointLights::MAX_POINT_LIGHTS);
+    ::bgfx::setUniform(ctx_.loaded_uniforms_["point_light_attenuation"], glm::value_ptr(getPointLights(world).getAttenuations().at(0)), PointLights::MAX_POINT_LIGHTS);
+    ::bgfx::setUniform(ctx_.loaded_uniforms_["nb_point_light"], glm::value_ptr(getPointLights(world).getNbLights()));
+  }
+
 } // namespace owds::bgfx

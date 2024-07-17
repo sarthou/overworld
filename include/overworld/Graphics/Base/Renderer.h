@@ -11,6 +11,8 @@ namespace owds {
   class World;
   class Actor;
   class Camera;
+  class AmbientLight;
+  class PointLights;
 
   class Renderer
   {
@@ -34,6 +36,10 @@ namespace owds {
 
     virtual std::vector<std::reference_wrapper<owds::Camera>> getCameras() = 0;
     virtual owds::Camera* getRenderCamera() = 0;
+
+  protected:
+    const AmbientLight& getAmbientLight(World* world);
+    const PointLights& getPointLights(World* world);
   };
 } // namespace owds
 

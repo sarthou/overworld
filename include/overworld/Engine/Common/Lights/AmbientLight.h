@@ -9,12 +9,12 @@ namespace owds {
   class AmbientLight
   {
   public:
-    AmbientLight(const glm::vec3& direction,
-                 const glm::vec4& color = glm::vec4(1.0),
+    AmbientLight(const glm::vec3& direction = glm::vec3(0.0f, 0.0f, -1.0f),
+                 const glm::vec3& color = glm::vec3(1.0),
                  float ambient_strength = 1.0f,
                  float diffuse_strength = 1.0f,
                  float specular_strength = 1.0f) : direction_(direction, 1.0f),
-                                                   color_(color),
+                                                   color_(glm::vec4(color, 1.0f)),
                                                    ambient_strength_(ambient_strength),
                                                    diffuse_strength_(diffuse_strength),
                                                    specular_strength_(specular_strength)
@@ -29,9 +29,9 @@ namespace owds {
       direction_ = glm::vec4(direction, 1.0f);
     }
 
-    void setColor(const glm::vec4& color)
+    void setColor(const glm::vec3& color)
     {
-      color_ = color;
+      color_ = glm::vec4(color, 1.0f);
       computeAmbient();
       computeDiffuse();
       computeSpecular();

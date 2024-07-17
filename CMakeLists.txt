@@ -189,6 +189,7 @@ bgfx_compile_shader_to_header(
     OUTPUT_DIR ${CMAKE_BINARY_DIR}/include/generated/shaders/)
 
 owds_add_library(overworld_graphics
+    src/Graphics/Base/Renderer.cpp
     src/Graphics/Assimp/ModelLoader.cpp
     src/Graphics/BGFX/Camera.cpp
     src/Graphics/BGFX/Renderer.cpp

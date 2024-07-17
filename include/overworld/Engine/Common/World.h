@@ -7,6 +7,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include "overworld/Engine/Common/Lights/AmbientLight.h"
+#include "overworld/Engine/Common/Lights/PointLights.h"
 #include "overworld/Engine/Common/Shapes/Shape.h"
 
 namespace urdf {
@@ -28,8 +30,12 @@ namespace owds {
   class Model;
   class Material;
 
+  class Renderer;
+
   class World
   {
+    friend Renderer;
+
   protected:
     explicit World(const std::filesystem::path& base_assets_path);
 
@@ -181,6 +187,26 @@ namespace owds {
       const std::array<float, 3>& joint1_position,
       const std::array<float, 4>& joint1_orientation) = 0;
 
+    void setAmbientLight(const std::array<float, 3>& direction,
+                         const std::array<float, 3>& color = {1.0, 1.0, 1.0},
+                         float ambient_strength = 1.0f,
+                         float diffuse_strength = 1.0f,
+                         float specular_strength = 1.0f);
+    void setAmbientLightDirection(const std::array<float, 3>& direction);
+    void setAmbientLightColor(const std::array<float, 3>& color);
+    void setAmbientLightAmbientStrength(float ambient_strength);
+
+    std::size_t addPointLight(const std::array<float, 3>& position,
+                              const std::array<float, 3>& color = {1.0, 1.0, 1.0},
+                              float ambient_strength = 1.0f,
+                              float diffuse_strength = 1.0f,
+                              float specular_strength = 1.0f,
+                              float attenuation_radius = 10.f);
+    void removePointLight(std::size_t id);
+    void setPointLightColor(std::size_t id, const glm::vec3& color);
+    void setPointLightPosition(std::size_t id, const glm::vec3& position);
+    void setPointLightAmbientStrength(std::size_t id, float strength);
+
     /**
      * @param gravity Self-explanatory.
      */
@@ -204,6 +230,9 @@ namespace owds {
     owds::Model& preloaded_cylinder_model_;
     owds::Model& preloaded_sphere_model_;
     std::unordered_map<owds::Urdf*, std::unique_ptr<owds::Urdf>> loaded_robots_;
+
+    AmbientLight ambient_light_;
+    PointLights point_lights_;
   };
 } // namespace owds
 
