@@ -3,7 +3,7 @@
 
 #include <memory>
 
-#include "overworld/Physics/Base/World.h"
+#include "overworld/Engine/Common/World.h"
 
 namespace owds::physx {
   class Context;

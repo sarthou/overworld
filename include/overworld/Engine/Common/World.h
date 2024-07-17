@@ -1,5 +1,5 @@
-#ifndef OWDS_PHYSICS_BASE_PHYSICSINTERFACE_H
-#define OWDS_PHYSICS_BASE_PHYSICSINTERFACE_H
+#ifndef OWDS_COMMON_WORLD_H
+#define OWDS_COMMON_WORLD_H
 
 #include <array>
 #include <filesystem>
@@ -207,4 +207,4 @@ namespace owds {
   };
 } // namespace owds
 
-#endif // OWDS_PHYSICS_BASE_PHYSICSINTERFACE_H
+#endif // OWDS_COMMON_WORLD_H

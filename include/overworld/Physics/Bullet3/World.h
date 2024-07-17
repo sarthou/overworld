@@ -1,12 +1,13 @@
 #ifndef OWDS_PHYSICS_BULLET3_WORLD_H
 #define OWDS_PHYSICS_BULLET3_WORLD_H
 
-#include "overworld/Physics/Base/World.h"
+#include "overworld/Engine/Common/World.h"
 
 namespace owds::bullet3 {
   class Context;
 
-  class World final : public owds::World {
+  class World final : public owds::World
+  {
   public:
     explicit World(const std::filesystem::path& base_assets_path);
     ~World() override;
@@ -79,9 +80,10 @@ namespace owds::bullet3 {
 
     void setGravity(const std::array<float, 3>& gravity) override;
     void stepSimulation(float delta) override;
+
   protected:
     std::unique_ptr<Context> ctx_;
   };
-}
+} // namespace owds::bullet3
 
 #endif // OWDS_PHYSICS_BULLET3_WORLD_H
