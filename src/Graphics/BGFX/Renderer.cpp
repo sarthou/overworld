@@ -7,9 +7,9 @@
 #include <glm/gtx/quaternion.hpp>
 #include <string>
 
+#include "overworld/Engine/Common/Models/Model.h"
 #include "overworld/Graphics/BGFX/Camera.h"
 #include "overworld/Graphics/BGFX/Vertex.h"
-#include "overworld/Graphics/Base/Model.h"
 #include "overworld/Graphics/Base/Window.h"
 #include "overworld/Helper/GlmMath.h"
 #include "overworld/Physics/Base/Actor.h"
@@ -77,12 +77,12 @@ namespace owds::bgfx {
                                   0.3, 0.5, 1.0);
 
     point_lights_.addLight(glm::vec3(2.0f, -2.0f, 1.0f),
-                           glm::vec4(1.0f, 1.0f, 1.0f, 1.0f),
+                           glm::vec3(1.0f, 1.0f, 1.0f),
                            0.4, 0.5, 1.0,
                            10.f);
 
     point_lights_.addLight(glm::vec3(10.0f, -2.0f, 1.0f),
-                           glm::vec4(0.0f, 1.0f, 1.0f, 1.0f),
+                           glm::vec3(0.0f, 1.0f, 1.0f),
                            0.5, 0.5, 1.0,
                            glm::vec3(1.0f, 0.35f, 0.44f));
 

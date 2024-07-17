@@ -6,7 +6,7 @@
 #include <filesystem>
 #include <fstream>
 
-#include "overworld/Graphics/Base/Model.h"
+#include "overworld/Engine/Common/Models/Model.h"
 
 namespace owds::assimp {
   owds::Mesh processMesh(const aiMesh* mesh)

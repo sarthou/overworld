@@ -7,11 +7,11 @@
 #include <unordered_map>
 #include <vector>
 
+#include "overworld/Engine/Common/Models/Model.h"
 #include "overworld/Graphics/BGFX/API.h"
 #include "overworld/Graphics/BGFX/MeshHandle.h"
 #include "overworld/Graphics/BGFX/Shader.h"
 #include "overworld/Graphics/Base/InstanceData.h"
-#include "overworld/Graphics/Base/Model.h"
 
 namespace owds {
   class Window;

@@ -12,17 +12,16 @@ namespace owds {
 
   class PointLights
   {
-  protected:
+  public:
     const static std::size_t MAX_POINT_LIGHTS = 20;
 
-  public:
     PointLights() : nb_lights_(0)
     {
       available_.fill(true);
     }
 
     std::size_t addLight(const glm::vec3& position,
-                         const glm::vec4& color = glm::vec4(1.0),
+                         const glm::vec3& color = glm::vec3(1.0),
                          float ambient_strength = 1.0f,
                          float diffuse_strength = 1.0f,
                          float specular_strength = 1.0f,
@@ -30,7 +29,7 @@ namespace owds {
     {
       size_t id = findAvailableId();
       setPosition(id, position);
-      colors_[id] = color;
+      colors_[id] = glm::vec4(color, 1.0);
       setAmbientStrength(id, ambient_strength);
       setDiffuseStrength(id, diffuse_strength);
       setSpecularStrength(id, specular_strength);
@@ -40,7 +39,7 @@ namespace owds {
     }
 
     std::size_t addLight(const glm::vec3& position,
-                         const glm::vec4& color = glm::vec4(1.0),
+                         const glm::vec3& color = glm::vec3(1.0),
                          float ambient_strength = 1.0f,
                          float diffuse_strength = 1.0f,
                          float specular_strength = 1.0f,
@@ -48,7 +47,7 @@ namespace owds {
     {
       size_t id = findAvailableId();
       setPosition(id, position);
-      colors_[id] = color;
+      colors_[id] = glm::vec4(color, 1.0);
       setAmbientStrength(id, ambient_strength);
       setDiffuseStrength(id, diffuse_strength);
       setSpecularStrength(id, specular_strength);

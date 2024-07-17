@@ -7,7 +7,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "overworld/Shapes/Shape.h"
+#include "overworld/Engine/Common/Shapes/Shape.h"
 
 namespace urdf {
   class Material;

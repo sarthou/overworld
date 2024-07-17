@@ -3,7 +3,7 @@
 
 #include <eigen3/Eigen/Eigen>
 
-#include "overworld/Graphics/Base/Color.h"
+#include "overworld/Engine/Common/Models/Color.h"
 
 namespace owds {
   class Vertex

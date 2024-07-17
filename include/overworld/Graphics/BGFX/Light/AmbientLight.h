@@ -7,8 +7,8 @@
 #include <string>
 #include <unordered_map>
 
+#include "overworld/Engine/Common/Lights/AmbientLight.h"
 #include "overworld/Graphics/BGFX/API.h"
-#include "overworld/Graphics/Base/Light/AmbientLight.h"
 
 namespace owds::bgfx {
 

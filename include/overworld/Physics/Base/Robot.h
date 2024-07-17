@@ -3,7 +3,8 @@
 
 #include <string>
 #include <unordered_map>
-#include "overworld/Graphics/Base/Material.h"
+
+#include "overworld/Engine/Common/Models/Material.h"
 
 namespace owds {
   class Actor;

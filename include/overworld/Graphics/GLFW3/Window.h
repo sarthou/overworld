@@ -2,6 +2,7 @@
 #define OWDS_GRAPHICS_GLFW3_WINDOW_H
 
 #include <memory>
+#include <string>
 
 #include "overworld/Graphics/Base/Window.h"
 
@@ -11,7 +12,7 @@ namespace owds::glfw3 {
   class Window final : public owds::Window
   {
   public:
-    Window();
+    Window(const std::string& name = "Overworld");
     ~Window() override;
 
     [[nodiscard]] WindowPlatformData getPlatformData() const override;

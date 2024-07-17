@@ -3,17 +3,18 @@
 #include <GLFW/glfw3.h>
 #include <memory>
 #include <overworld/Graphics/Base/Camera.h>
+#include <string>
 
 #include "overworld/Graphics/Base/Renderer.h"
 #include "overworld/Graphics/GLFW3/Context.h"
 
 namespace owds::glfw3 {
 
-  Window::Window() : ctx_(std::make_unique<owds::glfw3::Context>())
+  Window::Window(const std::string& name) : ctx_(std::make_unique<owds::glfw3::Context>())
   {
     glfwInit();
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-    ctx_->glfw_window_ = glfwCreateWindow(640, 480, "Default GLFW3 window", nullptr, nullptr);
+    ctx_->glfw_window_ = glfwCreateWindow(640, 480, name.c_str(), nullptr, nullptr);
 
     glfwSetWindowUserPointer(ctx_->glfw_window_, this);
     glfwSetWindowSizeCallback(ctx_->glfw_window_, [](GLFWwindow* window, const int width, const int height) {

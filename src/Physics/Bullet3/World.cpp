@@ -1,10 +1,10 @@
 #include "overworld/Physics/Bullet3/World.h"
 
+#include "overworld/Engine/Common/Shapes/Shape.h"
 #include "overworld/Physics/Base/JointLocation.h"
 #include "overworld/Physics/Bullet3/Actor.h"
 #include "overworld/Physics/Bullet3/Context.h"
 #include "overworld/Physics/Bullet3/Joints/JointPrismatic.h"
-#include "overworld/Shapes/Shape.h"
 
 namespace owds::bullet3 {
   World::World(const std::filesystem::path& base_assets_path)
@@ -47,12 +47,12 @@ namespace owds::bullet3 {
     const std::array<float, 3>& joint1_position,
     const std::array<float, 3>& joint1_orientation)
   {
-    (void) actor0;
-    (void) joint0_position;
-    (void) joint0_orientation;
-    (void) actor1;
-    (void) joint1_position;
-    (void) joint1_orientation;
+    (void)actor0;
+    (void)joint0_position;
+    (void)joint0_orientation;
+    (void)actor1;
+    (void)joint1_position;
+    (void)joint1_orientation;
     assert(false && "not implemented");
   }
 
@@ -64,12 +64,12 @@ namespace owds::bullet3 {
     const std::array<float, 3>& joint1_position,
     const std::array<float, 3>& joint1_orientation)
   {
-    (void) actor0;
-    (void) joint0_position;
-    (void) joint0_orientation;
-    (void) actor1;
-    (void) joint1_position;
-    (void) joint1_orientation;
+    (void)actor0;
+    (void)joint0_position;
+    (void)joint0_orientation;
+    (void)actor1;
+    (void)joint1_position;
+    (void)joint1_orientation;
     assert(false && "not implemented");
   }
 
@@ -105,12 +105,12 @@ namespace owds::bullet3 {
     const std::array<float, 3>& joint1_position,
     const std::array<float, 3>& joint1_orientation)
   {
-    (void) actor0;
-    (void) joint0_position;
-    (void) joint0_orientation;
-    (void) actor1;
-    (void) joint1_position;
-    (void) joint1_orientation;
+    (void)actor0;
+    (void)joint0_position;
+    (void)joint0_orientation;
+    (void)actor1;
+    (void)joint1_position;
+    (void)joint1_orientation;
     assert(false && "not implemented");
   }
 
@@ -122,12 +122,12 @@ namespace owds::bullet3 {
     const std::array<float, 3>& joint1_position,
     const std::array<float, 3>& joint1_orientation)
   {
-    (void) actor0;
-    (void) joint0_position;
-    (void) joint0_orientation;
-    (void) actor1;
-    (void) joint1_position;
-    (void) joint1_orientation;
+    (void)actor0;
+    (void)joint0_position;
+    (void)joint0_orientation;
+    (void)actor1;
+    (void)joint1_position;
+    (void)joint1_orientation;
     assert(false && "not implemented");
   }
 
@@ -139,12 +139,12 @@ namespace owds::bullet3 {
     const std::array<float, 3>& joint1_position,
     const std::array<float, 3>& joint1_orientation)
   {
-    (void) actor0;
-    (void) joint0_position;
-    (void) joint0_orientation;
-    (void) actor1;
-    (void) joint1_position;
-    (void) joint1_orientation;
+    (void)actor0;
+    (void)joint0_position;
+    (void)joint0_orientation;
+    (void)actor1;
+    (void)joint1_position;
+    (void)joint1_orientation;
     assert(false && "not implemented");
   }
 

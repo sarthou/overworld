@@ -3,7 +3,7 @@
 
 #include <bgfx/bgfx.h>
 
-#include "overworld/Graphics/Base/Vertex.h"
+#include "overworld/Engine/Common/Models/Vertex.h"
 
 namespace owds::bgfx {
   class Vertex : public owds::Vertex

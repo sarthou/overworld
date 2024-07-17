@@ -3,8 +3,8 @@
 
 #include <string>
 
-#include "overworld/Graphics/Base/Material.h"
-#include "overworld/Graphics/Base/Mesh.h"
+#include "overworld/Engine/Common/Models/Material.h"
+#include "overworld/Engine/Common/Models/Mesh.h"
 
 namespace owds {
   class Model

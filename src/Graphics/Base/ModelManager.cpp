@@ -1,6 +1,6 @@
 #include "overworld/Graphics/Base/ModelManager.h"
 
-#include "overworld/Graphics/Base/Model.h"
+#include "overworld/Engine/Common/Models/Model.h"
 #include "overworld/Graphics/Base/ModelLoader.h"
 
 namespace owds {

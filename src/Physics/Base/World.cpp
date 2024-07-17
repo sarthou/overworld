@@ -8,8 +8,8 @@
 #include <urdf/model.h>
 
 #include "overworld/Compat/ROS.h"
-#include "overworld/Graphics/Base/Color.h"
-#include "overworld/Graphics/Base/Material.h"
+#include "overworld/Engine/Common/Models/Color.h"
+#include "overworld/Engine/Common/Models/Material.h"
 #include "overworld/Graphics/Base/ModelManager.h"
 #include "overworld/Helper/ROS.h"
 #include "overworld/Physics/Base/Actor.h"

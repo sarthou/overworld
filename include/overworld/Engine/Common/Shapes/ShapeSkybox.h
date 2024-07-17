@@ -1,0 +1,19 @@
+#ifndef OWDS_SHAPES_SKYBOX_H
+#define OWDS_SHAPES_SKYBOX_H
+
+#include <memory>
+
+#include "overworld/Engine/Common/Models/Material.h"
+
+namespace owds {
+  class Model;
+
+  class ShapeSkybox
+  {
+  public:
+    owds::Material material_;
+    std::reference_wrapper<owds::Model> skybox_model_;
+  };
+} // namespace owds
+
+#endif // OWDS_SHAPES_SKYBOX_H

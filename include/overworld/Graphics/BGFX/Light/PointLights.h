@@ -6,8 +6,8 @@
 #include <string>
 #include <unordered_map>
 
+#include "overworld/Engine/Common/Lights/PointLights.h"
 #include "overworld/Graphics/BGFX/API.h"
-#include "overworld/Graphics/Base/Light/PointLights.h"
 
 namespace owds::bgfx {
 

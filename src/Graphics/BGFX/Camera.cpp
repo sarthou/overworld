@@ -9,10 +9,10 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 
+#include "overworld/Engine/Common/Models/Color.h"
 #include "overworld/Graphics/BGFX/API.h"
 #include "overworld/Graphics/Base/CameraProjection.h"
 #include "overworld/Graphics/Base/CameraView.h"
-#include "overworld/Graphics/Base/Color.h"
 #include "overworld/Graphics/Base/ViewAntiAliasing.h"
 #include "overworld/Helper/BitCast.h"
 #include "overworld/Helper/GlmMath.h"

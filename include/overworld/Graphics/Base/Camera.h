@@ -3,9 +3,9 @@
 
 #include <functional>
 
+#include "overworld/Engine/Common/Models/Color.h"
 #include "overworld/Graphics/Base/CameraProjection.h"
 #include "overworld/Graphics/Base/CameraView.h"
-#include "overworld/Graphics/Base/Color.h"
 #include "overworld/Graphics/Base/ViewAntiAliasing.h"
 
 namespace owds {

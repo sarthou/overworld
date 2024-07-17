@@ -5,7 +5,7 @@
 #include <string>
 #include <unordered_map>
 
-#include "overworld/Graphics/Base/Mesh.h"
+#include "overworld/Engine/Common/Models/Mesh.h"
 #include "overworld/Physics/PhysX/API.h"
 
 namespace owds::physx {

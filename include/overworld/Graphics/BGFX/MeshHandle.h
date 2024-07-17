@@ -1,8 +1,8 @@
 #ifndef OWDS_GRAPHICS_BGFX_MESH_H
 #define OWDS_GRAPHICS_BGFX_MESH_H
 
+#include "overworld/Engine/Common/Models/Color.h"
 #include "overworld/Graphics/BGFX/API.h"
-#include "overworld/Graphics/Base/Color.h"
 
 namespace owds::bgfx {
   class MeshHandle

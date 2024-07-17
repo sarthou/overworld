@@ -3,7 +3,7 @@
 
 #include <vector>
 
-#include "overworld/Graphics/Base/Vertex.h"
+#include "overworld/Engine/Common/Models/Vertex.h"
 
 namespace owds {
   class Mesh

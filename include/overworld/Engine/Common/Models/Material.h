@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "overworld/Graphics/Base/Color.h"
+#include "overworld/Engine/Common/Models/Color.h"
 
 namespace owds {
   class Material
