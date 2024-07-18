@@ -10,6 +10,7 @@
 #include "overworld/Engine/Common/Models/Model.h"
 #include "overworld/Graphics/BGFX/API.h"
 #include "overworld/Graphics/BGFX/MeshHandle.h"
+#include "overworld/Graphics/BGFX/ModelHandle.h"
 #include "overworld/Graphics/BGFX/Shader.h"
 #include "overworld/Graphics/Base/InstanceData.h"
 
@@ -42,10 +43,11 @@ namespace owds::bgfx {
     std::unordered_map<std::string, owds::bgfx::Shader> shaders_;
     std::unordered_map<std::string, ::bgfx::UniformHandle> loaded_uniforms_;
     std::unordered_map<std::string, ::bgfx::TextureHandle> loaded_textures_;
+    std::unordered_map<owds::Mesh::Id, owds::bgfx::MeshHandle> loaded_meshes_;
 
     ::bgfx::TextureHandle white_tex_{};
 
-    std::unordered_map<owds::Mesh::Id, owds::bgfx::MeshHandle> cached_meshes_;
+    std::unordered_map<owds::Model::Id, owds::bgfx::ModelHandle> cached_models_;
     std::unordered_map<owds::Model::Id, std::unordered_map<owds::Mesh::Id, std::vector<owds::InstanceData>>> current_mesh_batches_;
 
     Context() = default;

@@ -63,12 +63,7 @@ namespace owds::bgfx {
     ctx_.is_initialized_ = true;
     ctx_.render_camera_ = new owds::bgfx::Camera();
 
-    ctx_.loaded_uniforms_["material_texture_diffuse"] = ::bgfx::createUniform("material_texture_diffuse", ::bgfx::UniformType::Sampler);
-    ctx_.loaded_uniforms_["material_texture_specular"] = ::bgfx::createUniform("material_texture_specular", ::bgfx::UniformType::Sampler);
-    ctx_.loaded_uniforms_["material_color"] = ::bgfx::createUniform("material_color", ::bgfx::UniformType::Vec4);
-    ctx_.loaded_uniforms_["material_shininess"] = ::bgfx::createUniform("material_shininess", ::bgfx::UniformType::Vec4);
-    ctx_.loaded_uniforms_["material_specular"] = ::bgfx::createUniform("material_specular", ::bgfx::UniformType::Vec4);
-
+    initMaterialUniforms();
     initLightUniforms();
 
     ctx_.loaded_uniforms_["view_position"] = ::bgfx::createUniform("view_position", ::bgfx::UniformType::Vec4);
@@ -257,54 +252,63 @@ namespace owds::bgfx {
     (void)shape; // todo
   }
 
-  void Renderer::tryCacheModel(const owds::Model& model, const owds::Material& material)
+  void Renderer::loadModel(const owds::Model& model, const owds::Material& material)
   {
     if(model.meshes_.empty())
-    {
       return;
-    }
 
-    if(ctx_.cached_meshes_.count(model.meshes_.front().id_))
-    {
+    auto model_it = ctx_.cached_models_.find(model.id_);
+    if(model_it != ctx_.cached_models_.end())
       return;
-    }
 
-    auto tex = ctx_.white_tex_;
+    model_it = ctx_.cached_models_.insert({model.id_, {}}).first;
 
-    if(!material.texture_path_.empty())
+    // Colors
+    model_it->second.color_rgba_ = material.color_rgba_;
+    model_it->second.shininess_ = 64.f; // TODO take from material
+    model_it->second.specular_ = 0.1f;  // TODO take from material
+
+    // Material
+    if(material.texture_path_.empty() == false)
     {
-      if(!ctx_.loaded_textures_.count(material.texture_path_))
+      auto text_it = ctx_.loaded_textures_.find(material.texture_path_);
+      if(text_it == ctx_.loaded_textures_.end())
       {
-        tex = loadTexture(material.texture_path_, BGFX_TEXTURE_SRGB);
-        ctx_.loaded_textures_[material.texture_path_] = tex;
+        model_it->second.tex_diffuse_ = loadTexture(material.texture_path_, BGFX_TEXTURE_SRGB);
+        ctx_.loaded_textures_[material.texture_path_] = model_it->second.tex_diffuse_;
       }
+      else
+        model_it->second.tex_diffuse_ = text_it->second;
     }
+    else
+      model_it->second.tex_diffuse_ = ctx_.white_tex_;
 
+    // Meshes
     for(const auto& mesh : model.meshes_)
     {
-      ctx_.cached_meshes_.emplace(
-        mesh.id_, owds::bgfx::MeshHandle{
-                    material.color_rgba_,
-                    tex,
-                    ::bgfx::createVertexBuffer(
-                      ::bgfx::makeRef(mesh.vertices_.data(), mesh.vertices_.size() * sizeof(mesh.vertices_[0])),
-                      Vertex::getMSLayout()),
-                    ::bgfx::createIndexBuffer(
-                      ::bgfx::makeRef(mesh.indices_.data(), mesh.indices_.size() * sizeof(mesh.indices_[0])),
-                      BGFX_BUFFER_INDEX32)});
+      auto mesh_it = ctx_.loaded_meshes_.find(mesh.id_);
+      if(mesh_it == ctx_.loaded_meshes_.end())
+      {
+        mesh_it = ctx_.loaded_meshes_.emplace(mesh.id_, owds::bgfx::MeshHandle{
+                                                          ::bgfx::createVertexBuffer(::bgfx::makeRef(mesh.vertices_.data(),
+                                                                                                     mesh.vertices_.size() * sizeof(mesh.vertices_[0])),
+                                                                                     Vertex::getMSLayout()),
+                                                          ::bgfx::createIndexBuffer(::bgfx::makeRef(mesh.indices_.data(),
+                                                                                                    mesh.indices_.size() * sizeof(mesh.indices_[0])),
+                                                                                    BGFX_BUFFER_INDEX32)})
+                    .first;
+      }
+
+      model_it->second.meshes_.emplace(mesh.id_, mesh_it->second);
     }
   }
 
   void Renderer::queueModelBatch(const owds::Model& model, const owds::Material& material, const std::array<float, 16>& model_mat)
   {
-    tryCacheModel(model, material);
+    loadModel(model, material);
 
     for(auto& mesh : model.meshes_)
-    {
-      ctx_.current_mesh_batches_[model.id_][mesh.id_].emplace_back(owds::InstanceData{
-        model_mat,
-        {}});
-    }
+      ctx_.current_mesh_batches_[model.id_][mesh.id_].emplace_back(owds::InstanceData{model_mat, {}}); // TODO add instance data ?
   }
 
   void Renderer::render(const std::uint64_t state, const owds::bgfx::Camera& camera)
@@ -318,31 +322,16 @@ namespace owds::bgfx {
 
     for(auto& [model_id, batch] : ctx_.current_mesh_batches_)
     {
+      auto& model = ctx_.cached_models_[model_id];
+      setMaterialUniforms(model);
+
       for(auto& [mesh_id, transforms] : batch)
       {
-        const auto& mesh = ctx_.cached_meshes_[mesh_id];
-
-        ::bgfx::setTexture(0, ctx_.loaded_uniforms_["material_texture_diffuse"], mesh.tex_);
-        auto material_shininess = glm::vec4(64.f, 0.f, 0.f, 0.f);
-        ::bgfx::setUniform(ctx_.loaded_uniforms_["material_shininess"], glm::value_ptr(material_shininess));
-        auto material_specular = glm::vec4(0.1f, 0.f, 0.f, 0.f);
-        ::bgfx::setUniform(ctx_.loaded_uniforms_["material_specular"], glm::value_ptr(material_specular));
+        const auto& mesh = model.meshes_[mesh_id];
 
         for(const auto& transform : transforms)
         {
           ::bgfx::setTransform(transform.mvp_.data(), 1);
-
-          auto material_color = glm::vec4(
-            static_cast<float>(mesh.color_rgba_.r_) / 255.f,
-            static_cast<float>(mesh.color_rgba_.g_) / 255.f,
-            static_cast<float>(mesh.color_rgba_.b_) / 255.f,
-            static_cast<float>(mesh.color_rgba_.a_) / 255.f); /*glm::vec4(
-                                                             0.1f + rand() % 200 / 128.f,
-                                                             0.1f + rand() % 200 / 128.f,
-                                                             0.1f + rand() % 200 / 128.f,
-                                                             1)*/
-
-          ::bgfx::setUniform(ctx_.loaded_uniforms_["material_color"], glm::value_ptr(material_color));
 
           ::bgfx::setVertexBuffer(0, mesh.vbh_);
           ::bgfx::setIndexBuffer(mesh.ibh_);
@@ -358,11 +347,12 @@ namespace owds::bgfx {
   {
     for(auto& [model_id, batch] : ctx_.current_mesh_batches_)
     {
+      auto& model = ctx_.cached_models_[model_id];
+      setMaterialUniforms(model);
+
       for(auto& [mesh_id, transforms] : batch)
       {
-        auto& mesh = ctx_.cached_meshes_[mesh_id];
-
-        ::bgfx::setTexture(0, ctx_.loaded_uniforms_["material_texture_diffuse"], mesh.tex_);
+        const auto& mesh = model.meshes_[mesh_id];
 
         ::bgfx::InstanceDataBuffer idb{};
         ::bgfx::allocInstanceDataBuffer(&idb, transforms.size(), sizeof(transforms[0]));
@@ -411,6 +401,29 @@ namespace owds::bgfx {
     ::bgfx::setUniform(ctx_.loaded_uniforms_["point_light_position"], glm::value_ptr(getPointLights(world).getPositions().at(0)), PointLights::MAX_POINT_LIGHTS);
     ::bgfx::setUniform(ctx_.loaded_uniforms_["point_light_attenuation"], glm::value_ptr(getPointLights(world).getAttenuations().at(0)), PointLights::MAX_POINT_LIGHTS);
     ::bgfx::setUniform(ctx_.loaded_uniforms_["nb_point_light"], glm::value_ptr(getPointLights(world).getNbLights()));
+  }
+
+  void Renderer::initMaterialUniforms()
+  {
+    ctx_.loaded_uniforms_["material_texture_diffuse"] = ::bgfx::createUniform("material_texture_diffuse", ::bgfx::UniformType::Sampler);
+    ctx_.loaded_uniforms_["material_texture_specular"] = ::bgfx::createUniform("material_texture_specular", ::bgfx::UniformType::Sampler);
+    ctx_.loaded_uniforms_["material_color"] = ::bgfx::createUniform("material_color", ::bgfx::UniformType::Vec4);
+    ctx_.loaded_uniforms_["material_shininess"] = ::bgfx::createUniform("material_shininess", ::bgfx::UniformType::Vec4);
+    ctx_.loaded_uniforms_["material_specular"] = ::bgfx::createUniform("material_specular", ::bgfx::UniformType::Vec4);
+  }
+
+  void Renderer::setMaterialUniforms(const owds::bgfx::ModelHandle& model)
+  {
+    ::bgfx::setTexture(0, ctx_.loaded_uniforms_["material_texture_diffuse"], model.tex_diffuse_);
+    auto material_shininess = glm::vec4(model.shininess_, 0.f, 0.f, 0.f);
+    ::bgfx::setUniform(ctx_.loaded_uniforms_["material_shininess"], glm::value_ptr(material_shininess));
+    auto material_specular = glm::vec4(model.specular_, 0.f, 0.f, 0.f);
+    ::bgfx::setUniform(ctx_.loaded_uniforms_["material_specular"], glm::value_ptr(material_specular));
+    auto material_color = glm::vec4(static_cast<float>(model.color_rgba_.r_) / 255.f,
+                                    static_cast<float>(model.color_rgba_.g_) / 255.f,
+                                    static_cast<float>(model.color_rgba_.b_) / 255.f,
+                                    static_cast<float>(model.color_rgba_.a_) / 255.f);
+    ::bgfx::setUniform(ctx_.loaded_uniforms_["material_color"], glm::value_ptr(material_color));
   }
 
   ::bgfx::TextureHandle Renderer::loadTexture(const std::string& file_name,

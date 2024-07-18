@@ -55,7 +55,7 @@ namespace owds::bgfx {
     void queueActorBatch(const owds::Actor& actor, const owds::ShapeDummy& shape);
     void queueActorBatch(const owds::Actor& actor, const owds::ShapeSphere& shape);
 
-    void tryCacheModel(const owds::Model& model, const owds::Material& material);
+    void loadModel(const owds::Model& model, const owds::Material& material);
     void queueModelBatch(const owds::Model& model, const owds::Material& material, const std::array<float, 16>& model_mat);
 
     void render(std::uint64_t state, const owds::bgfx::Camera& camera);
@@ -63,6 +63,8 @@ namespace owds::bgfx {
 
     void initLightUniforms();
     void setLightUniforms(World* world);
+    void initMaterialUniforms();
+    void setMaterialUniforms(const owds::bgfx::ModelHandle& model);
 
     ::bgfx::TextureHandle loadTexture(const std::string& file_name,
                                       uint64_t flags = 0,
