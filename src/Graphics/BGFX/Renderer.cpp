@@ -275,35 +275,7 @@ namespace owds::bgfx {
     {
       if(!ctx_.loaded_textures_.count(material.texture_path_))
       {
-        std::ifstream t(material.texture_path_, std::ios::binary);
-        assert(t.good());
-
-        std::string data((std::istreambuf_iterator(t)), std::istreambuf_iterator<char>());
-        assert(!data.empty());
-
-        int width = 0, height = 0, channels = 0;
-        const auto pixels = reinterpret_cast<owds::Color*>(stbi_load_from_memory(
-          reinterpret_cast<stbi_uc*>(data.data()),
-          static_cast<int>(data.size()),
-          &width,
-          &height,
-          &channels,
-          4));
-
-        assert(pixels);
-
-        tex = ::bgfx::createTexture2D(
-          width,
-          height,
-          false,
-          1,
-          ::bgfx::TextureFormat::RGBA8,
-          BGFX_TEXTURE_SRGB,
-          ::bgfx::makeRef(pixels, width * height * sizeof(owds::Color), [](void* _ptr, void* _userData) {
-            (void)_userData;
-            stbi_image_free(_ptr);
-          }));
-
+        tex = loadTexture(material.texture_path_, BGFX_TEXTURE_SRGB);
         ctx_.loaded_textures_[material.texture_path_] = tex;
       }
     }
@@ -439,6 +411,70 @@ namespace owds::bgfx {
     ::bgfx::setUniform(ctx_.loaded_uniforms_["point_light_position"], glm::value_ptr(getPointLights(world).getPositions().at(0)), PointLights::MAX_POINT_LIGHTS);
     ::bgfx::setUniform(ctx_.loaded_uniforms_["point_light_attenuation"], glm::value_ptr(getPointLights(world).getAttenuations().at(0)), PointLights::MAX_POINT_LIGHTS);
     ::bgfx::setUniform(ctx_.loaded_uniforms_["nb_point_light"], glm::value_ptr(getPointLights(world).getNbLights()));
+  }
+
+  ::bgfx::TextureHandle Renderer::loadTexture(const std::string& file_name,
+                                              uint64_t flags,
+                                              ::bgfx::TextureInfo* texture_info,
+                                              bool flip,
+                                              bool cube_map)
+  {
+    // flag BGFX_TEXTURE_SRGB
+    ::bgfx::TextureHandle handle;
+
+    int width = 0, height = 0, channels = 0;
+    stbi_set_flip_vertically_on_load(flip);
+    unsigned char* data = stbi_load(file_name.c_str(), &width, &height, &channels, 0);
+
+    if(data != nullptr)
+    {
+      const ::bgfx::Memory* mem = ::bgfx::makeRef(data, width * height * channels, [](void* ptr, void* user_data) {
+        (void)user_data;
+        stbi_image_free(ptr);
+      });
+
+      ::bgfx::TextureFormat::Enum format;
+      if(channels == 1)
+        format = ::bgfx::TextureFormat::R8;
+      else if(channels == 3)
+        format = ::bgfx::TextureFormat::RGB8;
+      else if(channels == 4)
+        format = ::bgfx::TextureFormat::RGBA8;
+
+      if(texture_info != nullptr)
+      {
+        ::bgfx::calcTextureSize(*texture_info,
+                                uint16_t(width),
+                                uint16_t(height),
+                                uint16_t(0), // depth
+                                cube_map,
+                                false, // umMips > 1
+                                1,     // num layers
+                                format);
+      }
+
+      if(cube_map)
+      {
+        handle = ::bgfx::createTextureCube(uint16_t(width),
+                                           false, // umMips > 1
+                                           channels, format,
+                                           flags, mem);
+      }
+      else if(::bgfx::isTextureValid(0, false, channels, format, flags))
+      {
+        handle = ::bgfx::createTexture2D(uint16_t(width),
+                                         uint16_t(height),
+                                         false, // umMips > 1
+                                         1,     // num layers
+                                         format,
+                                         flags, mem);
+      }
+
+      if(::bgfx::isValid(handle))
+        ::bgfx::setName(handle, file_name.c_str(), file_name.size());
+    }
+
+    return handle;
   }
 
 } // namespace owds::bgfx

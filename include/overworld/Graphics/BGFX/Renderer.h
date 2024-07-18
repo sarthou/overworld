@@ -64,6 +64,12 @@ namespace owds::bgfx {
     void initLightUniforms();
     void setLightUniforms(World* world);
 
+    ::bgfx::TextureHandle loadTexture(const std::string& file_name,
+                                      uint64_t flags = 0,
+                                      ::bgfx::TextureInfo* texture_info = nullptr,
+                                      bool flip = false,
+                                      bool cube_map = false);
+
     owds::bgfx::Context ctx_;
   };
 } // namespace owds::bgfx
