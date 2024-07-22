@@ -87,7 +87,7 @@ namespace owds {
 
     void setAttenuation(std::size_t id, float radius)
     {
-      attenuations_[id] = glm::vec4(1.0f, 2.0 / radius, 1.0 / (radius * radius), 0.0f);
+      attenuations_[id] = glm::vec4(1.0f, 2.0 / radius, 1.0 / (radius /* * radius*/), 0.0f);
     }
 
     void setAmbientStrength(std::size_t id, float strength)

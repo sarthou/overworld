@@ -48,17 +48,17 @@ int main()
 
   world.setAmbientLight({-0.2f, -1.0f, -0.3f},
                         {1.0f, 0.976f, 0.898f},
-                        0.15, 0.35, 1.0);
+                        0.3, 0.5, 0.9);
 
-  world.addPointLight({2.0f, -2.0f, 1.0f},
+  world.addPointLight({2.0f, -1.0f, 2.0f},
                       {1.0f, 1.0f, 1.0f},
-                      0.2, 0.3, 1.0,
-                      10.f);
+                      0.4, 0.5, 1.0,
+                      5.f);
 
-  world.addPointLight({10.0f, -2.0f, 1.0f},
+  world.addPointLight({10.0f, -1.0f, 2.0f},
                       {0.0f, 1.0f, 1.0f},
-                      0.2, 0.3, 1.0,
-                      7.0f);
+                      0.4, 0.5, 1.0,
+                      5.0f);
 
   renderer.attachWorld(&world);
 
