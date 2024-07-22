@@ -32,8 +32,8 @@ namespace owds {
     {
     case owds::CameraProjection_e::perspective:
     {
-      constexpr auto near = 0.1f;
-      constexpr auto far = 100.f;
+      auto near = planes_[0];
+      auto far = planes_[1];
       const auto aspect_ratio = view_dimensions_[0] / view_dimensions_[1];
 
       proj_matrix_ = glm::perspective(field_of_view_, aspect_ratio, near, far);
@@ -42,8 +42,8 @@ namespace owds {
     }
     case owds::CameraProjection_e::orthographic:
     {
-      constexpr auto near = 0.1f;
-      constexpr auto far = 100.f;
+      auto near = planes_[0];
+      auto far = planes_[1];
       proj_matrix_ = glm::ortho(-view_dimensions_[0] / 2, view_dimensions_[0] / 2,
                                 -view_dimensions_[1] / 2, view_dimensions_[1] / 2,
                                 near, far);
@@ -87,6 +87,12 @@ namespace owds {
   {
     view_dimensions_[0] = resolution[0];
     view_dimensions_[1] = resolution[1];
+  }
+
+  void Camera::setPlanes(const std::array<float, 2>& near_far_planes)
+  {
+    planes_[0] = near_far_planes[0];
+    planes_[1] = near_far_planes[1];
   }
 
   void Camera::finalize()

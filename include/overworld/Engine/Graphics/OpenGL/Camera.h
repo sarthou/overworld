@@ -29,6 +29,7 @@ namespace owds {
     glm::vec3 world_eye_up_ = {0.f, 0., 1.f};
 
     glm::vec2 view_angles_{-90.0f, 0.0f}; // yaw/pitch in deg
+    glm::vec2 planes_{0.1, 100.};
 
     glm::vec2 mouse_current_position_{};
     glm::vec2 mouse_drag_start_position_{};
@@ -66,6 +67,7 @@ namespace owds {
     void setOutputAA(owds::ViewAntiAliasing_e aa_setting);
     void setOutputFPS(std::uint64_t desired_target_fps);
     void setOutputResolution(const std::array<float, 2>& resolution);
+    void setPlanes(const std::array<float, 2>& near_far_planes);
     void finalize();
     void setPositionAndOrientation(const std::array<float, 3>& position, const std::array<float, 3>& orientation);
     void setPositionAndLookAt(const std::array<float, 3>& eye_position, const std::array<float, 3>& dst_position);
