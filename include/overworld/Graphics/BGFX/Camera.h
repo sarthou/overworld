@@ -55,6 +55,7 @@ namespace owds::bgfx {
     bool render_collision_models_ = false;
 
     Camera() = default;
+    void setViewId(::bgfx::ViewId id) { id_ = id; }
 
     void updateViewMatrix();
     void updateProjectionMatrix();

@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "overworld/Graphics/BGFX/Context.h"
+#include "overworld/Graphics/BGFX/ShadowsRenderer.h"
 #include "overworld/Graphics/Base/Renderer.h"
 
 namespace owds {
@@ -47,6 +48,7 @@ namespace owds::bgfx {
 
   protected:
     void commitCamera(const owds::bgfx::Camera& camera);
+    void commitShadows();
     void commitWorld(const owds::World& world);
     void queueActorBatch(const owds::Actor& actor, const owds::ShapeBox& shape);
     void queueActorBatch(const owds::Actor& actor, const owds::ShapeCapsule& shape);
@@ -58,7 +60,7 @@ namespace owds::bgfx {
     void loadModel(const owds::Model& model, const owds::Material& material);
     void queueModelBatch(const owds::Model& model, const owds::Material& material, const std::array<float, 16>& model_mat);
 
-    void render(std::uint64_t state, const owds::bgfx::Camera& camera);
+    void render(std::uint64_t state, const owds::bgfx::Camera& camera, const std::string& shader = "default");
     void renderInstanced(std::uint64_t state);
 
     void initLightUniforms();
@@ -73,6 +75,7 @@ namespace owds::bgfx {
                                       bool cube_map = false);
 
     owds::bgfx::Context ctx_;
+    owds::bgfx::ShadowsRenderer shadows_renderer_;
   };
 } // namespace owds::bgfx
 

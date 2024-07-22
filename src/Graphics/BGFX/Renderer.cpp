@@ -18,9 +18,12 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+#define RENDER_SHADOW_PASS_ID 1
+#define RENDER_SCENE_PASS_ID 0
+
 namespace owds::bgfx {
 
-  Renderer::Renderer()
+  Renderer::Renderer() : shadows_renderer_(RENDER_SHADOW_PASS_ID)
   {}
 
   Renderer::~Renderer()
@@ -55,13 +58,16 @@ namespace owds::bgfx {
     // const auto caps = ::bgfx::getCaps();
     // ctx_.instanced_rendering_supported = caps->supported & BGFX_CAPS_INSTANCING;
 
-    ::bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x443355FF, 1.0f, 0);
+    ::bgfx::setViewClear(RENDER_SCENE_PASS_ID, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x443355FF, 1.0f, 0);
 
     ctx_.shaders_.emplace(std::piecewise_construct, std::make_tuple("default"), std::make_tuple("vs_default", "fs_default"));
     ctx_.shaders_.emplace(std::piecewise_construct, std::make_tuple("skybox"), std::make_tuple("vs_skybox", "fs_skybox"));
     ctx_.shaders_.emplace(std::piecewise_construct, std::make_tuple("simple_shadows"), std::make_tuple("vs_simple_shadows", "fs_simple_shadows"));
     ctx_.is_initialized_ = true;
     ctx_.render_camera_ = new owds::bgfx::Camera();
+    ctx_.render_camera_->setViewId(RENDER_SCENE_PASS_ID);
+
+    shadows_renderer_.initialize();
 
     initMaterialUniforms();
     initLightUniforms();
@@ -127,6 +133,7 @@ namespace owds::bgfx {
     ctx_.render_camera_->setOutputResolution({static_cast<float>(ctx_.width_), static_cast<float>(ctx_.height_)});
     ctx_.render_camera_->updateMatrices();
     commitCamera(*ctx_.render_camera_);
+    // commitShadows();
 
     for(const auto& camera : ctx_.cameras_)
     {
@@ -192,6 +199,25 @@ namespace owds::bgfx {
     }
   }
 
+  void Renderer::commitShadows()
+  {
+    auto state = shadows_renderer_.state_;
+
+    ::bgfx::setDebug(shadows_renderer_.camera_.show_debug_stats_ ? BGFX_DEBUG_STATS : 0);
+
+    ctx_.render_collision_models_ = shadows_renderer_.camera_.render_collision_models_;
+
+    ::bgfx::touch(0); // Submit an empty primitive for rendering. Uniforms and draw state will be applied but no geometry will be submitted.
+    if(ctx_.instanced_rendering_supported)
+    {
+      renderInstanced(state);
+    }
+    else
+    {
+      render(state, shadows_renderer_.camera_, "simple_shadows");
+    }
+  }
+
   void Renderer::commitWorld(const owds::World& world)
   {
     for(const auto& actor : world.getActors())
@@ -226,7 +252,7 @@ namespace owds::bgfx {
 
   void Renderer::queueActorBatch(const owds::Actor& actor, const owds::ShapeCustomMesh& shape)
   {
-    const auto size_mat = glm::scale(glm::mat4(1.f), ToV3(shape.scale_));
+    const auto size_mat = glm::scale(glm::mat4(1.f), shape.scale_);
     const auto model_mat = ToM4(actor.getModelMatrix()) * size_mat;
 
     queueModelBatch(shape.custom_model_, shape.material_, FromM4(model_mat));
@@ -311,7 +337,7 @@ namespace owds::bgfx {
       ctx_.current_mesh_batches_[model.id_][mesh.id_].emplace_back(owds::InstanceData{model_mat, {}}); // TODO add instance data ?
   }
 
-  void Renderer::render(const std::uint64_t state, const owds::bgfx::Camera& camera)
+  void Renderer::render(const std::uint64_t state, const owds::bgfx::Camera& camera, const std::string& shader)
   {
     srand(0);
 
@@ -337,7 +363,7 @@ namespace owds::bgfx {
           ::bgfx::setIndexBuffer(mesh.ibh_);
 
           ::bgfx::setState(state);
-          ctx_.shaders_.at("default").submit(0);
+          ctx_.shaders_.at(shader).submit(0);
         }
       }
     }

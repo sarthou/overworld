@@ -256,9 +256,9 @@ namespace owds::physx {
         for(const auto& vertex : mesh.vertices_)
         {
           vertices.emplace_back(
-            vertex.position_[0],
-            vertex.position_[1],
-            vertex.position_[2]);
+            vertex.position_.x,
+            vertex.position_.y,
+            vertex.position_.z);
         }
 
         s_ctx->px_cached_meshes[mesh.id_] = createPxTriangleMesh(params, vertices, mesh.indices_);
@@ -267,16 +267,16 @@ namespace owds::physx {
       px_geometries_.emplace_back(std::make_unique<::physx::PxTriangleMeshGeometry>(
         s_ctx->px_cached_meshes[mesh.id_].get(),
         ::physx::PxMeshScale(::physx::PxVec3(
-          static_cast<::physx::PxReal>(shape.scale_[0]),
-          static_cast<::physx::PxReal>(shape.scale_[1]),
-          static_cast<::physx::PxReal>(shape.scale_[2])))));
+          static_cast<::physx::PxReal>(shape.scale_.x),
+          static_cast<::physx::PxReal>(shape.scale_.y),
+          static_cast<::physx::PxReal>(shape.scale_.z)))));
     }
   }
 
   void Actor::setupPhysicsShape(const owds::ShapeCylinder& shape)
   {
     setupPhysicsShape(owds::ShapeCustomMesh{
-      std::array<float, 3>{shape.radius_, shape.height_, shape.radius_},
+      glm::vec3{shape.radius_, shape.height_, shape.radius_},
       {},
       shape.cylinder_model_
     });

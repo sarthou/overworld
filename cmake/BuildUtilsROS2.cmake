@@ -60,15 +60,15 @@ endmacro(owds_generate_interfaces)
 function(owds_add_generic TARGET)
     set_target_properties(${TARGET}
         PROPERTIES
-            CXX_STANDARD 17
-            CXX_STANDARD_REQUIRED ON
-            CUDA_STANDARD 11
-            CUDA_STANDARD_REQUIRED ON)
+        CXX_STANDARD 17
+        CXX_STANDARD_REQUIRED ON
+        CUDA_STANDARD 11
+        CUDA_STANDARD_REQUIRED ON)
 
     target_compile_options(${TARGET}
         PRIVATE
-            $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
-            $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -Wpedantic -Werror>)
+        $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
+        $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -Wpedantic -Werror>)
 
     owds_enable_sanitization(${TARGET})
 endfunction(owds_add_generic)
@@ -77,10 +77,10 @@ function(owds_add_ros_generic TARGET)
     ament_target_dependencies(${TARGET} PUBLIC ${OWDS_ROS2_DEPS})
 
     target_link_libraries(${TARGET} PUBLIC
-            ontologenius::ontologenius_lib
+        ontologenius::ontologenius_lib
 
-            # todo: I feel like I shouldn't be doing this ^
-            ${cpp_typesupport_target})
+        # todo: I feel like I shouldn't be doing this ^
+        ${cpp_typesupport_target})
 
     target_compile_definitions(${TARGET} PUBLIC OWDS_ROS_VERSION=$ENV{ROS_VERSION})
     owds_add_generic(${TARGET})
@@ -99,8 +99,9 @@ function(owds_add_library TARGET)
 
     target_include_directories(${TARGET}
         PUBLIC
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-            $<INSTALL_INTERFACE:include>)
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/External/include>
+        $<INSTALL_INTERFACE:include>)
 
     owds_add_generic(${TARGET})
 endfunction(owds_add_library)
@@ -118,8 +119,9 @@ function(owds_add_ros_library TARGET)
 
     target_include_directories(${TARGET}
         PUBLIC
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-            $<INSTALL_INTERFACE:include>)
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/External/include>
+        $<INSTALL_INTERFACE:include>)
 
     ament_export_libraries(${TARGET})
     owds_add_ros_generic(${TARGET})
@@ -135,7 +137,7 @@ function(owds_add_ros_executable TARGET)
     endif()
 
     add_executable(${TARGET} ${ARGN})
-    target_include_directories(${TARGET} PUBLIC include)
+    target_include_directories(${TARGET} PUBLIC include External/include)
     owds_add_ros_generic(${TARGET})
 endfunction(owds_add_ros_executable)
 
@@ -163,7 +165,8 @@ endfunction()
 
 function(owds_finalize)
     install(DIRECTORY include/ DESTINATION include)
-    owds_export_extra_directory(launch/ros2/launch)
+
+    # owds_export_extra_directory(launch/ros2/launch)
 
     # ament_export_targets(overworld)
     ament_package()

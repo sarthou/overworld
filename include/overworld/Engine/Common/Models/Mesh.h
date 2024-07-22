@@ -1,6 +1,7 @@
 #ifndef OWDS_COMMON_BASE_MESH_H
 #define OWDS_COMMON_BASE_MESH_H
 
+#include <string>
 #include <vector>
 
 #include "overworld/Engine/Common/Models/Vertex.h"

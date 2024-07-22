@@ -65,7 +65,7 @@ namespace owds {
   owds::Shape World::createShapeFromModel(const owds::Material& material, const std::string& path, const std::array<float, 3>& scale)
   {
     return owds::ShapeCustomMesh{
-      scale,
+      glm::vec3(scale[0], scale[1], scale[2]),
       material,
       owds::ModelManager::get().load(path)};
   }

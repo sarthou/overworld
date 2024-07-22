@@ -1,4 +1,4 @@
-#include "overworld/Graphics/Assimp/ModelLoader.h"
+#include "overworld/Engine/Graphics/Assimp/ModelLoader.h"
 
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
@@ -9,6 +9,7 @@
 #include "overworld/Engine/Common/Models/Model.h"
 
 namespace owds::assimp {
+
   owds::Mesh processMesh(const aiMesh* mesh)
   {
     owds::Mesh out_mesh = owds::Mesh::create();
@@ -32,8 +33,10 @@ namespace owds::assimp {
       {
         vertex.uv_ = {
           mesh->mTextureCoords[0][i].x,
-          1.f - mesh->mTextureCoords[0][i].y}; // flip
+          mesh->mTextureCoords[0][i].y};
       }
+      else
+        vertex.uv_ = {0, 0};
 
       out_mesh.vertices_.emplace_back(vertex);
     }
@@ -73,7 +76,9 @@ namespace owds::assimp {
       0 |
         aiProcess_Triangulate |
         aiProcess_SortByPType |
-        aiProcess_GenNormals);
+        aiProcess_GenNormals |
+        aiProcess_FlipUVs |
+        aiProcess_GenUVCoords);
 
     if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {

@@ -190,9 +190,10 @@ bgfx_compile_shader_to_header(
 
 owds_add_library(overworld_graphics
     src/Graphics/Base/Renderer.cpp
-    src/Graphics/Assimp/ModelLoader.cpp
+    src/Engine/Graphics/Assimp/ModelLoader.cpp
     src/Graphics/BGFX/Camera.cpp
     src/Graphics/BGFX/Renderer.cpp
+    src/Graphics/BGFX/ShadowsRenderer.cpp
     src/Graphics/BGFX/Vertex.cpp
     src/Graphics/GLFW3/Window.cpp
     ${overworld_vert_shaders}
@@ -200,8 +201,23 @@ owds_add_library(overworld_graphics
 
 target_include_directories(overworld_graphics PUBLIC ${CMAKE_BINARY_DIR}/include/generated/shaders/)
 target_link_libraries(overworld_graphics PUBLIC overworld_engine_common assimp bgfx bx glfw)
-target_compile_definitions(overworld_graphics PUBLIC GLM_FORCE_LEFT_HANDED)
+target_compile_definitions(overworld_graphics PUBLIC GLM_FORCE_RIGHT_HANDED)
 target_compile_options(overworld_graphics PRIVATE $<$<CXX_COMPILER_ID:Clang>:-Wno-gnu-zero-variadic-macro-arguments>)
+
+# ##################################
+owds_add_library(overworld_glad External/src/glad.c)
+
+owds_add_library(overworld_graphics_new
+    src/Engine/Graphics/Assimp/ModelLoader.cpp
+    src/Engine/Graphics/GLFW/Window.cpp
+    src/Engine/Graphics/OpenGL/Camera.cpp
+    src/Engine/Graphics/OpenGL/Cubemap.cpp
+    src/Engine/Graphics/OpenGL/Renderer.cpp
+    src/Engine/Graphics/OpenGL/Screen.cpp
+    src/Engine/Graphics/OpenGL/Shader.cpp
+    src/Engine/Graphics/OpenGL/Texture2D.cpp)
+target_link_libraries(overworld_graphics_new PUBLIC overworld_engine_common overworld_glad assimp glfw)
+target_compile_options(overworld_graphics_new PRIVATE $<$<CXX_COMPILER_ID:Clang>:-Wno-unused-function>)
 
 # ##################################
 if(OWDS_USE_PHYSX)
@@ -352,14 +368,23 @@ owds_add_ros_executable(teleop
 
 # ##################################
 owds_add_ros_executable(overworld_test1 src/Nodes/Test1.cpp)
+target_compile_options(overworld_test1 PRIVATE $<$<CXX_COMPILER_ID:Clang>:-Wno-gnu-zero-variadic-macro-arguments>)
 
 target_link_libraries(overworld_test1
     PUBLIC
         overworld_graphics
         overworld_physics)
 
+owds_add_ros_executable(overworld_opengl src/Nodes/TestOpengl.cpp)
+target_compile_options(overworld_opengl PRIVATE $<$<CXX_COMPILER_ID:Clang>:-Wno-gnu-zero-variadic-macro-arguments>)
+target_link_libraries(overworld_opengl
+    PUBLIC
+    overworld_graphics_new
+    overworld_physics)
+
 # ##################################
 owds_install_executables(overworld_test1)
+owds_install_executables(overworld_opengl)
 
 # ##################################
 owds_export_extra_directory(docs/)

@@ -1,24 +1,24 @@
-################################################
-##          Find macros and libraries         ##
-################################################
+# ###############################################
+# #          Find macros and libraries         ##
+# ###############################################
 
 find_package(catkin REQUIRED COMPONENTS
-        roscpp
-        # rospy
-        std_msgs
-        genmsg
-        message_generation
-        pluginlib
-        ontologenius
+    roscpp
+
+    # rospy
+    std_msgs
+    genmsg
+    message_generation
+    pluginlib
+    ontologenius
 )
 
 find_package(cmake_modules REQUIRED)
 find_package(pluginlib REQUIRED)
 
-###################################
-##  ROS specific configuration   ##
-###################################
-
+# ##################################
+# #  ROS specific configuration   ##
+# ##################################
 macro(owds_queue_messages_generation)
     add_message_files(FILES ${ARGN})
 endmacro(owds_queue_messages_generation)
@@ -29,26 +29,25 @@ endmacro(owds_queue_services_generation)
 
 macro(owds_generate_interfaces)
     generate_messages(
-            DEPENDENCIES
-            std_msgs
-            ontologenius
+        DEPENDENCIES
+        std_msgs
+        ontologenius
     )
 endmacro(owds_generate_interfaces)
 
-###################################
-##             Build             ##
-###################################
-
+# ##################################
+# #             Build             ##
+# ##################################
 function(owds_add_generic TARGET)
     set_target_properties(${TARGET}
-            PROPERTIES
-            CXX_STANDARD 17
-            CXX_STANDARD_REQUIRED ON)
+        PROPERTIES
+        CXX_STANDARD 17
+        CXX_STANDARD_REQUIRED ON)
 
     target_compile_options(${TARGET_NAME}
         PRIVATE
-            $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
-            $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -Wpedantic -Werror>)
+        $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
+        $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -Wpedantic -Werror>)
 
     target_enable_sanitizers(${TARGET})
 endfunction(owds_add_generic)
@@ -75,9 +74,10 @@ function(owds_add_library TARGET)
     add_library(${TARGET} ${ARGN})
 
     target_include_directories(${TARGET}
-            PUBLIC
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-            $<INSTALL_INTERFACE:include>)
+        PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/External/include>
+        $<INSTALL_INTERFACE:include>)
 
     owds_add_generic(${TARGET})
 endfunction(owds_add_library)
@@ -94,9 +94,10 @@ function(owds_add_ros_library TARGET)
     add_library(${TARGET} ${ARGN})
 
     target_include_directories(${TARGET}
-            PUBLIC
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-            $<INSTALL_INTERFACE:include>)
+        PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/External/include>
+        $<INSTALL_INTERFACE:include>)
 
     # ament_export_libraries(${TARGET})
     owds_add_ros_generic(${TARGET})
@@ -112,21 +113,21 @@ function(owds_add_ros_executable TARGET)
     endif()
 
     add_executable(${TARGET} ${ARGN})
-    target_include_directories(${TARGET} PUBLIC include)
+    target_include_directories(${TARGET} PUBLIC include External/include)
     owds_add_ros_generic(${TARGET})
 endfunction(owds_add_ros_executable)
 
 function(owds_install_libs)
     install(TARGETS ${ARGN}
-            ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-            LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-            RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-            PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+        ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+        LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+        RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 endfunction(owds_install_libs)
 
 function(owds_install_executables)
     install(TARGETS ${ARGN}
-            RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+        RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 endfunction(owds_install_executables)
 
 function(owds_finalize)

@@ -1,37 +1,33 @@
-#include "overworld/Graphics/BGFX/Camera.h"
+#include "overworld/Engine/Graphics/OpenGL/Camera.h"
 
+#include "glad/glad.h"
+
+// first
 #include <GLFW/glfw3.h>
 #include <array>
 #include <cstdint>
 #include <cstdio>
-#include <functional>
 #include <glm/gtc/packing.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <iostream>
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
 
-#include "overworld/Engine/Common/Models/Color.h"
-#include "overworld/Graphics/BGFX/API.h"
-#include "overworld/Graphics/Base/CameraProjection.h"
-#include "overworld/Graphics/Base/CameraView.h"
-#include "overworld/Graphics/Base/ViewAntiAliasing.h"
-#include "overworld/Helper/BitCast.h"
+#include "overworld/Engine/Graphics/Common/CameraProjection.h"
+#include "overworld/Engine/Graphics/Common/CameraView.h"
+#include "overworld/Engine/Graphics/Common/ViewAntiAliasing.h"
 #include "overworld/Helper/GlmMath.h"
 
-namespace owds::bgfx {
+namespace owds {
 
   void Camera::updateViewMatrix()
   {
-    view_matrix_ = FromM4(glm::lookAt(
-      world_eye_position_,
-      world_eye_position_ + world_eye_front_,
-      world_eye_up_));
-
-    ::bgfx::setViewTransform(id_, view_matrix_.data(), proj_matrix_.data());
+    view_matrix_ = glm::lookAt(world_eye_position_,
+                               world_eye_position_ + world_eye_front_,
+                               world_eye_up_);
   }
 
   void Camera::updateProjectionMatrix()
   {
-    // todo: check if everything is setup correctly
     switch(projection_type_)
     {
     case owds::CameraProjection_e::perspective:
@@ -40,31 +36,20 @@ namespace owds::bgfx {
       constexpr auto far = 100.f;
       const auto aspect_ratio = view_dimensions_[0] / view_dimensions_[1];
 
-      if(::bgfx::getCaps()->homogeneousDepth)
-      {
-        proj_matrix_ = FromM4(glm::perspectiveLH_NO<float>(field_of_view_, aspect_ratio, near, far));
-      }
-      else
-      {
-        proj_matrix_ = FromM4(glm::perspectiveLH_ZO<float>(field_of_view_, aspect_ratio, near, far));
-      }
+      proj_matrix_ = glm::perspective(field_of_view_, aspect_ratio, near, far);
+
       break;
     }
     case owds::CameraProjection_e::orthographic:
     {
-      if(::bgfx::getCaps()->homogeneousDepth)
-      {
-        proj_matrix_ = FromM4(glm::orthoLH_NO<float>(0, 0, view_dimensions_[0], view_dimensions_[1], -1000.0f, 1000.0f));
-      }
-      else
-      {
-        proj_matrix_ = FromM4(glm::orthoLH_ZO<float>(0, 0, view_dimensions_[0], view_dimensions_[1], -1000.0f, 1000.0f));
-      }
+      constexpr auto near = 0.1f;
+      constexpr auto far = 100.f;
+      proj_matrix_ = glm::ortho(-view_dimensions_[0] / 2, view_dimensions_[0] / 2,
+                                -view_dimensions_[1] / 2, view_dimensions_[1] / 2,
+                                near, far);
       break;
     }
     }
-
-    ::bgfx::setViewTransform(id_, view_matrix_.data(), proj_matrix_.data());
   }
 
   void Camera::updateMatrices()
@@ -90,7 +75,7 @@ namespace owds::bgfx {
 
   void Camera::setOutputAA(const owds::ViewAntiAliasing_e aa_setting)
   {
-    (void)aa_setting; // todo
+    aa_setting_ = aa_setting;
   }
 
   void Camera::setOutputFPS(const std::uint64_t desired_target_fps)
@@ -102,17 +87,6 @@ namespace owds::bgfx {
   {
     view_dimensions_[0] = resolution[0];
     view_dimensions_[1] = resolution[1];
-    ::bgfx::setViewRect(id_, 0, 0, static_cast<uint16_t>(view_dimensions_[0]), static_cast<uint16_t>(view_dimensions_[1]));
-  }
-
-  void Camera::setOutputClearColor(const owds::Color clear_color)
-  {
-    ::bgfx::setViewClear(id_, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, owds::BitCast<std::uint32_t>(clear_color), 1.0f, 0);
-  }
-
-  void Camera::setCaptureCallback(std::function<void(const std::vector<owds::Color>&)> callback)
-  {
-    (void)callback; // todo
   }
 
   void Camera::finalize()
@@ -226,7 +200,7 @@ namespace owds::bgfx {
       mouse_drag_start_position_ = mouse_current_position_;
 
       view_angles_.x += delta.x; // yaw
-      view_angles_.y -= delta.y; // pitch
+      view_angles_.y += delta.y; // pitch
 
       if(view_angles_.y > 89.0f)
         view_angles_.y = 89.0f;
@@ -270,4 +244,4 @@ namespace owds::bgfx {
       world_eye_position_ -= world_eye_up_ * 0.1f;
   }
 
-} // namespace owds::bgfx
+} // namespace owds

@@ -115,6 +115,13 @@ namespace owds {
     const std::array<glm::vec4, MAX_POINT_LIGHTS>& getAttenuations() const { return attenuations_; }
     glm::vec4 getNbLights() const { return glm::vec4(nb_lights_); }
 
+    const glm::vec4& getAmbient(std::size_t id) const { return ambients_[id]; }
+    const glm::vec4& getDiffuse(std::size_t id) const { return diffuses_[id]; }
+    const glm::vec4& getSpecular(std::size_t id) const { return speculars_[id]; }
+    const glm::vec4& getPosition(std::size_t id) const { return positions_[id]; }
+    const glm::vec4& getAttenuation(std::size_t id) const { return attenuations_[id]; }
+    float getNbLightsFloat() const { return nb_lights_; }
+
   private:
     std::array<bool, MAX_POINT_LIGHTS> available_;
     std::size_t nb_lights_;
