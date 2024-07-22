@@ -44,14 +44,15 @@ namespace owds {
     void geometricReasoning();
     void reasoningOnUpdate() override;
 
-    std::vector<Object*> simulatePhysics(const std::vector<Object*>& objects, const std::vector<Object*>& to_simulate_objetcs);
+    std::map<std::string, Object*> simulatePhysics(const std::map<std::string, Object*>& objects, const std::map<std::string, Object*>& to_simulate_objetcs);
     void startSimulation(Object* object);
     void stopSimulation(Object* object, bool erase = true);
 
-    std::vector<PointOfInterest> getPoisInFov(Object* object);
-    std::vector<Object*> isObjectsInFovAabb(std::vector<Object*> objects);
-    bool shouldBeSeen(Object* object, const std::vector<PointOfInterest>& pois);
-    std::unordered_set<int> getObjectsInCamera();
+    std::vector<PointOfInterest> getPoisInFov(Object* object, Sensor* sensor, std::string module_name);
+    bool isObjectInFovAabb(Object* object, Sensor* sensor);
+
+    bool shouldBeSeen(Object* object, Sensor* sensor, const std::vector<PointOfInterest>& pois);
+    bool isObjectInCamera(Object* object, Sensor* sensors);
 
     void mergeFalseIdData();
 

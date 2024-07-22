@@ -25,6 +25,8 @@ namespace owds {
 
   bool FakeHumanPerceptionModule::perceptionCallback(const overworld::AgentPose& msg)
   {
+    for(auto& percept : percepts_)
+      percept.second.setSensorId(robot_agent_->getSensors().begin()->first); // we set a sensor by default but we must put the sensor which sees the percept.
     if(msg.parts.size() == 0)
       return false;
 
@@ -60,7 +62,7 @@ namespace owds {
     return true;
   }
 
-  Percept<BodyPart> FakeHumanPerceptionModule::createPercept(const std::string& human_name, const std::string& part_name)
+  Percept<BodyPart> FakeHumanPerceptionModule::createPercept(const std::string& human_name, const std::string& part_name) // TODO add the eyes as sensors?
   {
     BodyPartType_e part_type = BodyPartType_e::BODY_PART_UNKNOW;
 

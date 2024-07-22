@@ -190,55 +190,58 @@ namespace owds {
       return true;
   }
 
-  bool FactsCalculator::isPerceiving(Agent* agent_perceiving, Agent* agent_perceived)
+  bool FactsCalculator::isPerceiving(Agent* agent_perceiving, Agent* agent_perceived) // TODO CHECK
   {
-    if(agent_perceiving->getHead() == nullptr || agent_perceiving->getHead()->isLocated() == false)
-    {
+        auto agent_perceiving_sensors = agent_perceiving->getSensors();
+    if(agent_perceiving_sensors.empty() || agent_perceiving->getHead()->isLocated() == false) // TODO: LOCATED
       return false;
-    }
-    Pose head_pose = agent_perceiving->getHead()->pose();
-    if(agent_perceived->getHead() != nullptr && agent_perceived->getHead()->isLocated())
-    {
-      if(agent_perceiving->getFieldOfView().hasIn(agent_perceived->getHead()->pose().transformIn(head_pose)))
-      {
-        facts_.emplace_back(agent_perceiving->getId(), "isPerceiving", agent_perceived->getId());
-        return true;
-      }
-    }
 
-    if(agent_perceived->getLeftHand() != nullptr && agent_perceived->getLeftHand()->isLocated())
+    for(const auto& agent_perceiving_sensor : agent_perceiving_sensors)
     {
-      if(agent_perceiving->getFieldOfView().hasIn(agent_perceived->getLeftHand()->pose().transformIn(head_pose)))
+      Pose sensor_pose = agent_perceiving_sensor.second->pose();
+      if(agent_perceived->getHead() != nullptr && agent_perceived->getHead()->isLocated())
       {
-        facts_.emplace_back(agent_perceiving->getId(), "isPerceiving", agent_perceived->getId());
-        return true;
+        if(agent_perceiving_sensor.second->getFieldOfView().hasIn(agent_perceived->getHead()->pose().transformIn(sensor_pose)))
+        {
+          facts_.emplace_back(agent_perceiving_sensor.first, "isPerceiving", agent_perceived->getId());
+          return true;
+        }
       }
-    }
 
-    if(agent_perceived->getRightHand() != nullptr && agent_perceived->getRightHand()->isLocated())
-    {
-      if(agent_perceiving->getFieldOfView().hasIn(agent_perceived->getRightHand()->pose().transformIn(head_pose)))
+      if(agent_perceived->getLeftHand() != nullptr && agent_perceived->getLeftHand()->isLocated())
       {
-        facts_.emplace_back(agent_perceiving->getId(), "isPerceiving", agent_perceived->getId());
-        return true;
+        if(agent_perceiving_sensor.second->getFieldOfView().hasIn(agent_perceived->getLeftHand()->pose().transformIn(sensor_pose)))
+        {
+          facts_.emplace_back(agent_perceiving_sensor.first, "isPerceiving", agent_perceived->getId());
+          return true;
+        }
       }
-    }
 
-    if(agent_perceived->getTorso() != nullptr && agent_perceived->getTorso()->isLocated())
-    {
-      if(agent_perceiving->getFieldOfView().hasIn(agent_perceived->getTorso()->pose().transformIn(head_pose)))
+      if(agent_perceived->getRightHand() != nullptr && agent_perceived->getRightHand()->isLocated())
       {
-        facts_.emplace_back(agent_perceiving->getId(), "isPerceiving", agent_perceived->getId());
-        return true;
+        if(agent_perceiving_sensor.second->getFieldOfView().hasIn(agent_perceived->getRightHand()->pose().transformIn(sensor_pose)))
+        {
+          facts_.emplace_back(agent_perceiving_sensor.first, "isPerceiving", agent_perceived->getId());
+          return true;
+        }
       }
-    }
 
-    if(agent_perceived->getBase() != nullptr && agent_perceived->getBase()->isLocated())
-    {
-      if(agent_perceiving->getFieldOfView().hasIn(agent_perceived->getBase()->pose().transformIn(head_pose)))
+      if(agent_perceived->getTorso() != nullptr && agent_perceived->getTorso()->isLocated())
       {
-        facts_.emplace_back(agent_perceiving->getId(), "isPerceiving", agent_perceived->getId());
-        return true;
+        if(agent_perceiving_sensor.second->getFieldOfView().hasIn(agent_perceived->getTorso()->pose().transformIn(sensor_pose)))
+        {
+          facts_.emplace_back(agent_perceiving_sensor.first, "isPerceiving", agent_perceived->getId());
+          return true;
+        }
+      }
+
+      if(agent_perceived->getBase() != nullptr && agent_perceived->getBase()->isLocated())
+      {
+        if(agent_perceiving_sensor.second->getFieldOfView().hasIn(agent_perceived->getBase()->pose().transformIn(sensor_pose)))
+        {
+          facts_.emplace_back(agent_perceiving_sensor.first, "isPerceiving", agent_perceived->getId());
+          return true;
+        }
       }
     }
     return false;

@@ -227,9 +227,9 @@
           <div class="code_line">    </div>
           <div class="code_line">    </div>
           <div class="code_line">    </div>
-          <div class="code_line">    <span class="xml_comment">&lt;!-- agents#head_camera_frame --&gt;</span></div>
+          <div class="code_line">    <span class="xml_comment">&lt;!-- agents#eve_head --&gt;</span></div>
           <div class="code_line">    </div>
-          <div class="code_line">    &lt;<span class="xml_tag">owl:NamedIndividual</span> <span class="xml_param">rdf:about</span>=<span class="xml_string">&quot;agents#head_camera_frame&quot;</span>&gt;</div>
+          <div class="code_line">    &lt;<span class="xml_tag">owl:NamedIndividual</span> <span class="xml_param">rdf:about</span>=<span class="xml_string">&quot;agents#eve_head&quot;</span>&gt;</div>
           <div class="code_line">        &lt;<span class="xml_tag">rdf:type</span> <span class="xml_param">rdf:resource</span>=<span class="xml_string">&quot;cg_agents#Head&quot;</span>/&gt;</div>
           <div class="code_line">    &lt;/<span class="xml_tag">owl:NamedIndividual</span>&gt;</div>
           <div class="code_line">    </div>
@@ -256,7 +256,7 @@
           <div class="code_line">    &lt;<span class="xml_tag">owl:NamedIndividual</span> <span class="xml_param">rdf:about</span>=<span class="xml_string">&quot;agents#eve&quot;</span>&gt;</div>
           <div class="code_line">        &lt;<span class="xml_tag">rdf:type</span> <span class="xml_param">rdf:resource</span>=<span class="xml_string">&quot;cg_agents#Robot&quot;</span>/&gt;</div>
           <div class="code_line">        &lt;<span class="xml_tag">cg_agents:hasBase</span> <span class="xml_param">rdf:resource</span>=<span class="xml_string">&quot;agents#base_link&quot;</span>/&gt;</div>
-          <div class="code_line">        &lt;<span class="xml_tag">cg_agents:hasHead</span> <span class="xml_param">rdf:resource</span>=<span class="xml_string">&quot;agents#head_camera_frame&quot;</span>/&gt;</div>
+          <div class="code_line">        &lt;<span class="xml_tag">cg_agents:hasHead</span> <span class="xml_param">rdf:resource</span>=<span class="xml_string">&quot;agents#eve_head&quot;</span>/&gt;</div>
           <div class="code_line">        &lt;<span class="xml_tag">cg_agents:hasRightHand</span> <span class="xml_param">rdf:resource</span>=<span class="xml_string">&quot;agents#right_gripper_frame&quot;</span>/&gt;</div>
           <div class="code_line">        &lt;<span class="xml_tag">cg_agents:hasLeftHand</span> <span class="xml_param">rdf:resource</span>=<span class="xml_string">&quot;agents#left_gripper_frame&quot;</span>/&gt;</div>
           <div class="code_line">    &lt;/<span class="xml_tag">owl:NamedIndividual</span>&gt;</div>
@@ -274,7 +274,7 @@
 
         <p>The three first individuals are our robot's body parts. 
            We declare a base, a head and two hands. The names of these parts are in fact the robot's frames that we want to consider as specific body parts. 
-           For example, we state that the frame head_camera_frame has to be considered as a head of an agent. 
+           For example, we state that the frame eve_head has to be considered as a head of an agent. 
            Nevertheless, for each body part, we do not say to which agent they correspond. 
            We do it in the agent description.
         </p>

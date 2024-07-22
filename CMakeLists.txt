@@ -157,6 +157,7 @@ add_library(${PROJECT_NAME}_types_lib STATIC
   src/BasicTypes/BodyPart.cpp
   src/BasicTypes/Object.cpp
   src/BasicTypes/Hand.cpp
+  src/BasicTypes/Sensors/SensorBase.cpp
 )
 target_link_libraries(${PROJECT_NAME}_types_lib PUBLIC
                       ${catkin_LIBRARIES}

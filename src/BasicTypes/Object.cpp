@@ -11,32 +11,52 @@ namespace owds {
                                                            is_static_(false),
                                                            hand_in_(nullptr),
                                                            mass_(0)
-  {}
-
-  void Object::setPointsOfInterest(const std::vector<PointOfInterest>& points_of_interest)
   {
-    points_of_interest_ = points_of_interest;
+    points_of_interest_[""] = {};
   }
 
-  void Object::addPointOfInterest(const PointOfInterest& point_of_interest)
+  void Object::setPointsOfInterest(const std::string& module_name, const std::vector<PointOfInterest>& points_of_interest)
   {
-    points_of_interest_.push_back(point_of_interest);
+    auto it = points_of_interest_.find(module_name);
+    if(it != points_of_interest_.end())
+      it->second = points_of_interest;
+    else
+      points_of_interest_.emplace(module_name, points_of_interest);
   }
 
-  void Object::emptyPointsOfInterest()
+  void Object::addPointOfInterest(const std::string& module_name, const PointOfInterest& point_of_interest)
   {
-    (void)points_of_interest_.empty();
+    auto it = points_of_interest_.find(module_name);
+    if(it != points_of_interest_.end())
+      it->second.push_back(point_of_interest);
+    else
+      points_of_interest_.emplace(module_name, std::vector<PointOfInterest>{point_of_interest}); // TODO check
   }
 
-  const std::vector<PointOfInterest>& Object::getPointsOfInterest() const
+  void Object::emptyPointsOfInterest(const std::string& module_name)
   {
-    return points_of_interest_;
+    auto it = points_of_interest_.find(module_name);
+    if(it != points_of_interest_.end())
+      (void)it->second.empty();
   }
 
-  void Object::setAllPoiUnseen()
+  const std::vector<PointOfInterest>& Object::getPointsOfInterest(const std::string& module_name) const
   {
-    for(auto& poi : points_of_interest_)
-      poi.setUnseen();
+    auto it = points_of_interest_.find(module_name);
+    if(it != points_of_interest_.end())
+      return it->second;
+    else
+      return points_of_interest_.at("");
+  }
+
+  void Object::setAllPoiUnseen(const std::string& module_name)
+  {
+    auto it = points_of_interest_.find(module_name);
+    if(it != points_of_interest_.end())
+    {
+      for(auto& poi : it->second)
+        poi.setUnseen();
+    }
   }
 
   void Object::updatePose(const Pose& pose, ros::Time stamp)
@@ -116,6 +136,11 @@ namespace owds {
       Pose object_pose = hand_pose * Entity::pose(stamp);
       return object_pose;
     }
+  }
+
+  std::array<double, 3> Object::direction() const
+  {
+    return Entity::direction();
   }
 
   Hand* Object::getHandIn(unsigned int id) const

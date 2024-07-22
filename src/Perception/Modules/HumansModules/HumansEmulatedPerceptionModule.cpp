@@ -5,7 +5,10 @@ namespace owds {
   bool HumansEmulatedPerceptionModule::perceptionCallback(const std::vector<BodyPart*>& msg)
   {
     for(auto& percept : percepts_)
+    {
+      percept.second.setSensorId(robot_agent_->getSensors().begin()->first); // TODO: adapt
       percept.second.setUnseen();
+    }
 
     for(auto body_part : msg)
     {

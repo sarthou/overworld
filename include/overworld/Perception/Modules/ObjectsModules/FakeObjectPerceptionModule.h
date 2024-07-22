@@ -27,6 +27,7 @@ namespace owds {
 
     std::string topic_name_;
     bool true_id_;
+    std::string sensor_id_;
 
     virtual bool perceptionCallback(const overworld::EntitiesPoses& msg) override;
 
