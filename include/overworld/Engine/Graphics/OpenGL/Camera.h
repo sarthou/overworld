@@ -71,8 +71,12 @@ namespace owds {
     void finalize();
     void setPositionAndOrientation(const std::array<float, 3>& position, const std::array<float, 3>& orientation);
     void setPositionAndLookAt(const std::array<float, 3>& eye_position, const std::array<float, 3>& dst_position);
+    void setPositionAndDirection(const std::array<float, 3>& eye_position, const std::array<float, 3>& eye_direction);
+    void setDirectionAndLookAt(const std::array<float, 3>& eye_direction, const std::array<float, 3>& dst_position);
 
     void recomputeDirectionVector();
+
+    std::vector<glm::vec4> getFrustumCornersWorldSpace();
 
     void processUserKeyboardInput(float delta_time, int key, bool is_down);
     void processUserMouseBtnInput(float delta_time, char btn, bool is_down);
@@ -81,9 +85,13 @@ namespace owds {
     void update();
 
     glm::vec3 getPosition() const { return world_eye_position_; }
+    glm::vec3 getFrontPose() const { return world_eye_position_ + world_eye_front_; }
 
     glm::mat4 getViewMatrix() const { return view_matrix_; }
     glm::mat4 getProjectionMatrix() const { return proj_matrix_; }
+
+    float getNearPlane() { return planes_[0]; }
+    float getFarPlane() { return planes_[1]; }
 
   private:
     glm::mat4 view_matrix_;

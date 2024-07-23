@@ -34,7 +34,7 @@ namespace owds {
       setupMesh();
     }
 
-    void draw(Shader& shader) const
+    void draw(const Shader& shader, unsigned int texture_pose_offset = 0) const
     {
       unsigned int diffuse_nr = 1;
       unsigned int specular_nr = 1;
@@ -42,7 +42,7 @@ namespace owds {
       unsigned int height_nr = 1;
       for(unsigned int i = 0; i < textures.size(); i++)
       {
-        glActiveTexture(GL_TEXTURE0 + i); // active proper texture unit before binding
+        glActiveTexture(GL_TEXTURE0 + texture_pose_offset + i); // active proper texture unit before binding
         std::string number;
         std::string name;
         if(textures[i].type_ == texture_diffuse)
@@ -67,7 +67,7 @@ namespace owds {
         }
 
         // now set the sampler to the correct texture unit
-        glUniform1i(glGetUniformLocation(shader.id_, (name + number).c_str()), i);
+        glUniform1i(glGetUniformLocation(shader.id_, (name + number).c_str()), texture_pose_offset + i);
         // and finally bind the texture
         glBindTexture(GL_TEXTURE_2D, textures[i].id_);
       }

@@ -64,7 +64,6 @@ namespace owds {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     init_ = true;
-    std::cout << "init ok" << std::endl;
   }
 
   void Screen::reinitBuffers()
@@ -87,6 +86,7 @@ namespace owds {
   void Screen::bindFrameBuffer() const
   {
     glBindFramebuffer(GL_FRAMEBUFFER, msaa_framebuffer_);
+    glViewport(0, 0, width_, height_);
   }
 
   void Screen::generateColorTexture() const

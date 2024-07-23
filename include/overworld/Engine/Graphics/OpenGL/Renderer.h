@@ -12,17 +12,17 @@
 #include "overworld/Engine/Common/Urdf/Actor.h"
 #include "overworld/Engine/Graphics/Common/InstanceData.h"
 #include "overworld/Engine/Graphics/OpenGL/Camera.h"
+#include "overworld/Engine/Graphics/OpenGL/Cubemap.h"
 #include "overworld/Engine/Graphics/OpenGL/MeshHandle.h"
 #include "overworld/Engine/Graphics/OpenGL/Screen.h"
 #include "overworld/Engine/Graphics/OpenGL/Shader.h"
+#include "overworld/Engine/Graphics/OpenGL/Shadow.h"
 
 namespace owds {
   class Window;
   class World;
-  class Camera;
   class AmbientLight;
   class PointLights;
-  class Cubemap;
 
   class Renderer
   {
@@ -42,7 +42,8 @@ namespace owds {
     Camera render_camera_;
     std::unordered_map<std::string, Shader> shaders_;
     Screen screen_;
-    Cubemap* sky_;
+    Cubemap sky_;
+    Shadow shadow_;
     float max_fps_ = 120;
     float delta_time_;
     float last_frame_;
@@ -62,8 +63,9 @@ namespace owds {
     void loadInstance(const Model& model, const Material& material, const glm::mat4& model_mat);
     void loadModel(const Model& model, const Material& material);
     void render();
+    void renderModels(const Shader& shader, unsigned int texture_offset = 0);
 
-    void setLightsUniforms();
+    void setLightsUniforms(const Shader& shader);
     void setAntiAliasing(ViewAntiAliasing_e setting);
   };
 } // namespace owds

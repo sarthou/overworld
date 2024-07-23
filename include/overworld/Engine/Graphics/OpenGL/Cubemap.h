@@ -14,7 +14,7 @@ namespace owds {
   public:
     bool init(const std::string& path);
 
-    void use(Shader& shader);
+    void draw(Shader& shader);
 
     unsigned int getId() const { return texture_id_; }
 

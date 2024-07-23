@@ -36,7 +36,8 @@ int main()
   cam->setFieldOfView(80.f);
   cam->setOutputAA(owds::ViewAntiAliasing_e::msaa_x8);
   cam->setOutputResolution({640, 480});
-  cam->setPositionAndLookAt({5, 5, 5}, {0, 0, 0});
+  cam->setPositionAndLookAt({5, 5, 0}, {0, 0, 0});
+  cam->setPlanes({0.1, 80.});
   cam->finalize();
 
   owds::Window window;
@@ -46,7 +47,7 @@ int main()
 
   std::cout << "================== WORLD CREATED ================" << std::endl;
 
-  world.setAmbientLight({-0.2f, -1.0f, -0.3f},
+  world.setAmbientLight({-0.2f, -0.5f, -0.3f},
                         {1.0f, 0.976f, 0.898f},
                         0.3, 0.5, 0.9);
 

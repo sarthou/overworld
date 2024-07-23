@@ -124,6 +124,34 @@ namespace owds {
     updateViewMatrix();
   }
 
+  void Camera::setPositionAndDirection(const std::array<float, 3>& eye_position, const std::array<float, 3>& eye_direction)
+  {
+    world_eye_position_ = ToV3(eye_position);
+    world_eye_front_ = ToV3(eye_direction);
+
+    const auto xy = glm::sqrt(glm::pow(world_eye_front_.x, 2) + glm::pow(world_eye_front_.y, 2));
+
+    view_angles_.x = glm::degrees(glm::atan(world_eye_front_.y, world_eye_front_.x));
+    view_angles_.y = glm::degrees(glm::atan(world_eye_front_.z, static_cast<float>(xy)));
+
+    recomputeDirectionVector();
+    updateViewMatrix();
+  }
+
+  void Camera::setDirectionAndLookAt(const std::array<float, 3>& eye_direction, const std::array<float, 3>& dst_position)
+  {
+    world_eye_front_ = ToV3(eye_direction);
+    world_eye_position_ = ToV3(dst_position) - world_eye_front_;
+
+    const auto xy = glm::sqrt(glm::pow(world_eye_front_.x, 2) + glm::pow(world_eye_front_.y, 2));
+
+    view_angles_.x = glm::degrees(glm::atan(world_eye_front_.y, world_eye_front_.x));
+    view_angles_.y = glm::degrees(glm::atan(world_eye_front_.z, static_cast<float>(xy)));
+
+    recomputeDirectionVector();
+    updateViewMatrix();
+  }
+
   void Camera::recomputeDirectionVector()
   {
     glm::vec3 world_up(0.0f, 0.0f, 1.0f);
@@ -136,6 +164,26 @@ namespace owds {
     world_eye_front_ = glm::normalize(front);
     world_eye_right_ = glm::normalize(glm::cross(world_eye_front_, world_up)); // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
     world_eye_up_ = glm::normalize(glm::cross(world_eye_right_, world_eye_front_));
+  }
+
+  std::vector<glm::vec4> Camera::getFrustumCornersWorldSpace()
+  {
+    const auto inv = glm::inverse(proj_matrix_ * view_matrix_);
+
+    std::vector<glm::vec4> frustum_corners;
+    for(unsigned int x = 0; x < 2; ++x)
+    {
+      for(unsigned int y = 0; y < 2; ++y)
+      {
+        for(unsigned int z = 0; z < 2; ++z)
+        {
+          const glm::vec4 pt = inv * glm::vec4(2.0f * x - 1.0f, 2.0f * y - 1.0f, 2.0f * z - 1.0f, 1.0f);
+          frustum_corners.push_back(pt / pt.w);
+        }
+      }
+    }
+
+    return frustum_corners;
   }
 
   void Camera::processUserKeyboardInput(const float delta_time, const int key, const bool is_down)

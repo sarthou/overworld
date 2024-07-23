@@ -69,7 +69,7 @@ namespace owds {
     return true;
   }
 
-  void Cubemap::use(Shader& shader)
+  void Cubemap::draw(Shader& shader)
   {
     glDepthFunc(GL_LEQUAL); // change depth function so depth test passes when values are equal to depth buffer's content
     shader.use();

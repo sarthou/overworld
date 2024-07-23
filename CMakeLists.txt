@@ -215,6 +215,7 @@ owds_add_library(overworld_graphics_new
     src/Engine/Graphics/OpenGL/Renderer.cpp
     src/Engine/Graphics/OpenGL/Screen.cpp
     src/Engine/Graphics/OpenGL/Shader.cpp
+    src/Engine/Graphics/OpenGL/Shadow.cpp
     src/Engine/Graphics/OpenGL/Texture2D.cpp)
 target_link_libraries(overworld_graphics_new PUBLIC overworld_engine_common overworld_glad assimp glfw)
 target_compile_options(overworld_graphics_new PRIVATE $<$<CXX_COMPILER_ID:Clang>:-Wno-unused-function>)

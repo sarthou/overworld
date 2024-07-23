@@ -34,16 +34,16 @@ MessageCallback(GLenum source,
   (void)id;
   (void)length;
   (void)userParam;
-  fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
-          (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
-          type, severity, message);
+  if(severity == GL_DEBUG_SEVERITY_HIGH /* || (severity == GL_DEBUG_SEVERITY_MEDIUM)*/)
+    fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
+            (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
+            type, severity, message);
 }
 
 namespace owds {
 
   Renderer::~Renderer()
   {
-    delete sky_;
   }
 
   bool Renderer::initialize(const Window& window)
@@ -86,9 +86,13 @@ namespace owds {
     shaders_.insert({
       "screen", {"screen_shader.vs", "screen_shader.fs"}
     });
+    shaders_.insert({
+      "depth", {"depth_shader.vs", "depth_shader.fs", "depth_shader.gs"}
+    });
 
-    sky_ = new Cubemap;
-    sky_->init("/home/gsarthou/Robots/Dacobot2/ros2_ws/src/overworld/models/textures/skybox/");
+    sky_.init("/home/gsarthou/Robots/Dacobot2/ros2_ws/src/overworld/models/textures/skybox/");
+
+    shadow_.init(render_camera_.getNearPlane(), render_camera_.getFarPlane());
 
     shaders_.at("screen").use();
     shaders_.at("screen").setInt("screenTexture", 0);
@@ -240,56 +244,60 @@ namespace owds {
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-    // 1. draw scene as normal in multisampled buffers
-    screen_.bindFrameBuffer();
-    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-
-    glEnable(GL_DEPTH_TEST);
-    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-    glEnable(GL_FRAMEBUFFER_SRGB);
-
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    glStencilMask(0x00);
-
     // glStencilFunc(GL_ALWAYS, 1, 0xFF); // all fragments should pass the stencil test
     // glStencilMask(0xFF);               // enable writing to the stencil buffer
 
     render_collision_models_ = render_camera_.render_collision_models_;
 
-    auto& shader = shaders_.at("default");
+    auto& light_shader = shaders_.at("default");
     auto& sky_shader = shaders_.at("sky");
+    auto& shadow_shader = shaders_.at("depth");
 
-    // set transformation matrices
+    // 0. draw scene as normal in depth buffers
+
+    auto ambient_dir = -glm::normalize(world_->ambient_light_.getDirection());
+    shadow_.computeLightSpaceMatrices(render_camera_, ambient_dir);
+
+    shadow_shader.use();
+    shadow_.setLighntMatrices();
+
+    shadow_.bindFrameBuffer();
+    glEnable(GL_DEPTH_TEST);
+    glDisable(GL_CULL_FACE);
+
+    renderModels(shadow_shader);
+
+    glEnable(GL_CULL_FACE);
+
+    // 1. draw scene as normal in multisampled buffers
+
+    screen_.bindFrameBuffer();
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+    glEnable(GL_DEPTH_TEST);
+    // glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+    glEnable(GL_FRAMEBUFFER_SRGB);
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    // glStencilMask(0x00);
+
+    light_shader.use();
+    setLightsUniforms(light_shader);
+    render_camera_.updateMatrices();
+    light_shader.setVec3("view_pose", render_camera_.getPosition());
+    light_shader.setMat4("view", render_camera_.getViewMatrix());
+    light_shader.setMat4("projection", render_camera_.getProjectionMatrix());
+
+    shadow_.setUniforms(light_shader, 1);
+    shadow_.setLighntMatrices();
+
+    renderModels(light_shader, 0);
+
     sky_shader.use();
     glm::mat4 view = glm::mat4(glm::mat3(render_camera_.getViewMatrix()));
     sky_shader.setMat4("view", view);
     sky_shader.setMat4("projection", render_camera_.getProjectionMatrix());
 
-    shader.use();
-    setLightsUniforms();
-    render_camera_.updateMatrices();
-    shader.setVec3("view_pose", render_camera_.getPosition());
-    shader.setMat4("view", render_camera_.getViewMatrix());
-    shader.setMat4("projection", render_camera_.getProjectionMatrix());
-
-    // draw
-    for(auto& [model_id, batch] : current_mesh_batches_)
-    {
-      auto& meshes = cached_models_.at(model_id);
-
-      for(auto& [mesh_id, transforms] : batch)
-      {
-        const auto& mesh = meshes.at(mesh_id);
-
-        for(const auto& transform : transforms)
-        {
-          shader.setMat4("model", transform.mvp_);
-          mesh.draw(shader);
-        }
-      }
-    }
-
-    sky_->use(sky_shader);
+    sky_.draw(sky_shader);
 
     // 2. now blit multisampled buffer(s) to normal colorbuffer of intermediate FBO. Image is stored in screenTexture
     screen_.generateColorTexture();
@@ -306,9 +314,27 @@ namespace owds {
     screen_.draw();
   }
 
-  void Renderer::setLightsUniforms()
+  void Renderer::renderModels(const Shader& shader, unsigned int texture_offset)
   {
-    Shader& shader = shaders_.at("default");
+    for(auto& [model_id, batch] : current_mesh_batches_)
+    {
+      auto& meshes = cached_models_.at(model_id);
+
+      for(auto& [mesh_id, transforms] : batch)
+      {
+        const auto& mesh = meshes.at(mesh_id);
+
+        for(const auto& transform : transforms)
+        {
+          shader.setMat4("model", transform.mvp_);
+          mesh.draw(shader, texture_offset);
+        }
+      }
+    }
+  }
+
+  void Renderer::setLightsUniforms(const Shader& shader)
+  {
     AmbientLight& ambient = world_->ambient_light_;
 
     shader.setVec4("dir_light.ambient", ambient.getAmbient());
@@ -325,6 +351,10 @@ namespace owds {
       shader.setVec4(name + ".specular", points.getSpecular(i));
       shader.setVec4(name + ".position", points.getPosition(i));
       shader.setVec4(name + ".attenuation", points.getAttenuation(i));
+      /*std::cout << "set " << name
+                << " att = " << points.getAttenuation(i).x
+                << ":" << points.getAttenuation(i).y << ":"
+                << points.getAttenuation(i).z << std::endl;*/
     }
     shader.setFloat("nb_point_lights", points.getNbLightsFloat());
   }

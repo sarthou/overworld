@@ -1,6 +1,7 @@
 #include "overworld/Engine/Graphics/OpenGL/Shader.h"
 
 #include <fstream>
+#include <glm/gtc/packing.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/matrix.hpp>
 #include <glm/vec2.hpp>
@@ -15,7 +16,7 @@ namespace owds {
 
   std::string Shader::shaders_directory;
 
-  Shader::Shader(const std::string& vertex_path, const std::string& fragment_path)
+  Shader::Shader(const std::string& vertex_path, const std::string& fragment_path, const std::string& geometry_path)
   {
     // 1. retrieve the vertex/fragment source code from filePath
     std::string vertex_code;
@@ -61,10 +62,39 @@ namespace owds {
     glCompileShader(fragment);
     checkCompileErrors(fragment, "FRAGMENT");
 
+    unsigned int geometry = 0;
+    if(geometry_path.empty() == false)
+    {
+      std::string geometry_code;
+      std::ifstream g_shader_file;
+      g_shader_file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+      try
+      {
+        g_shader_file.open(shaders_directory + geometry_path);
+        std::stringstream g_shader_stream;
+        g_shader_stream << g_shader_file.rdbuf();
+        g_shader_file.close();
+        geometry_code = g_shader_stream.str();
+      }
+      catch(std::ifstream::failure e)
+      {
+        std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
+      }
+      const char* g_shader_code = geometry_code.c_str();
+
+      // similiar for Geometry Shader
+      geometry = glCreateShader(GL_GEOMETRY_SHADER);
+      glShaderSource(geometry, 1, &g_shader_code, nullptr);
+      glCompileShader(geometry);
+      checkCompileErrors(geometry, "GEOMETRY");
+    }
+
     // shader Program
     id_ = glCreateProgram();
     glAttachShader(id_, vertex);
     glAttachShader(id_, fragment);
+    if(geometry_path.empty() == false)
+      glAttachShader(id_, geometry);
     glLinkProgram(id_);
     checkCompileErrors(id_, "PROGRAM");
 

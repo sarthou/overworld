@@ -18,7 +18,7 @@ namespace owds {
     unsigned int id_;
 
     // constructor reads and builds the shader
-    Shader(const std::string& vertex_path, const std::string& fragment_path);
+    Shader(const std::string& vertex_path, const std::string& fragment_path, const std::string& geometry_path = "");
     // use/activate the shader
     void use();
     // utility uniform functions
