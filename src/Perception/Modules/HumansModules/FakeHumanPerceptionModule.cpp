@@ -62,7 +62,7 @@ namespace owds {
     return true;
   }
 
-  Percept<BodyPart> FakeHumanPerceptionModule::createPercept(const std::string& human_name, const std::string& part_name) // TODO add the eyes as sensors?
+  Percept<BodyPart> FakeHumanPerceptionModule::createPercept(const std::string& human_name, const std::string& part_name)
   {
     BodyPartType_e part_type = BodyPartType_e::BODY_PART_UNKNOW;
 

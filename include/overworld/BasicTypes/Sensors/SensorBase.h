@@ -25,9 +25,6 @@ namespace owds {
     void setPerceptseen(const std::string& percept_id) { objects_seen_ids_.insert(percept_id); };
     void resetPerceptseen(const std::string& percept_id) { objects_seen_ids_.erase(percept_id); };
 
-    double meanRelativeError() const;
-    double standardDeviation() const;
-
     bool isActivated() const { return is_activated_; }
     void activate(bool is_activated) { is_activated_ = is_activated; }
 

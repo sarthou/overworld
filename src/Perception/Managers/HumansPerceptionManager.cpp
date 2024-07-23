@@ -8,7 +8,7 @@ namespace owds {
   void HumansPerceptionManager::getPercepts(const std::string& module_name, std::map<std::string, Percept<BodyPart>>& percepts)
   {
     for(auto& percept : percepts)
-    {
+    { //We by default the sensor id with the first set in the agent sensors
       percept.second.setSensorId(getAgent(myself_agent_name_)->getSensors().begin()->first); // TODO: adapt
       percept.second.setModuleName(module_name);
 
