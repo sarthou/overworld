@@ -56,13 +56,13 @@
     </collision>
   </link>
 
-  <joint name="head_camera_frame_joint" type="fixed">
+  <joint name="eve_head_joint" type="fixed">
     <origin xyz="0.19 0.0 0.24" rpy="-1.57079632679 0.0 -1.57079632679"/>
     <parent link="head"/>
-    <child link="head_camera_frame"/>
+    <child link="eve_head"/>
   </joint>
 
-  <link name="head_camera_frame"/>
+  <link name="eve_head"/>
 
   <joint name="arm_left_joint" type="revolute">
     <origin xyz="0.0 0.3 0.6" rpy="0.0 0.0 0.0"/>
@@ -130,4 +130,19 @@
 
   <link name="right_gripper_frame"/>
 
+  <joint name="left_eye_joint" type="fixed">
+      <origin xyz="0.1 0.05 0.25" rpy="0 0 0"/>
+      <parent link="head"/>
+      <child link="left_eye_camera_frame"/>
+    </joint>
+
+  <link name="left_eye_camera_frame"/>
+
+  <joint name="right_eye_joint" type="fixed">
+    <origin xyz="0.1 -0.05 0.25" rpy="0 0 0"/>
+    <parent link="head"/>
+    <child link="right_eye_camera_frame"/>
+  </joint>
+
+  <link name="right_eye_camera_frame"/>
 </robot>

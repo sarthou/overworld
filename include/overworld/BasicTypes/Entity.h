@@ -41,6 +41,8 @@ namespace owds {
     bool hasMoved(const ros::Time& stamp) const;
 
     std::array<double, 3> computeTranslationSpeed() const;
+    virtual std::array<double, 3> direction() const;
+    double speed() const;
 
     void setId(const std::string& id, bool is_true_id = true);
     const std::string& id() const { return id_; }

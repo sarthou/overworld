@@ -10,7 +10,8 @@
 
 namespace owds {
 
-  class FirstMethodDataFusion : public DataFusionBase_<Object>
+  template<typename T>
+  class FirstMethodDataFusion : public DataFusionBase_<T>
   {
   public:
   private:

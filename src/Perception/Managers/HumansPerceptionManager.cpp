@@ -8,15 +8,21 @@ namespace owds {
   void HumansPerceptionManager::getPercepts(const std::string& module_name, std::map<std::string, Percept<BodyPart>>& percepts)
   {
     for(auto& percept : percepts)
-    {
-      std::string part_id = percept.first;
-      if(percept.second.isLocated()) //TODO consider human disparition
+    { //We by default the sensor id with the first set in the agent sensors
+      percept.second.setSensorId(getAgent(myself_agent_name_)->getSensors().begin()->first); // TODO: adapt
+      percept.second.setModuleName(module_name);
+
+      if(!percept.second.getSensorId().empty()) // we avoid problems with static object
       {
-        auto it = aggregated_.find(part_id);
-        if(it == aggregated_.end())
-          aggregated_.emplace(part_id, std::vector<Percept<BodyPart>>{percept.second}).first;
-        else
-          it->second.push_back(percept.second);
+        auto* sensor = getAgent(myself_agent_name_)->getSensor(percept.second.getSensorId());
+        if(sensor != nullptr)
+          sensor->setPerceptseen(percept.first);
+      }
+
+      std::string part_id = percept.first;
+      if(percept.second.isLocated()) // TODO consider human disparition
+      {
+        fusionAggregated(part_id, module_name, percept.second);
       }
     }
   }
@@ -28,6 +34,9 @@ namespace owds {
       auto it = entities_.find(percept.second->id());
       if(it == entities_.end())
       {
+        if(!percept.second->getSensorId().empty())
+          fusionRegister(percept.first, percept.second->getSensorId(), percept.second->getModuleName());
+
         if(percept.second->isLocated() == false)
           continue;
 
@@ -46,6 +55,26 @@ namespace owds {
       }
 
       updateEntityPose(it->second, percept.second->pose(), percept.second->lastStamp());
+
+      if(percept.second->getType() == BODY_PART_HEAD)
+      {
+        auto human_eyes = onto_->individuals.getOn(percept.first, "hasSensor");
+        for(auto& eye : human_eyes)
+        {
+          auto vect = onto_->individuals.getFrom("hasFrameId", eye);
+          if(vect.empty())
+            vect = onto_->individuals.find(eye);
+
+          auto inner_it = sensors_register_.find(vect.front());
+          if(inner_it == sensors_register_.end())
+          {
+            inner_it = createSensor(vect.front(), percept.second->getAgentName());
+            updateAgent(inner_it->second, AgentType_e::HUMAN);
+          }
+          if(percept.second->isLocated())
+            inner_it->second->updatePose(percept.second->pose(), percept.second->lastStamp());
+        }
+      }
     }
   }
 

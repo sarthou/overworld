@@ -261,7 +261,7 @@ namespace owds {
     auto facts = facts_calculator_.computeAreasFacts(areas, objects, body_parts, false);
     facts_publisher_.publish(facts);
   }
-
+  
   void SituationAssessor::processHumans(std::map<std::string, std::unordered_set<int>>& agents_segmentation_ids)
   {
     auto objects = perception_manager_.objects_manager_.getEntities();
@@ -271,26 +271,29 @@ namespace owds {
 
     for(auto human : humans)
     {
-      if(human.second->getHead() == nullptr)
+      if(human.second->getSensors().empty())
         continue;
-      else if(human.second->getHead()->isLocated() == false)
+      else if(human.second->getHead()->isLocated() == false) 
         continue;
 
-      auto proj_matrix = bullet_client_->computeProjectionMatrix(human.second->getFieldOfView().getHeight(),
-                                                                 human.second->getFieldOfView().getRatioOpenGl(),
-                                                                 human.second->getFieldOfView().getClipNear(),
-                                                                 human.second->getFieldOfView().getClipFar());
-      Pose target_pose = human.second->getHead()->pose() * Pose({0, 0, 1}, {0, 0, 0, 1});
-      auto head_pose_trans = human.second->getHead()->pose().arrays().first;
-      auto target_pose_trans = target_pose.arrays().first;
-      auto view_matrix = bullet_client_->computeViewMatrix({(float)head_pose_trans[0], (float)head_pose_trans[1], (float)head_pose_trans[2]},
-                                                           {(float)target_pose_trans[0], (float)target_pose_trans[1], (float)target_pose_trans[2]},
-                                                           {0., 0., 1.});
-      auto images = bullet_client_->getCameraImage(300 * human.second->getFieldOfView().getRatioOpenGl(), 300, view_matrix, proj_matrix, owds::BULLET_HARDWARE_OPENGL);
+      for(const auto& sensor: human.second->getSensors())
+      {
+        auto proj_matrix = bullet_client_->computeProjectionMatrix(sensor.second->getFieldOfView().getHeight(),
+                                                                  sensor.second->getFieldOfView().getRatioOpenGl(),
+                                                                  sensor.second->getFieldOfView().getClipNear(),
+                                                                  sensor.second->getFieldOfView().getClipFar());
+        Pose target_pose = sensor.second->pose() * Pose({0, 0, 1}, {0, 0, 0, 1});
+        auto head_pose_trans = sensor.second->pose().arrays().first;
+        auto target_pose_trans = target_pose.arrays().first;
+        auto view_matrix = bullet_client_->computeViewMatrix({(float)head_pose_trans[0], (float)head_pose_trans[1], (float)head_pose_trans[2]},
+                                                            {(float)target_pose_trans[0], (float)target_pose_trans[1], (float)target_pose_trans[2]},
+                                                            {0., 0., 1.});
+        auto images = bullet_client_->getCameraImage(300 * sensor.second->getFieldOfView().getRatioOpenGl(), 300, view_matrix, proj_matrix, owds::BULLET_HARDWARE_OPENGL);
 
-      ros_sender_->sendImage(human.first + "/view", images);
-      agents_segmentation_ids[human.first] = bullet_client_->getSegmentationIds(images);
-      updateHumansPerspective(human.first, objects, body_parts, areas, agents_segmentation_ids[human.first]);
+        ros_sender_->sendImage(human.first + "/view", images);
+        agents_segmentation_ids[human.first] = bullet_client_->getSegmentationIds(images);
+        updateHumansPerspective(human.first, objects, body_parts, areas, agents_segmentation_ids[human.first]);
+      }
     }
   }
 
