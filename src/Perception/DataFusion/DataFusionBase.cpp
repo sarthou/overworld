@@ -15,7 +15,6 @@ namespace owds {
       auto fused_percept_it = fusioned_percepts.find(it.first);
       if(fused_percept_it == fusioned_percepts.end())
       {
-
         fused_percept_it = fusioned_percepts.emplace(it.first, new Percept<Object>(it.second.begin()->second)).first;
         fused_percept_it->second->removeFromHand();
       }
