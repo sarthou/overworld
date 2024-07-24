@@ -28,7 +28,6 @@ namespace owds {
       Hand* hand = nullptr;
       Pose pose_in_hand;
       Pose pose_in_map;
-      bool located_in_map = false;
       int nb_frame_unseen = 1000;
 
       // We try to find if the percept should be in hand
@@ -48,7 +47,6 @@ namespace owds {
         {
           // We take the pose of the most recently perceived percept
           pose_in_map = inner_it.second.pose();
-          located_in_map = true;
           nb_frame_unseen = inner_it.second.getNbFrameUnseen();
         }
       }
@@ -84,10 +82,7 @@ namespace owds {
           Hand* hand = percept->getHandIn();
           auto pose_tmp = percept->pose();
           hand->removePerceptFromHand(percept->id());
-          if(located_in_map)
-            percept->updatePose(pose_in_map);
-          else
-            percept->updatePose(pose_tmp);
+          percept->updatePose(pose_tmp);
           nb_frame_unseen = 0;
         }
 
