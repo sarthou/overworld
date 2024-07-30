@@ -24,15 +24,15 @@ namespace overworld {
     virtual std::string getDescription() override;
 
   private:
-    std::unordered_set<ontologenius::ObjectPropertyBranch_t*> computable_properties_;
+    std::unordered_set<ontologenius::ObjectPropertyBranch*> computable_properties_;
     ros::NodeHandle n_;
     ros::ServiceClient overworld_client_;
 
-    ontologenius::ObjectPropertyBranch_t* isComputableProperty(const std::string& property);
-    std::set<ontologenius::ObjectPropertyBranch_t*> isInRange(const std::string& indiv, ontologenius::ObjectPropertyBranch_t* property);
-    std::set<ontologenius::ObjectPropertyBranch_t*> isInDomain(const std::string& indiv, ontologenius::ObjectPropertyBranch_t* property);
+    ontologenius::ObjectPropertyBranch* isComputableProperty(const std::string& property);
+    std::set<ontologenius::ObjectPropertyBranch*> isInRange(const std::string& indiv, ontologenius::ObjectPropertyBranch* property);
+    std::set<ontologenius::ObjectPropertyBranch*> isInDomain(const std::string& indiv, ontologenius::ObjectPropertyBranch* property);
 
-    overworld::GetRelations createRequest(const std::string& subject, const std::set<ontologenius::ObjectPropertyBranch_t*>& predicates, const std::string& object);
+    overworld::GetRelations createRequest(const std::string& subject, const std::set<ontologenius::ObjectPropertyBranch*>& predicates, const std::string& object);
     bool call(overworld::GetRelations& srv);
     void updateOntology(const std::vector<overworld::Triplet>& to_add, const std::vector<overworld::Triplet>& to_delete);
   };

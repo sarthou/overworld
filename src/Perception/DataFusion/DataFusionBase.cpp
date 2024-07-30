@@ -14,7 +14,10 @@ namespace owds {
 
       auto fused_percept_it = fusioned_percepts.find(pair.first);
       if(fused_percept_it == fusioned_percepts.end())
+      {
         fused_percept_it = fusioned_percepts.emplace(pair.first, new Percept<Object>(pair.second.front())).first;
+        fused_percept_it->second->removeFromHand();
+      }
 
       Percept<Object>* percept = fused_percept_it->second;
       std::string percept_id = pair.first;
@@ -74,7 +77,10 @@ namespace owds {
         if(percept->isInHand())
         {
           Hand* hand = percept->getHandIn();
+          auto pose_tmp = percept->pose();
           hand->removePerceptFromHand(percept->id());
+          percept->updatePose(pose_tmp);
+          nb_frame_unseen = 0; // releasing an object assume a perception
         }
 
         percept->setNbFrameUnseen(nb_frame_unseen);
