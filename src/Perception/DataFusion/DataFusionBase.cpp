@@ -82,7 +82,7 @@ namespace owds {
           auto pose_tmp = percept->pose();
           hand->removePerceptFromHand(percept->id());
           percept->updatePose(pose_tmp);
-          nb_frame_unseen = 0; // releasing an object assume a perception
+          //nb_frame_unseen = 0;
         }
 
         percept->setNbFrameUnseen(nb_frame_unseen);
