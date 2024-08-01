@@ -11,13 +11,20 @@ namespace owds {
     {
       if(percept.second.getType() == owds::BODY_PART_SENSOR)
       {
-        auto vect = onto_->individuals.getFrom("hasFrameId", percept.first);
-        if(vect.empty())
-          vect = onto_->individuals.find(percept.first);
-
-        auto it = sensors_register_.find(vect.front());
+        auto it = sensors_register_.find(percept.first);
         if(it == sensors_register_.end())
         {
+          auto frame_it = frames_register_.find(percept.first);
+          if(frame_it != frames_register_.end())
+            it = sensors_register_.find(frame_it->second->id());
+        }
+
+        if(it == sensors_register_.end())
+        {
+          auto vect = onto_->individuals.getFrom("hasFrameId", percept.first);
+          if(vect.empty())
+            vect = onto_->individuals.find(percept.first);
+
           it = createSensor(vect.front(), percept.second.getAgentName());
           updateAgent(it->second, AgentType_e::ROBOT);
         }
