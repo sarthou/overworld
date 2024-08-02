@@ -115,11 +115,12 @@ namespace owds {
     std::string frame_id = getOntoValue(onto_res, std::string(""));
     onto_res = onto_->individuals.getOn(sensor_id, "isStatic");
     bool is_static = getOntoValue(onto_res, true);
-    FieldOfView fov = getFov(sensor_id);
+    
     auto* sensor = new Sensor(sensor_id, frame_id, is_static, getFov(sensor_id));
     if(!agent_name.empty())
       sensor->setAgentName(agent_name);
     auto it = sensors_register_.emplace(sensor_id, sensor).first;
+    frames_register_.emplace(frame_id, sensor);
 
     return it;
   }

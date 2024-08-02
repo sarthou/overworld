@@ -29,6 +29,7 @@ namespace owds {
   protected:
     std::map<std::string, Agent*> agents_;
     std::map<std::string, Sensor*> sensors_register_;
+    std::map<std::string, Sensor*> frames_register_;
 
     Agent* getAgent(const std::string& agent_name, AgentType_e type);
 

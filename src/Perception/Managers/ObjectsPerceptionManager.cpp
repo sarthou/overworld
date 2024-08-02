@@ -73,11 +73,21 @@ namespace owds {
     {
       percept.second.setModuleName(module_name);
 
-      if(!percept.second.getSensorId().empty()) // we avoid problems with static object
+      if(percept.second.getSensorId().empty() == false) // we avoid problems with static object
       {
         auto* sensor = myself_agent_->getSensor(percept.second.getSensorId());
         if(sensor != nullptr)
           sensor->setPerceptseen(percept.first);
+      }
+      else if(myself_agent_->getType() == AgentType_e::HUMAN)
+      {
+        auto human_sensors = myself_agent_->getSensors();
+        if(human_sensors.empty() == false)
+        {
+          auto sensor = human_sensors.begin()->second; // we assume a single sensor by human
+          percept.second.setSensorId(sensor->id());
+          sensor->setPerceptseen(percept.first);
+        }
       }
 
       std::string entity_id = percept.first;
@@ -92,6 +102,9 @@ namespace owds {
 
       if(percept.second.isLocated())
         fusionAggregated(entity_id, module_name, percept.second);
+
+      if(percept.second.getSensorId().empty() == false)
+        fusionRegister(percept.first, percept.second.getSensorId(), percept.second.getModuleName());
     }
   }
 
@@ -112,12 +125,6 @@ namespace owds {
   void ObjectsPerceptionManager::reasoningOnUpdate()
   {
     fusioner_.fuseData(fusioned_percepts_, aggregated_);
-
-    for(auto& percept : fusioned_percepts_)
-    {
-      if(!percept.second->getSensorId().empty())
-        fusionRegister(percept.first, percept.second->getSensorId(), percept.second->getModuleName());
-    }
 
     if(false_ids_to_be_merged_.size())
       mergeFalseIdData();

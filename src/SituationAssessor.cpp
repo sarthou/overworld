@@ -293,6 +293,8 @@ namespace owds {
         ros_sender_->sendImage(human.first + "/view", images);
         agents_segmentation_ids[human.first] = bullet_client_->getSegmentationIds(images);
         updateHumansPerspective(human.first, objects, body_parts, areas, agents_segmentation_ids[human.first]);
+
+        break; // TODO consider only one sensor per human
       }
     }
   }

@@ -28,10 +28,10 @@
 
     <owl:NamedIndividual rdf:about="pr2#pr2_fov">
         <rdf:type rdf:resource="cg_agents#FieldOfView"/>
-        <cg_agents:fovHasClipNear rdf:datatype="http://www.w3.org/2002/07/owl#real">0.1</cg_agents:fovHasClipNear>
-        <cg_agents:fovHasClipFar rdf:datatype="http://www.w3.org/2002/07/owl#real">6</cg_agents:fovHasClipFar>
-        <cg_agents:fovHasHeight rdf:datatype="http://www.w3.org/2002/07/owl#real">54.8</cg_agents:fovHasHeight>
-        <cg_agents:fovHasWidth rdf:datatype="http://www.w3.org/2002/07/owl#real">84.1</cg_agents:fovHasWidth>
+        <cg_sensors:fovHasClipNear rdf:datatype="http://www.w3.org/2002/07/owl#real">0.1</cg_sensors:fovHasClipNear>
+        <cg_sensors:fovHasClipFar rdf:datatype="http://www.w3.org/2002/07/owl#real">6</cg_sensors:fovHasClipFar>
+        <cg_sensors:fovHasHeight rdf:datatype="http://www.w3.org/2002/07/owl#real">54.8</cg_sensors:fovHasHeight>
+        <cg_sensors:fovHasWidth rdf:datatype="http://www.w3.org/2002/07/owl#real">84.1</cg_sensors:fovHasWidth>
     </owl:NamedIndividual>
     
 

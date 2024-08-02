@@ -27,6 +27,7 @@ namespace owds {
       Hand* hand = nullptr;
       Pose pose_in_hand;
       Pose pose_in_map;
+      bool located_in_map = false;
       int nb_frame_unseen = 1000;
 
       // We try to find if the percept should be in hand
@@ -46,6 +47,7 @@ namespace owds {
         {
           // We take the pose of the most recently perceived percept
           pose_in_map = inner_it.second.pose();
+          located_in_map = true;
           nb_frame_unseen = inner_it.second.getNbFrameUnseen();
         }
       }
@@ -55,12 +57,10 @@ namespace owds {
         for(auto& inner_it : it.second)
           percept->merge(&inner_it.second, false); // to update the shape but not the pose
         percept->setSeen();
-
         // If the precept was already in hand we do not have to update the transform
         if(percept->isInHand() == false)
         {
           hand->putPerceptInHand(percept);
-
           if(pose_in_hand.similarTo(Pose()) == false)
             percept->updatePose(pose_in_hand);
           else if(pose_in_map.similarTo(Pose()) == false)
@@ -68,11 +68,11 @@ namespace owds {
             pose_in_hand = pose_in_map.transformIn(hand->pose());
             percept->updatePose(pose_in_hand);
           }
-          else
-            percept->updatePose(Pose());
+          //else
+            //percept->updatePose(Pose());
         }
-        else
-          percept->updatePose(percept->poseRaw());
+        //else
+          //percept->updatePose(percept->poseRaw()); //update pose in hand
       }
       else
       {
@@ -81,8 +81,13 @@ namespace owds {
           Hand* hand = percept->getHandIn();
           auto pose_tmp = percept->pose();
           hand->removePerceptFromHand(percept->id());
-          percept->updatePose(pose_tmp);
-          nb_frame_unseen = 0;
+          if(located_in_map)
+            percept->updatePose(pose_in_map);
+          else
+            percept->updatePose(pose_tmp);
+          
+          //percept->updatePose(pose_tmp);
+          //nb_frame_unseen = 0;
         }
 
         percept->setNbFrameUnseen(nb_frame_unseen);

@@ -100,7 +100,7 @@ namespace owds {
   template<typename T>
   void EntitiesPerceptionManager<T>::fusionRegister(const std::string& entity_id, const std::string& sensor_id, const std::string& module_name)
   {
-    if((!sensor_id.empty())) // we avoid problems with static object
+    if(!sensor_id.empty()) // we avoid problems with static object
     {
       auto it = entities_percetion_register_.find(entity_id);
       if(it == entities_percetion_register_.end())
@@ -113,11 +113,7 @@ namespace owds {
         if(inner_it == it->second.end())
           it->second.emplace(sensor_id, std::set<std::string>{module_name});
         else
-        {
-          auto inner_inner_it = inner_it->second.find(module_name);
-          if(inner_inner_it == inner_it->second.end())
-            inner_it->second.emplace(module_name);
-        }
+          inner_it->second.insert(module_name);
       }
     }
   }
