@@ -185,6 +185,9 @@ namespace owds {
   template<typename T>
   void EntitiesPerceptionManager<T>::removeEntityPose(T* entity)
   {
+    auto percept = fusioned_percepts_.find(entity->id());
+    if(percept != fusioned_percepts_.end())
+      percept->second->unsetPose();
     entity->unsetPose();
     updateToBullet(entity);
   }

@@ -528,28 +528,36 @@ namespace owds {
 
     for(auto& false_id : false_ids_to_be_merged_)
     {
+      std::cout << "try to merge " << false_id << std::endl;
       auto false_obj = fusioned_percepts_.find(false_id);
       if(false_obj->second->isLocated() == false)
         continue;
 
-      double obj_volume = false_obj->second->getAabbVolume();
+      double obj_volume = false_obj->second->getBbVolume();
       double min_error = 10000;
       Percept<Object>* to_be_merged = nullptr;
 
-      for(auto percept : fusioned_percepts_)
+      for(auto& percept : fusioned_percepts_)
       {
         if(percept.second->isStatic())
           continue;
         else if(percept.second->isLocated() == false)
+          continue;
+        else if(percept.second->getBbVolume() == 0) // not yet initialized
           continue;
         else if(merged_ids_.find(percept.first) != merged_ids_.end()) // we cannot merge two false ids together
           continue;
 
         if(percept.first != false_obj->first)
         {
+          std::cout << "test with " << percept.first << std::endl;
+          std::cout << "dist = " << percept.second->pose().distanceTo(false_obj->second->pose())<< std::endl;
+          std::cout << "percept volume " << percept.second->getBbVolume() << std::endl;
+          std::cout << "volume difference " <<  obj_volume - percept.second->getBbVolume() << std::endl;
+
           if(percept.second->pose().distanceTo(false_obj->second->pose()) <= 0.1) // TODO tune
           {
-            double error = std::abs(obj_volume - percept.second->getAabbVolume());
+            double error = std::abs(obj_volume - percept.second->getBbVolume());
             if(error < min_error)
             {
               to_be_merged = percept.second;
@@ -561,11 +569,12 @@ namespace owds {
 
       if(to_be_merged != nullptr)
       {
+        std::cout << "find merge possibility with #########################################################################" << to_be_merged->id() << std::endl;
         fusionRegister(to_be_merged->id(), false_obj->second->getSensorId(), false_obj->second->getModuleName());
         merged.insert(false_id);
-        to_be_merged->addFalseId(false_id);
+        to_be_merged->addFalseId(false_id); // #########################################################################
         merged_ids_.insert(std::make_pair(false_id, to_be_merged->id()));
-      }
+      }   
     }
 
     // for all merged false entities, we unset its pose (put it below the world)
@@ -576,7 +585,9 @@ namespace owds {
       false_ids_to_be_merged_.erase(false_id);
       aggregated_.erase(false_id);
 
-      delete fusioned_percepts_.at(false_id);
+      auto to_be_removed = fusioned_percepts_.at(false_id);
+
+      delete to_be_removed;
       fusioned_percepts_.erase(false_id);
 
       if(entities_.find(false_id) != entities_.end())
@@ -586,6 +597,8 @@ namespace owds {
         entities_.erase(false_id);
       }
     }
+
+    std::cout << "end of merge" << std::endl;
   }
 
   void ObjectsPerceptionManager::getObjectBoundingBox(Object* object)
@@ -610,6 +623,16 @@ namespace owds {
                              (bb.max[1] - bb.min[1]) / 2. + bb.min[1],
                              (bb.max[2] - bb.min[2]) / 2. + bb.min[2]});
     object->computeCorners();
+
+    auto percept_it = fusioned_percepts_.find(object->id());
+    if(percept_it != fusioned_percepts_.end())
+    {
+      percept_it->second->setBoundingBox({bb.max[0] - bb.min[0], bb.max[1] - bb.min[1], bb.max[2] - bb.min[2]});
+      percept_it->second->setOriginOffset({(bb.max[0] - bb.min[0]) / 2. + bb.min[0],
+                              (bb.max[1] - bb.min[1]) / 2. + bb.min[1],
+                              (bb.max[2] - bb.min[2]) / 2. + bb.min[2]});
+      percept_it->second->computeCorners();
+    }
   }
 
 } // namespace owds
