@@ -8,7 +8,7 @@ layout (location = 2) in vec2 TexCoords;
 struct Material {
   sampler2D texture_diffuse1;
   sampler2D texture_specular1;
-  sampler2D emission;
+  //sampler2D emission;
   float     shininess;
   float     specular;
   vec4      color;
@@ -32,8 +32,11 @@ struct PointLight {
   vec4 diffuse;
   vec4 specular;
   vec4 attenuation;
+
+  samplerCube depth_map;
+  float far_plane;
 };  
-#define NR_POINT_LIGHTS 20 
+#define NR_POINT_LIGHTS 20 // MAX_POINTLIGHT 
 uniform PointLight point_lights[NR_POINT_LIGHTS];
 uniform float nb_point_lights;
 
@@ -52,8 +55,17 @@ uniform float far_plane;
 
 vec4 calcDirLight(DirLight light, vec3 normal, vec3 viewDir);
 vec4 calcPointLight(PointLight light, vec3 normal, vec3 viewDir);
-float ShadowCalculation(vec3 fragPosWorldSpace);
+float ambiantShadowCalculation(vec3 fragPosWorldSpace);
+float pointShadowCalculation(PointLight light, vec3 fragPosWorldSpace);
 
+vec3 sampleOffsetDirections[20] = vec3[]
+(
+  vec3( 1,  1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1,  1,  1), 
+  vec3( 1,  1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1,  1, -1),
+  vec3( 1,  1,  0), vec3( 1, -1,  0), vec3(-1, -1,  0), vec3(-1,  1,  0),
+  vec3( 1,  0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1,  0, -1),
+  vec3( 0,  1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0,  1, -1)
+);
 
 void main()
 {
@@ -91,7 +103,7 @@ vec4 calcDirLight(DirLight light, vec3 normal, vec3 viewDir)
   if(material.specular < 0)
     mat_spec = vec4(texture(material.texture_specular1, TexCoords).r);
 
-  float shadow = ShadowCalculation(FragPos);
+  float shadow = ambiantShadowCalculation(FragPos);
 
   vec4 ambient  = light.ambient  * mat_ambient;
   vec4 diffuse  = light.diffuse  * diff * mat_ambient;
@@ -121,16 +133,42 @@ vec4 calcPointLight(PointLight light, vec3 normal, vec3 viewDir)
   if(material.specular <= 0)
     mat_spec = vec4(texture(material.texture_specular1, TexCoords).r);
 
+  float shadow = pointShadowCalculation(light, FragPos);
+
   vec4 ambient  = light.ambient  * mat_ambient;
   vec4 diffuse  = light.diffuse  * diff * mat_ambient;
   vec4 specular = light.specular * spec * mat_spec;
   ambient  *= attenuation;
   diffuse  *= attenuation;
   specular *= attenuation;
-  return (ambient + diffuse + specular);
+
+  return ((1.0 - shadow) * (ambient + diffuse + specular));
 }
 
-float ShadowCalculation(vec3 fragPosWorldSpace)
+float pointShadowCalculation(PointLight light, vec3 fragPosWorldSpace)
+{
+  vec3 fragToLight = FragPos - light.position.xyz;
+  float currentDepth = length(fragToLight);
+  
+  float shadow = 0.0;
+  float bias   = 0.05;
+  int samples  = 20;
+  float viewDistance = length(view_pose - FragPos);
+  float diskRadius = 0.002; //(1.0 + (viewDistance / light.far_plane)) / 100.0;
+  
+  for(int i = 0; i < samples; ++i)
+  {
+    float closestDepth = texture(light.depth_map, fragToLight + sampleOffsetDirections[i] * diskRadius).r;
+    closestDepth *= light.far_plane;   // undo mapping [0;1]
+    if(currentDepth - bias > closestDepth)
+      shadow += 1.0;
+  }
+  shadow /= float(samples);
+
+  return shadow;
+}
+
+float ambiantShadowCalculation(vec3 fragPosWorldSpace)
 {
   // select cascade layer
   vec4 frag_pose_view_space = view * vec4(fragPosWorldSpace, 1.0);

@@ -14,7 +14,7 @@ namespace owds {
     void init(float near_plane, float far_plane);
     void bindFrameBuffer() const;
     void setUniforms(const Shader& shader, unsigned int texture_offset) const;
-    void setLighntMatrices();
+    void setLightMatrices();
     void computeLightSpaceMatrices(Camera ref_cam, const glm::vec3& light_dir);
 
   private:

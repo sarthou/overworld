@@ -3,6 +3,7 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -40,6 +41,7 @@ namespace owds {
       unsigned int specular_nr = 1;
       unsigned int normal_nr = 1;
       unsigned int height_nr = 1;
+      unsigned int nb_used = 0;
       for(unsigned int i = 0; i < textures.size(); i++)
       {
         glActiveTexture(GL_TEXTURE0 + texture_pose_offset + i); // active proper texture unit before binding
@@ -47,29 +49,62 @@ namespace owds {
         std::string name;
         if(textures[i].type_ == texture_diffuse)
         {
-          name = "texture_diffuse";
+          name = "material.texture_diffuse";
           number = std::to_string(diffuse_nr++);
         }
         else if(textures[i].type_ == texture_specular)
         {
-          name = "texture_specular";
+          name = "material.texture_specular";
           number = std::to_string(specular_nr++);
         }
         else if(textures[i].type_ == texture_normal)
         {
-          name = "texture_normal";
+          name = "material.texture_normal";
           number = std::to_string(normal_nr++);
         }
         else if(textures[i].type_ == texture_height)
         {
-          name = "texture_height";
+          name = "material.texture_height";
           number = std::to_string(height_nr++);
         }
 
-        // now set the sampler to the correct texture unit
-        glUniform1i(glGetUniformLocation(shader.id_, (name + number).c_str()), texture_pose_offset + i);
-        // and finally bind the texture
+        // now bind the texture
         glBindTexture(GL_TEXTURE_2D, textures[i].id_);
+        // and finally set the sampler to the correct texture unit
+        shader.setInt(name + number, texture_pose_offset + i);
+        nb_used++;
+      }
+
+      if(diffuse_nr == 1)
+      {
+        glActiveTexture(GL_TEXTURE0 + texture_pose_offset + nb_used);
+        glBindTexture(GL_TEXTURE_2D, 0);
+        shader.setInt("material.texture_diffuse1", texture_pose_offset + nb_used);
+        nb_used++;
+      }
+
+      if(specular_nr == 1)
+      {
+        glActiveTexture(GL_TEXTURE0 + texture_pose_offset + nb_used);
+        glBindTexture(GL_TEXTURE_2D, 0);
+        shader.setInt("material.texture_specular1", texture_pose_offset + nb_used);
+        nb_used++;
+      }
+
+      if(normal_nr == 1)
+      {
+        glActiveTexture(GL_TEXTURE0 + texture_pose_offset + nb_used);
+        glBindTexture(GL_TEXTURE_2D, 0);
+        shader.setInt("material.texture_normal1", texture_pose_offset + nb_used);
+        nb_used++;
+      }
+
+      if(height_nr == 1)
+      {
+        glActiveTexture(GL_TEXTURE0 + texture_pose_offset + nb_used);
+        glBindTexture(GL_TEXTURE_2D, 0);
+        shader.setInt("material.texture_height1", texture_pose_offset + nb_used);
+        nb_used++;
       }
 
       shader.setFloat("material.shininess", shininess);

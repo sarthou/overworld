@@ -45,30 +45,30 @@ int main()
 
   DefaultEngine world(owds::compat::owds_ros::getShareDirectory("overworld"));
 
-  std::cout << "================== WORLD CREATED ================" << std::endl;
+  std::cout << "================== WORLD CREATED ! ================" << std::endl;
 
   world.setAmbientLight({-0.2f, -0.5f, -0.3f},
                         {1.0f, 0.976f, 0.898f},
                         0.3, 0.5, 0.9);
 
-  world.addPointLight({2.0f, -1.0f, 2.0f},
+  world.addPointLight({2.0f, -1.5f, 2.0f},
                       {1.0f, 1.0f, 1.0f},
                       0.4, 0.5, 1.0,
                       5.f);
 
-  world.addPointLight({10.0f, -1.0f, 2.0f},
+  world.addPointLight({10.0f, -1.5f, 2.0f},
                       {0.0f, 1.0f, 1.0f},
-                      0.4, 0.5, 1.0,
-                      5.0f);
+                      0.5, 0.6, 1.0,
+                      8.0f);
 
   renderer.attachWorld(&world);
 
-  std::cout << "================== WORLD ATTACHED ================" << std::endl;
+  std::cout << "================== WORLD ATTACHED ! ================" << std::endl;
 
   (void)world.loadRobotFromDescription("models/adream/adream.urdf");
   world.stepSimulation(1.f / 144.f);
 
-  std::cout << "================== WORLD LOADED ================" << std::endl;
+  std::cout << "================== WORLD LOADED !! ================" << std::endl;
 
   while(!window.isCloseRequested())
   {

@@ -15,6 +15,7 @@
 #include "overworld/Engine/Graphics/OpenGL/Camera.h"
 #include "overworld/Engine/Graphics/OpenGL/Cubemap.h"
 #include "overworld/Engine/Graphics/OpenGL/MeshHandle.h"
+#include "overworld/Engine/Graphics/OpenGL/PointShadow.h"
 #include "overworld/Engine/Graphics/OpenGL/Screen.h"
 #include "overworld/Engine/Graphics/OpenGL/Shader.h"
 
@@ -44,6 +45,7 @@ namespace owds {
     Screen screen_;
     Cubemap sky_;
     AmbientShadow shadow_;
+    PointShadow point_shadows_;
     float max_fps_ = 120;
     float delta_time_;
     float last_frame_;

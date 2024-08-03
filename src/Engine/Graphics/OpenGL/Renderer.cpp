@@ -91,6 +91,9 @@ namespace owds {
     shaders_.insert({
       "depth", {"depth_shader.vs", "depth_shader.fs", "depth_shader.gs"}
     });
+    shaders_.insert({
+      "depthcube", {"depthcube_shader.vs", "depthcube_shader.fs", "depthcube_shader.gs"}
+    });
 
     sky_.init("/home/gsarthou/Robots/Dacobot2/ros2_ws/src/overworld/models/textures/skybox/Footballfield/");
 
@@ -109,6 +112,8 @@ namespace owds {
   {
     screen_.setSize(new_width, new_height);
     glViewport(0, 0, new_width, new_height);
+    render_camera_.setOutputResolution(std::array<float, 2>{(float)new_width, (float)new_height});
+    render_camera_.finalize();
     screen_.reinitBuffers();
   }
 
@@ -129,7 +134,6 @@ namespace owds {
         mesh.second.clear();
 
     loadWorld();
-
     render();
   }
 
@@ -254,19 +258,39 @@ namespace owds {
     auto& light_shader = shaders_.at("default");
     auto& sky_shader = shaders_.at("sky");
     auto& shadow_shader = shaders_.at("depth");
+    auto& shadow_point_shader = shaders_.at("depthcube");
 
     // 0. draw scene as normal in depth buffers
 
+    // 0.1. ambient shadows
     auto ambient_dir = -glm::normalize(world_->ambient_light_.getDirection());
     shadow_.computeLightSpaceMatrices(render_camera_, ambient_dir);
 
     shadow_shader.use();
-    shadow_.setLighntMatrices();
+    shadow_.setLightMatrices();
 
     shadow_.bindFrameBuffer();
     glEnable(GL_DEPTH_TEST);
 
-    renderModels(shadow_shader);
+    renderModels(shadow_shader, 2);
+
+    // 0.2 points shadows
+    for(size_t i = 0; i < PointLights::MAX_POINT_LIGHTS; i++)
+    {
+      if(world_->point_lights_.isUsed(i))
+      {
+        if(point_shadows_.isInit(i) == false)
+          point_shadows_.init(i, world_->point_lights_.getAttenuationDistance(i));
+
+        point_shadows_.computeLightTransforms(i, glm::vec3(world_->point_lights_.getPosition(i)));
+
+        shadow_point_shader.use();
+        point_shadows_.bindFrameBuffer(i);
+        point_shadows_.setUniforms(i, shadow_point_shader);
+
+        renderModels(shadow_point_shader, 2);
+      }
+    }
 
     // 1. draw scene as normal in multisampled buffers
 
@@ -287,9 +311,13 @@ namespace owds {
     light_shader.setMat4("projection", render_camera_.getProjectionMatrix());
 
     shadow_.setUniforms(light_shader, 1);
-    shadow_.setLighntMatrices();
+    shadow_.setLightMatrices();
 
-    renderModels(light_shader, 0);
+    for(size_t i = 0; i < PointLights::MAX_POINT_LIGHTS; i++)
+      if(world_->point_lights_.isUsed(i))
+        point_shadows_.setUniforms(i, light_shader, 6);
+
+    renderModels(light_shader, 2);
 
     sky_shader.use();
     glm::mat4 view = glm::mat4(glm::mat3(render_camera_.getViewMatrix()));
@@ -341,6 +369,14 @@ namespace owds {
     shader.setVec4("dir_light.specular", ambient.getSpecular());
     shader.setVec4("dir_light.direction", ambient.getDirection());
 
+    glActiveTexture(GL_TEXTURE2);
+    for(size_t i = 0; i < PointLights::MAX_POINT_LIGHTS; i++)
+    {
+      shader.setInt("point_lights[" + std::to_string(i) + "].depth_map", 6);
+    }
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+    glActiveTexture(GL_TEXTURE0);
+
     PointLights& points = world_->point_lights_;
     for(size_t i = 0; i < points.getNbLightsFloat(); i++)
     {
@@ -350,10 +386,6 @@ namespace owds {
       shader.setVec4(name + ".specular", points.getSpecular(i));
       shader.setVec4(name + ".position", points.getPosition(i));
       shader.setVec4(name + ".attenuation", points.getAttenuation(i));
-      /*std::cout << "set " << name
-                << " att = " << points.getAttenuation(i).x
-                << ":" << points.getAttenuation(i).y << ":"
-                << points.getAttenuation(i).z << std::endl;*/
     }
     shader.setFloat("nb_point_lights", points.getNbLightsFloat());
   }

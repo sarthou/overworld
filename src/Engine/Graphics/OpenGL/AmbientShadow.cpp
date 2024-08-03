@@ -72,14 +72,14 @@ namespace owds {
       shader.setFloat("cascade_planes_distances[" + std::to_string(i) + "]", shadow_cascade_levels_[i]);
 
     glActiveTexture(GL_TEXTURE0 + texture_offset);
-    shader.setInt("shadow_maps", texture_offset);
     glBindTexture(GL_TEXTURE_2D_ARRAY, depth_maps_);
+    shader.setInt("shadow_maps", texture_offset);
 
     // always good practice to set everything back to defaults once configured.
     glActiveTexture(GL_TEXTURE0);
   }
 
-  void AmbientShadow::setLighntMatrices()
+  void AmbientShadow::setLightMatrices()
   {
     glBindBuffer(GL_UNIFORM_BUFFER, matrices_uniform_buffer_);
     for(size_t i = 0; i < lightspace_matrices_.size(); ++i)

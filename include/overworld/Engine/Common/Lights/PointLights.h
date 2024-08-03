@@ -13,7 +13,7 @@ namespace owds {
   class PointLights
   {
   public:
-    const static std::size_t MAX_POINT_LIGHTS = 20;
+    const static std::size_t MAX_POINT_LIGHTS = 20; // MAX_POINTLIGHT
 
     PointLights() : nb_lights_(0)
     {
@@ -34,6 +34,7 @@ namespace owds {
       setDiffuseStrength(id, diffuse_strength);
       setSpecularStrength(id, specular_strength);
       setAttenuation(id, attenuation);
+      attenuation_distances_[id] = 20;
 
       return id;
     }
@@ -52,6 +53,7 @@ namespace owds {
       setDiffuseStrength(id, diffuse_strength);
       setSpecularStrength(id, specular_strength);
       setAttenuation(id, attenuation_radius);
+      attenuation_distances_[id] = attenuation_radius;
 
       return id;
     }
@@ -115,11 +117,13 @@ namespace owds {
     const std::array<glm::vec4, MAX_POINT_LIGHTS>& getAttenuations() const { return attenuations_; }
     glm::vec4 getNbLights() const { return glm::vec4(nb_lights_); }
 
+    bool isUsed(std::size_t id) const { return !available_[id]; }
     const glm::vec4& getAmbient(std::size_t id) const { return ambients_[id]; }
     const glm::vec4& getDiffuse(std::size_t id) const { return diffuses_[id]; }
     const glm::vec4& getSpecular(std::size_t id) const { return speculars_[id]; }
     const glm::vec4& getPosition(std::size_t id) const { return positions_[id]; }
     const glm::vec4& getAttenuation(std::size_t id) const { return attenuations_[id]; }
+    float getAttenuationDistance(std::size_t id) const { return attenuation_distances_[id]; }
     float getNbLightsFloat() const { return nb_lights_; }
 
   private:
@@ -137,6 +141,7 @@ namespace owds {
     std::array<glm::vec4, MAX_POINT_LIGHTS> diffuses_;
     std::array<glm::vec4, MAX_POINT_LIGHTS> speculars_;
     std::array<glm::vec4, MAX_POINT_LIGHTS> attenuations_;
+    std::array<float, MAX_POINT_LIGHTS> attenuation_distances_;
 
     void removeId(std::size_t id)
     {

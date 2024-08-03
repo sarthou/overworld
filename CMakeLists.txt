@@ -212,6 +212,7 @@ owds_add_library(overworld_graphics_new
     src/Engine/Graphics/GLFW/Window.cpp
     src/Engine/Graphics/OpenGL/Camera.cpp
     src/Engine/Graphics/OpenGL/Cubemap.cpp
+    src/Engine/Graphics/OpenGL/PointShadow.cpp
     src/Engine/Graphics/OpenGL/Renderer.cpp
     src/Engine/Graphics/OpenGL/Screen.cpp
     src/Engine/Graphics/OpenGL/Shader.cpp
