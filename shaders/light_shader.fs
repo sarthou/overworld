@@ -87,62 +87,69 @@ void main()
 
 vec4 calcDirLight(DirLight light, vec3 normal, vec3 viewDir)
 {
-  vec3 lightDir = normalize(-light.direction.xyz);
-  vec3 halfwayDir = normalize(lightDir + viewDir);
-  // diffuse shading
-  float diff = max(dot(normal, lightDir), 0.0);
-  // specular shading
-  //float spec = pow(max(dot(normal, halfwayDir), 0.0), material.shininess);
-  vec3 reflectDir = reflect(-lightDir, normal);
-  float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-  // combine results
   vec4 mat_ambient = material.color / 255.F;
   if(material.color.w == 0)
     mat_ambient = texture(material.texture_diffuse1, TexCoords);
-  vec4 mat_spec = vec4(material.specular);
-  if(material.specular < 0)
-    mat_spec = vec4(texture(material.texture_specular1, TexCoords).r);
 
   float shadow = ambiantShadowCalculation(FragPos);
 
-  vec4 ambient  = light.ambient  * mat_ambient;
-  vec4 diffuse  = light.diffuse  * diff * mat_ambient;
-  vec4 specular = light.specular * spec * mat_spec;
-  return (ambient + (1.0 - shadow) * (diffuse + specular));
+  if(shadow < 0.999)
+  {
+    vec3 lightDir = normalize(-light.direction.xyz);
+    vec3 halfwayDir = normalize(lightDir + viewDir);
+    // diffuse shading
+    float diff = max(dot(normal, lightDir), 0.0);
+    // specular shading
+    float spec = pow(max(dot(normal, halfwayDir), 0.0), material.shininess);
+    
+    vec4 mat_spec = vec4(material.specular);
+    if(material.specular < 0)
+      mat_spec = vec4(texture(material.texture_specular1, TexCoords).r);
+
+    vec4 ambient  = light.ambient  * mat_ambient;
+    vec4 diffuse  = light.diffuse  * diff * mat_ambient;
+    vec4 specular = light.specular * spec * mat_spec;
+    return (ambient + (1.0 - shadow) * (diffuse + specular));
+  }
+  else
+    return light.ambient  * mat_ambient;
 }
 
 vec4 calcPointLight(PointLight light, vec3 normal, vec3 viewDir)
 {
-  vec3 lightDir = normalize(light.position.xyz - FragPos);
-  vec3 halfwayDir = normalize(lightDir + viewDir);
-  // diffuse shading
-  float diff = max(dot(normal, lightDir), 0.0);
-  // specular shading
-  //float spec = pow(max(dot(normal, halfwayDir), 0.0), material.shininess);
-  vec3 reflectDir = reflect(-lightDir, normal);
-  float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-  // attenuation
-  float distance    = length(vec3(light.position.xyz) - FragPos);
-  float attenuation = 1.0 / (light.attenuation.x + light.attenuation.y * distance + 
-                      light.attenuation.z * (distance * distance));    
-  // combine results
-  vec4 mat_ambient = material.color / 255.f;
-  if(material.color.w == 0)
-    mat_ambient = texture(material.texture_diffuse1, TexCoords);
-  vec4 mat_spec = vec4(material.specular);
-  if(material.specular <= 0)
-    mat_spec = vec4(texture(material.texture_specular1, TexCoords).r);
-
   float shadow = pointShadowCalculation(light, FragPos);
 
-  vec4 ambient  = light.ambient  * mat_ambient;
-  vec4 diffuse  = light.diffuse  * diff * mat_ambient;
-  vec4 specular = light.specular * spec * mat_spec;
-  ambient  *= attenuation;
-  diffuse  *= attenuation;
-  specular *= attenuation;
+  if(shadow < 0.999)
+  {
+    vec3 lightDir = normalize(light.position.xyz - FragPos);
+    vec3 halfwayDir = normalize(lightDir + viewDir);
+    // diffuse shading
+    float diff = max(dot(normal, lightDir), 0.0);
+    // specular shading
+    float spec = pow(max(dot(normal, halfwayDir), 0.0), material.shininess);
+    // attenuation
+    float distance    = length(vec3(light.position.xyz) - FragPos);
+    float attenuation = 1.0 / (light.attenuation.x + light.attenuation.y * distance + 
+                        light.attenuation.z * (distance * distance));    
+    // combine results
+    vec4 mat_ambient = material.color / 255.f;
+    if(material.color.w == 0)
+      mat_ambient = texture(material.texture_diffuse1, TexCoords);
+    vec4 mat_spec = vec4(material.specular);
+    if(material.specular <= 0)
+      mat_spec = vec4(texture(material.texture_specular1, TexCoords).r);
 
-  return ((1.0 - shadow) * (ambient + diffuse + specular));
+    vec4 ambient  = light.ambient  * mat_ambient;
+    vec4 diffuse  = light.diffuse  * diff * mat_ambient;
+    vec4 specular = light.specular * spec * mat_spec;
+    ambient  *= attenuation;
+    diffuse  *= attenuation;
+    specular *= attenuation;
+
+    return ((1.0 - shadow) * (ambient + diffuse + specular));
+  }
+  else
+    return vec4(0.f);
 }
 
 float pointShadowCalculation(PointLight light, vec3 fragPosWorldSpace)
