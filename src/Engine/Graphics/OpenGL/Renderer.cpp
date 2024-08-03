@@ -92,7 +92,7 @@ namespace owds {
       "depth", {"depth_shader.vs", "depth_shader.fs", "depth_shader.gs"}
     });
 
-    sky_.init("/home/gsarthou/Robots/Dacobot2/ros2_ws/src/overworld/models/textures/skybox/");
+    sky_.init("/home/gsarthou/Robots/Dacobot2/ros2_ws/src/overworld/models/textures/skybox/Footballfield/");
 
     shadow_.init(render_camera_.getNearPlane(), render_camera_.getFarPlane());
 
