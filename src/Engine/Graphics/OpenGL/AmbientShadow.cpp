@@ -1,4 +1,4 @@
-#include "overworld/Engine/Graphics/OpenGL/Shadow.h"
+#include "overworld/Engine/Graphics/OpenGL/AmbientShadow.h"
 
 #include <array>
 #include <glm/gtc/packing.hpp>
@@ -13,7 +13,7 @@
 
 namespace owds {
 
-  void Shadow::init(float near_plane, float far_plane)
+  void AmbientShadow::init(float near_plane, float far_plane)
   {
     near_plane_ = near_plane;
     far_plane_ = far_plane;
@@ -57,14 +57,14 @@ namespace owds {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
   }
 
-  void Shadow::bindFrameBuffer() const
+  void AmbientShadow::bindFrameBuffer() const
   {
     glBindFramebuffer(GL_FRAMEBUFFER, depth_framebuffer_);
     glViewport(0, 0, resolution_, resolution_);
     glClear(GL_DEPTH_BUFFER_BIT);
   }
 
-  void Shadow::setUniforms(const Shader& shader, unsigned int texture_offset) const
+  void AmbientShadow::setUniforms(const Shader& shader, unsigned int texture_offset) const
   {
     shader.setFloat("far_plane", far_plane_);
     shader.setInt("cascade_count", shadow_cascade_levels_.size());
@@ -79,7 +79,7 @@ namespace owds {
     glActiveTexture(GL_TEXTURE0);
   }
 
-  void Shadow::setLighntMatrices()
+  void AmbientShadow::setLighntMatrices()
   {
     glBindBuffer(GL_UNIFORM_BUFFER, matrices_uniform_buffer_);
     for(size_t i = 0; i < lightspace_matrices_.size(); ++i)
@@ -87,7 +87,7 @@ namespace owds {
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
   }
 
-  void Shadow::computeLightSpaceMatrices(Camera ref_cam, const glm::vec3& light_dir)
+  void AmbientShadow::computeLightSpaceMatrices(Camera ref_cam, const glm::vec3& light_dir)
   {
     lightspace_matrices_.clear();
     for(size_t i = 0; i < shadow_cascade_levels_.size() + 1; ++i)
@@ -101,7 +101,7 @@ namespace owds {
     }
   }
 
-  glm::mat4 Shadow::getLightSpaceMatrix(Camera& ref_cam, const glm::vec3& light_dir, float near_plane, float far_plane)
+  glm::mat4 AmbientShadow::getLightSpaceMatrix(Camera& ref_cam, const glm::vec3& light_dir, float near_plane, float far_plane)
   {
     ref_cam.setPlanes({near_plane, far_plane});
     ref_cam.updateProjectionMatrix();

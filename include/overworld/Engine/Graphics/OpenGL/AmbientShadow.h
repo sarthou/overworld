@@ -8,7 +8,7 @@
 namespace owds {
   class Shader;
 
-  class Shadow
+  class AmbientShadow
   {
   public:
     void init(float near_plane, float far_plane);

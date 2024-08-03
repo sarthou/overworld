@@ -1,5 +1,6 @@
 #include "overworld/Engine/Graphics/OpenGL/Renderer.h"
 
+#include <cstdint>
 #include <iostream>
 #include <string>
 #include <unistd.h>
@@ -14,6 +15,7 @@
 #include "overworld/Engine/Common/Urdf/Actor.h"
 #include "overworld/Engine/Common/World.h"
 #include "overworld/Engine/Graphics/Common/InstanceData.h"
+#include "overworld/Engine/Graphics/Common/ViewAntiAliasing.h"
 #include "overworld/Engine/Graphics/OpenGL/Cubemap.h"
 #include "overworld/Engine/Graphics/OpenGL/MeshHandle.h"
 #include "overworld/Helper/GlmMath.h"
@@ -62,8 +64,8 @@ namespace owds {
     // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     glEnable(GL_CULL_FACE);
-    glCullFace(GL_FRONT);
-    glFrontFace(GL_CW);
+    glCullFace(GL_BACK);
+    // glFrontFace(GL_CW);
 
     glEnable(GL_DEBUG_OUTPUT);
     glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
@@ -263,11 +265,8 @@ namespace owds {
 
     shadow_.bindFrameBuffer();
     glEnable(GL_DEPTH_TEST);
-    glDisable(GL_CULL_FACE);
 
     renderModels(shadow_shader);
-
-    glEnable(GL_CULL_FACE);
 
     // 1. draw scene as normal in multisampled buffers
 

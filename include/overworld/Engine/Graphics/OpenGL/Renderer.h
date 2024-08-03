@@ -11,12 +11,12 @@
 #include "overworld/Engine/Common/Shapes/Shape.h"
 #include "overworld/Engine/Common/Urdf/Actor.h"
 #include "overworld/Engine/Graphics/Common/InstanceData.h"
+#include "overworld/Engine/Graphics/OpenGL/AmbientShadow.h"
 #include "overworld/Engine/Graphics/OpenGL/Camera.h"
 #include "overworld/Engine/Graphics/OpenGL/Cubemap.h"
 #include "overworld/Engine/Graphics/OpenGL/MeshHandle.h"
 #include "overworld/Engine/Graphics/OpenGL/Screen.h"
 #include "overworld/Engine/Graphics/OpenGL/Shader.h"
-#include "overworld/Engine/Graphics/OpenGL/Shadow.h"
 
 namespace owds {
   class Window;
@@ -43,7 +43,7 @@ namespace owds {
     std::unordered_map<std::string, Shader> shaders_;
     Screen screen_;
     Cubemap sky_;
-    Shadow shadow_;
+    AmbientShadow shadow_;
     float max_fps_ = 120;
     float delta_time_;
     float last_frame_;
