@@ -27,7 +27,6 @@ namespace owds {
 
   void Hand::removePerceptFromHand(const std::string& object_name)
   {
-    std::cout << "Hand::removePerceptFromHand" << std::endl;
     removeFromHand(object_name, has_percept_in_);
   }
 

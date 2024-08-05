@@ -49,7 +49,7 @@ namespace owds {
     onto::OntologiesManipulator ontos_;
     onto::OntologyManipulator* onto_;
 
-    void fusionAggregated(const std::string& entity_id, const std::string& module_name, Percept<T> percept);
+    void fusionAggregated(const std::string& entity_id, const std::string& module_name, const Percept<T>& percept);
     void fusionRegister(const std::string& entity_id, const std::string& sensor_id, const std::string& module_name);
     virtual void getPercepts(const std::string& module_name, std::map<std::string, Percept<T>>& percepts);
     virtual void reasoningOnUpdate() {}
@@ -100,13 +100,11 @@ namespace owds {
   template<typename T>
   void EntitiesPerceptionManager<T>::fusionRegister(const std::string& entity_id, const std::string& sensor_id, const std::string& module_name)
   {
-    if(!sensor_id.empty()) // we avoid problems with static object
+    if(sensor_id.empty() == false) // we avoid problems with static object
     {
       auto it = entities_percetion_register_.find(entity_id);
       if(it == entities_percetion_register_.end())
-        entities_percetion_register_.emplace(entity_id, std::map<std::string, std::set<std::string>>{
-                                                          {sensor_id, {module_name}}
-        });
+        entities_percetion_register_.emplace(entity_id, std::map<std::string, std::set<std::string>>{{sensor_id, {module_name}}});
       else
       {
         auto inner_it = it->second.find(sensor_id);
@@ -119,14 +117,12 @@ namespace owds {
   }
 
   template<typename T>
-  void EntitiesPerceptionManager<T>::fusionAggregated(const std::string& entity_id, const std::string& module_name, Percept<T> percept)
+  void EntitiesPerceptionManager<T>::fusionAggregated(const std::string& entity_id, const std::string& module_name, const Percept<T>& percept)
   {
     auto it = aggregated_.find(entity_id);
     if(it == aggregated_.end())
     {
-      auto p = aggregated_.emplace(entity_id, std::map<std::string, Percept<T>>{
-                                       {module_name, percept}
-      }).first;
+      aggregated_.emplace(entity_id, std::map<std::string, Percept<T>>{{module_name, percept}});
     }
     else
     {

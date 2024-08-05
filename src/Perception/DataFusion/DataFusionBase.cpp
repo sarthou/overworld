@@ -54,15 +54,12 @@ namespace owds {
 
       if(hand != nullptr)
       {
-        std::cout << "first merge" << std::endl;
         for(auto& inner_it : it.second)
           percept->merge(&inner_it.second, false); // to update the shape but not the pose
         percept->setSeen();
         // If the percept was already in hand we do not have to update the transform
         if(percept->isInHand() == false)
         {
-          std::cout << "put Percept In hand#####################################################################" << std::endl;
-          std::cout << " - " << percept->id() << std::endl; 
           hand->putPerceptInHand(percept);
           if(pose_in_hand.similarTo(Pose()) == false)
             percept->updatePose(pose_in_hand);
@@ -71,11 +68,11 @@ namespace owds {
             pose_in_hand = pose_in_map.transformIn(hand->pose());
             percept->updatePose(pose_in_hand);
           }
-          //else
-            //percept->updatePose(Pose());
+          // else
+          // percept->updatePose(Pose());
         }
-        //else
-          //percept->updatePose(percept->poseRaw()); //update pose in hand
+        // else
+        // percept->updatePose(percept->poseRaw()); //update pose in hand
       }
       else
       {
@@ -83,22 +80,17 @@ namespace owds {
         {
           Hand* hand = percept->getHandIn();
           auto pose_tmp = percept->pose();
-          std::cout << "remove from hand" << std::endl;
-          std::cout << " - " << percept->id() << std::endl;
-          std::cout << " - " << hand->id() << std::endl;
-          for(auto& prpt : hand->getPerceptsInHand())
-            std::cout << " -- " << prpt << std::endl;
-          hand->removePerceptFromHand(percept->id()); //line that crash #####################################################################
+          hand->removePerceptFromHand(percept->id());
           for(auto& false_id : percept->getFalseIds())
             hand->removePerceptFromHand(false_id);
-          std::cout << "remove done" << std::endl;
+
           if(located_in_map)
             percept->updatePose(pose_in_map);
           else
             percept->updatePose(pose_tmp);
-          
-          //percept->updatePose(pose_tmp);
-          //nb_frame_unseen = 0;
+
+          // percept->updatePose(pose_tmp);
+          // nb_frame_unseen = 0;
         }
 
         percept->setNbFrameUnseen(nb_frame_unseen);
