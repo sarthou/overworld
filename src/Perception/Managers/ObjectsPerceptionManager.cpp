@@ -26,7 +26,7 @@ namespace owds {
     {
       if(object.second->isStatic() == false)
       {
-        if(object.second->isLocated())
+        if(object.second->isLocated() && (object.second->isInHand() == false))
         {
           if(simulated_objects_.find(object.second->id()) == simulated_objects_.end())
           {
