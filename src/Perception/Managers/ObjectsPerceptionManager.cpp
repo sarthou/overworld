@@ -26,7 +26,7 @@ namespace owds {
     {
       if(object.second->isStatic() == false)
       {
-        if(object.second->isLocated())
+        if(object.second->isLocated() && (object.second->isInHand() == false))
         {
           if(simulated_objects_.find(object.second->id()) == simulated_objects_.end())
           {
@@ -100,8 +100,7 @@ namespace owds {
           entity_id = merged_id->second;
       }
 
-      if(percept.second.isLocated())
-        fusionAggregated(entity_id, module_name, percept.second);
+      fusionAggregated(entity_id, module_name, percept.second);
 
       if(percept.second.getSensorId().empty() == false)
         fusionRegister(percept.first, percept.second.getSensorId(), percept.second.getModuleName());
@@ -532,15 +531,17 @@ namespace owds {
       if(false_obj->second->isLocated() == false)
         continue;
 
-      double obj_volume = false_obj->second->getAabbVolume();
+      double obj_volume = false_obj->second->getBbVolume();
       double min_error = 10000;
       Percept<Object>* to_be_merged = nullptr;
 
-      for(auto percept : fusioned_percepts_)
+      for(auto& percept : fusioned_percepts_)
       {
         if(percept.second->isStatic())
           continue;
         else if(percept.second->isLocated() == false)
+          continue;
+        else if(percept.second->getBbVolume() == 0) // not yet initialized
           continue;
         else if(merged_ids_.find(percept.first) != merged_ids_.end()) // we cannot merge two false ids together
           continue;
@@ -549,7 +550,7 @@ namespace owds {
         {
           if(percept.second->pose().distanceTo(false_obj->second->pose()) <= 0.1) // TODO tune
           {
-            double error = std::abs(obj_volume - percept.second->getAabbVolume());
+            double error = std::abs(obj_volume - percept.second->getBbVolume());
             if(error < min_error)
             {
               to_be_merged = percept.second;
@@ -576,7 +577,9 @@ namespace owds {
       false_ids_to_be_merged_.erase(false_id);
       aggregated_.erase(false_id);
 
-      delete fusioned_percepts_.at(false_id);
+      auto to_be_removed = fusioned_percepts_.at(false_id);
+
+      delete to_be_removed;
       fusioned_percepts_.erase(false_id);
 
       if(entities_.find(false_id) != entities_.end())
@@ -610,6 +613,16 @@ namespace owds {
                              (bb.max[1] - bb.min[1]) / 2. + bb.min[1],
                              (bb.max[2] - bb.min[2]) / 2. + bb.min[2]});
     object->computeCorners();
+
+    auto percept_it = fusioned_percepts_.find(object->id());
+    if(percept_it != fusioned_percepts_.end())
+    {
+      percept_it->second->setBoundingBox({bb.max[0] - bb.min[0], bb.max[1] - bb.min[1], bb.max[2] - bb.min[2]});
+      percept_it->second->setOriginOffset({(bb.max[0] - bb.min[0]) / 2. + bb.min[0],
+                                           (bb.max[1] - bb.min[1]) / 2. + bb.min[1],
+                                           (bb.max[2] - bb.min[2]) / 2. + bb.min[2]});
+      percept_it->second->computeCorners();
+    }
   }
 
 } // namespace owds
