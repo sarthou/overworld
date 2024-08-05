@@ -100,8 +100,7 @@ namespace owds {
           entity_id = merged_id->second;
       }
 
-      if(percept.second.isLocated())
-        fusionAggregated(entity_id, module_name, percept.second);
+      fusionAggregated(entity_id, module_name, percept.second);
 
       if(percept.second.getSensorId().empty() == false)
         fusionRegister(percept.first, percept.second.getSensorId(), percept.second.getModuleName());
