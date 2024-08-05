@@ -14,10 +14,8 @@ namespace owds {
 
   private:
     DataFusionBase fusioner_;
-
     void getPercepts(const std::string& module_name, std::map<std::string, Percept<BodyPart>>& percepts) override;
     void reasoningOnUpdate() override;
-
     void fromfusedToEntities();
   };
 

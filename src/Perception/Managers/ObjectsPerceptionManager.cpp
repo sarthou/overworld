@@ -71,6 +71,25 @@ namespace owds {
   {
     for(auto& percept : percepts)
     {
+      percept.second.setModuleName(module_name);
+
+      if(percept.second.getSensorId().empty() == false) // we avoid problems with static object
+      {
+        auto* sensor = myself_agent_->getSensor(percept.second.getSensorId());
+        if(sensor != nullptr)
+          sensor->setPerceptseen(percept.first);
+      }
+      else if(myself_agent_->getType() == AgentType_e::HUMAN)
+      {
+        auto human_sensors = myself_agent_->getSensors();
+        if(human_sensors.empty() == false)
+        {
+          auto sensor = human_sensors.begin()->second; // we assume a single sensor by human
+          percept.second.setSensorId(sensor->id());
+          sensor->setPerceptseen(percept.first);
+        }
+      }
+
       std::string entity_id = percept.first;
       if(percept.second.isTrueId() == false)
       {
@@ -81,16 +100,11 @@ namespace owds {
           entity_id = merged_id->second;
       }
 
-      auto it = aggregated_.find(entity_id);
-      if(it == aggregated_.end())
-      {
-        if(percept.second.isLocated() == false)
-          continue;
+      if(percept.second.isLocated())
+        fusionAggregated(entity_id, module_name, percept.second);
 
-        it = aggregated_.emplace(entity_id, std::vector<Percept<Object>>{percept.second}).first;
-      }
-      else
-        it->second.push_back(percept.second);
+      if(percept.second.getSensorId().empty() == false)
+        fusionRegister(percept.first, percept.second.getSensorId(), percept.second.getModuleName());
     }
   }
 
@@ -117,9 +131,6 @@ namespace owds {
 
     fromfusedToEntities();
     geometricReasoning();
-
-    for(auto& percept : aggregated_)
-      percept.second.clear();
   }
 
   bool ObjectsPerceptionManager::handReasoning(Percept<Object>* percept, Object* entity)
@@ -160,7 +171,7 @@ namespace owds {
 
   void ObjectsPerceptionManager::fromfusedToEntities()
   {
-    for(auto& percept : fusioned_percepts_)
+    for(const auto& percept : fusioned_percepts_)
     {
       auto it = entities_.find(percept.second->id());
       if(it == entities_.end())
@@ -192,63 +203,100 @@ namespace owds {
     bullet_client_->performCollisionDetection();
     UpdateAabbs();
 
-    std::vector<Object*> no_data_objects;
-    std::vector<Object*> objects_to_remove;
-    std::vector<Object*> objects_to_simulate;
+    std::map<std::string, std::set<Sensor*>> object__sensors_set; // map of the object and the sensors associated to module without poi
+    std::map<std::string, Object*> no_data_objects;
+    std::map<std::string, Object*> objects_to_remove;
+    std::map<std::string, Object*> objects_to_simulate;
+
     for(auto& object : entities_)
     {
+      bool object_is_consider_with_no_poi = false;
+      bool can_pass_to_the_next_object = false;
       if(shouldBeReasonedOn(object.second) == false)
       {
         if(object.second->isStatic() == false)
           lost_objects_nb_frames_.erase(object.first);
         continue;
       }
-
-      if(object.second->getPointsOfInterest().size() != 0)
+      auto it = entities_percetion_register_.find(object.first);
+      if(it == entities_percetion_register_.end())
+        continue;
+      for(auto& pair_sensor__set_modules : it->second)
       {
-        auto pois_in_fov = getPoisInFov(object.second);
-        if(pois_in_fov.size() != 0)
-        {
-          if(shouldBeSeen(object.second, pois_in_fov))
-          {
-            auto it_unseen = lost_objects_nb_frames_.find(object.first);
-            if(it_unseen == lost_objects_nb_frames_.end())
-              it_unseen = lost_objects_nb_frames_.insert({object.second->id(), 0}).first;
+        object_is_consider_with_no_poi = false;
 
-            it_unseen->second++;
-            if(it_unseen->second > MAX_UNSEEN)
-              objects_to_remove.push_back(object.second);
+        if(can_pass_to_the_next_object)
+          break;
+
+        for(auto& module_name : pair_sensor__set_modules.second)
+        {
+          if(object.second->getPointsOfInterest(module_name).size() != 0)
+          {
+            auto pois_in_fov = getPoisInFov(object.second, myself_agent_->getSensor(pair_sensor__set_modules.first), module_name);
+            if(pois_in_fov.size() != 0)
+            {
+              if(shouldBeSeen(object.second, myself_agent_->getSensor(pair_sensor__set_modules.first), pois_in_fov))
+              {
+                auto it_unseen = lost_objects_nb_frames_.find(object.first);
+                if(it_unseen == lost_objects_nb_frames_.end())
+                  it_unseen = lost_objects_nb_frames_.insert({object.second->id(), 0}).first;
+
+                it_unseen->second++;
+                if(it_unseen->second > MAX_UNSEEN)
+                {
+                  objects_to_remove.emplace(object.first, object.second);
+                  objects_to_simulate.erase(object.first);
+                  no_data_objects.erase(object.first);
+                  can_pass_to_the_next_object = true;
+                  break;
+                }
+              }
+              else
+              {
+                objects_to_simulate.emplace(object.first, object.second);
+                no_data_objects.erase(object.first);
+              }
+            } // object with pois but none in the fov
+            else // object with no pois in the fov should be put in no_data and erased if pois are in the fov of another module
+              object_is_consider_with_no_poi = true;
           }
+          else // object has no pois
+            object_is_consider_with_no_poi = true;
+        }
+        if(object_is_consider_with_no_poi)
+        {
+          no_data_objects.emplace(object.first, object.second);
+          auto it = object__sensors_set.find(object.first);
+          if(it == object__sensors_set.end())
+            object__sensors_set.emplace(object.first, std::set<Sensor*>{myself_agent_->getSensor(pair_sensor__set_modules.first)});
           else
-            objects_to_simulate.push_back(object.second);
+            it->second.emplace(myself_agent_->getSensor(pair_sensor__set_modules.first));
         }
       }
-      else // Object has no poi
-        no_data_objects.push_back(object.second);
     }
-
     if(no_data_objects.size())
     {
-      auto objects_in_fov = isObjectsInFovAabb(no_data_objects);
-      if(objects_in_fov.size())
+      for(auto no_data_obj : no_data_objects)
       {
-        auto objects_in_camera = getObjectsInCamera();
-
-        for(auto no_data_obj : objects_in_fov)
+        auto sensor_set = object__sensors_set.find(no_data_obj.first);
+        for(auto sensor : sensor_set->second)
         {
-          // equivalent to shouldBeSeen
-          if(objects_in_camera.find(no_data_obj->bulletId()) != objects_in_camera.end())
+          if(isObjectInFovAabb(no_data_obj.second, sensor) && isObjectInCamera(no_data_obj.second, sensor)) // pb
           {
-            auto it_unseen = lost_objects_nb_frames_.find(no_data_obj->id());
+            auto it_unseen = lost_objects_nb_frames_.find(no_data_obj.first);
             if(it_unseen == lost_objects_nb_frames_.end())
-              it_unseen = lost_objects_nb_frames_.insert({no_data_obj->id(), 0}).first;
+              it_unseen = lost_objects_nb_frames_.insert({no_data_obj.first, 0}).first;
 
             it_unseen->second++;
             if(it_unseen->second > MAX_UNSEEN)
-              objects_to_remove.push_back(no_data_obj);
+            {
+              objects_to_remove.emplace(no_data_obj.first, no_data_obj.second);
+              objects_to_simulate.erase(no_data_obj.first);
+              break;
+            }
           }
-          else
-            objects_to_simulate.push_back(no_data_obj);
+          else // there is the case where one told to simulate and the next one says to remove, we wait the end of the loop to be sure
+            objects_to_simulate.emplace(no_data_obj.first, no_data_obj.second);
         }
       }
     }
@@ -258,10 +306,10 @@ namespace owds {
     objects_to_remove = simulatePhysics(objects_to_remove, objects_to_simulate);
 
     for(auto obj : objects_to_remove)
-      removeEntityPose(obj);
+      removeEntityPose(obj.second);
   }
 
-  std::vector<Object*> ObjectsPerceptionManager::simulatePhysics(const std::vector<Object*>& lost_objects, const std::vector<Object*>& to_simulate_objetcs)
+  std::map<std::string, Object*> ObjectsPerceptionManager::simulatePhysics(const std::map<std::string, Object*>& lost_objects, const std::map<std::string, Object*>& to_simulate_objetcs)
   {
     if(simulate_)
     {
@@ -269,20 +317,20 @@ namespace owds {
       lost_ids.reserve(lost_objects.size());
       for(auto& object : lost_objects)
       {
-        lost_ids.insert(object->id());
-        auto it = simulated_objects_.find(object->id());
+        lost_ids.insert(object.first);
+        auto it = simulated_objects_.find(object.first);
         if(it == simulated_objects_.end())
-          startSimulation(object);
+          startSimulation(object.second);
       }
 
       for(auto& object : to_simulate_objetcs)
       {
-        auto it = simulated_objects_.find(object->id());
+        auto it = simulated_objects_.find(object.first);
         if(it == simulated_objects_.end())
-          startSimulation(object);
+          startSimulation(object.second);
       }
 
-      std::vector<Object*> objects_to_remove;
+      std::map<std::string, Object*> objects_to_remove;
       for(auto& simulated_object : simulated_objects_)
       {
         if(lost_ids.find(simulated_object.first) == lost_ids.end())
@@ -292,23 +340,23 @@ namespace owds {
           simulated_object.second++;
           if(simulated_object.second > MAX_SIMULATED)
           {
-            auto entity = entities_[simulated_object.first];
-            stopSimulation(entity, false);
-            objects_to_remove.push_back(entity);
+            auto entity = entities_.find(simulated_object.first);
+            stopSimulation(entity->second, false);
+            objects_to_remove.emplace(entity->first, entity->second);
           }
         }
       }
 
       // We remove them in a second time as we loop on them previously
       for(auto entity : objects_to_remove)
-        simulated_objects_.erase(entity->id());
+        simulated_objects_.erase(entity.first);
 
       return objects_to_remove;
     }
     else
     {
-      std::vector<Object*> objects_to_remove = lost_objects;
-      objects_to_remove.insert(objects_to_remove.end(), to_simulate_objetcs.begin(), to_simulate_objetcs.end());
+      std::map<std::string, Object*> objects_to_remove = lost_objects;
+      objects_to_remove.insert(to_simulate_objetcs.begin(), to_simulate_objetcs.end());
       return objects_to_remove;
     }
   }
@@ -345,29 +393,29 @@ namespace owds {
     }
   }
 
-  std::vector<PointOfInterest> ObjectsPerceptionManager::getPoisInFov(Object* object)
+  std::vector<PointOfInterest> ObjectsPerceptionManager::getPoisInFov(Object* object, Sensor* sensor, std::string module_name)
   {
-    if(myself_agent_ == nullptr)
+    if(sensor == nullptr)
     {
-      ShellDisplay::error("[ObjectsPerceptionManager] has no agent defined");
-      return object->getPointsOfInterest();
+      ShellDisplay::error("[ObjectsPerceptionManager] has no sensor defined");
+      return object->getPointsOfInterest(module_name);
     }
-    if(myself_agent_->getHead() == nullptr)
+    if(sensor->id().empty())
     {
-      ShellDisplay::error("[ObjectsPerceptionManager] defined agent has no head");
-      return object->getPointsOfInterest();
+      ShellDisplay::error("[ObjectsPerceptionManager] defined sensor is empty");
+      return object->getPointsOfInterest(module_name);
     }
 
     std::vector<PointOfInterest> pois_in_fov;
 
-    for(const auto& poi : object->getPointsOfInterest())
+    for(const auto& poi : object->getPointsOfInterest(module_name))
     {
       bool poi_is_valid = true;
       for(const auto& point : poi.getPoints())
       {
         auto poi_in_map = object->pose() * point;
-        auto poi_in_head = poi_in_map.transformIn(myself_agent_->getHead()->pose());
-        if(myself_agent_->getFieldOfView().hasIn(poi_in_head))
+        auto poi_in_sensor = poi_in_map.transformIn(sensor->pose());
+        if(sensor->getFieldOfView().hasIn(poi_in_sensor))
           continue;
         else
         {
@@ -383,44 +431,39 @@ namespace owds {
     return pois_in_fov;
   }
 
-  std::vector<Object*> ObjectsPerceptionManager::isObjectsInFovAabb(std::vector<Object*> objects)
+  bool ObjectsPerceptionManager::isObjectInFovAabb(Object* object, Sensor* sensor)
   {
-    std::vector<Object*> res;
-    for(auto object : objects)
-    {
-      size_t nb_in_fov = 0;
-      std::array<Pose, 8> points = {Pose({object->getAabb().min[0], object->getAabb().min[1], object->getAabb().min[2]}, {0, 0, 0, 1}),
-                                    Pose({object->getAabb().min[0], object->getAabb().min[1], object->getAabb().max[2]}, {0, 0, 0, 1}),
-                                    Pose({object->getAabb().min[0], object->getAabb().max[1], object->getAabb().min[2]}, {0, 0, 0, 1}),
-                                    Pose({object->getAabb().min[0], object->getAabb().max[1], object->getAabb().max[2]}, {0, 0, 0, 1}),
-                                    Pose({object->getAabb().max[0], object->getAabb().min[1], object->getAabb().min[2]}, {0, 0, 0, 1}),
-                                    Pose({object->getAabb().max[0], object->getAabb().min[1], object->getAabb().max[2]}, {0, 0, 0, 1}),
-                                    Pose({object->getAabb().max[0], object->getAabb().max[1], object->getAabb().min[2]}, {0, 0, 0, 1}),
-                                    Pose({object->getAabb().max[0], object->getAabb().max[1], object->getAabb().max[2]}, {0, 0, 0, 1})};
+    size_t nb_in_fov = 0;
+    std::array<Pose, 8> points = {Pose({object->getAabb().min[0], object->getAabb().min[1], object->getAabb().min[2]}, {0, 0, 0, 1}),
+                                  Pose({object->getAabb().min[0], object->getAabb().min[1], object->getAabb().max[2]}, {0, 0, 0, 1}),
+                                  Pose({object->getAabb().min[0], object->getAabb().max[1], object->getAabb().min[2]}, {0, 0, 0, 1}),
+                                  Pose({object->getAabb().min[0], object->getAabb().max[1], object->getAabb().max[2]}, {0, 0, 0, 1}),
+                                  Pose({object->getAabb().max[0], object->getAabb().min[1], object->getAabb().min[2]}, {0, 0, 0, 1}),
+                                  Pose({object->getAabb().max[0], object->getAabb().min[1], object->getAabb().max[2]}, {0, 0, 0, 1}),
+                                  Pose({object->getAabb().max[0], object->getAabb().max[1], object->getAabb().min[2]}, {0, 0, 0, 1}),
+                                  Pose({object->getAabb().max[0], object->getAabb().max[1], object->getAabb().max[2]}, {0, 0, 0, 1})};
 
-      for(const auto& point : points)
+    for(const auto& point : points)
+    {
+      auto point_in_sensor = point.transformIn(sensor->pose());
+      if(sensor->getFieldOfView().hasIn(point_in_sensor, 2))
       {
-        auto point_in_head = point.transformIn(myself_agent_->getHead()->pose());
-        if(myself_agent_->getFieldOfView().hasIn(point_in_head, 2))
-        {
-          nb_in_fov++;
-          if(nb_in_fov >= 2)
-            res.push_back(object);
-        }
+        nb_in_fov++;
+        if(nb_in_fov >= 2)
+          return true;
       }
     }
-
-    return res;
+    return false;
   }
 
-  bool ObjectsPerceptionManager::shouldBeSeen(Object* object, const std::vector<PointOfInterest>& pois)
+  bool ObjectsPerceptionManager::shouldBeSeen(Object* object, Sensor* sensor, const std::vector<PointOfInterest>& pois)
   {
-    if(myself_agent_->getHead() == nullptr)
+    if(sensor->id().empty() || sensor == nullptr)
       return false;
 
     for(const auto& poi : pois)
     {
-      std::vector<std::array<double, 3>> from_poses(poi.getPoints().size(), myself_agent_->getHead()->pose().arrays().first);
+      std::vector<std::array<double, 3>> from_poses(poi.getPoints().size(), sensor->pose().arrays().first);
       std::vector<std::array<double, 3>> to_poses;
 
       for(const auto& point : poi.getPoints())
@@ -432,48 +475,55 @@ namespace owds {
 
       if(ray_cast_info.size() == 0)
         return true;
-      /*else
+      else
       {
         for(auto& info : ray_cast_info)
         {
-          bullet_client_->addUserDebugLine({info.m_hitPositionWorld[0],
-                                            info.m_hitPositionWorld[1],
-                                            info.m_hitPositionWorld[2]},
-                                           myself_agent_->getHead()->pose().arrays().first,
-                                           {1,0,0}, 1, 2.0);
-
+          if(info.m_hitObjectUniqueId != object->bulletId())
+            return false;
+          else if(info.m_hitFraction < 0.95)
+            return false;
         }
-      }*/
+        return true;
+      }
     }
 
     return false;
   }
 
-  std::unordered_set<int> ObjectsPerceptionManager::getObjectsInCamera()
+  bool ObjectsPerceptionManager::isObjectInCamera(Object* object, Sensor* sensor)
   {
-    if(myself_agent_ == nullptr)
+    if(sensor == nullptr)
       return {};
-    else if(myself_agent_->getHead() == nullptr)
+    else if(sensor->id().empty())
       return {};
-    else if(myself_agent_->getHead()->isLocated() == false)
+    else if(sensor->isLocated() == false)
       return {};
 
-    auto proj_matrix = bullet_client_->computeProjectionMatrix(myself_agent_->getFieldOfView().getHeight(),
-                                                               myself_agent_->getFieldOfView().getRatioOpenGl(),
-                                                               myself_agent_->getFieldOfView().getClipNear(),
-                                                               myself_agent_->getFieldOfView().getClipFar());
-    Pose target_pose = myself_agent_->getHead()->pose() * Pose({0, 0, 1}, {0, 0, 0, 1});
-    auto head_pose_trans = myself_agent_->getHead()->pose().arrays().first;
+    auto proj_matrix = bullet_client_->computeProjectionMatrix(sensor->getFieldOfView().getHeight(),
+                                                               sensor->getFieldOfView().getRatioOpenGl(),
+                                                               sensor->getFieldOfView().getClipNear(),
+                                                               sensor->getFieldOfView().getClipFar());
+    Pose target_pose = sensor->pose() * Pose({0, 0, 1}, {0, 0, 0, 1});
+    auto sensor_pose_trans = sensor->pose().arrays().first;
     auto target_pose_trans = target_pose.arrays().first;
-    auto view_matrix = bullet_client_->computeViewMatrix({(float)head_pose_trans[0], (float)head_pose_trans[1], (float)head_pose_trans[2]},
+    auto view_matrix = bullet_client_->computeViewMatrix({(float)sensor_pose_trans[0], (float)sensor_pose_trans[1], (float)sensor_pose_trans[2]},
                                                          {(float)target_pose_trans[0], (float)target_pose_trans[1], (float)target_pose_trans[2]},
                                                          {0., 0., 1.});
-    auto images = bullet_client_->getCameraImage(100 * myself_agent_->getFieldOfView().getRatioOpenGl(), 100, view_matrix, proj_matrix, owds::BULLET_HARDWARE_OPENGL);
-    return bullet_client_->getSegmentationIds(images);
+    auto images = bullet_client_->getCameraImage(100 * sensor->getFieldOfView().getRatioOpenGl(), 100, view_matrix, proj_matrix, owds::BULLET_HARDWARE_OPENGL);
+    auto objects_in_sensor = bullet_client_->getSegmentationIds(images);
+    if(objects_in_sensor.find(object->bulletId()) != objects_in_sensor.end())
+      return true;
+    else
+      return false;
   }
 
   void ObjectsPerceptionManager::mergeFalseIdData()
   {
+    double direction_similarity_threshold = 0;
+    double speed_difference_threshold = 5;
+    int times_seen_difference_threshold = 20;
+
     std::unordered_set<std::string> merged;
 
     for(auto& false_id : false_ids_to_be_merged_)
@@ -497,8 +547,7 @@ namespace owds {
 
         if(percept.first != false_obj->first)
         {
-          if(percept.second->pose().distanceTo(false_obj->second->pose()) <= 0.1) // TODO tune + add condition on the direction and speed,
-          // and how many times the object has been seen
+          if(percept.second->pose().distanceTo(false_obj->second->pose()) <= 0.1) // TODO tune
           {
             double error = std::abs(obj_volume - percept.second->getAabbVolume());
             if(error < min_error)
@@ -512,6 +561,7 @@ namespace owds {
 
       if(to_be_merged != nullptr)
       {
+        fusionRegister(to_be_merged->id(), false_obj->second->getSensorId(), false_obj->second->getModuleName());
         merged.insert(false_id);
         to_be_merged->addFalseId(false_id);
         merged_ids_.insert(std::make_pair(false_id, to_be_merged->id()));
@@ -522,6 +572,7 @@ namespace owds {
     // then we erase it from all maps
     for(auto& false_id : merged)
     {
+      entities_percetion_register_.erase(false_id);
       false_ids_to_be_merged_.erase(false_id);
       aggregated_.erase(false_id);
 

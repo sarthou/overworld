@@ -7,8 +7,10 @@
 #include <unordered_map>
 #include <vector>
 
+#include "overworld/BasicTypes/Agent.h"
 #include "overworld/BasicTypes/Entity.h"
 #include "overworld/BasicTypes/Percept.h"
+#include "overworld/BasicTypes/Sensors/SensorBase.h"
 #include "overworld/Bullet/BulletClient.h"
 #include "overworld/Perception/DataFusion/DataFusionBase.h"
 #include "overworld/Perception/Managers/BasePerceptionManager.h"
@@ -37,7 +39,8 @@ namespace owds {
 
   protected:
     std::map<std::string, T*> entities_;
-    std::map<std::string, std::vector<Percept<T>>> aggregated_;
+    std::map<std::string, std::map<std::string, Percept<T>>> aggregated_;
+    std::map<std::string, std::map<std::string, std::set<std::string>>> entities_percetion_register_;
     std::unordered_map<std::string, Percept<T>*> fusioned_percepts_;
     std::unordered_set<std::string> black_listed_entities_;
     BulletClient* bullet_client_;
@@ -46,6 +49,8 @@ namespace owds {
     onto::OntologiesManipulator ontos_;
     onto::OntologyManipulator* onto_;
 
+    void fusionAggregated(const std::string& entity_id, const std::string& module_name, Percept<T> percept);
+    void fusionRegister(const std::string& entity_id, const std::string& sensor_id, const std::string& module_name);
     virtual void getPercepts(const std::string& module_name, std::map<std::string, Percept<T>>& percepts);
     virtual void reasoningOnUpdate() {}
 
@@ -90,6 +95,47 @@ namespace owds {
       return it->second;
     else
       return nullptr;
+  }
+
+  template<typename T>
+  void EntitiesPerceptionManager<T>::fusionRegister(const std::string& entity_id, const std::string& sensor_id, const std::string& module_name)
+  {
+    if(!sensor_id.empty()) // we avoid problems with static object
+    {
+      auto it = entities_percetion_register_.find(entity_id);
+      if(it == entities_percetion_register_.end())
+        entities_percetion_register_.emplace(entity_id, std::map<std::string, std::set<std::string>>{
+                                                          {sensor_id, {module_name}}
+        });
+      else
+      {
+        auto inner_it = it->second.find(sensor_id);
+        if(inner_it == it->second.end())
+          it->second.emplace(sensor_id, std::set<std::string>{module_name});
+        else
+          inner_it->second.insert(module_name);
+      }
+    }
+  }
+
+  template<typename T>
+  void EntitiesPerceptionManager<T>::fusionAggregated(const std::string& entity_id, const std::string& module_name, Percept<T> percept)
+  {
+    auto it = aggregated_.find(entity_id);
+    if(it == aggregated_.end())
+    {
+      auto p = aggregated_.emplace(entity_id, std::map<std::string, Percept<T>>{
+                                       {module_name, percept}
+      }).first;
+    }
+    else
+    {
+      auto inner_it = it->second.find(module_name);
+      if(inner_it == it->second.end())
+        it->second.emplace(module_name, percept);
+      else
+        inner_it->second = percept;
+    }
   }
 
   template<typename T>
