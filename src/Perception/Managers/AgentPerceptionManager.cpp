@@ -97,7 +97,8 @@ namespace owds {
       if(it_agent == agents_.end())
         it_agent = createAgent(sensor->getAgentName(), type);
       it_agent->second->setSensor(sensor);
-      ShellDisplay::info("[AgentPerceptionManager] Sensor " + sensor->id() + " has been setted for " + it_agent->second->getId());
+      ShellDisplay::info("[AgentPerceptionManager] Sensor " + sensor->id() + " has been setted for " + it_agent->second->getId() +
+                         " with FoV " + sensor->getFieldOfView().toString());
       return it_agent->second;
     }
     else
@@ -115,7 +116,7 @@ namespace owds {
     std::string frame_id = getOntoValue(onto_res, std::string(""));
     onto_res = onto_->individuals.getOn(sensor_id, "isStatic");
     bool is_static = getOntoValue(onto_res, true);
-    
+
     auto* sensor = new Sensor(sensor_id, frame_id, is_static, getFov(sensor_id));
     if(!agent_name.empty())
       sensor->setAgentName(agent_name);
