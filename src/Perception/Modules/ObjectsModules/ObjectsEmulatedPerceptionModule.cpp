@@ -4,8 +4,7 @@ namespace owds {
 
   bool ObjectsEmulatedPerceptionModule::perceptionCallback(const std::vector<Object*>& msg)
   {
-    for(auto& percept : percepts_)
-      percept.second.setUnseen();
+    setAllPerceptsUnseen();
 
     for(auto object : msg)
     {

@@ -40,8 +40,7 @@ namespace owds {
 
   bool FakeObjectPerceptionModule::perceptionCallback(const overworld::EntitiesPoses& msg)
   {
-    for(auto& percept : percepts_)
-      percept.second.setUnseen();
+    setAllPerceptsUnseen();
 
     for(auto& obj : msg.entities)
     {
