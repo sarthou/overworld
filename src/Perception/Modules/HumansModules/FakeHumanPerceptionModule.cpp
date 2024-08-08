@@ -25,8 +25,11 @@ namespace owds {
 
   bool FakeHumanPerceptionModule::perceptionCallback(const overworld::AgentPose& msg)
   {
+    setAllPerceptsUnseen();
+
     for(auto& percept : percepts_)
       percept.second.setSensorId(robot_agent_->getSensors().begin()->first); // we set a sensor by default but we must put the sensor which sees the percept.
+
     if(msg.parts.size() == 0)
       return false;
 
@@ -51,6 +54,7 @@ namespace owds {
         else
           part_in_map = part.pose;
         it_percept->second.updatePose(part_in_map);
+        it_percept->second.setSeen();
       }
       catch(const tf2::TransformException& ex)
       {
