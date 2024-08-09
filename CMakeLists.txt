@@ -98,7 +98,7 @@ generate_messages(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-  INCLUDE_DIRS include
+  INCLUDE_DIRS include ${BULLET_INCLUDE_DIRS}
   LIBRARIES ${PROJECT_NAME}_bullet_lib ${PROJECT_NAME}_types_lib ${PROJECT_NAME}_utility_lib
   CATKIN_DEPENDS ontologenius roscpp std_msgs tf2 tf2_ros roslib
 #  DEPENDS system_lib
@@ -308,3 +308,45 @@ target_link_libraries(${PROJECT_NAME}_object_spawn PRIVATE
                       ${PROJECT_NAME}_sender_lib
                       ${catkin_LIBRARIES}
                       ${ontologenius_LIBRARIES})
+
+# ##################################
+# #            Install            ##
+# ##################################
+install(TARGETS
+  ${PROJECT_NAME}_bullet_lib
+  ${PROJECT_NAME}_types_lib
+  ${PROJECT_NAME}_utility_lib
+  overworld_reasoner_plugin
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+  PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+install(DIRECTORY include/${PROJECT_NAME}/
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+  FILES_MATCHING PATTERN "*.h"
+  PATTERN ".svn" EXCLUDE
+)
+
+install(DIRECTORY launch/
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
+)
+
+install(DIRECTORY config/
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/config
+)
+
+install(DIRECTORY models/
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/models
+)
+
+install(DIRECTORY ontologies/
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/ontologies
+)
+
+install(FILES
+  modules_plugins.xml
+  reasoners_plugins.xml
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
