@@ -87,7 +87,7 @@ void main()
 
 vec4 calcDirLight(DirLight light, vec3 normal, vec3 viewDir)
 {
-  vec4 mat_ambient = material.color / 255.F;
+  vec4 mat_ambient = material.color;
   if(material.color.w == 0)
     mat_ambient = texture(material.texture_diffuse1, TexCoords);
 
@@ -132,7 +132,7 @@ vec4 calcPointLight(PointLight light, vec3 normal, vec3 viewDir)
     float attenuation = 1.0 / (light.attenuation.x + light.attenuation.y * distance + 
                         light.attenuation.z * (distance * distance));    
     // combine results
-    vec4 mat_ambient = material.color / 255.f;
+    vec4 mat_ambient = material.color;
     if(material.color.w == 0)
       mat_ambient = texture(material.texture_diffuse1, TexCoords);
     vec4 mat_spec = vec4(material.specular);
@@ -155,10 +155,13 @@ vec4 calcPointLight(PointLight light, vec3 normal, vec3 viewDir)
 float pointShadowCalculation(PointLight light, vec3 fragPosWorldSpace)
 {
   vec3 fragToLight = FragPos - light.position.xyz;
+  if(length(fragToLight) > light.far_plane)
+    return 1.0;
+
   float currentDepth = length(fragToLight);
-  
+
   float shadow = 0.0;
-  float bias   = 0.05;
+  float bias = 0.04; 
   int samples  = 20;
   float viewDistance = length(view_pose - FragPos);
   float diskRadius = 0.002; //(1.0 + (viewDistance / light.far_plane)) / 100.0;
