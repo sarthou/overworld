@@ -167,16 +167,38 @@ namespace owds {
 
     auto& link = createActor(collision_shape, visual_shapes);
 
+    if(urdf_link.parent_joint != nullptr)
+    {
+      auto transform = urdf_link.parent_joint->parent_to_joint_origin_transform;
+      link.setPositionAndOrientation({static_cast<float>(transform.position.x),
+                                      static_cast<float>(transform.position.y),
+                                      static_cast<float>(transform.position.z)},
+                                     {static_cast<float>(transform.rotation.x),
+                                      static_cast<float>(transform.rotation.y),
+                                      static_cast<float>(transform.rotation.z),
+                                      static_cast<float>(transform.rotation.w)});
+    }
+    else
+    {
+      link.setPositionAndOrientation({static_cast<float>(0),
+                                      static_cast<float>(0),
+                                      static_cast<float>(0)},
+                                     {static_cast<float>(0),
+                                      static_cast<float>(0),
+                                      static_cast<float>(0),
+                                      static_cast<float>(1.)});
+    }
+
     if(urdf_link.inertial)
     {
       const auto& inertial = *urdf_link.inertial;
-      link.setPositionAndOrientation({static_cast<float>(inertial.origin.position.x),
-                                      static_cast<float>(inertial.origin.position.y),
-                                      static_cast<float>(inertial.origin.position.z)},
-                                     {static_cast<float>(inertial.origin.rotation.x),
-                                      static_cast<float>(inertial.origin.rotation.y),
-                                      static_cast<float>(inertial.origin.rotation.z),
-                                      static_cast<float>(inertial.origin.rotation.w)});
+      // link.setPositionAndOrientation({static_cast<float>(inertial.origin.position.x),
+      //                                 static_cast<float>(inertial.origin.position.y),
+      //                                 static_cast<float>(inertial.origin.position.z)},
+      //                                {static_cast<float>(inertial.origin.rotation.x),
+      //                                 static_cast<float>(inertial.origin.rotation.y),
+      //                                 static_cast<float>(inertial.origin.rotation.z),
+      //                                 static_cast<float>(inertial.origin.rotation.w)});
       link.setMass(static_cast<float>(inertial.mass));
     }
 

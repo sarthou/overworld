@@ -84,108 +84,108 @@ namespace owds {
 
     /**
      * A hinge joint that rotates along the axis and has a limited range specified by the upper and lower limits.
-     * @param actor0 First actor
-     * @param joint0_position Position of the joint relative to actor0
-     * @param joint0_orientation XYZ rotations, in radians
-     * @param actor1 Second actor
-     * @param joint1_position Same as joint0_position but relative to actor1
-     * @param joint1_orientation Same as joint0_orientation but relative to actor1
+     * @param parent First actor
+     * @param origin_position Position of the joint relative to parent
+     * @param origin_position XYZ rotations, in radians
+     * @param child Second actor
+     * @param joint_position Same as origin_position but relative to child
+     * @param joint_orientation Same as origin_position but relative to child
      */
     virtual owds::JointRevolute& createJointRevolute [[nodiscard]] (
-      owds::Actor& actor0,
-      const std::array<float, 3>& joint0_position,
-      const std::array<float, 4>& joint0_orientation,
-      owds::Actor& actor1,
-      const std::array<float, 3>& joint1_position,
-      const std::array<float, 4>& joint1_orientation) = 0;
+      owds::Actor& parent,
+      const std::array<float, 3>& origin_position,
+      const std::array<float, 4>& origin_orientation,
+      owds::Actor& child,
+      const std::array<float, 3>& joint_position,
+      const std::array<float, 4>& joint_orientation) = 0;
 
     /**
      * A continuous hinge joint that rotates around the axis and has no upper and lower limits.
-     * @param actor0 First actor
-     * @param joint0_position Position of the joint relative to actor0
-     * @param joint0_orientation XYZ rotations, in radians
-     * @param actor1 Second actor
-     * @param joint1_position Same as joint0_position but relative to actor1
-     * @param joint1_orientation Same as joint0_orientation but relative to actor1
+     * @param parent First actor
+     * @param origin_position Position of the joint relative to parent
+     * @param origin_position XYZ rotations, in radians
+     * @param child Second actor
+     * @param joint_position Same as origin_position but relative to child
+     * @param joint_orientation Same as origin_position but relative to child
      */
     virtual owds::JointContinuous& createJointContinuous [[nodiscard]] (
-      owds::Actor& actor0,
-      const std::array<float, 3>& joint0_position,
-      const std::array<float, 4>& joint0_orientation,
-      owds::Actor& actor1,
-      const std::array<float, 3>& joint1_position,
-      const std::array<float, 4>& joint1_orientation) = 0;
+      owds::Actor& parent,
+      const std::array<float, 3>& origin_position,
+      const std::array<float, 4>& origin_orientation,
+      owds::Actor& child,
+      const std::array<float, 3>& joint_position,
+      const std::array<float, 4>& joint_orientation) = 0;
 
     /**
      * A sliding joint that slides along the axis, and has a limited range specified by the upper and lower limits.
      *
-     * @param actor0 First actor
-     * @param joint0_position Position of the joint relative to actor0
-     * @param joint0_orientation XYZ rotations, in radians
-     * @param actor1 Second actor
-     * @param joint1_position Same as joint0_position but relative to actor1
-     * @param joint1_orientation Same as joint0_orientation but relative to actor1
+     * @param parent First actor
+     * @param origin_position Position of the joint relative to parent
+     * @param origin_position XYZ rotations, in radians
+     * @param child Second actor
+     * @param joint_position Same as origin_position but relative to child
+     * @param joint_orientation Same as origin_position but relative to child
      */
     virtual owds::JointPrismatic& createJointPrismatic [[nodiscard]] (
-      owds::Actor& actor0,
-      const std::array<float, 3>& joint0_position,
-      const std::array<float, 4>& joint0_orientation,
-      owds::Actor& actor1,
-      const std::array<float, 3>& joint1_position,
-      const std::array<float, 4>& joint1_orientation) = 0;
+      owds::Actor& parent,
+      const std::array<float, 3>& origin_position,
+      const std::array<float, 4>& origin_orientation,
+      owds::Actor& child,
+      const std::array<float, 3>& joint_position,
+      const std::array<float, 4>& joint_orientation) = 0;
 
     /**
      * All degrees of freedom are locked.
      *
-     * @param actor0 First actor
-     * @param joint0_position Position of the joint relative to actor0
-     * @param joint0_orientation XYZ rotations, in radians
-     * @param actor1 Second actor
-     * @param joint1_position Same as joint0_position but relative to actor1
-     * @param joint1_orientation Same as joint0_orientation but relative to actor1
+     * @param parent First actor
+     * @param origin_position Position of the joint relative to parent
+     * @param origin_position XYZ rotations, in radians
+     * @param child Second actor
+     * @param joint_position Same as origin_position but relative to child
+     * @param joint_orientation Same as origin_position but relative to child
      */
     virtual owds::JointFixed& createJointFixed [[nodiscard]] (
-      owds::Actor& actor0,
-      const std::array<float, 3>& joint0_position,
-      const std::array<float, 4>& joint0_orientation,
-      owds::Actor& actor1,
-      const std::array<float, 3>& joint1_position,
-      const std::array<float, 4>& joint1_orientation) = 0;
+      owds::Actor& parent,
+      const std::array<float, 3>& origin_position,
+      const std::array<float, 4>& origin_orientation,
+      owds::Actor& child,
+      const std::array<float, 3>& joint_position,
+      const std::array<float, 4>& joint_orientation) = 0;
 
     /**
      * This joint allows motion for all 6 degrees of freedom.
      *
-     * @param actor0 First actor
-     * @param joint0_position Position of the joint relative to actor0
-     * @param joint0_orientation XYZ rotations, in radians
-     * @param actor1 Second actor
-     * @param joint1_position Same as joint0_position but relative to actor1
-     * @param joint1_orientation Same as joint0_orientation but relative to actor1
+     * @param parent First actor
+     * @param origin_position Position of the joint relative to parent
+     * @param origin_position XYZ rotations, in radians
+     * @param child Second actor
+     * @param joint_position Same as origin_position but relative to child
+     * @param joint_orientation Same as origin_position but relative to child
      */
     virtual owds::JointFloating& createJointFloating [[nodiscard]] (
-      owds::Actor& actor0,
-      const std::array<float, 3>& joint0_position,
-      const std::array<float, 4>& joint0_orientation,
-      owds::Actor& actor1,
-      const std::array<float, 3>& joint1_position,
-      const std::array<float, 4>& joint1_orientation) = 0;
+      owds::Actor& parent,
+      const std::array<float, 3>& origin_position,
+      const std::array<float, 4>& origin_orientation,
+      owds::Actor& child,
+      const std::array<float, 3>& joint_position,
+      const std::array<float, 4>& joint_orientation) = 0;
 
     /**
      * This joint allows motion in a plane perpendicular to the axis.
-     * @param actor0 First actor
-     * @param joint0_position Position of the joint relative to actor0
-     * @param joint0_orientation XYZ rotations, in radians
-     * @param actor1 Second actor
-     * @param joint1_position Same as joint0_position but relative to actor1
-     * @param joint1_orientation Same as joint0_orientation but relative to actor1
+     * @param parent First actor
+     * @param origin_position Position of the joint relative to parent
+     * @param origin_position XYZ rotations, in radians
+     * @param child Second actor
+     * @param joint_position Same as origin_position but relative to child
+     * @param joint_orientation Same as origin_position but relative to child
      */
     virtual owds::JointPlanar& createJointPlanar [[nodiscard]] (
-      owds::Actor& actor0,
-      const std::array<float, 3>& joint0_position,
-      const std::array<float, 4>& joint0_orientation,
-      owds::Actor& actor1,
-      const std::array<float, 3>& joint1_position,
-      const std::array<float, 4>& joint1_orientation) = 0;
+      owds::Actor& parent,
+      const std::array<float, 3>& origin_position,
+      const std::array<float, 4>& origin_orientation,
+      owds::Actor& child,
+      const std::array<float, 3>& joint_position,
+      const std::array<float, 4>& joint_orientation) = 0;
 
     void setAmbientLight(const std::array<float, 3>& direction,
                          const std::array<float, 3>& color = {1.0, 1.0, 1.0},

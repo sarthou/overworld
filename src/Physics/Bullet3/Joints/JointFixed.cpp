@@ -17,12 +17,12 @@ namespace owds::bullet3 {
 
   void JointFixed::setup()
   {
-    const auto quat_orientation0 = glm::quat(owds::BitCast<glm::vec3>(location_.joint0_orientation_));
-    const auto quat_orientation1 = glm::quat(owds::BitCast<glm::vec3>(location_.joint1_orientation_));
+    const auto quat_orientation0 = location_.origin_orientation_;
+    const auto quat_orientation1 = location_.joint_orientation_;
 
     joint_ = std::make_unique<btGeneric6DofConstraint>(
-      *dynamic_cast<const owds::bullet3::Actor*>(&location_.actor0_)->bt_actor_,
-      *dynamic_cast<const owds::bullet3::Actor*>(&location_.actor1_)->bt_actor_,
+      *dynamic_cast<const owds::bullet3::Actor*>(&location_.parent_)->bt_actor_,
+      *dynamic_cast<const owds::bullet3::Actor*>(&location_.child_)->bt_actor_,
 
       btTransform(
         btQuaternion(
@@ -31,9 +31,9 @@ namespace owds::bullet3 {
           static_cast<btScalar>(quat_orientation0.z),
           static_cast<btScalar>(quat_orientation0.w)),
         btVector3(
-          static_cast<btScalar>(location_.joint0_position_[0]),
-          static_cast<btScalar>(location_.joint0_position_[1]),
-          static_cast<btScalar>(location_.joint0_position_[2]))),
+          static_cast<btScalar>(location_.origin_position_.x),
+          static_cast<btScalar>(location_.origin_position_.y),
+          static_cast<btScalar>(location_.origin_position_.z))),
 
       btTransform(
         btQuaternion(
@@ -42,9 +42,9 @@ namespace owds::bullet3 {
           static_cast<btScalar>(quat_orientation1.z),
           static_cast<btScalar>(quat_orientation1.w)),
         btVector3(
-          static_cast<btScalar>(location_.joint1_position_[0]),
-          static_cast<btScalar>(location_.joint1_position_[1]),
-          static_cast<btScalar>(location_.joint1_position_[2]))),
+          static_cast<btScalar>(location_.joint_position_.x),
+          static_cast<btScalar>(location_.joint_position_.y),
+          static_cast<btScalar>(location_.joint_position_.z))),
       true);
 
     // Lock all 6 axes (linear XYZ + angular XYZ)

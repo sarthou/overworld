@@ -2,6 +2,8 @@
 #define OWDS_COMMON_JOINTLOCATION_H
 
 #include <array>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/vec3.hpp>
 
 namespace owds {
   class Actor;
@@ -9,26 +11,26 @@ namespace owds {
   {
   public:
     JointLocation(
-      owds::Actor& actor0,
-      const std::array<float, 3>& joint0_position,
-      const std::array<float, 4>& joint0_orientation,
-      owds::Actor& actor1,
-      const std::array<float, 3>& joint1_position,
-      const std::array<float, 4>& joint1_orientation)
-      : actor0_(actor0),
-        joint0_position_(joint0_position),
-        joint0_orientation_(joint0_orientation),
-        actor1_(actor1),
-        joint1_position_(joint1_position),
-        joint1_orientation_(joint1_orientation)
+      owds::Actor& parent,
+      const glm::vec3& origin_position,
+      const glm::quat& origin_orientation,
+      owds::Actor& child,
+      const glm::vec3& joint_position,
+      const glm::quat& joint_orientation)
+      : parent_(parent),
+        origin_position_(origin_position),
+        origin_orientation_(origin_orientation),
+        child_(child),
+        joint_position_(joint_position),
+        joint_orientation_(joint_orientation)
     {}
 
-    owds::Actor& actor0_;
-    std::array<float, 3> joint0_position_;
-    std::array<float, 4> joint0_orientation_;
-    owds::Actor& actor1_;
-    std::array<float, 3> joint1_position_;
-    std::array<float, 4> joint1_orientation_;
+    owds::Actor& parent_;
+    glm::vec3 origin_position_;
+    glm::quat origin_orientation_;
+    owds::Actor& child_;
+    glm::vec3 joint_position_;
+    glm::quat joint_orientation_;
   };
 } // namespace owds
 

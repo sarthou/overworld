@@ -40,56 +40,56 @@ namespace owds::bullet3 {
   }
 
   owds::JointRevolute& World::createJointRevolute(
-    owds::Actor& actor0,
-    const std::array<float, 3>& joint0_position,
-    const std::array<float, 3>& joint0_orientation,
-    owds::Actor& actor1,
-    const std::array<float, 3>& joint1_position,
-    const std::array<float, 3>& joint1_orientation)
+    owds::Actor& parent,
+    const std::array<float, 3>& origin_position,
+    const std::array<float, 3>& origin_position,
+    owds::Actor& child,
+    const std::array<float, 3>& joint_position,
+    const std::array<float, 3>& joint_orientation)
   {
-    (void)actor0;
-    (void)joint0_position;
-    (void)joint0_orientation;
-    (void)actor1;
-    (void)joint1_position;
-    (void)joint1_orientation;
+    (void)parent;
+    (void)origin_position;
+    (void)origin_position;
+    (void)child;
+    (void)joint_position;
+    (void)joint_orientation;
     assert(false && "not implemented");
   }
 
   owds::JointContinuous& World::createJointContinuous(
-    owds::Actor& actor0,
-    const std::array<float, 3>& joint0_position,
-    const std::array<float, 3>& joint0_orientation,
-    owds::Actor& actor1,
-    const std::array<float, 3>& joint1_position,
-    const std::array<float, 3>& joint1_orientation)
+    owds::Actor& parent,
+    const std::array<float, 3>& origin_position,
+    const std::array<float, 3>& origin_position,
+    owds::Actor& child,
+    const std::array<float, 3>& joint_position,
+    const std::array<float, 3>& joint_orientation)
   {
-    (void)actor0;
-    (void)joint0_position;
-    (void)joint0_orientation;
-    (void)actor1;
-    (void)joint1_position;
-    (void)joint1_orientation;
+    (void)parent;
+    (void)origin_position;
+    (void)origin_position;
+    (void)child;
+    (void)joint_position;
+    (void)joint_orientation;
     assert(false && "not implemented");
   }
 
   owds::JointPrismatic& World::createJointPrismatic(
-    owds::Actor& actor0,
-    const std::array<float, 3>& joint0_position,
-    const std::array<float, 3>& joint0_orientation,
-    owds::Actor& actor1,
-    const std::array<float, 3>& joint1_position,
-    const std::array<float, 3>& joint1_orientation)
+    owds::Actor& parent,
+    const std::array<float, 3>& origin_position,
+    const std::array<float, 3>& origin_position,
+    owds::Actor& child,
+    const std::array<float, 3>& joint_position,
+    const std::array<float, 3>& joint_orientation)
   {
     auto joint = std::make_unique<owds::bullet3::JointPrismatic>(
       *ctx_,
       owds::JointLocation(
-        actor0,
-        joint0_position,
-        joint0_orientation,
-        actor1,
-        joint1_position,
-        joint1_orientation));
+        parent,
+        origin_position,
+        origin_position,
+        child,
+        joint_position,
+        joint_orientation));
 
     joint->setup();
 
@@ -98,53 +98,53 @@ namespace owds::bullet3 {
   }
 
   owds::JointFixed& World::createJointFixed(
-    owds::Actor& actor0,
-    const std::array<float, 3>& joint0_position,
-    const std::array<float, 3>& joint0_orientation,
-    owds::Actor& actor1,
-    const std::array<float, 3>& joint1_position,
-    const std::array<float, 3>& joint1_orientation)
+    owds::Actor& parent,
+    const std::array<float, 3>& origin_position,
+    const std::array<float, 3>& origin_position,
+    owds::Actor& child,
+    const std::array<float, 3>& joint_position,
+    const std::array<float, 3>& joint_orientation)
   {
-    (void)actor0;
-    (void)joint0_position;
-    (void)joint0_orientation;
-    (void)actor1;
-    (void)joint1_position;
-    (void)joint1_orientation;
+    (void)parent;
+    (void)origin_position;
+    (void)origin_position;
+    (void)child;
+    (void)joint_position;
+    (void)joint_orientation;
     assert(false && "not implemented");
   }
 
   owds::JointFloating& World::createJointFloating(
-    owds::Actor& actor0,
-    const std::array<float, 3>& joint0_position,
-    const std::array<float, 3>& joint0_orientation,
-    owds::Actor& actor1,
-    const std::array<float, 3>& joint1_position,
-    const std::array<float, 3>& joint1_orientation)
+    owds::Actor& parent,
+    const std::array<float, 3>& origin_position,
+    const std::array<float, 3>& origin_position,
+    owds::Actor& child,
+    const std::array<float, 3>& joint_position,
+    const std::array<float, 3>& joint_orientation)
   {
-    (void)actor0;
-    (void)joint0_position;
-    (void)joint0_orientation;
-    (void)actor1;
-    (void)joint1_position;
-    (void)joint1_orientation;
+    (void)parent;
+    (void)origin_position;
+    (void)origin_position;
+    (void)child;
+    (void)joint_position;
+    (void)joint_orientation;
     assert(false && "not implemented");
   }
 
   owds::JointPlanar& World::createJointPlanar(
-    owds::Actor& actor0,
-    const std::array<float, 3>& joint0_position,
-    const std::array<float, 3>& joint0_orientation,
-    owds::Actor& actor1,
-    const std::array<float, 3>& joint1_position,
-    const std::array<float, 3>& joint1_orientation)
+    owds::Actor& parent,
+    const std::array<float, 3>& origin_position,
+    const std::array<float, 3>& origin_position,
+    owds::Actor& child,
+    const std::array<float, 3>& joint_position,
+    const std::array<float, 3>& joint_orientation)
   {
-    (void)actor0;
-    (void)joint0_position;
-    (void)joint0_orientation;
-    (void)actor1;
-    (void)joint1_position;
-    (void)joint1_orientation;
+    (void)parent;
+    (void)origin_position;
+    (void)origin_position;
+    (void)child;
+    (void)joint_position;
+    (void)joint_orientation;
     assert(false && "not implemented");
   }
 

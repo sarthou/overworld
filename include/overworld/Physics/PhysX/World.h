@@ -34,52 +34,52 @@ namespace owds::physx {
     [[nodiscard]] const std::vector<std::reference_wrapper<owds::Actor>>& getActors() const override;
 
     owds::JointRevolute& createJointRevolute [[nodiscard]] (
-      owds::Actor& actor0,
-      const std::array<float, 3>& joint0_position,
-      const std::array<float, 4>& joint0_orientation,
-      owds::Actor& actor1,
-      const std::array<float, 3>& joint1_position,
-      const std::array<float, 4>& joint1_orientation) override;
+      owds::Actor& parent,
+      const std::array<float, 3>& origin_position,
+      const std::array<float, 4>& origin_orientation,
+      owds::Actor& child,
+      const std::array<float, 3>& joint_position,
+      const std::array<float, 4>& joint_orientation) override;
 
     owds::JointContinuous& createJointContinuous [[nodiscard]] (
-      owds::Actor& actor0,
-      const std::array<float, 3>& joint0_position,
-      const std::array<float, 4>& joint0_orientation,
-      owds::Actor& actor1,
-      const std::array<float, 3>& joint1_position,
-      const std::array<float, 4>& joint1_orientation) override;
+      owds::Actor& parent,
+      const std::array<float, 3>& origin_position,
+      const std::array<float, 4>& origin_orientation,
+      owds::Actor& child,
+      const std::array<float, 3>& joint_position,
+      const std::array<float, 4>& joint_orientation) override;
 
     owds::JointPrismatic& createJointPrismatic [[nodiscard]] (
-      owds::Actor& actor0,
-      const std::array<float, 3>& joint0_position,
-      const std::array<float, 4>& joint0_orientation,
-      owds::Actor& actor1,
-      const std::array<float, 3>& joint1_position,
-      const std::array<float, 4>& joint1_orientation) override;
+      owds::Actor& parent,
+      const std::array<float, 3>& origin_position,
+      const std::array<float, 4>& origin_orientation,
+      owds::Actor& child,
+      const std::array<float, 3>& joint_position,
+      const std::array<float, 4>& joint_orientation) override;
 
     owds::JointFixed& createJointFixed [[nodiscard]] (
-      owds::Actor& actor0,
-      const std::array<float, 3>& joint0_position,
-      const std::array<float, 4>& joint0_orientation,
-      owds::Actor& actor1,
-      const std::array<float, 3>& joint1_position,
-      const std::array<float, 4>& joint1_orientation) override;
+      owds::Actor& parent,
+      const std::array<float, 3>& origin_position,
+      const std::array<float, 4>& origin_orientation,
+      owds::Actor& child,
+      const std::array<float, 3>& joint_position,
+      const std::array<float, 4>& joint_orientation) override;
 
     owds::JointFloating& createJointFloating [[nodiscard]] (
-      owds::Actor& actor0,
-      const std::array<float, 3>& joint0_position,
-      const std::array<float, 4>& joint0_orientation,
-      owds::Actor& actor1,
-      const std::array<float, 3>& joint1_position,
-      const std::array<float, 4>& joint1_orientation) override;
+      owds::Actor& parent,
+      const std::array<float, 3>& origin_position,
+      const std::array<float, 4>& origin_orientation,
+      owds::Actor& child,
+      const std::array<float, 3>& joint_position,
+      const std::array<float, 4>& joint_orientation) override;
 
     owds::JointPlanar& createJointPlanar [[nodiscard]] (
-      owds::Actor& actor0,
-      const std::array<float, 3>& joint0_position,
-      const std::array<float, 4>& joint0_orientation,
-      owds::Actor& actor1,
-      const std::array<float, 3>& joint1_position,
-      const std::array<float, 4>& joint1_orientation) override;
+      owds::Actor& parent,
+      const std::array<float, 3>& origin_position,
+      const std::array<float, 4>& origin_orientation,
+      owds::Actor& child,
+      const std::array<float, 3>& joint_position,
+      const std::array<float, 4>& joint_orientation) override;
 
     void setGravity(const std::array<float, 3>& gravity) override;
     void stepSimulation(float delta) override;
