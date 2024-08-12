@@ -1,6 +1,7 @@
 #ifndef OWDS_COMMON_BASE_MODEL_H
 #define OWDS_COMMON_BASE_MODEL_H
 
+#include <array>
 #include <string>
 
 #include "overworld/Engine/Common/Models/Material.h"
@@ -23,6 +24,7 @@ namespace owds {
 
     std::string source_path_;
     std::vector<owds::Mesh> meshes_{};
+    std::array<float, 3> scale_;
   };
 } // namespace owds
 

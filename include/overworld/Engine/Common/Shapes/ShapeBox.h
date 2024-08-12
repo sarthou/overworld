@@ -13,7 +13,7 @@ namespace owds {
   {
   public:
     std::array<float, 3> half_extents_{};
-    owds::Color color_rgba_{};
+    owds::Color diffuse_color_{};
     std::reference_wrapper<owds::Model> box_model_;
   };
 } // namespace owds

@@ -70,10 +70,13 @@ namespace owds {
       owds::ModelManager::get().load(path)};
   }
 
-  owds::Urdf& World::loadRobotFromDescription(const std::string& path)
+  owds::Urdf& World::loadRobotFromDescription(const std::string& path, bool from_base_path)
   {
     urdf::Model urdf_model;
+    if(from_base_path)
     assert(urdf_model.initFile((base_assets_path_ / path).string()));
+    else
+      assert(urdf_model.initFile(path));
 
     auto robot = std::make_unique<owds::Urdf>();
     const auto robot_ptr = robot.get();
@@ -108,15 +111,19 @@ namespace owds {
   {
     robot.materials_[urdf_material.name] = {
       !urdf_material.texture_filename.empty() ?
-        owds::Color{255,                                                      255, 255, 255}
+        owds::Color{1,                     1, 1, 1}
         :
-        owds::Color{static_cast<std::uint8_t>(urdf_material.color.r * 255.f),
-                    static_cast<std::uint8_t>(urdf_material.color.g * 255.f),
-                    static_cast<std::uint8_t>(urdf_material.color.b * 255.f),
-                    static_cast<std::uint8_t>(urdf_material.color.a * 255.f)               },
+        owds::Color{urdf_material.color.r,
+                    urdf_material.color.g,
+                    urdf_material.color.b,
+                    urdf_material.color.a         },
+      owds::Color{1,                     1, 1, 1}, // specular
+      0.0, // shininess_
       urdf_material.texture_filename.empty() ?
         "" :
-        owds::rosPkgPathToPath(urdf_material.texture_filename)
+        owds::rosPkgPathToPath(urdf_material.texture_filename),
+      "", // specular
+      "", // normal
     };
   }
 
@@ -134,8 +141,10 @@ namespace owds {
   {
     const auto material_name = urdf_link.visual ? urdf_link.visual->material_name : "";
     const auto material = material_name.empty() ? owds::Material{
-                                                    owds::Color{255, 255, 255, 255},
-                                                    ""
+                                                    owds::Color{1, 1, 1, 1},
+                                                    owds::Color{1, 1, 1, 1},
+                                                    0.0,
+                                                    "", "", ""
     } :
                                                   robot.materials_.at(material_name);
 
@@ -248,13 +257,13 @@ namespace owds {
     case urdf::Geometry::SPHERE:
     {
       auto& sphere = dynamic_cast<const urdf::Sphere&>(urdf_shape);
-      return createShapeSphere(material.color_rgba_,
+      return createShapeSphere(material.diffuse_color_,
                                static_cast<float>(sphere.radius));
     }
     case urdf::Geometry::BOX:
     {
       auto& box = dynamic_cast<const urdf::Box&>(urdf_shape);
-      return createShapeBox(material.color_rgba_,
+      return createShapeBox(material.diffuse_color_,
                             {static_cast<float>(box.dim.x),
                              static_cast<float>(box.dim.y),
                              static_cast<float>(box.dim.z)});
@@ -263,7 +272,7 @@ namespace owds {
     {
       // I hope the cylinder is ok
       auto& cylinder = dynamic_cast<const urdf::Cylinder&>(urdf_shape);
-      return createShapeCylinder(material.color_rgba_,
+      return createShapeCylinder(material.diffuse_color_,
                                  static_cast<float>(cylinder.radius),
                                  static_cast<float>(cylinder.length));
     }

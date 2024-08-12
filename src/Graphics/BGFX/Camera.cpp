@@ -107,7 +107,8 @@ namespace owds::bgfx {
 
   void Camera::setOutputClearColor(const owds::Color clear_color)
   {
-    ::bgfx::setViewClear(id_, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, owds::BitCast<std::uint32_t>(clear_color), 1.0f, 0);
+    (void)clear_color;
+    //::bgfx::setViewClear(id_, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, owds::BitCast<std::uint32_t>(clear_color), 1.0f, 0);
   }
 
   void Camera::setCaptureCallback(std::function<void(const std::vector<owds::Color>&)> callback)

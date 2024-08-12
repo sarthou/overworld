@@ -12,7 +12,7 @@ namespace owds {
   {
   public:
     float radius_{};
-    owds::Color color_rgba_;
+    owds::Color diffuse_color_;
     std::reference_wrapper<owds::Model> sphere_model_;
   };
 } // namespace owds

@@ -64,7 +64,7 @@
     <visual>
       <origin rpy="0 0 1.57" xyz="0 0 0.0"/>
       <geometry>
-        <mesh filename="package://overworld/models/adream/window_h10_1.obj" scale="1 1 1"/>
+        <mesh filename="package://overworld/models/adream/window_h10_1.stl" scale="1 1 1"/>
       </geometry>
       <material name="black">
         <color rgba="0 0 0 1"/>

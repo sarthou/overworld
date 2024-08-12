@@ -16,7 +16,7 @@ namespace owds {
   public:
     float radius_{};
     float height_{};
-    owds::Color color_rgba_{};
+    owds::Color diffuse_color_{};
     std::reference_wrapper<owds::Model> cylinder_model_;
     std::reference_wrapper<owds::Model> sphere_model_;
   };

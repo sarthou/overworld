@@ -11,7 +11,7 @@ namespace owds::bgfx {
   class ModelHandle
   {
   public:
-    ::owds::Color color_rgba_{};
+    ::owds::Color diffuse_color_{};
     float specular_;
     float shininess_;
     ::bgfx::TextureHandle tex_diffuse_{};

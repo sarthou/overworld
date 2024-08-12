@@ -160,7 +160,7 @@ namespace owds {
     const auto size_mat = glm::scale(glm::mat4(1.f), ToV3(shape.half_extents_));
     const auto model_mat = ToM4(actor.getModelMatrix()) * size_mat;
 
-    loadInstance(shape.box_model_, {shape.color_rgba_, ""}, model_mat);
+    loadInstance(shape.box_model_, {shape.diffuse_color_, shape.diffuse_color_, 0., "", "", ""}, model_mat);
   }
 
   void Renderer::loadActor(const Actor& actor, const ShapeCapsule& shape)
@@ -182,7 +182,7 @@ namespace owds {
     const auto size_mat = glm::scale(glm::mat4(1.f), glm::vec3(shape.radius_, shape.height_, shape.radius_));
     const auto model_mat = ToM4(actor.getModelMatrix()) * size_mat;
 
-    loadInstance(shape.cylinder_model_, {shape.color_rgba_, ""}, model_mat);
+    loadInstance(shape.cylinder_model_, {shape.diffuse_color_, shape.diffuse_color_, 0., "", "", ""}, model_mat);
   }
 
   void Renderer::loadActor(const Actor& actor, const ShapeDummy& shape)
@@ -218,13 +218,13 @@ namespace owds {
 
     std::vector<Texture2D> textures;
 
-    if(material.texture_path_.empty() == false)
+    if(material.diffuse_texture_.empty() == false)
     {
-      auto text_it = loaded_textures_.find(material.texture_path_);
+      auto text_it = loaded_textures_.find(material.diffuse_texture_);
       if(text_it == loaded_textures_.end())
       {
         text_it = loaded_textures_.insert({
-                                            material.texture_path_, {material.texture_path_, texture_diffuse, true}
+                                            material.diffuse_texture_, {material.diffuse_texture_, texture_diffuse, true, true}
         })
                     .first;
       }
@@ -238,8 +238,8 @@ namespace owds {
       })
                        .first;
 
-      mesh_it->second.color = material.color_rgba_;
-      mesh_it->second.color.a_ = 255;
+      mesh_it->second.color = material.diffuse_color_;
+      mesh_it->second.color.a_ = 1.0;
       mesh_it->second.shininess = 64.f; // TODO take from material
       mesh_it->second.specular = 0.1f;  // TODO take from material
     }

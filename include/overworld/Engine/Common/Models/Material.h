@@ -9,8 +9,12 @@ namespace owds {
   class Material
   {
   public:
-    owds::Color color_rgba_;
-    std::string texture_path_;
+    owds::Color diffuse_color_;
+    owds::Color specular_color_;
+    float shininess_ = 0.;
+    std::string diffuse_texture_;
+    std::string specular_texture_;
+    std::string normal_texture_;
   };
 } // namespace owds
 

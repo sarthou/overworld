@@ -7,10 +7,10 @@ namespace owds {
   class Color
   {
   public:
-    std::uint8_t r_;
-    std::uint8_t g_;
-    std::uint8_t b_;
-    std::uint8_t a_;
+    float r_ = -1.0f;
+    float g_ = -1.0f;
+    float b_ = -1.0f;
+    float a_ = 1.0f;
   };
 } // namespace owds
 

@@ -65,7 +65,7 @@ namespace owds {
       const owds::Shape& collision_shape,
       const std::vector<owds::Shape>& visual_shapes) = 0;
 
-    [[nodiscard]] owds::Urdf& loadRobotFromDescription(const std::string& path);
+    [[nodiscard]] owds::Urdf& loadRobotFromDescription(const std::string& path, bool from_base_path = true);
 
     /**
      * @return

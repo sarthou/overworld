@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 
+#include "overworld/Engine/Common/Models/Material.h"
 #include "overworld/Engine/Common/Models/Vertex.h"
 
 namespace owds {
@@ -24,6 +25,7 @@ namespace owds {
     std::string name_;
     std::vector<owds::Vertex> vertices_{};
     std::vector<std::uint32_t> indices_{};
+    Material material_;
   };
 } // namespace owds
 

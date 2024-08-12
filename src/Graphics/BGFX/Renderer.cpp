@@ -241,7 +241,7 @@ namespace owds::bgfx {
     const auto size_mat = glm::scale(glm::mat4(1.f), ToV3(shape.half_extents_));
     const auto model_mat = ToM4(actor.getModelMatrix()) * size_mat;
 
-    queueModelBatch(shape.box_model_, {shape.color_rgba_, ""}, FromM4(model_mat));
+    queueModelBatch(shape.box_model_, {shape.diffuse_color_, shape.diffuse_color_, 0., "", "", ""}, FromM4(model_mat));
   }
 
   void Renderer::queueActorBatch(const owds::Actor& actor, const owds::ShapeCapsule& shape)
@@ -263,7 +263,7 @@ namespace owds::bgfx {
     const auto size_mat = glm::scale(glm::mat4(1.f), glm::vec3(shape.radius_, shape.height_, shape.radius_));
     const auto model_mat = ToM4(actor.getModelMatrix()) * size_mat;
 
-    queueModelBatch(shape.cylinder_model_, {shape.color_rgba_, ""}, FromM4(model_mat));
+    queueModelBatch(shape.cylinder_model_, {shape.diffuse_color_, shape.diffuse_color_, 0., "", "", ""}, FromM4(model_mat));
   }
 
   void Renderer::queueActorBatch(const owds::Actor& actor, const owds::ShapeDummy& shape)
@@ -290,18 +290,18 @@ namespace owds::bgfx {
     model_it = ctx_.cached_models_.insert({model.id_, {}}).first;
 
     // Colors
-    model_it->second.color_rgba_ = material.color_rgba_;
+    model_it->second.diffuse_color_ = material.diffuse_color_;
     model_it->second.shininess_ = 64.f; // TODO take from material
     model_it->second.specular_ = 0.1f;  // TODO take from material
 
     // Material
-    if(material.texture_path_.empty() == false)
+    if(material.diffuse_texture_.empty() == false)
     {
-      auto text_it = ctx_.loaded_textures_.find(material.texture_path_);
+      auto text_it = ctx_.loaded_textures_.find(material.diffuse_texture_);
       if(text_it == ctx_.loaded_textures_.end())
       {
-        model_it->second.tex_diffuse_ = loadTexture(material.texture_path_, BGFX_TEXTURE_SRGB);
-        ctx_.loaded_textures_[material.texture_path_] = model_it->second.tex_diffuse_;
+        model_it->second.tex_diffuse_ = loadTexture(material.diffuse_texture_, BGFX_TEXTURE_SRGB);
+        ctx_.loaded_textures_[material.diffuse_texture_] = model_it->second.tex_diffuse_;
       }
       else
         model_it->second.tex_diffuse_ = text_it->second;
@@ -445,10 +445,10 @@ namespace owds::bgfx {
     ::bgfx::setUniform(ctx_.loaded_uniforms_["material_shininess"], glm::value_ptr(material_shininess));
     auto material_specular = glm::vec4(model.specular_, 0.f, 0.f, 0.f);
     ::bgfx::setUniform(ctx_.loaded_uniforms_["material_specular"], glm::value_ptr(material_specular));
-    auto material_color = glm::vec4(static_cast<float>(model.color_rgba_.r_) / 255.f,
-                                    static_cast<float>(model.color_rgba_.g_) / 255.f,
-                                    static_cast<float>(model.color_rgba_.b_) / 255.f,
-                                    static_cast<float>(model.color_rgba_.a_) / 255.f);
+    auto material_color = glm::vec4(model.diffuse_color_.r_,
+                                    model.diffuse_color_.g_,
+                                    model.diffuse_color_.b_,
+                                    model.diffuse_color_.a_);
     ::bgfx::setUniform(ctx_.loaded_uniforms_["material_color"], glm::value_ptr(material_color));
   }
 
