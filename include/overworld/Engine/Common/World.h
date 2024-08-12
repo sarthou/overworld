@@ -3,6 +3,7 @@
 
 #include <array>
 #include <filesystem>
+#include <glm/matrix.hpp>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -55,11 +56,11 @@ namespace owds {
      * Additionally, there are non-standard but commonly used geometries such as:
      * - Capsule(s) / Pill(s)
      */
-    [[nodiscard]] owds::Shape createShapeBox(const owds::Color& color, const std::array<float, 3>& half_extents);
-    [[nodiscard]] owds::Shape createShapeCapsule(const owds::Color& color, float radius, float height);
-    [[nodiscard]] owds::Shape createShapeCylinder(const owds::Color& color, float radius, float height);
-    [[nodiscard]] owds::Shape createShapeSphere(const owds::Color& color, float radius);
-    [[nodiscard]] owds::Shape createShapeFromModel(const owds::Material& material, const std::string& path, const std::array<float, 3>& scale);
+    [[nodiscard]] owds::Shape createShapeBox(const owds::Color& color, const std::array<float, 3>& half_extents, glm::mat4& transform);
+    [[nodiscard]] owds::Shape createShapeCapsule(const owds::Color& color, float radius, float height, glm::mat4& transform);
+    [[nodiscard]] owds::Shape createShapeCylinder(const owds::Color& color, float radius, float height, glm::mat4& transform);
+    [[nodiscard]] owds::Shape createShapeSphere(const owds::Color& color, float radius, glm::mat4& transform);
+    [[nodiscard]] owds::Shape createShapeFromModel(const owds::Material& material, const std::string& path, const std::array<float, 3>& scale, glm::mat4& transform);
 
     [[nodiscard]] virtual owds::Actor& createActor(
       const owds::Shape& collision_shape,
@@ -223,7 +224,7 @@ namespace owds {
     void processLink(owds::Urdf& robot, const urdf::Link& urdf_link);
     void processJoints(owds::Urdf& robot, const urdf::Link& urdf_link);
     void processJoint(owds::Urdf& robot, const urdf::Joint& urdf_joint);
-    owds::Shape convertShape(const owds::Material& material, const urdf::Geometry& urdf_shape);
+    owds::Shape convertShape(const owds::Material& material, const urdf::Geometry& urdf_shape, glm::mat4& transform);
 
     std::filesystem::path base_assets_path_;
     owds::Model& preloaded_box_model_;

@@ -5,6 +5,7 @@
 #include <glm/vec3.hpp>
 #include <memory>
 
+#include "glm/matrix.hpp"
 #include "overworld/Engine/Common/Models/Material.h"
 
 namespace owds {
@@ -19,6 +20,7 @@ namespace owds {
     glm::vec3 scale_ = {1.f, 1.f, 1.f};
     owds::Material material_;
     std::reference_wrapper<owds::Model> custom_model_;
+    glm::mat4 shape_transform_{1.};
   };
 } // namespace owds
 

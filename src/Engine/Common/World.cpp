@@ -12,6 +12,7 @@
 #include "overworld/Engine/Common/Models/ModelManager.h"
 #include "overworld/Engine/Common/Urdf/Actor.h"
 #include "overworld/Engine/Common/Urdf/Urdf.h"
+#include "overworld/Helper/GlmMath.h"
 #include "overworld/Helper/ROS.h"
 
 namespace owds {
@@ -27,47 +28,52 @@ namespace owds {
 
   World::~World() = default;
 
-  owds::Shape World::createShapeBox(const owds::Color& color, const std::array<float, 3>& half_extents)
+  owds::Shape World::createShapeBox(const owds::Color& color, const std::array<float, 3>& half_extents, glm::mat4& transform)
   {
     return owds::ShapeBox{
       half_extents,
       color,
-      preloaded_box_model_};
+      preloaded_box_model_,
+      transform};
   }
 
-  owds::Shape World::createShapeCapsule(const owds::Color& color, const float radius, const float height)
+  owds::Shape World::createShapeCapsule(const owds::Color& color, const float radius, const float height, glm::mat4& transform)
   {
     return owds::ShapeCapsule{
       radius,
       height,
       color,
       preloaded_cylinder_model_,
-      preloaded_sphere_model_};
+      preloaded_sphere_model_,
+      transform};
   }
 
-  owds::Shape World::createShapeCylinder(const owds::Color& color, const float radius, const float height)
+  owds::Shape World::createShapeCylinder(const owds::Color& color, const float radius, const float height, glm::mat4& transform)
   {
     return owds::ShapeCylinder{
       radius,
       height,
       color,
-      preloaded_cylinder_model_};
+      preloaded_cylinder_model_,
+      transform};
   }
 
-  owds::Shape World::createShapeSphere(const owds::Color& color, const float radius)
+  owds::Shape World::createShapeSphere(const owds::Color& color, const float radius, glm::mat4& transform)
   {
     return owds::ShapeSphere{
       radius,
       color,
-      preloaded_sphere_model_};
+      preloaded_sphere_model_,
+      transform};
   }
 
-  owds::Shape World::createShapeFromModel(const owds::Material& material, const std::string& path, const std::array<float, 3>& scale)
+  owds::Shape World::createShapeFromModel(const owds::Material& material, const std::string& path, const std::array<float, 3>& scale, glm::mat4& transform)
   {
     return owds::ShapeCustomMesh{
       glm::vec3(scale[0], scale[1], scale[2]),
       material,
-      owds::ModelManager::get().load(path)};
+      owds::ModelManager::get().load(path),
+      transform};
   }
 
   owds::Urdf& World::loadRobotFromDescription(const std::string& path, bool from_base_path)
@@ -162,7 +168,13 @@ namespace owds {
 
     for(auto& visual_geometry : urdf_link.visual_array)
     {
-      visual_shapes.emplace_back(convertShape(material, *visual_geometry->geometry));
+      auto& origin = visual_geometry->origin;
+      glm::vec3 position = ToV3({(float)origin.position.x, (float)origin.position.y, (float)origin.position.z});
+      glm::quat rotation = ToQT({(float)origin.rotation.x, (float)origin.rotation.y, (float)origin.rotation.z, (float)origin.rotation.w});
+      glm::mat4 translate = glm::translate(glm::mat4(1), position);
+      glm::mat4 rotate = glm::mat4_cast(rotation);
+      glm::mat4 transform = translate * rotate;
+      visual_shapes.emplace_back(convertShape(material, *visual_geometry->geometry, transform));
     }
 
     auto& link = createActor(collision_shape, visual_shapes);
@@ -272,7 +284,7 @@ namespace owds {
     }
   }
 
-  owds::Shape World::convertShape(const owds::Material& material, const urdf::Geometry& urdf_shape)
+  owds::Shape World::convertShape(const owds::Material& material, const urdf::Geometry& urdf_shape, glm::mat4& transform)
   {
     switch(urdf_shape.type)
     {
@@ -280,7 +292,8 @@ namespace owds {
     {
       auto& sphere = dynamic_cast<const urdf::Sphere&>(urdf_shape);
       return createShapeSphere(material.diffuse_color_,
-                               static_cast<float>(sphere.radius));
+                               static_cast<float>(sphere.radius),
+                               transform);
     }
     case urdf::Geometry::BOX:
     {
@@ -288,7 +301,8 @@ namespace owds {
       return createShapeBox(material.diffuse_color_,
                             {static_cast<float>(box.dim.x),
                              static_cast<float>(box.dim.y),
-                             static_cast<float>(box.dim.z)});
+                             static_cast<float>(box.dim.z)},
+                            transform);
     }
     case urdf::Geometry::CYLINDER:
     {
@@ -296,7 +310,8 @@ namespace owds {
       auto& cylinder = dynamic_cast<const urdf::Cylinder&>(urdf_shape);
       return createShapeCylinder(material.diffuse_color_,
                                  static_cast<float>(cylinder.radius),
-                                 static_cast<float>(cylinder.length));
+                                 static_cast<float>(cylinder.length),
+                                 transform);
     }
     case urdf::Geometry::MESH:
     {
@@ -306,7 +321,8 @@ namespace owds {
                                   owds::rosPkgPathToPath(mesh.filename),
                                   {static_cast<float>(mesh.scale.x),
                                    static_cast<float>(mesh.scale.y),
-                                   static_cast<float>(mesh.scale.z)});
+                                   static_cast<float>(mesh.scale.z)},
+                                  transform);
     }
     default:
       assert(false && "Unrecognized/unsupported shape");

@@ -3,6 +3,7 @@
 
 #include <memory>
 
+#include "glm/matrix.hpp"
 #include "overworld/Engine/Common/Models/Color.h"
 
 namespace owds {
@@ -15,6 +16,7 @@ namespace owds {
     float height_{};
     owds::Color diffuse_color_;
     std::reference_wrapper<owds::Model> cylinder_model_;
+    glm::mat4 shape_transform_{1.};
   };
 } // namespace owds
 

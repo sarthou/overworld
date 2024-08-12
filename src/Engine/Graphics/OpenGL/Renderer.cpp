@@ -158,7 +158,7 @@ namespace owds {
   void Renderer::loadActor(const Actor& actor, const ShapeBox& shape)
   {
     const auto size_mat = glm::scale(glm::mat4(1.f), ToV3(shape.half_extents_));
-    const auto model_mat = ToM4(actor.getModelMatrix()) * size_mat;
+    const auto model_mat = shape.shape_transform_ * ToM4(actor.getModelMatrix()) * size_mat;
 
     loadInstance(shape.box_model_, {shape.diffuse_color_, shape.diffuse_color_, 0., "", "", ""}, model_mat);
   }
@@ -172,7 +172,7 @@ namespace owds {
   void Renderer::loadActor(const Actor& actor, const ShapeCustomMesh& shape)
   {
     const auto size_mat = glm::scale(glm::mat4(1.f), shape.scale_);
-    const auto model_mat = ToM4(actor.getModelMatrix()) * size_mat;
+    const auto model_mat = shape.shape_transform_ * ToM4(actor.getModelMatrix()) * size_mat;
 
     loadInstance(shape.custom_model_, shape.material_, model_mat);
   }
@@ -180,7 +180,7 @@ namespace owds {
   void Renderer::loadActor(const Actor& actor, const ShapeCylinder& shape)
   {
     const auto size_mat = glm::scale(glm::mat4(1.f), glm::vec3(shape.radius_, shape.height_, shape.radius_));
-    const auto model_mat = ToM4(actor.getModelMatrix()) * size_mat;
+    const auto model_mat = shape.shape_transform_ * ToM4(actor.getModelMatrix()) * size_mat;
 
     loadInstance(shape.cylinder_model_, {shape.diffuse_color_, shape.diffuse_color_, 0., "", "", ""}, model_mat);
   }
