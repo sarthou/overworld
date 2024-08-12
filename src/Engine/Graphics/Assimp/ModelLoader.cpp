@@ -7,6 +7,7 @@
 #include <fstream>
 #include <iostream>
 
+#include "overworld/Engine/Common/Models/Loaders/ColladaLoader.h"
 #include "overworld/Engine/Common/Models/Loaders/ObjLoader.h"
 #include "overworld/Engine/Common/Models/Loaders/StlLoader.h"
 #include "overworld/Engine/Common/Models/Model.h"
@@ -81,7 +82,8 @@ namespace owds::assimp {
         aiProcess_SortByPType |
         aiProcess_GenNormals |
         aiProcess_FlipUVs |
-        aiProcess_GenUVCoords);
+        aiProcess_GenUVCoords |
+        aiProcess_GlobalScale);
 
     if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
@@ -96,17 +98,18 @@ namespace owds::assimp {
 
   std::unique_ptr<owds::Model> ModelLoader::load(const std::filesystem::path& path) const
   {
-    std::cout << "load file : " << path.string() << std::endl;
     if(path.string().rfind(".stl") != std::string::npos)
       return StlLoader::read(path.string());
     else if(path.string().rfind(".obj") != std::string::npos)
     {
-      std::cout << "=> load OBJ" << std::endl;
       ObjLoader loader;
       return loader.read(path.string());
     }
-
-    std::cout << "=> load OTHER" << std::endl;
+    else if(path.string().rfind(".dae") != std::string::npos)
+    {
+      ColladaLoader loader;
+      return loader.read(path.string());
+    }
 
     auto model = std::make_unique<owds::Model>(owds::Model::create());
     model->source_path_ = path.string();
