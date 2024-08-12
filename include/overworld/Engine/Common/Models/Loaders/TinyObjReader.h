@@ -79,6 +79,10 @@ namespace tinyobj {
     double specular[3];
     double shininess;
 
+    bool has_ambient = false;
+    bool has_diffuse = false;
+    bool has_specular = false;
+
     std::string ambient_texname;  // map_Ka. For ambient or ambient occlusion.
     std::string diffuse_texname;  // map_Kd
     std::string specular_texname; // map_Ks
@@ -107,14 +111,10 @@ namespace tinyobj {
   {
     std::string name;
     std::vector<Index_t> indices;
-    std::vector<unsigned int>
-      num_face_vertices;                           // The number of vertices per
-                                                   // face. 3 = triangle, 4 = quad, ...
-    std::vector<int> material_ids;                 // per-face material ID
-    std::vector<unsigned int> smoothing_group_ids; // per-face smoothing group
-                                                   // ID(0 = off. positive value
-                                                   // = group id)
-    std::vector<tag_t> tags;                       // SubD tag
+
+    int material_id; // per-face material ID
+
+    std::vector<tag_t> tags; // SubD tag
   };
 
   // Vertex attributes
@@ -268,6 +268,7 @@ namespace tinyobj {
   /// Loads materials into std::map
   void LoadMtl(std::map<std::string, int>* material_map,
                std::vector<Material_t>* materials, std::istream* inStream,
+               const std::string& texture_path,
                std::string* warning, std::string* err);
 
   ///

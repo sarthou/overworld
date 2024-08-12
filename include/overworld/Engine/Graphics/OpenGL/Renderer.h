@@ -63,6 +63,8 @@ namespace owds {
     void loadActor(const Actor& actor, const ShapeDummy& shape);
     void loadActor(const Actor& actor, const ShapeSphere& shape);
     void loadInstance(const Model& model, const Material& material, const glm::mat4& model_mat);
+    Material combineMaterials(const Material& shape_material, const Material& model_material);
+    std::vector<Texture2D> loadTextures(Material& material);
     void loadModel(const Model& model, const Material& material);
     void render();
     void renderModels(const Shader& shader, unsigned int texture_offset = 0);

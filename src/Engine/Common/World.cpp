@@ -80,7 +80,7 @@ namespace owds {
   {
     urdf::Model urdf_model;
     if(from_base_path)
-    assert(urdf_model.initFile((base_assets_path_ / path).string()));
+      assert(urdf_model.initFile((base_assets_path_ / path).string()));
     else
       assert(urdf_model.initFile(path));
 
@@ -117,14 +117,14 @@ namespace owds {
   {
     robot.materials_[urdf_material.name] = {
       !urdf_material.texture_filename.empty() ?
-        owds::Color{1,                     1, 1, 1}
+        owds::Color{1,                     1, 1, 0.}
         :
         owds::Color{urdf_material.color.r,
                     urdf_material.color.g,
                     urdf_material.color.b,
-                    urdf_material.color.a         },
-      owds::Color{1,                     1, 1, 1}, // specular
-      0.0, // shininess_
+                    urdf_material.color.a          },
+      owds::Color{1,                     1, 1, 0.}, // specular
+      -1.0, // shininess_
       urdf_material.texture_filename.empty() ?
         "" :
         owds::rosPkgPathToPath(urdf_material.texture_filename),
@@ -147,9 +147,9 @@ namespace owds {
   {
     const auto material_name = urdf_link.visual ? urdf_link.visual->material_name : "";
     const auto material = material_name.empty() ? owds::Material{
-                                                    owds::Color{1, 1, 1, 1},
-                                                    owds::Color{1, 1, 1, 1},
-                                                    0.0,
+                                                    owds::Color{1, 1, 1, 0.},
+                                                    owds::Color{1, 1, 1, 0.},
+                                                    -1.0,
                                                     "", "", ""
     } :
                                                   robot.materials_.at(material_name);
@@ -159,7 +159,7 @@ namespace owds {
 
     if(urdf_link.collision)
     {
-      collision_shape = convertShape(material, *urdf_link.collision->geometry);
+      // collision_shape = convertShape(material, *urdf_link.collision->geometry); // TODO
     }
 
     assert(urdf_link.collision_array.size() <= 1 && "Links with multiple collision shapes are not supported at this moment.");

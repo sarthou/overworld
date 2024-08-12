@@ -11,7 +11,7 @@ namespace owds {
   public:
     owds::Color diffuse_color_;
     owds::Color specular_color_;
-    float shininess_ = 0.;
+    float shininess_ = -1.;
     std::string diffuse_texture_;
     std::string specular_texture_;
     std::string normal_texture_;

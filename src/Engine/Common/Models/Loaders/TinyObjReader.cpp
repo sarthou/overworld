@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <fstream>
+#include <iostream>
 #include <limits>
 #include <map>
 #include <set>
@@ -330,13 +331,18 @@ namespace tinyobj {
     material->ambient_texname = "";
     material->diffuse_texname = "";
     material->specular_texname = "";
+
+    material->has_ambient = false;
+    material->has_diffuse = false;
+    material->has_specular = false;
+
     for(int i = 0; i < 3; i++)
     {
       material->ambient[i] = static_cast<double>(0.0);
       material->diffuse[i] = static_cast<double>(0.0);
       material->specular[i] = static_cast<double>(0.0);
     }
-    material->shininess = static_cast<double>(1.0);
+    material->shininess = static_cast<double>(-1.0);
 
     material->normal_texname = "";
   }
@@ -364,6 +370,7 @@ namespace tinyobj {
                                   const std::vector<double>& v, std::string* warn)
   {
     shape->name = name;
+    shape->material_id = material_id;
 
     // polygon
     if(face_group.empty() == false)
@@ -489,9 +496,6 @@ namespace tinyobj {
               shape->indices.push_back(idx2);
               shape->indices.push_back(idx3);
             }
-
-            shape->material_ids.push_back(material_id);
-            shape->material_ids.push_back(material_id);
           }
           else
           {
@@ -668,8 +672,6 @@ namespace tinyobj {
                 shape->indices.push_back(idx0);
                 shape->indices.push_back(idx1);
                 shape->indices.push_back(idx2);
-
-                shape->material_ids.push_back(material_id);
               }
 
               // remove v1 from the list
@@ -704,8 +706,6 @@ namespace tinyobj {
                 shape->indices.push_back(idx0);
                 shape->indices.push_back(idx1);
                 shape->indices.push_back(idx2);
-
-                shape->material_ids.push_back(material_id);
               }
             }
           } // npolys
@@ -720,8 +720,6 @@ namespace tinyobj {
             idx.texcoord_index = face[k].vt_idx;
             shape->indices.push_back(idx);
           }
-
-          shape->material_ids.push_back(material_id); // per face
         }
       }
 
@@ -790,6 +788,7 @@ namespace tinyobj {
 
   void LoadMtl(std::map<std::string, int>* material_map,
                std::vector<Material_t>* materials, std::istream* inStream,
+               const std::string& texture_path,
                std::string* warning, std::string* err)
   {
     (void)err;
@@ -888,6 +887,7 @@ namespace tinyobj {
           material.ambient[0] = r;
           material.ambient[1] = g;
           material.ambient[2] = b;
+          material.has_ambient = true;
           continue;
         }
 
@@ -900,6 +900,7 @@ namespace tinyobj {
           material.diffuse[0] = r;
           material.diffuse[1] = g;
           material.diffuse[2] = b;
+          material.has_diffuse = true;
           has_kd = true;
           continue;
         }
@@ -913,6 +914,7 @@ namespace tinyobj {
           material.specular[0] = r;
           material.specular[1] = g;
           material.specular[2] = b;
+          material.has_specular = true;
           continue;
         }
       }
@@ -981,6 +983,8 @@ namespace tinyobj {
       {
         token += 7;
         parseTextureName(material.ambient_texname, token);
+        if(material.ambient_texname.find('/') == std::string::npos)
+          material.ambient_texname = texture_path + "/" + material.ambient_texname;
         continue;
       }
 
@@ -989,6 +993,8 @@ namespace tinyobj {
       {
         token += 7;
         parseTextureName(material.diffuse_texname, token);
+        if(material.diffuse_texname.find('/') == std::string::npos)
+          material.diffuse_texname = texture_path + "/" + material.diffuse_texname;
 
         // Set a decent diffuse default value if a diffuse texture is specified
         // without a matching Kd value.
@@ -1007,6 +1013,8 @@ namespace tinyobj {
       {
         token += 7;
         parseTextureName(material.specular_texname, token);
+        if(material.specular_texname.find('/') == std::string::npos)
+          material.specular_texname = texture_path + "/" + material.specular_texname;
         continue;
       }
 
@@ -1059,12 +1067,13 @@ namespace tinyobj {
       {
         token += 5;
         parseTextureName(material.normal_texname, token);
+        if(material.normal_texname.find('/') == std::string::npos)
+          material.normal_texname = texture_path + "/" + material.normal_texname;
         continue;
       }
     }
     // flush last material.
-    material_map->insert(std::pair<std::string, int>(
-      material.name, static_cast<int>(materials->size())));
+    material_map->insert(std::pair<std::string, int>(material.name, static_cast<int>(materials->size())));
     materials->push_back(material);
 
     if(warning)
@@ -1078,20 +1087,14 @@ namespace tinyobj {
                                       std::map<std::string, int>* matMap,
                                       std::string* warn, std::string* err)
   {
-    if(!m_mtlBaseDir.empty())
+    if(m_mtlBaseDir.empty() == false)
     {
-#ifdef _WIN32
-      char sep = ';';
-#else
-      char sep = ':';
-#endif
-
       // https://stackoverflow.com/questions/5167625/splitting-a-c-stdstring-using-tokens-e-g
       std::vector<std::string> paths;
       std::istringstream f(m_mtlBaseDir);
 
       std::string s;
-      while(getline(f, s, sep))
+      while(getline(f, s, ':'))
       {
         paths.push_back(s);
       }
@@ -1103,7 +1106,7 @@ namespace tinyobj {
         std::ifstream matIStream(filepath.c_str());
         if(matIStream)
         {
-          LoadMtl(matMap, materials, &matIStream, warn, err);
+          LoadMtl(matMap, materials, &matIStream, m_mtlBaseDir, warn, err);
 
           return true;
         }
@@ -1124,7 +1127,7 @@ namespace tinyobj {
       std::ifstream matIStream(filepath.c_str());
       if(matIStream)
       {
-        LoadMtl(matMap, materials, &matIStream, warn, err);
+        LoadMtl(matMap, materials, &matIStream, m_mtlBaseDir, warn, err);
 
         return true;
       }
@@ -1159,7 +1162,7 @@ namespace tinyobj {
       return false;
     }
 
-    LoadMtl(matMap, materials, &m_inStream, warn, err);
+    LoadMtl(matMap, materials, &m_inStream, "", warn, err);
 
     return true;
   }
@@ -1189,13 +1192,8 @@ namespace tinyobj {
     std::string baseDir = mtl_basedir ? mtl_basedir : "";
     if(!baseDir.empty())
     {
-#ifndef _WIN32
-      const char dirsep = '/';
-#else
-      const char dirsep = '\\';
-#endif
-      if(baseDir[baseDir.length() - 1] != dirsep)
-        baseDir += dirsep;
+      if(baseDir[baseDir.length() - 1] != '/')
+        baseDir += '/';
     }
     MaterialFileReader matFileReader(baseDir);
 
@@ -1401,7 +1399,7 @@ namespace tinyobj {
       // load mtl
       if((0 == strncmp(token, "mtllib", 6)) && IS_SPACE((token[6])))
       {
-        if(readMatFn)
+        if(readMatFn != nullptr)
         {
           token += 7;
 
@@ -1481,7 +1479,7 @@ namespace tinyobj {
 
         shape = Mesh_t();
 
-        // material = -1;
+        material = -1;
         face_group.clear();
 
         std::vector<std::string> names;
@@ -1535,7 +1533,7 @@ namespace tinyobj {
         if(shape.indices.size() > 0)
           shapes->push_back(shape);
 
-        // material = -1;
+        material = -1;
         face_group.clear();
         shape = Mesh_t();
 

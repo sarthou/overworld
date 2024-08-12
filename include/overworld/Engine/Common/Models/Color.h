@@ -10,7 +10,7 @@ namespace owds {
     float r_ = -1.0f;
     float g_ = -1.0f;
     float b_ = -1.0f;
-    float a_ = 1.0f;
+    float a_ = 0.0f;
   };
 } // namespace owds
 

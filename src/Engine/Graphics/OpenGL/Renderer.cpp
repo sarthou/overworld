@@ -205,17 +205,45 @@ namespace owds {
       current_mesh_batches_[model.id_][mesh.id_].emplace_back(InstanceData{model_mat, {}}); // TODO add instance data ?
   }
 
-  void Renderer::loadModel(const Model& model, const Material& material)
+  Material Renderer::combineMaterials(const Material& shape_material, const Material& model_material)
   {
-    if(model.meshes_.empty())
-      return;
+    Material material;
 
-    auto model_it = cached_models_.find(model.id_);
-    if(model_it != cached_models_.end())
-      return;
+    if(model_material.diffuse_texture_.empty())
+      material.diffuse_texture_ = shape_material.diffuse_texture_;
+    else
+      material.diffuse_texture_ = model_material.diffuse_texture_;
 
-    model_it = cached_models_.insert({model.id_, {}}).first;
+    if(model_material.specular_texture_.empty())
+      material.specular_texture_ = shape_material.specular_texture_;
+    else
+      material.specular_texture_ = model_material.specular_texture_;
 
+    if(model_material.normal_texture_.empty())
+      material.normal_texture_ = shape_material.normal_texture_;
+    else
+      material.normal_texture_ = model_material.normal_texture_;
+
+    if(model_material.diffuse_color_.a_ == 0.f)
+      material.diffuse_color_ = shape_material.diffuse_color_;
+    else
+      material.diffuse_color_ = model_material.diffuse_color_;
+
+    if(model_material.specular_color_.a_ <= 0.001f)
+      material.specular_color_ = shape_material.specular_color_;
+    else
+      material.specular_color_ = model_material.specular_color_;
+
+    if(model_material.shininess_ == -1.f)
+      material.shininess_ = shape_material.shininess_;
+    else
+      material.shininess_ = shape_material.shininess_;
+
+    return material;
+  }
+
+  std::vector<Texture2D> Renderer::loadTextures(Material& material)
+  {
     std::vector<Texture2D> textures;
 
     if(material.diffuse_texture_.empty() == false)
@@ -231,17 +259,59 @@ namespace owds {
       textures.emplace_back(text_it->second);
     }
 
+    /*if(material.specular_texture_.empty() == false)
+    {
+      auto text_it = loaded_textures_.find(material.specular_texture_);
+      if(text_it == loaded_textures_.end())
+      {
+        text_it = loaded_textures_.insert({
+                                            material.specular_texture_, {material.specular_texture_, texture_specular, false, true}
+        })
+                    .first;
+      }
+      textures.emplace_back(text_it->second);
+    }*/
+
+    if(material.normal_texture_.empty() == false)
+    {
+      auto text_it = loaded_textures_.find(material.normal_texture_);
+      if(text_it == loaded_textures_.end())
+      {
+        text_it = loaded_textures_.insert({
+                                            material.normal_texture_, {material.normal_texture_, texture_normal, false, true}
+        })
+                    .first;
+      }
+      textures.emplace_back(text_it->second);
+    }
+
+    return textures;
+  }
+
+  void Renderer::loadModel(const Model& model, const Material& material)
+  {
+    if(model.meshes_.empty())
+      return;
+
+    auto model_it = cached_models_.find(model.id_);
+    if(model_it != cached_models_.end())
+      return;
+
+    model_it = cached_models_.insert({model.id_, {}}).first;
+
     for(const auto& mesh : model.meshes_)
     {
+      auto mesh_material = combineMaterials(mesh.material_, material);
+      auto textures = loadTextures(mesh_material);
       auto mesh_it = model_it->second.insert({
                                                mesh.id_, {mesh, textures}
       })
                        .first;
 
-      mesh_it->second.color = material.diffuse_color_;
+      mesh_it->second.color = mesh_material.diffuse_color_;
       mesh_it->second.color.a_ = 1.0;
-      mesh_it->second.shininess = 64.f; // TODO take from material
-      mesh_it->second.specular = 0.1f;  // TODO take from material
+      mesh_it->second.shininess = mesh_material.shininess_ <= 0 ? 64.f : mesh_material.shininess_;
+      mesh_it->second.specular = mesh_material.specular_color_.a_ == 0. ? 0.1f : mesh_material.specular_color_.r_;
     }
   }
 
