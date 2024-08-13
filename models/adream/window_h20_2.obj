@@ -1,6 +1,6 @@
 # Blender v2.83.1 OBJ File: 'adream_empty.blend'
 # www.blender.org
-mtllib window_h20_2.mtl
+mtllib window.mtl
 o window_h20_4_Cube.063
 v 2.654360 0.120832 0.987055
 v 2.549529 0.120832 0.987055
