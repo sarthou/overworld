@@ -26,6 +26,11 @@ namespace owds {
       if(nb_channels == 1)
       {
         internal_format = data_format = GL_RED;
+        if(type == texture_diffuse)
+        {
+          loadGreyAsRgb(data);
+          return;
+        }
       }
       else if(nb_channels == 3)
       {
@@ -45,7 +50,7 @@ namespace owds {
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, internal_format == GL_SRGB_ALPHA ? GL_CLAMP_TO_EDGE : GL_REPEAT);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, internal_format == GL_SRGB_ALPHA ? GL_CLAMP_TO_EDGE : GL_REPEAT);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); // GL_LINEAR
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // GL_NEAREST
 
       stbi_image_free(data);
     }
@@ -72,6 +77,32 @@ namespace owds {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     std::cout << "color texture ceated " << id_ << std::endl;
+  }
+
+  void Texture2D::loadGreyAsRgb(unsigned char* data)
+  {
+    unsigned char* image = new unsigned char[width * height * 3];
+    for(int i = 0; i < height; i++)
+    {
+      for(int j = 0; j < width; j++)
+      {
+        image[3 * (i * width + j) + 0] = data[(i * width + j)];
+        image[3 * (i * width + j) + 1] = data[(i * width + j)];
+        image[3 * (i * width + j) + 2] = data[(i * width + j)];
+      }
+    }
+
+    glBindTexture(GL_TEXTURE_2D, id_);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // GL_NEAREST
+
+    delete[] image;
+    stbi_image_free(data);
   }
 
 } // namespace owds

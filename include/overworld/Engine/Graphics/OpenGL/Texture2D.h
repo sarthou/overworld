@@ -37,6 +37,9 @@ namespace owds {
       glActiveTexture(unit);
       glBindTexture(GL_TEXTURE_2D, id_);
     }
+
+  private:
+    void loadGreyAsRgb(unsigned char* data);
   };
 
 } // namespace owds
