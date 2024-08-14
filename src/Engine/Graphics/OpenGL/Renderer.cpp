@@ -259,7 +259,7 @@ namespace owds {
       textures.emplace_back(text_it->second);
     }
 
-    /*if(material.specular_texture_.empty() == false)
+    if(material.specular_texture_.empty() == false)
     {
       auto text_it = loaded_textures_.find(material.specular_texture_);
       if(text_it == loaded_textures_.end())
@@ -270,7 +270,7 @@ namespace owds {
                     .first;
       }
       textures.emplace_back(text_it->second);
-    }*/
+    }
 
     if(material.normal_texture_.empty() == false)
     {
