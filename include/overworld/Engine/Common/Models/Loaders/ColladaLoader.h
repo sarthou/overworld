@@ -21,6 +21,7 @@ namespace owds {
   private:
     bool getXmlDocument(const std::string& path, TiXmlDocument& doc);
     void getScalingAndTransform(TiXmlElement* root);
+    std::map<std::string, Material> getMaterialLibrary(TiXmlElement* root);
     std::map<std::string, Mesh> getMeshLibrary(TiXmlElement* root);
 
     std::vector<Mesh> readSceneGeometries(TiXmlElement* root, std::map<std::string, Mesh>& meshes_library);

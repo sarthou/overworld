@@ -17,6 +17,13 @@
 
 namespace owds {
 
+  struct EffectParam_t
+  {
+    std::string type;
+    std::string source;
+    std::string init_from;
+  };
+
   struct VertexSource_t
   {
     std::string position_id;
@@ -99,6 +106,47 @@ namespace owds {
     return vec;
   }
 
+  void getColorAndTexture(TiXmlElement* elem, std::map<std::string, EffectParam_t>& params, std::map<std::string, std::string>& images, Color& color, std::string& texture)
+  {
+    auto* color_elem = elem->FirstChildElement("color");
+    if(color_elem != nullptr)
+    {
+      auto color_vec = getVector4FromXmlText(color_elem->GetText());
+      color.r_ = color_vec.x;
+      color.g_ = color_vec.y;
+      color.b_ = color_vec.z;
+      color.a_ = color_vec.w;
+      return;
+    }
+
+    auto* texture_elem = elem->FirstChildElement("texture");
+    if(texture_elem != nullptr)
+    {
+      auto* texture_txt = texture_elem->Attribute("texture");
+      auto sampler_it = params.find(texture_txt);
+      if(sampler_it != params.end())
+      {
+        auto surface_it = params.find(sampler_it->second.source);
+        if(surface_it != params.end())
+          texture = surface_it->second.init_from;
+        else
+          texture = sampler_it->second.source;
+      }
+      else
+        texture = texture_txt;
+
+      if(texture.empty() == false)
+      {
+        auto image_it = images.find(texture);
+        if(image_it != images.end())
+          texture = image_it->second;
+        else
+          texture = "";
+      }
+      return;
+    }
+  }
+
   std::unique_ptr<owds::Model> ColladaLoader::read(const std::string& path)
   {
     TiXmlDocument doc;
@@ -107,8 +155,21 @@ namespace owds {
 
     getScalingAndTransform(doc.RootElement());
 
-    auto library = getMeshLibrary(doc.RootElement());
-    auto instances = readSceneGeometries(doc.RootElement(), library);
+    auto mesh_library = getMeshLibrary(doc.RootElement());
+    auto material_library = getMaterialLibrary(doc.RootElement());
+    (void)material_library;
+    auto instances = readSceneGeometries(doc.RootElement(), mesh_library);
+
+    for(auto& material : material_library)
+    {
+      std::cout << material.first << ":" << std::endl;
+      std::cout << " -> diffuse = " << material.second.diffuse_color_.r_ << " " << material.second.diffuse_color_.g_ << " " << material.second.diffuse_color_.b_ << " " << material.second.diffuse_color_.a_ << std::endl;
+      std::cout << " -> diffuse = " << material.second.diffuse_texture_ << std::endl;
+      std::cout << " -> specular = " << material.second.specular_color_.r_ << " " << material.second.specular_color_.g_ << " " << material.second.specular_color_.b_ << " " << material.second.specular_color_.a_ << std::endl;
+      std::cout << " -> specular = " << material.second.specular_texture_ << std::endl;
+      std::cout << " -> normal   = " << material.second.normal_texture_ << std::endl;
+      std::cout << " -> shininess = " << material.second.shininess_ << std::endl;
+    }
 
     if(instances.empty() == false)
     {
@@ -175,6 +236,127 @@ namespace owds {
         // if(up_text == "Z_UP") // client and COLLADA are both Z_UP so no transform needed (identity)
       }
     }
+  }
+
+  std::map<std::string, Material> ColladaLoader::getMaterialLibrary(TiXmlElement* root)
+  {
+    std::map<std::string, Material> res;
+
+    std::map<std::string, std::string> images;
+    auto* image_library = root->FirstChildElement("library_images");
+    if(image_library != nullptr)
+    {
+      for(auto* image = image_library->FirstChildElement("image"); image != nullptr; image = image->NextSiblingElement("image"))
+      {
+        std::string image_id = std::string(image->Attribute("id"));
+        auto* init_from = image->FirstChildElement("init_from");
+        if(init_from != nullptr)
+          images.emplace(image_id, init_from->GetText());
+      }
+    }
+
+    std::map<std::string, Material> effects;
+    auto* effect_library = root->FirstChildElement("library_effects");
+    if(effect_library != nullptr)
+    {
+      for(auto* effect = effect_library->FirstChildElement("effect"); effect != nullptr; effect = effect->NextSiblingElement("effect"))
+      {
+        std::string effect_id = std::string(effect->Attribute("id"));
+        auto* profile_common = effect->FirstChildElement("profile_COMMON");
+        if(profile_common != nullptr)
+        {
+          std::map<std::string, EffectParam_t> params;
+          for(auto* param = profile_common->FirstChildElement("newparam"); param != nullptr; param = param->NextSiblingElement("newparam"))
+          {
+            std::string sid = std::string(param->Attribute("sid"));
+            auto* surface = param->FirstChildElement("surface");
+            if(surface != nullptr)
+            {
+              params.emplace(sid, EffectParam_t{"surface", "", surface->FirstChildElement("init_from")->GetText()});
+              continue;
+            }
+
+            auto* sampler = param->FirstChildElement("sampler2D");
+            if(sampler != nullptr)
+            {
+              params.emplace(sid, EffectParam_t{"sampler2D", sampler->FirstChildElement("source")->GetText(), ""});
+              continue;
+            }
+          }
+
+          auto* technique = profile_common->FirstChildElement("technique");
+          if(technique != nullptr)
+          {
+            Material material;
+
+            auto* extra = technique->FirstChildElement("extra");
+            if(extra != nullptr)
+            {
+              auto* extra_technique = extra->FirstChildElement("technique");
+              if(extra_technique != nullptr)
+              {
+                Color tmp;
+                auto* bump = extra_technique->FirstChildElement("bump");
+                if(bump != nullptr)
+                  getColorAndTexture(bump, params, images, tmp, material.normal_texture_);
+              }
+            }
+
+            auto* blinn = technique->FirstChildElement("blinn");
+            if(blinn != nullptr)
+            {
+              auto* diffuse = blinn->FirstChildElement("diffuse");
+              if(diffuse != nullptr)
+                getColorAndTexture(diffuse, params, images, material.diffuse_color_, material.diffuse_texture_);
+
+              auto* specular = blinn->FirstChildElement("specular");
+              if(specular != nullptr)
+                getColorAndTexture(specular, params, images, material.specular_color_, material.specular_texture_);
+
+              auto* shininess = blinn->FirstChildElement("shininess");
+              if(shininess != nullptr)
+                material.shininess_ = atof(shininess->FirstChildElement("float")->GetText());
+
+              effects.emplace(effect_id, material);
+
+              continue;
+            }
+
+            auto* lambert = technique->FirstChildElement("lambert");
+            if(lambert != nullptr)
+            {
+              auto* diffuse = lambert->FirstChildElement("diffuse");
+              if(diffuse != nullptr)
+                getColorAndTexture(diffuse, params, images, material.diffuse_color_, material.diffuse_texture_);
+
+              effects.emplace(effect_id, material);
+              continue;
+            }
+          }
+        }
+        else
+          ShellDisplay::warning("[ColladaLoader] no profile_COMMON found for effect effect_id. Effect will be ignored.");
+      }
+    }
+
+    auto* material_library = root->FirstChildElement("library_materials");
+    if(material_library == nullptr)
+      return {};
+
+    for(auto* material = material_library->FirstChildElement("material"); material != nullptr; material = material->NextSiblingElement("material"))
+    {
+      std::string material_id = std::string(material->Attribute("id"));
+      auto* instance_effect = material->FirstChildElement("instance_effect");
+      if(instance_effect != nullptr)
+      {
+        std::string effect_url(instance_effect->Attribute("url"));
+        auto effect_it = effects.find(effect_url.erase(0, 1));
+        if(effect_it != effects.end())
+          res.emplace(material_id, effect_it->second);
+      }
+    }
+
+    return res;
   }
 
   std::map<std::string, Mesh> ColladaLoader::getMeshLibrary(TiXmlElement* root)
@@ -460,6 +642,8 @@ namespace owds {
         Mesh& instance = instances.back();
         for(auto& v : instance.vertices_)
           v.position_ = glm::vec3(node_trans * glm::vec4(v.position_, 1.));
+
+        // TODO get bind_material
       }
       else
         ShellDisplay::error("[ColladaLoader] geom " + geom_url + " not found");
