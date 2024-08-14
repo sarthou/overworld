@@ -41,7 +41,7 @@ namespace owds::bullet3 {
     void setStaticFriction(float coefficient) override;
     void setDynamicFriction(float coefficient) override;
     void setRestitution(float coefficient) override;
-    void setPositionAndOrientation(const std::array<float, 3>& position, const std::array<float, 3>& orientation) override;
+    void setPositionAndOrientation(const std::array<float, 3>& position, const std::array<float, 4>& orientation) override;
 
     [[nodiscard]] std::array<float, 16> getModelMatrix() const override;
     [[nodiscard]] std::pair<std::array<float, 3>, std::array<float, 3>> getPositionAndOrientation() const override;

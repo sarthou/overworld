@@ -27,7 +27,7 @@ namespace owds::bullet3 {
   {
     std::visit([this](auto& elem) { setupPhysicsShape(elem); }, collision_shape_);
 
-    if(!bt_geometry_)
+    if(bt_geometry_ == nullptr)
     {
       return;
     }
@@ -104,7 +104,7 @@ namespace owds::bullet3 {
   {
     assert(bt_actor_);
 
-    (void) coefficient; // todo: uhhhh...
+    (void)coefficient; // todo: uhhhh...
   }
 
   void Actor::setRestitution(const float coefficient)
@@ -114,11 +114,11 @@ namespace owds::bullet3 {
     bt_actor_->setRestitution(coefficient);
   }
 
-  void Actor::setPositionAndOrientation(const std::array<float, 3>& position, const std::array<float, 3>& orientation)
+  void Actor::setPositionAndOrientation(const std::array<float, 3>& position, const std::array<float, 4>& orientation)
   {
     assert(bt_actor_);
 
-    const auto orientation_quat = glm::quat(owds::BitCast<glm::vec3>(orientation));
+    const auto orientation_quat = glm::quat(owds::BitCast<glm::vec4>(orientation));
     const auto bt_transform = btTransform(
       btQuaternion(
         static_cast<btScalar>(orientation_quat.x),
@@ -182,7 +182,7 @@ namespace owds::bullet3 {
 
   void Actor::setupPhysicsShape(const owds::ShapeCustomMesh& shape)
   {
-    (void) shape; // todo: handle custom meshes
+    (void)shape; // todo: handle custom meshes
   }
 
   void Actor::setupPhysicsShape(const owds::ShapeCylinder& shape)
@@ -195,7 +195,7 @@ namespace owds::bullet3 {
 
   void Actor::setupPhysicsShape(const owds::ShapeDummy& shape)
   {
-    (void) shape;
+    (void)shape;
   }
 
   void Actor::setupPhysicsShape(const owds::ShapeSphere& shape)

@@ -2,6 +2,7 @@
 
 #include "overworld/Engine/Common/Shapes/Shape.h"
 #include "overworld/Engine/Common/Urdf/JointLocation.h"
+#include "overworld/Helper/GlmMath.h"
 #include "overworld/Physics/Bullet3/Actor.h"
 #include "overworld/Physics/Bullet3/Context.h"
 #include "overworld/Physics/Bullet3/Joints/JointPrismatic.h"
@@ -42,14 +43,14 @@ namespace owds::bullet3 {
   owds::JointRevolute& World::createJointRevolute(
     owds::Actor& parent,
     const std::array<float, 3>& origin_position,
-    const std::array<float, 3>& origin_position,
+    const std::array<float, 4>& origin_orientation,
     owds::Actor& child,
     const std::array<float, 3>& joint_position,
-    const std::array<float, 3>& joint_orientation)
+    const std::array<float, 4>& joint_orientation)
   {
     (void)parent;
     (void)origin_position;
-    (void)origin_position;
+    (void)origin_orientation;
     (void)child;
     (void)joint_position;
     (void)joint_orientation;
@@ -59,14 +60,14 @@ namespace owds::bullet3 {
   owds::JointContinuous& World::createJointContinuous(
     owds::Actor& parent,
     const std::array<float, 3>& origin_position,
-    const std::array<float, 3>& origin_position,
+    const std::array<float, 4>& origin_orientation,
     owds::Actor& child,
     const std::array<float, 3>& joint_position,
-    const std::array<float, 3>& joint_orientation)
+    const std::array<float, 4>& joint_orientation)
   {
     (void)parent;
     (void)origin_position;
-    (void)origin_position;
+    (void)origin_orientation;
     (void)child;
     (void)joint_position;
     (void)joint_orientation;
@@ -76,20 +77,20 @@ namespace owds::bullet3 {
   owds::JointPrismatic& World::createJointPrismatic(
     owds::Actor& parent,
     const std::array<float, 3>& origin_position,
-    const std::array<float, 3>& origin_position,
+    const std::array<float, 4>& origin_orientation,
     owds::Actor& child,
     const std::array<float, 3>& joint_position,
-    const std::array<float, 3>& joint_orientation)
+    const std::array<float, 4>& joint_orientation)
   {
     auto joint = std::make_unique<owds::bullet3::JointPrismatic>(
       *ctx_,
       owds::JointLocation(
         parent,
-        origin_position,
-        origin_position,
+        ToV3(origin_position),
+        ToQT(origin_orientation),
         child,
-        joint_position,
-        joint_orientation));
+        ToV3(joint_position),
+        ToQT(joint_orientation)));
 
     joint->setup();
 
@@ -100,14 +101,14 @@ namespace owds::bullet3 {
   owds::JointFixed& World::createJointFixed(
     owds::Actor& parent,
     const std::array<float, 3>& origin_position,
-    const std::array<float, 3>& origin_position,
+    const std::array<float, 4>& origin_orientation,
     owds::Actor& child,
     const std::array<float, 3>& joint_position,
-    const std::array<float, 3>& joint_orientation)
+    const std::array<float, 4>& joint_orientation)
   {
     (void)parent;
     (void)origin_position;
-    (void)origin_position;
+    (void)origin_orientation;
     (void)child;
     (void)joint_position;
     (void)joint_orientation;
@@ -117,14 +118,14 @@ namespace owds::bullet3 {
   owds::JointFloating& World::createJointFloating(
     owds::Actor& parent,
     const std::array<float, 3>& origin_position,
-    const std::array<float, 3>& origin_position,
+    const std::array<float, 4>& origin_orientation,
     owds::Actor& child,
     const std::array<float, 3>& joint_position,
-    const std::array<float, 3>& joint_orientation)
+    const std::array<float, 4>& joint_orientation)
   {
     (void)parent;
     (void)origin_position;
-    (void)origin_position;
+    (void)origin_orientation;
     (void)child;
     (void)joint_position;
     (void)joint_orientation;
@@ -134,14 +135,14 @@ namespace owds::bullet3 {
   owds::JointPlanar& World::createJointPlanar(
     owds::Actor& parent,
     const std::array<float, 3>& origin_position,
-    const std::array<float, 3>& origin_position,
+    const std::array<float, 4>& origin_orientation,
     owds::Actor& child,
     const std::array<float, 3>& joint_position,
-    const std::array<float, 3>& joint_orientation)
+    const std::array<float, 4>& joint_orientation)
   {
     (void)parent;
     (void)origin_position;
-    (void)origin_position;
+    (void)origin_orientation;
     (void)child;
     (void)joint_position;
     (void)joint_orientation;

@@ -84,33 +84,33 @@ namespace owds {
     else
       assert(urdf_model.initFile(path));
 
-    auto robot = std::make_unique<owds::Urdf>();
-    const auto robot_ptr = robot.get();
-    loaded_robots_[robot_ptr] = std::move(robot);
+    auto urdf = std::make_unique<owds::Urdf>();
+    const auto urdf_ptr = urdf.get();
+    loaded_urdfs_[urdf_ptr] = std::move(urdf);
 
-    robot_ptr->name_ = urdf_model.name_;
+    urdf_ptr->name_ = urdf_model.name_;
 
     for(auto& [name, material] : urdf_model.materials_)
     {
-      processMaterial(*robot_ptr, *material);
+      processMaterial(*urdf_ptr, *material);
     }
 
     for(auto& [name, link] : urdf_model.links_)
     {
-      processLinks(*robot_ptr, *link);
+      processLinks(*urdf_ptr, *link);
     }
 
     for(const auto& [name, joint] : urdf_model.joints_)
     {
-      processJoint(*robot_ptr, *joint);
+      processJoint(*urdf_ptr, *joint);
     }
 
     for(auto& [name, link] : urdf_model.links_)
     {
-      processJoints(*robot_ptr, *link);
+      processJoints(*urdf_ptr, *link);
     }
 
-    return *robot_ptr;
+    return *urdf_ptr;
   }
 
   void World::processMaterial(owds::Urdf& robot, const urdf::Material& urdf_material)
@@ -161,7 +161,13 @@ namespace owds {
 
     if(urdf_link.collision)
     {
-      // collision_shape = convertShape(material, *urdf_link.collision->geometry); // TODO
+      auto& origin = urdf_link.collision->origin;
+      glm::vec3 position = ToV3({(float)origin.position.x, (float)origin.position.y, (float)origin.position.z});
+      glm::quat rotation = ToQT({(float)origin.rotation.x, (float)origin.rotation.y, (float)origin.rotation.z, (float)origin.rotation.w});
+      glm::mat4 translate = glm::translate(glm::mat4(1), position);
+      glm::mat4 rotate = glm::mat4_cast(rotation);
+      glm::mat4 transform = translate * rotate;
+      collision_shape = convertShape(material, *urdf_link.collision->geometry, transform); // TODO
     }
 
     assert(urdf_link.collision_array.size() <= 1 && "Links with multiple collision shapes are not supported at this moment.");

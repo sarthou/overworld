@@ -230,7 +230,7 @@ namespace owds {
     owds::Model& preloaded_box_model_;
     owds::Model& preloaded_cylinder_model_;
     owds::Model& preloaded_sphere_model_;
-    std::unordered_map<owds::Urdf*, std::unique_ptr<owds::Urdf>> loaded_robots_;
+    std::unordered_map<owds::Urdf*, std::unique_ptr<owds::Urdf>> loaded_urdfs_;
 
     AmbientLight ambient_light_;
     PointLights point_lights_;
