@@ -9,9 +9,12 @@ namespace owds {
   class Vertex
   {
   public:
+    // Never change the attributes order
     glm::vec3 position_;
     glm::vec3 normal_;
     glm::vec2 uv_;
+    glm::vec3 tangent_;
+    glm::vec3 bitangent_;
   };
 
 } // namespace owds

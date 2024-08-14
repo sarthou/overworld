@@ -984,7 +984,12 @@ namespace tinyobj {
         token += 7;
         parseTextureName(material.ambient_texname, token);
         if(material.ambient_texname.find('/') == std::string::npos)
-          material.ambient_texname = texture_path + "/" + material.ambient_texname;
+        {
+          if(texture_path.back() != '/')
+            material.ambient_texname = texture_path + "/" + material.ambient_texname;
+          else
+            material.ambient_texname = texture_path + material.ambient_texname;
+        }
         continue;
       }
 
@@ -994,7 +999,12 @@ namespace tinyobj {
         token += 7;
         parseTextureName(material.diffuse_texname, token);
         if(material.diffuse_texname.find('/') == std::string::npos)
-          material.diffuse_texname = texture_path + "/" + material.diffuse_texname;
+        {
+          if(texture_path.back() != '/')
+            material.diffuse_texname = texture_path + "/" + material.diffuse_texname;
+          else
+            material.diffuse_texname = texture_path + material.diffuse_texname;
+        }
 
         // Set a decent diffuse default value if a diffuse texture is specified
         // without a matching Kd value.
@@ -1014,7 +1024,12 @@ namespace tinyobj {
         token += 7;
         parseTextureName(material.specular_texname, token);
         if(material.specular_texname.find('/') == std::string::npos)
-          material.specular_texname = texture_path + "/" + material.specular_texname;
+        {
+          if(texture_path.back() != '/')
+            material.specular_texname = texture_path + "/" + material.specular_texname;
+          else
+            material.specular_texname = texture_path + material.specular_texname;
+        }
         continue;
       }
 
@@ -1023,8 +1038,19 @@ namespace tinyobj {
       //  continue;
 
       // bump texture
-      // if((0 == strncmp(token, "map_bump", 8)) && IS_SPACE(token[8]))
-      //  continue;
+      if(((0 == strncmp(token, "map_Bump", 8)) || (0 == strncmp(token, "map_bump", 8))) && IS_SPACE(token[8]))
+      {
+        token += 9;
+        parseTextureName(material.normal_texname, token);
+        if(material.normal_texname.find('/') == std::string::npos)
+        {
+          if(texture_path.back() != '/')
+            material.normal_texname = texture_path + "/" + material.normal_texname;
+          else
+            material.normal_texname = texture_path + material.normal_texname;
+        }
+        continue;
+      }
 
       // bump texture
       // if((0 == strncmp(token, "bump", 4)) && IS_SPACE(token[4]))
@@ -1063,14 +1089,8 @@ namespace tinyobj {
       //  continue;
 
       // PBR: normal map texture
-      if((0 == strncmp(token, "norm", 4)) && IS_SPACE(token[4]))
-      {
-        token += 5;
-        parseTextureName(material.normal_texname, token);
-        if(material.normal_texname.find('/') == std::string::npos)
-          material.normal_texname = texture_path + "/" + material.normal_texname;
-        continue;
-      }
+      // if((0 == strncmp(token, "norm", 4)) && IS_SPACE(token[4]))
+      //  continue
     }
     // flush last material.
     material_map->insert(std::pair<std::string, int>(material.name, static_cast<int>(materials->size())));

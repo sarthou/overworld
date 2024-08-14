@@ -61,6 +61,7 @@ namespace owds {
         {
           name = "material.texture_normal";
           number = std::to_string(normal_nr++);
+          shader.setFloat("material.use_normal", 1.);
         }
         else if(textures[i].type_ == texture_height)
         {
@@ -96,6 +97,7 @@ namespace owds {
         glActiveTexture(GL_TEXTURE0 + texture_pose_offset + nb_used);
         glBindTexture(GL_TEXTURE_2D, 0);
         shader.setInt("material.texture_normal1", texture_pose_offset + nb_used);
+        shader.setFloat("material.use_normal", 0.);
         nb_used++;
       }
 
@@ -150,11 +152,11 @@ namespace owds {
       glEnableVertexAttribArray(2);
       glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, uv_));
       // vertex tangent
-      // glEnableVertexAttribArray(3);
-      // glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Tangent));
-      //// vertex bitangent
-      // glEnableVertexAttribArray(4);
-      // glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Bitangent));
+      glEnableVertexAttribArray(3);
+      glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, tangent_));
+      // vertex bitangent
+      glEnableVertexAttribArray(4);
+      glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, bitangent_));
       //// ids
       // glEnableVertexAttribArray(5);
       // glVertexAttribIPointer(5, 4, GL_INT, sizeof(Vertex), (void*)offsetof(Vertex, m_BoneIDs));

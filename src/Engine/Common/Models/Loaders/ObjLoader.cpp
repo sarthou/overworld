@@ -23,7 +23,7 @@ namespace owds {
   std::unique_ptr<owds::Model> ObjLoader::read(const std::string& path)
   {
     std::string mtl_path;
-    size_t pos = path.find_last_of("/\\");
+    auto pos = path.find_last_of("/\\");
     if(pos != std::string::npos)
       mtl_path = path.substr(0, pos);
 
@@ -80,7 +80,6 @@ namespace owds {
                                                    std::vector<tinyobj::Mesh_t>& meshes,
                                                    std::vector<tinyobj::Material_t>& materials)
   {
-    (void)materials; // TODO
     auto model = std::make_unique<Model>(Model::create());
 
     for(const auto& tiny_mesh : meshes)

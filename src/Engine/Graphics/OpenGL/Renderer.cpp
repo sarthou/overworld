@@ -78,7 +78,7 @@ namespace owds {
     if(render_camera_.aa_setting_ != ViewAntiAliasing_e::off)
       setAntiAliasing(render_camera_.aa_setting_);
 
-    Shader::shaders_directory = "/home/gsarthou/Robots/Dacobot2/ros2_ws/src/overworld/shaders/";
+    Shader::shaders_directory = "/home/gsarthou/Robots/Dacobot2/ros2_ws/src/overworld/shaders/"; // TODO not hard coded
     shaders_.insert({
       "default", {"light_shader.vs", "light_shader.fs"}
     });

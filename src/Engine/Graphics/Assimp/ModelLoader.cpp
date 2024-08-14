@@ -5,11 +5,14 @@
 #include <assimp/scene.h>
 #include <filesystem>
 #include <fstream>
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
 #include <iostream>
 
 #include "overworld/Engine/Common/Models/Loaders/ColladaLoader.h"
 #include "overworld/Engine/Common/Models/Loaders/ObjLoader.h"
 #include "overworld/Engine/Common/Models/Loaders/StlLoader.h"
+#include "overworld/Engine/Common/Models/Mesh.h"
 #include "overworld/Engine/Common/Models/Model.h"
 
 namespace owds::assimp {
@@ -120,5 +123,55 @@ namespace owds::assimp {
     }
 
     return model;
+  }
+
+  void ModelLoader::computeTangentSpace(std::unique_ptr<owds::Model> model)
+  {
+    for(auto& mesh : model->meshes_)
+      computeTangentSpace(mesh);
+  }
+
+  void ModelLoader::computeTangentSpace(Mesh& mesh)
+  {
+    for(unsigned int i = 0; i < mesh.indices_.size(); i = i + 3)
+    {
+      glm::vec3& vertex0 = mesh.vertices_.at(mesh.indices_.at(i)).position_;
+      glm::vec3& vertex1 = mesh.vertices_.at(mesh.indices_.at(i + 1)).position_;
+      glm::vec3& vertex2 = mesh.vertices_.at(mesh.indices_.at(i + 3)).position_;
+
+      glm::vec3 normal = glm::cross((vertex1 - vertex0), (vertex2 - vertex0));
+
+      glm::vec3 delta_pos;
+      if(vertex0 == vertex1)
+        delta_pos = vertex2 - vertex0;
+      else
+        delta_pos = vertex1 - vertex0;
+
+      glm::vec2& uv0 = mesh.vertices_.at(mesh.indices_.at(i)).uv_;
+      glm::vec2& uv1 = mesh.vertices_.at(mesh.indices_.at(i + 1)).uv_;
+      // lm::vec2& uv2 = mesh.vertices_.at(mesh.indices_.at(i + 2)).uv_;
+
+      glm::vec2 delta_uv1 = uv1 - uv0;
+
+      glm::vec3 tan;
+      // avoid divion with 0
+      if(delta_uv1.s != 0)
+        tan = delta_pos / delta_uv1.s;
+      else
+        tan = delta_pos / 1.0f;
+
+      tan = glm::normalize(tan - glm::dot(normal, tan) * normal);
+
+      glm::vec3 bin = glm::normalize(glm::cross(tan, normal));
+
+      // write into array - for each vertex of the face the same value
+      mesh.vertices_[mesh.indices_.at(i)].tangent_ = tan;
+      mesh.vertices_[mesh.indices_.at(i + 1)].tangent_ = tan;
+      mesh.vertices_[mesh.indices_.at(i + 2)].tangent_ = tan;
+
+      mesh.vertices_[mesh.indices_.at(i)].bitangent_ = bin;
+      mesh.vertices_[mesh.indices_.at(i + 1)].bitangent_ = bin;
+      mesh.vertices_[mesh.indices_.at(i + 2)].bitangent_ = bin;
+    }
   }
 } // namespace owds::assimp

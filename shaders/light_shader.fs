@@ -4,14 +4,17 @@ out vec4 FragColor;
 layout (location = 0) in vec3 FragPos;
 layout (location = 1) in vec3 Normal;
 layout (location = 2) in vec2 TexCoords;
+layout (location = 3) in mat3 TBN;
 
 struct Material {
   sampler2D texture_diffuse1;
   sampler2D texture_specular1;
-  //sampler2D emission;
+  sampler2D texture_normal1;
+
   float     shininess;
   float     specular;
   vec4      color;
+  float     use_normal; // 0 if no normal map
 }; 
 
 uniform Material material;
@@ -71,6 +74,13 @@ void main()
 {
   // properties
   vec3 norm = normalize(Normal);
+  if(material.use_normal > 0)
+  {
+    norm = texture(material.texture_normal1, TexCoords).rgb;
+    norm = norm * 2.0 - 1.0;   
+    norm = normalize(TBN * norm);
+  }
+  
   vec3 viewDir = normalize(view_pose - FragPos);
 
   // phase 1: Directional lighting
