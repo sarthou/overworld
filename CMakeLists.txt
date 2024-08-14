@@ -110,16 +110,6 @@ if(OWDS_USE_PHYSX)
     endif()
 endif()
 
-# #####################################################################
-# # BGFX to render all of our 3D graphics                            ##
-# #####################################################################
-FetchContent_Declare(
-    BGFX
-    GIT_REPOSITORY "https://github.com/bkaradzic/bgfx.cmake.git"
-    GIT_TAG "c2b7416a58a8610eecba5f6e3940e30c1b64e1f9"
-)
-FetchContent_MakeAvailable(BGFX)
-
 owds_depend_msg_package(std_msgs)
 owds_depend_msg_package(sensor_msgs)
 owds_depend_msg_package(visualization_msgs)
@@ -170,48 +160,9 @@ owds_add_ros_library(overworld_engine_common
     src/Engine/Common/World.cpp)
 
 # ##################################
-set(overworld_vert_shaders
-    shaders/vs_default.sc
-    shaders/vs_simple_shadows.sc
-    shaders/vs_skybox.sc)
-
-set(overworld_frag_shaders
-    shaders/fs_default.sc
-    shaders/fs_simple_shadows.sc
-    shaders/fs_skybox.sc)
-
-bgfx_compile_shader_to_header(
-    TYPE VERTEX
-    SHADERS ${overworld_vert_shaders}
-    VARYING_DEF ${CMAKE_SOURCE_DIR}/shaders/defs/varying.def.sc
-    OUTPUT_DIR ${CMAKE_BINARY_DIR}/include/generated/shaders/)
-
-bgfx_compile_shader_to_header(
-    TYPE FRAGMENT
-    SHADERS ${overworld_frag_shaders}
-    VARYING_DEF ${CMAKE_SOURCE_DIR}/shaders/defs/varying.def.sc
-    OUTPUT_DIR ${CMAKE_BINARY_DIR}/include/generated/shaders/)
-
-owds_add_library(overworld_graphics
-    src/Graphics/Base/Renderer.cpp
-    src/Engine/Graphics/Assimp/ModelLoader.cpp
-    src/Graphics/BGFX/Camera.cpp
-    src/Graphics/BGFX/Renderer.cpp
-    src/Graphics/BGFX/ShadowsRenderer.cpp
-    src/Graphics/BGFX/Vertex.cpp
-    src/Graphics/GLFW3/Window.cpp
-    ${overworld_vert_shaders}
-    ${overworld_frag_shaders})
-
-target_include_directories(overworld_graphics PUBLIC ${CMAKE_BINARY_DIR}/include/generated/shaders/)
-target_link_libraries(overworld_graphics PUBLIC overworld_engine_common assimp bgfx bx glfw)
-target_compile_definitions(overworld_graphics PUBLIC GLM_FORCE_RIGHT_HANDED)
-target_compile_options(overworld_graphics PRIVATE $<$<CXX_COMPILER_ID:Clang>:-Wno-gnu-zero-variadic-macro-arguments>)
-
-# ##################################
 owds_add_library(overworld_glad External/src/glad.c)
 
-owds_add_library(overworld_graphics_new
+owds_add_library(overworld_graphics
     src/Engine/Graphics/Assimp/ModelLoader.cpp
     src/Engine/Graphics/GLFW/Window.cpp
     src/Engine/Graphics/OpenGL/Camera.cpp
@@ -222,8 +173,8 @@ owds_add_library(overworld_graphics_new
     src/Engine/Graphics/OpenGL/Shader.cpp
     src/Engine/Graphics/OpenGL/AmbientShadow.cpp
     src/Engine/Graphics/OpenGL/Texture2D.cpp)
-target_link_libraries(overworld_graphics_new PUBLIC overworld_engine_common overworld_glad assimp glfw)
-target_compile_options(overworld_graphics_new PRIVATE $<$<CXX_COMPILER_ID:Clang>:-Wno-unused-function>)
+target_link_libraries(overworld_graphics PUBLIC overworld_engine_common overworld_glad assimp glfw)
+target_compile_options(overworld_graphics PRIVATE $<$<CXX_COMPILER_ID:Clang>:-Wno-unused-function>)
 
 # ##################################
 if(OWDS_USE_PHYSX)
@@ -373,23 +324,18 @@ owds_add_ros_executable(teleop
 # ##################################
 
 # ##################################
-owds_add_ros_executable(overworld_test1 src/Nodes/Test1.cpp)
-target_compile_options(overworld_test1 PRIVATE $<$<CXX_COMPILER_ID:Clang>:-Wno-gnu-zero-variadic-macro-arguments>)
-
-target_link_libraries(overworld_test1
-    PUBLIC
-        overworld_graphics
-        overworld_physics)
-
 owds_add_ros_executable(overworld_opengl src/Nodes/TestOpengl.cpp)
 target_compile_options(overworld_opengl PRIVATE $<$<CXX_COMPILER_ID:Clang>:-Wno-gnu-zero-variadic-macro-arguments>)
 target_link_libraries(overworld_opengl
     PUBLIC
-    overworld_graphics_new
+    overworld_graphics
     overworld_physics)
 
 # ##################################
-owds_install_executables(overworld_test1)
+owds_install_libs(overworld_graphics
+    overworld_glad
+    overworld_engine_common)
+
 owds_install_executables(overworld_opengl)
 
 # ##################################
