@@ -153,29 +153,33 @@ namespace owds {
     if(getXmlDocument(path, doc) == false)
       return nullptr;
 
+    std::string directory;
+    auto pos = path.find_last_of("/\\");
+    if(pos != std::string::npos)
+      directory = path.substr(0, pos) + "/";
+
     getScalingAndTransform(doc.RootElement());
 
     auto mesh_library = getMeshLibrary(doc.RootElement());
     auto material_library = getMaterialLibrary(doc.RootElement());
-    (void)material_library;
     auto instances = readSceneGeometries(doc.RootElement(), mesh_library);
-
-    for(auto& material : material_library)
-    {
-      std::cout << material.first << ":" << std::endl;
-      std::cout << " -> diffuse = " << material.second.diffuse_color_.r_ << " " << material.second.diffuse_color_.g_ << " " << material.second.diffuse_color_.b_ << " " << material.second.diffuse_color_.a_ << std::endl;
-      std::cout << " -> diffuse = " << material.second.diffuse_texture_ << std::endl;
-      std::cout << " -> specular = " << material.second.specular_color_.r_ << " " << material.second.specular_color_.g_ << " " << material.second.specular_color_.b_ << " " << material.second.specular_color_.a_ << std::endl;
-      std::cout << " -> specular = " << material.second.specular_texture_ << std::endl;
-      std::cout << " -> normal   = " << material.second.normal_texture_ << std::endl;
-      std::cout << " -> shininess = " << material.second.shininess_ << std::endl;
-    }
 
     if(instances.empty() == false)
     {
       auto model = std::make_unique<Model>(Model::create());
       model->source_path_ = path;
       model->meshes_.swap(instances);
+      for(auto& mesh : model->meshes_)
+      {
+        auto material_it = material_library.find(mesh.material_.name_);
+        if(material_it != material_library.end())
+        {
+          mesh.material_ = material_it->second;
+          mesh.material_.diffuse_texture_ = mesh.material_.diffuse_texture_.empty() ? "" : directory + mesh.material_.diffuse_texture_;
+          mesh.material_.specular_texture_ = mesh.material_.specular_texture_.empty() ? "" : directory + mesh.material_.specular_texture_;
+          mesh.material_.normal_texture_ = mesh.material_.normal_texture_.empty() ? "" : directory + mesh.material_.normal_texture_;
+        }
+      }
       return model;
     }
 
@@ -288,6 +292,7 @@ namespace owds {
           if(technique != nullptr)
           {
             Material material;
+            material.name_ = effect_id;
 
             auto* extra = technique->FirstChildElement("extra");
             if(extra != nullptr)
@@ -352,7 +357,11 @@ namespace owds {
         std::string effect_url(instance_effect->Attribute("url"));
         auto effect_it = effects.find(effect_url.erase(0, 1));
         if(effect_it != effects.end())
-          res.emplace(material_id, effect_it->second);
+        {
+          Material material = effect_it->second;
+          material.name_ = material_id; // rename effect to material
+          res.emplace(material_id, material);
+        }
       }
     }
 
@@ -643,7 +652,21 @@ namespace owds {
         for(auto& v : instance.vertices_)
           v.position_ = glm::vec3(node_trans * glm::vec4(v.position_, 1.));
 
-        // TODO get bind_material
+        auto* bind_material = instance_geom->FirstChildElement("bind_material");
+        if(bind_material != nullptr)
+        {
+          auto* technique_common = bind_material->FirstChildElement("technique_common");
+          if(technique_common != nullptr)
+          {
+            auto* instance_material = technique_common->FirstChildElement("instance_material");
+            if(instance_material != nullptr)
+            {
+              std::string target = instance_material->Attribute("target");
+              instance.material_.name_ = target.erase(0, 1);
+              // TODO bind with correct UVMAP
+            }
+          }
+        }
       }
       else
         ShellDisplay::error("[ColladaLoader] geom " + geom_url + " not found");

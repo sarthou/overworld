@@ -160,7 +160,7 @@ namespace owds {
     const auto size_mat = glm::scale(glm::mat4(1.f), ToV3(shape.half_extents_));
     const auto model_mat = shape.shape_transform_ * ToM4(actor.getModelMatrix()) * size_mat;
 
-    loadInstance(shape.box_model_, {shape.diffuse_color_, shape.diffuse_color_, 0., "", "", ""}, model_mat);
+    loadInstance(shape.box_model_, {"", shape.diffuse_color_, shape.diffuse_color_, 0., "", "", ""}, model_mat);
   }
 
   void Renderer::loadActor(const Actor& actor, const ShapeCapsule& shape)
@@ -182,7 +182,7 @@ namespace owds {
     const auto size_mat = glm::scale(glm::mat4(1.f), glm::vec3(shape.radius_, shape.height_, shape.radius_));
     const auto model_mat = shape.shape_transform_ * ToM4(actor.getModelMatrix()) * size_mat;
 
-    loadInstance(shape.cylinder_model_, {shape.diffuse_color_, shape.diffuse_color_, 0., "", "", ""}, model_mat);
+    loadInstance(shape.cylinder_model_, {"", shape.diffuse_color_, shape.diffuse_color_, 0., "", "", ""}, model_mat);
   }
 
   void Renderer::loadActor(const Actor& actor, const ShapeDummy& shape)

@@ -116,6 +116,7 @@ namespace owds {
   void World::processMaterial(owds::Urdf& robot, const urdf::Material& urdf_material)
   {
     robot.materials_[urdf_material.name] = {
+      urdf_material.name,
       !urdf_material.texture_filename.empty() ?
         owds::Color{1,                     1, 1, 0.}
         :
@@ -147,6 +148,7 @@ namespace owds {
   {
     const auto material_name = urdf_link.visual ? urdf_link.visual->material_name : "";
     const auto material = material_name.empty() ? owds::Material{
+                                                    "",
                                                     owds::Color{1, 1, 1, 0.},
                                                     owds::Color{1, 1, 1, 0.},
                                                     -1.0,

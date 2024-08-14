@@ -9,6 +9,7 @@ namespace owds {
   class Material
   {
   public:
+    std::string name_;
     owds::Color diffuse_color_;
     owds::Color specular_color_;
     float shininess_ = -1.;

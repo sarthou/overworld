@@ -241,7 +241,7 @@ namespace owds::bgfx {
     const auto size_mat = glm::scale(glm::mat4(1.f), ToV3(shape.half_extents_));
     const auto model_mat = ToM4(actor.getModelMatrix()) * size_mat;
 
-    queueModelBatch(shape.box_model_, {shape.diffuse_color_, shape.diffuse_color_, 0., "", "", ""}, FromM4(model_mat));
+    queueModelBatch(shape.box_model_, {"", shape.diffuse_color_, shape.diffuse_color_, 0., "", "", ""}, FromM4(model_mat));
   }
 
   void Renderer::queueActorBatch(const owds::Actor& actor, const owds::ShapeCapsule& shape)
@@ -263,7 +263,7 @@ namespace owds::bgfx {
     const auto size_mat = glm::scale(glm::mat4(1.f), glm::vec3(shape.radius_, shape.height_, shape.radius_));
     const auto model_mat = ToM4(actor.getModelMatrix()) * size_mat;
 
-    queueModelBatch(shape.cylinder_model_, {shape.diffuse_color_, shape.diffuse_color_, 0., "", "", ""}, FromM4(model_mat));
+    queueModelBatch(shape.cylinder_model_, {"", shape.diffuse_color_, shape.diffuse_color_, 0., "", "", ""}, FromM4(model_mat));
   }
 
   void Renderer::queueActorBatch(const owds::Actor& actor, const owds::ShapeDummy& shape)
