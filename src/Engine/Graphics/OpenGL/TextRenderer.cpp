@@ -1,6 +1,8 @@
 #include "overworld/Engine/Graphics/OpenGL/TextRenderer.h"
 
 #include <freetype/freetype.h>
+#include <glm/gtc/packing.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <string>
 
 #include "glad/glad.h"
@@ -88,7 +90,7 @@ namespace owds {
     return true;
   }
 
-  void TextRenderer::renderText(Shader& shader, const std::string& text, const glm::vec3& position, float height, const glm::vec3& color, bool center)
+  void TextRenderer::renderText(Shader& shader, const glm::mat4& view_matrix, const std::string& text, const glm::vec3& position, float height, const glm::vec3& color, bool center)
   {
     shader.use();
     shader.setVec3("text_color", color);
@@ -101,6 +103,13 @@ namespace owds {
     float x = position.x;
     float y = position.y;
     float z = position.z;
+
+    glm::vec4 center_in_world(x, y, z, 1.);
+    glm::vec4 center_in_cam = view_matrix * center_in_world;
+
+    x = center_in_cam.x;
+    y = center_in_cam.y;
+    z = center_in_cam.z;
 
     if(center)
     {
@@ -121,19 +130,19 @@ namespace owds {
       Character_t& ch = characters_[*c];
 
       float xpos = x + ch.bearing.x * height;
-      float zpos = z - (ch.size.y - ch.bearing.y) * height;
+      float ypos = y - (ch.size.y - ch.bearing.y) * height;
 
       float w = ch.size.x * height;
       float h = ch.size.y * height;
 
       float vertices[6 * 5] = {
-        xpos, y, zpos + h, 0.0f, 0.0f,
-        xpos, y, zpos, 0.0f, 1.0f,
-        xpos + w, y, zpos, 1.0f, 1.0f,
+        xpos, ypos + h, z, 0.0f, 0.0f,
+        xpos, ypos, z, 0.0f, 1.0f,
+        xpos + w, ypos, z, 1.0f, 1.0f,
 
-        xpos, y, zpos + h, 0.0f, 0.0f,
-        xpos + w, y, zpos, 1.0f, 1.0f,
-        xpos + w, y, zpos + h, 1.0f, 0.0f};
+        xpos, ypos + h, z, 0.0f, 0.0f,
+        xpos + w, ypos, z, 1.0f, 1.0f,
+        xpos + w, ypos + h, z, 1.0f, 0.0f};
 
       glBindTexture(GL_TEXTURE_2D, ch.texture_id_);
       glBindBuffer(GL_ARRAY_BUFFER, vbo_);

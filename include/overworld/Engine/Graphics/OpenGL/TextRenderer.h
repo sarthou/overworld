@@ -1,6 +1,7 @@
 #ifndef OWDS_TEXTRENDERER_H
 #define OWDS_TEXTRENDERER_H
 
+#include <glm/matrix.hpp>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <map>
@@ -25,7 +26,7 @@ namespace owds {
 
     bool load(const std::string& font, unsigned int font_size);
 
-    void renderText(Shader& shader, const std::string& text, const glm::vec3& position, float height, const glm::vec3& color, bool center = false);
+    void renderText(Shader& shader, const glm::mat4& view_matrix, const std::string& text, const glm::vec3& position, float height, const glm::vec3& color, bool center = false);
 
   private:
     unsigned int vao_;
