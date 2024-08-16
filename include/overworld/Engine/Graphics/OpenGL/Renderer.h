@@ -18,6 +18,7 @@
 #include "overworld/Engine/Graphics/OpenGL/PointShadow.h"
 #include "overworld/Engine/Graphics/OpenGL/Screen.h"
 #include "overworld/Engine/Graphics/OpenGL/Shader.h"
+#include "overworld/Engine/Graphics/OpenGL/TextRenderer.h"
 
 namespace owds {
   class Window;
@@ -46,6 +47,7 @@ namespace owds {
     Cubemap sky_;
     AmbientShadow shadow_;
     PointShadow point_shadows_;
+    TextRenderer text_renderer_;
     float max_fps_ = 120;
     float delta_time_;
     float last_frame_;

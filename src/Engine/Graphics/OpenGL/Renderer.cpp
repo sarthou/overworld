@@ -94,10 +94,15 @@ namespace owds {
     shaders_.insert({
       "depthcube", {"depthcube_shader.vs", "depthcube_shader.fs", "depthcube_shader.gs"}
     });
+    shaders_.insert({
+      "text", {"text_shader.vs", "text_shader.fs"}
+    });
 
     sky_.init("/home/gsarthou/Robots/Dacobot2/ros2_ws/src/overworld/models/textures/skybox/Footballfield/");
 
     shadow_.init(render_camera_.getNearPlane(), render_camera_.getFarPlane());
+    text_renderer_.init();
+    text_renderer_.load("/usr/share/fonts/truetype/open-sans/OpenSans-Regular.ttf", 48);
 
     shaders_.at("screen").use();
     shaders_.at("screen").setInt("screenTexture", 0);
@@ -319,6 +324,7 @@ namespace owds {
   {
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    glDisable(GL_BLEND);
 
     // glStencilFunc(GL_ALWAYS, 1, 0xFF); // all fragments should pass the stencil test
     // glStencilMask(0xFF);               // enable writing to the stencil buffer
@@ -329,6 +335,7 @@ namespace owds {
     auto& sky_shader = shaders_.at("sky");
     auto& shadow_shader = shaders_.at("depth");
     auto& shadow_point_shader = shaders_.at("depthcube");
+    auto& text_shader = shaders_.at("text");
 
     // 0. draw scene as normal in depth buffers
 
@@ -389,6 +396,8 @@ namespace owds {
 
     renderModels(light_shader, 2);
 
+    // 1.2 draw background
+
     sky_shader.use();
     glm::mat4 view = glm::mat4(glm::mat3(render_camera_.getViewMatrix()));
     sky_shader.setMat4("view", view);
@@ -396,7 +405,19 @@ namespace owds {
 
     sky_.draw(sky_shader);
 
+    // 1.3 draw text
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    text_shader.use();
+    text_shader.setMat4("projection", render_camera_.getProjectionMatrix());
+    text_shader.setMat4("view", render_camera_.getViewMatrix());
+
+    text_renderer_.renderText(text_shader, "tesH", glm::vec3(0, 0, 5), 1, glm::vec3(1.f, 0.f, 1.f));
+
     // 2. now blit multisampled buffer(s) to normal colorbuffer of intermediate FBO. Image is stored in screenTexture
+    glDisable(GL_BLEND);
     screen_.generateColorTexture();
 
     // 3. now render quad with scene's visuals as its texture image

@@ -57,6 +57,7 @@ find_package(assimp REQUIRED)
 find_package(Bullet REQUIRED)
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 find_package(glm CONFIG REQUIRED)
+find_package(Freetype REQUIRED)
 
 include(FetchContent)
 include(CheckLanguage)
@@ -171,9 +172,11 @@ owds_add_library(overworld_graphics
     src/Engine/Graphics/OpenGL/Renderer.cpp
     src/Engine/Graphics/OpenGL/Screen.cpp
     src/Engine/Graphics/OpenGL/Shader.cpp
+    src/Engine/Graphics/OpenGL/TextRenderer.cpp
     src/Engine/Graphics/OpenGL/AmbientShadow.cpp
     src/Engine/Graphics/OpenGL/Texture2D.cpp)
-target_link_libraries(overworld_graphics PUBLIC overworld_engine_common overworld_glad assimp glfw)
+target_link_libraries(overworld_graphics PUBLIC overworld_engine_common overworld_glad assimp glfw ${FREETYPE_LIBRARIES})
+target_include_directories(overworld_graphics PRIVATE ${FREETYPE_INCLUDE_DIRS})
 target_compile_options(overworld_graphics PRIVATE $<$<CXX_COMPILER_ID:Clang>:-Wno-unused-function>)
 
 # ##################################
