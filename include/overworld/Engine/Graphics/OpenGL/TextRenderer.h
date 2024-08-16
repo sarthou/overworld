@@ -25,7 +25,7 @@ namespace owds {
 
     bool load(const std::string& font, unsigned int font_size);
 
-    void renderText(Shader& shader, const std::string& text, const glm::vec3& position, float height, const glm::vec3& color);
+    void renderText(Shader& shader, const std::string& text, const glm::vec3& position, float height, const glm::vec3& color, bool center = false);
 
   private:
     unsigned int vao_;

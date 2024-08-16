@@ -88,7 +88,7 @@ namespace owds {
     return true;
   }
 
-  void TextRenderer::renderText(Shader& shader, const std::string& text, const glm::vec3& position, float height, const glm::vec3& color)
+  void TextRenderer::renderText(Shader& shader, const std::string& text, const glm::vec3& position, float height, const glm::vec3& color, bool center)
   {
     shader.use();
     shader.setVec3("text_color", color);
@@ -101,6 +101,19 @@ namespace owds {
     float x = position.x;
     float y = position.y;
     float z = position.z;
+
+    if(center)
+    {
+      float width = 0;
+      std::string::const_iterator c;
+      for(c = text.begin(); c != text.end(); c++)
+      {
+        Character_t& ch = characters_[*c];
+        width += (ch.advance >> 6) * height; // bitshift by 6 to get value in pixels (1/64th times 2^6 = 64)
+      }
+
+      x -= width / 2.f;
+    }
 
     std::string::const_iterator c;
     for(c = text.begin(); c != text.end(); c++)
