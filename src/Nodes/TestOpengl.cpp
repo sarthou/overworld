@@ -47,19 +47,26 @@ int main()
 
   std::cout << "================== WORLD CREATED ! ================" << std::endl;
 
-  world.setAmbientLight({-0.2f, -0.5f, -0.3f},
+  world.setAmbientLight({0.5f, 0.2f, -0.3f},
                         {1.0f, 0.976f, 0.898f},
-                        0.3, 0.5, 0.9);
+                        0.25, 0.4, 0.8);
 
-  world.addPointLight({1.5f, 2.0f, 2.9f},
+  world.addPointLight({5.f, 7.0f, 2.9f},
                       {1.0f, 1.0f, 1.0f},
                       0.4, 0.5, 1.0,
-                      5.f);
+                      6.f);
 
-  world.addPointLight({1.5f, 10.0f, 2.9f},
-                      {0.0f, 1.0f, 1.0f},
+  world.addPointLight({8.5f, 7.0f, 2.9f},
+                      {1.0f, 1.0f, 1.0f},
                       0.5, 0.6, 1.0,
-                      8.0f);
+                      6.0f);
+
+  world.addPointLight({5.f, 12.0f, 2.9f},
+                      {1.0f, 1.0f, 1.0f},
+                      0.4, 0.5, 1.0,
+                      6.f);
+
+  world.addDebugText("overworld", {5, 5, 5}, 0.5, {0., 0.5, 1.0});
 
   renderer.attachWorld(&world);
 

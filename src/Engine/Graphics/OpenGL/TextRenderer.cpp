@@ -90,6 +90,16 @@ namespace owds {
     return true;
   }
 
+  void TextRenderer::renderText(Shader& shader, const glm::mat4& view_matrix, const DebugText_t& text)
+  {
+    renderText(shader, view_matrix,
+               text.text,
+               text.position,
+               text.height,
+               text.color,
+               text.centered);
+  }
+
   void TextRenderer::renderText(Shader& shader, const glm::mat4& view_matrix, const std::string& text, const glm::vec3& position, float height, const glm::vec3& color, bool center)
   {
     shader.use();

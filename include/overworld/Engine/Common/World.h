@@ -8,6 +8,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "overworld/Engine/Common/Debug/DebugText.h"
 #include "overworld/Engine/Common/Lights/AmbientLight.h"
 #include "overworld/Engine/Common/Lights/PointLights.h"
 #include "overworld/Engine/Common/Shapes/Shape.h"
@@ -208,6 +209,14 @@ namespace owds {
     void setPointLightPosition(std::size_t id, const glm::vec3& position);
     void setPointLightAmbientStrength(std::size_t id, float strength);
 
+    int addDebugText(const std::string& text,
+                     const std::array<float, 3>& position,
+                     float height,
+                     const std::array<float, 3>& color = {1.0, 1.0, 1.0},
+                     bool centered = true,
+                     int replace_id = -1);
+    void removeDebugText(int id);
+
     /**
      * @param gravity Self-explanatory.
      */
@@ -234,6 +243,7 @@ namespace owds {
 
     AmbientLight ambient_light_;
     PointLights point_lights_;
+    std::vector<DebugText_t> debug_texts_;
   };
 } // namespace owds
 

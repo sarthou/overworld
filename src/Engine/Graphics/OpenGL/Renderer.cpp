@@ -412,8 +412,11 @@ namespace owds {
 
     text_shader.use();
     text_shader.setMat4("projection", render_camera_.getProjectionMatrix());
-
-    text_renderer_.renderText(text_shader, render_camera_.getViewMatrix(), "tesH", glm::vec3(0, 0, 5), 1, glm::vec3(1.f, 0.f, 1.f), true);
+    for(auto& debug : world_->debug_texts_)
+    {
+      if(debug.text.empty() == false)
+        text_renderer_.renderText(text_shader, render_camera_.getViewMatrix(), debug);
+    }
 
     // 2. now blit multisampled buffer(s) to normal colorbuffer of intermediate FBO. Image is stored in screenTexture
     glDisable(GL_BLEND);

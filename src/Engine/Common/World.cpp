@@ -398,4 +398,57 @@ namespace owds {
     point_lights_.setAmbientStrength(id, strength);
   }
 
+  int World::addDebugText(const std::string& text,
+                          const std::array<float, 3>& position,
+                          float height,
+                          const std::array<float, 3>& color,
+                          bool centered,
+                          int replace_id)
+  {
+    DebugText_t debug{
+      text,
+      centered,
+      glm::vec3(position[0], position[1], position[2]),
+      glm::vec3(color[0], color[1], color[2]),
+      height};
+
+    if(replace_id >= 0)
+    {
+      if(replace_id < (int)debug_texts_.size())
+      {
+        debug_texts_[replace_id] = debug;
+        return replace_id;
+      }
+      else
+        return -1;
+    }
+    else
+    {
+      int id = -1;
+      for(size_t i = 0; i < debug_texts_.size(); i++)
+      {
+        if(debug_texts_[i].text.empty())
+        {
+          id = i;
+          break;
+        }
+      }
+
+      if(id >= 0)
+        debug_texts_[id] = debug;
+      else
+      {
+        id = debug_texts_.size();
+        debug_texts_.emplace_back(debug);
+      }
+      return id;
+    }
+  }
+
+  void World::removeDebugText(int id)
+  {
+    if(id >= 0 && id < (int)debug_texts_.size())
+      debug_texts_[id].text = "";
+  }
+
 } // namespace owds
