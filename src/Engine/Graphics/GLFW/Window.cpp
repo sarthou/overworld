@@ -1,11 +1,20 @@
 #include "overworld/Engine/Graphics/GLFW/Window.h"
 
+#include "overworld/Compat/ROS.h"
+// should be first
+
 #include <memory>
 #include <string>
 
 #include "overworld/Engine/Graphics/Common/WindowPlatformData.h"
 #include "overworld/Engine/Graphics/OpenGL/Camera.h"
 #include "overworld/Engine/Graphics/OpenGL/Renderer.h"
+
+#ifndef STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_STATIC
+#include "stb_image.h"
+#endif
 
 // Should be last
 #define GLFW_EXPOSE_NATIVE_X11
@@ -23,6 +32,12 @@ namespace owds {
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
     // glfwWindowHint(GLFW_SAMPLES, 4);
     glfw_window_ = glfwCreateWindow(640, 480, name.c_str(), nullptr, nullptr);
+
+    GLFWimage icons[1];
+    std::string icon_path(owds::compat::owds_ros::getShareDirectory("overworld") + "/docs/images/overworld_light.png");
+    icons[0].pixels = stbi_load(icon_path.c_str(), &icons[0].width, &icons[0].height, 0, 4); // rgba channels
+    glfwSetWindowIcon(glfw_window_, 1, icons);
+    stbi_image_free(icons[0].pixels);
 
     glfwMakeContextCurrent(glfw_window_);
     glfwSetWindowUserPointer(glfw_window_, this);
