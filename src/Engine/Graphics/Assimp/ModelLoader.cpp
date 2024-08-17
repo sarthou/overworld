@@ -101,43 +101,50 @@ namespace owds::assimp {
 
   std::unique_ptr<owds::Model> ModelLoader::load(const std::filesystem::path& path) const
   {
+    std::unique_ptr<owds::Model> model = nullptr;
+
     if(path.string().rfind(".stl") != std::string::npos)
-      return StlLoader::read(path.string());
+      model = StlLoader::read(path.string());
     else if(path.string().rfind(".obj") != std::string::npos)
     {
       ObjLoader loader;
-      return loader.read(path.string());
+      model = loader.read(path.string());
     }
     else if(path.string().rfind(".dae") != std::string::npos)
     {
       ColladaLoader loader;
-      return loader.read(path.string());
+      model = loader.read(path.string());
     }
 
-    auto model = std::make_unique<owds::Model>(owds::Model::create());
-    model->source_path_ = path.string();
-
-    if(!loadModel(*model, path))
+    if(model == nullptr)
     {
-      return nullptr;
+      model = std::make_unique<owds::Model>(owds::Model::create());
+      model->source_path_ = path.string();
+
+      if(!loadModel(*model, path))
+      {
+        return nullptr;
+      }
     }
+
+    computeTangentSpace(model);
 
     return model;
   }
 
-  void ModelLoader::computeTangentSpace(std::unique_ptr<owds::Model> model)
+  void ModelLoader::computeTangentSpace(const std::unique_ptr<owds::Model>& model) const
   {
     for(auto& mesh : model->meshes_)
       computeTangentSpace(mesh);
   }
 
-  void ModelLoader::computeTangentSpace(Mesh& mesh)
+  void ModelLoader::computeTangentSpace(Mesh& mesh) const
   {
     for(unsigned int i = 0; i < mesh.indices_.size(); i = i + 3)
     {
       glm::vec3& vertex0 = mesh.vertices_.at(mesh.indices_.at(i)).position_;
       glm::vec3& vertex1 = mesh.vertices_.at(mesh.indices_.at(i + 1)).position_;
-      glm::vec3& vertex2 = mesh.vertices_.at(mesh.indices_.at(i + 3)).position_;
+      glm::vec3& vertex2 = mesh.vertices_.at(mesh.indices_.at(i + 2)).position_;
 
       glm::vec3 normal = glm::cross((vertex1 - vertex0), (vertex2 - vertex0));
 

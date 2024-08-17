@@ -14,8 +14,8 @@ namespace owds::assimp {
     std::unique_ptr<owds::Model> load(const std::filesystem::path& path) const override;
 
   private:
-    void computeTangentSpace(std::unique_ptr<owds::Model> model);
-    void computeTangentSpace(Mesh& mesh);
+    void computeTangentSpace(const std::unique_ptr<owds::Model>& model) const;
+    void computeTangentSpace(Mesh& mesh) const;
   };
 } // namespace owds::assimp
 
