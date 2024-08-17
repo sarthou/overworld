@@ -6,8 +6,9 @@
 #include <string>
 #include <unordered_map>
 
+#include "overworld/Engine/Common/Models/Loaders/ModelLoader.h"
+
 namespace owds {
-  class ModelLoader;
   class Model;
 
   class ModelManager
@@ -21,15 +22,10 @@ namespace owds {
 
     static ModelManager& get();
 
-    void setModelLoader(std::unique_ptr<ModelLoader> loader);
-
-    template<typename T>
-    void setModelLoader() { setModelLoader(std::make_unique<T>()); }
-
     owds::Model& load(const std::filesystem::path& path);
 
   protected:
-    std::unique_ptr<ModelLoader> model_loader_;
+    ModelLoader model_loader_;
     std::unordered_map<std::string, std::unique_ptr<owds::Model>> models_;
   };
 } // namespace owds

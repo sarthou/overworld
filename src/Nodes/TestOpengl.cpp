@@ -1,8 +1,8 @@
 #include <overworld/Compat/ROS.h>
 // should be first
 
+#include "overworld/Engine/Common/Models/Loaders/ModelLoader.h"
 #include "overworld/Engine/Common/Models/ModelManager.h"
-#include "overworld/Engine/Graphics/Assimp/ModelLoader.h"
 #include "overworld/Engine/Graphics/OpenGL/Camera.h"
 #include "overworld/Engine/Graphics/OpenGL/Renderer.h"
 
@@ -24,11 +24,6 @@ using DefaultEngine = owds::physx::World;
 
 int main()
 {
-  {
-    auto& mgr = owds::ModelManager::get();
-    mgr.setModelLoader<owds::assimp::ModelLoader>();
-  }
-
   owds::Renderer renderer;
   auto* cam = renderer.getRenderCamera();
   cam->setCameraView(owds::CameraView_e::segmented_view);

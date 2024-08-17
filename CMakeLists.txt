@@ -152,6 +152,7 @@ owds_add_ros_library(overworld_engine_common
     src/Engine/Common/Models/Loaders/ObjLoader.cpp
     src/Engine/Common/Models/Loaders/StlLoader.cpp
     src/Engine/Common/Models/Loaders/TinyObjReader.cpp
+    src/Engine/Common/Models/Loaders/ModelLoader.cpp
     src/Engine/Common/Models/Mesh.cpp
     src/Engine/Common/Models/Model.cpp
     src/Engine/Common/Models/ModelManager.cpp
@@ -164,7 +165,6 @@ owds_add_ros_library(overworld_engine_common
 owds_add_library(overworld_glad External/src/glad.c)
 
 owds_add_library(overworld_graphics
-    src/Engine/Graphics/Assimp/ModelLoader.cpp
     src/Engine/Graphics/GLFW/Window.cpp
     src/Engine/Graphics/OpenGL/Camera.cpp
     src/Engine/Graphics/OpenGL/Cubemap.cpp

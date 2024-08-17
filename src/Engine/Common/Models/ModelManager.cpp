@@ -1,7 +1,7 @@
 #include "overworld/Engine/Common/Models/ModelManager.h"
 
+#include "overworld/Engine/Common/Models/Loaders/ModelLoader.h"
 #include "overworld/Engine/Common/Models/Model.h"
-#include "overworld/Engine/Common/Models/ModelLoader.h"
 
 namespace owds {
   ModelManager::ModelManager() = default;
@@ -13,20 +13,13 @@ namespace owds {
     return mgr;
   }
 
-  void ModelManager::setModelLoader(std::unique_ptr<ModelLoader> loader)
-  {
-    model_loader_ = std::move(loader);
-  }
-
   owds::Model& ModelManager::load(const std::filesystem::path& path)
   {
     const auto absolute_path_str = path.string();
 
     if(!models_.count(absolute_path_str))
     {
-      assert(model_loader_ && "You must register a model loader via owds::ModelManager::load(...) first!");
-
-      auto model = model_loader_->load(path);
+      auto model = model_loader_.load(path);
 
       assert(model && "Failed to load model");
 

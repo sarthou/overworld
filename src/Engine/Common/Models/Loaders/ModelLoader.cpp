@@ -1,4 +1,4 @@
-#include "overworld/Engine/Graphics/Assimp/ModelLoader.h"
+#include "overworld/Engine/Common/Models/Loaders/ModelLoader.h"
 
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
@@ -15,7 +15,7 @@
 #include "overworld/Engine/Common/Models/Mesh.h"
 #include "overworld/Engine/Common/Models/Model.h"
 
-namespace owds::assimp {
+namespace owds {
 
   owds::Mesh processMesh(const aiMesh* mesh)
   {
@@ -181,4 +181,4 @@ namespace owds::assimp {
       mesh.vertices_[mesh.indices_.at(i + 2)].bitangent_ = bin;
     }
   }
-} // namespace owds::assimp
+} // namespace owds
