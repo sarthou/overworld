@@ -408,8 +408,8 @@ namespace owds {
     DebugText_t debug{
       text,
       centered,
-      glm::vec3(position[0], position[1], position[2]),
-      glm::vec3(color[0], color[1], color[2]),
+      ToV3(position),
+      ToV3(color),
       height};
 
     if(replace_id >= 0)
@@ -449,6 +449,70 @@ namespace owds {
   {
     if(id >= 0 && id < (int)debug_texts_.size())
       debug_texts_[id].text = "";
+  }
+
+  int World::addDebugLine(const std::array<float, 3>& position_from,
+                          const std::array<float, 3>& position_to,
+                          const std::array<float, 3>& color,
+                          int replace_id)
+  {
+    return addDebugLine({position_from, position_to},
+                        {0, 1},
+                        color, replace_id);
+  }
+
+  int World::addDebugLine(const std::vector<std::array<float, 3>>& vertices,
+                          const std::vector<unsigned int>& indices,
+                          const std::array<float, 3>& color,
+                          int replace_id)
+  {
+    std::vector<glm::vec3> glm_vertices;
+    glm_vertices.reserve(vertices.size());
+    for(auto& vertex : vertices)
+      glm_vertices.emplace_back(ToV3(vertex));
+
+    DebugLine debug{
+      glm_vertices,
+      indices,
+      ToV3(color)};
+
+    if(replace_id >= 0)
+    {
+      if(replace_id < (int)debug_lines_.size())
+      {
+        debug_lines_.at(replace_id) = std::move(debug);
+        return replace_id;
+      }
+      else
+        return -1;
+    }
+    else
+    {
+      int id = -1;
+      for(size_t i = 0; i < debug_lines_.size(); i++)
+      {
+        if(debug_lines_[i].indices_.empty())
+        {
+          id = i;
+          break;
+        }
+      }
+
+      if(id >= 0)
+        debug_lines_.at(id) = std::move(debug);
+      else
+      {
+        id = debug_lines_.size();
+        debug_lines_.emplace_back(debug);
+      }
+      return id;
+    }
+  }
+
+  void World::removeDebugLine(int id)
+  {
+    if(id >= 0 && id < (int)debug_lines_.size())
+      debug_lines_[id].indices_.clear();
   }
 
 } // namespace owds

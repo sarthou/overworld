@@ -97,6 +97,9 @@ namespace owds {
     shaders_.insert({
       "text", {"text_shader.vs", "text_shader.fs"}
     });
+    shaders_.insert({
+      "lines", {"lines_shader.vs", "lines_shader.fs"}
+    });
 
     sky_.init("/home/gsarthou/Robots/Dacobot2/ros2_ws/src/overworld/models/textures/skybox/Footballfield/");
 
@@ -139,6 +142,7 @@ namespace owds {
         mesh.second.clear();
 
     loadWorld();
+    loadDebugLines();
     render();
   }
 
@@ -320,6 +324,25 @@ namespace owds {
     }
   }
 
+  void Renderer::loadDebugLines()
+  {
+    std::set<unsigned int> ids;
+    for(auto& cached : cached_lines_)
+      ids.insert(cached.first);
+
+    for(size_t i = 0; i < world_->debug_lines_.size(); i++)
+    {
+      auto cache_it = cached_lines_.find(world_->debug_lines_[i].id_);
+      if(cache_it == cached_lines_.end())
+        cached_lines_.emplace(world_->debug_lines_[i].id_, world_->debug_lines_[i]);
+
+      ids.erase(world_->debug_lines_[i].id_);
+    }
+
+    for(auto id : ids)
+      cached_lines_.erase(id);
+  }
+
   void Renderer::render()
   {
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
@@ -330,12 +353,14 @@ namespace owds {
     // glStencilMask(0xFF);               // enable writing to the stencil buffer
 
     render_collision_models_ = render_camera_.render_collision_models_;
+    render_debug_ = render_camera_.render_debug_;
 
     auto& light_shader = shaders_.at("default");
     auto& sky_shader = shaders_.at("sky");
     auto& shadow_shader = shaders_.at("depth");
     auto& shadow_point_shader = shaders_.at("depthcube");
     auto& text_shader = shaders_.at("text");
+    auto& lines_shader = shaders_.at("lines");
 
     // 0. draw scene as normal in depth buffers
 
@@ -405,17 +430,30 @@ namespace owds {
 
     sky_.draw(sky_shader);
 
-    // 1.3 draw text
-
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    text_shader.use();
-    text_shader.setMat4("projection", render_camera_.getProjectionMatrix());
-    for(auto& debug : world_->debug_texts_)
+    if(render_debug_)
     {
-      if(debug.text.empty() == false)
-        text_renderer_.renderText(text_shader, render_camera_.getViewMatrix(), debug);
+      // 1.3 darw lines
+
+      lines_shader.use();
+      lines_shader.setMat4("view", render_camera_.getViewMatrix());
+      lines_shader.setMat4("projection", render_camera_.getProjectionMatrix());
+      lines_shader.setMat4("model", glm::mat4(1.));
+
+      for(auto& line_handle : cached_lines_)
+        line_handle.second.draw(lines_shader);
+
+      // 1.4 draw text
+
+      glEnable(GL_BLEND);
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+      text_shader.use();
+      text_shader.setMat4("projection", render_camera_.getProjectionMatrix());
+      for(auto& debug : world_->debug_texts_)
+      {
+        if(debug.text.empty() == false)
+          text_renderer_.renderText(text_shader, render_camera_.getViewMatrix(), debug);
+      }
     }
 
     // 2. now blit multisampled buffer(s) to normal colorbuffer of intermediate FBO. Image is stored in screenTexture

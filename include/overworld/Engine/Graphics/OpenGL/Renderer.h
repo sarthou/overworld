@@ -14,6 +14,7 @@
 #include "overworld/Engine/Graphics/OpenGL/AmbientShadow.h"
 #include "overworld/Engine/Graphics/OpenGL/Camera.h"
 #include "overworld/Engine/Graphics/OpenGL/Cubemap.h"
+#include "overworld/Engine/Graphics/OpenGL/LinesHandle.h"
 #include "overworld/Engine/Graphics/OpenGL/MeshHandle.h"
 #include "overworld/Engine/Graphics/OpenGL/PointShadow.h"
 #include "overworld/Engine/Graphics/OpenGL/Screen.h"
@@ -52,10 +53,12 @@ namespace owds {
     float delta_time_;
     float last_frame_;
 
+    bool render_debug_ = true;
     bool render_collision_models_ = false;
     std::unordered_map<std::string, Texture2D> loaded_textures_;
     std::unordered_map<Model::Id, std::unordered_map<Mesh::Id, MeshHandle>> cached_models_;
     std::unordered_map<Model::Id, std::unordered_map<Mesh::Id, std::vector<InstanceData>>> current_mesh_batches_;
+    std::unordered_map<unsigned int, LinesHandle> cached_lines_;
 
     void loadWorld();
     void loadActor(const Actor& actor, const ShapeBox& shape);
@@ -68,6 +71,7 @@ namespace owds {
     Material combineMaterials(const Material& shape_material, const Material& model_material);
     std::vector<Texture2D> loadTextures(Material& material);
     void loadModel(const Model& model, const Material& material);
+    void loadDebugLines();
     void render();
     void renderModels(const Shader& shader, unsigned int texture_offset = 0);
 

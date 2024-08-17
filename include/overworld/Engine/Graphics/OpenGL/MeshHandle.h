@@ -24,7 +24,6 @@ namespace owds {
     float shininess;
     float specular;
     Color color;
-    unsigned int vao; // vertex array object
 
     MeshHandle(const Mesh& mesh, const std::vector<Texture2D>& textures)
     {
@@ -113,7 +112,7 @@ namespace owds {
       shader.setFloat("material.specular", (specular_nr == 1) ? specular : -1);
       shader.setVec4("material.color", glm::vec4(color.r_, color.g_, color.b_, (diffuse_nr == 1) ? color.a_ : 0));
 
-      glBindVertexArray(vao);
+      glBindVertexArray(vao_);
       glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, 0);
       glBindVertexArray(0);
 
@@ -122,23 +121,24 @@ namespace owds {
     }
 
   private:
-    unsigned int vbo; // vertex buffer object
-    unsigned int ebo; //
+    unsigned int vbo_; // vertex buffer object
+    unsigned int ebo_; //
+    unsigned int vao_; // vertex array object
 
     // initializes all the buffer objects/arrays
     void setupMesh()
     {
       // create buffers/arrays
-      glGenVertexArrays(1, &vao);
-      glGenBuffers(1, &vbo);
-      glGenBuffers(1, &ebo);
+      glGenVertexArrays(1, &vao_);
+      glGenBuffers(1, &vbo_);
+      glGenBuffers(1, &ebo_);
 
-      glBindVertexArray(vao);
+      glBindVertexArray(vao_);
       // load data into vertex buffers
-      glBindBuffer(GL_ARRAY_BUFFER, vbo);
+      glBindBuffer(GL_ARRAY_BUFFER, vbo_);
       glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
 
-      glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+      glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
       glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
 
       // set the vertex attribute pointers

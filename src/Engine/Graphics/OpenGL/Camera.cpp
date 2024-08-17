@@ -192,6 +192,13 @@ namespace owds {
     {
     case GLFW_KEY_F1: show_debug_stats_ = is_down; break;
     case GLFW_KEY_F2: render_collision_models_ = is_down; break;
+    case GLFW_KEY_F3:
+    {
+      if(is_down == false && key_state_debug_)
+        render_debug_ = !render_debug_;
+      key_state_debug_ = is_down;
+      break;
+    }
     case GLFW_KEY_W:
     case GLFW_KEY_UP: key_state_front_ = is_down; break;
     case GLFW_KEY_S:

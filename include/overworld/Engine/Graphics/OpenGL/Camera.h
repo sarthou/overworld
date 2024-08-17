@@ -41,6 +41,7 @@ namespace owds {
     bool key_state_right_ = false;
     bool key_state_up_ = false;
     bool key_state_down_ = false;
+    bool key_state_debug_ = false;
 
     std::bitset<16> mouse_btn_states_{};
 
@@ -51,6 +52,7 @@ namespace owds {
   public:
     bool show_debug_stats_ = false;
     bool render_collision_models_ = false;
+    bool render_debug_ = true;
     owds::ViewAntiAliasing_e aa_setting_;
     std::array<float, 2> view_dimensions_{};
 

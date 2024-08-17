@@ -148,6 +148,7 @@ owds_generate_interfaces()
 owds_add_ros_library(overworld_compat src/Compat/ROS.cpp)
 
 owds_add_ros_library(overworld_engine_common
+    src/Engine/Common/Debug/DebugLine.cpp
     src/Engine/Common/Models/Loaders/ColladaLoader.cpp
     src/Engine/Common/Models/Loaders/ObjLoader.cpp
     src/Engine/Common/Models/Loaders/StlLoader.cpp

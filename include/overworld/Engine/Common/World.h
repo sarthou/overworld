@@ -8,6 +8,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "overworld/Engine/Common/Debug/DebugLine.h"
 #include "overworld/Engine/Common/Debug/DebugText.h"
 #include "overworld/Engine/Common/Lights/AmbientLight.h"
 #include "overworld/Engine/Common/Lights/PointLights.h"
@@ -217,6 +218,16 @@ namespace owds {
                      int replace_id = -1);
     void removeDebugText(int id);
 
+    int addDebugLine(const std::array<float, 3>& position_from,
+                     const std::array<float, 3>& position_to,
+                     const std::array<float, 3>& color = {1.0, 1.0, 1.0},
+                     int replace_id = -1);
+    int addDebugLine(const std::vector<std::array<float, 3>>& vertices,
+                     const std::vector<unsigned int>& indices,
+                     const std::array<float, 3>& color = {1.0, 1.0, 1.0},
+                     int replace_id = -1);
+    void removeDebugLine(int id);
+
     /**
      * @param gravity Self-explanatory.
      */
@@ -244,6 +255,7 @@ namespace owds {
     AmbientLight ambient_light_;
     PointLights point_lights_;
     std::vector<DebugText_t> debug_texts_;
+    std::vector<DebugLine> debug_lines_;
   };
 } // namespace owds
 

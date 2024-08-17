@@ -63,6 +63,8 @@ int main()
 
   world.addDebugText("overworld", {5, 5, 5}, 0.5, {0., 0.5, 1.0});
 
+  world.addDebugLine({0, 0, 0}, {1, 1, 1});
+
   renderer.attachWorld(&world);
 
   std::cout << "================== WORLD ATTACHED ! ================" << std::endl;
