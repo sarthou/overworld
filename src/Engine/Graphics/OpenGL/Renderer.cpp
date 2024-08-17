@@ -107,6 +107,22 @@ namespace owds {
     text_renderer_.init();
     text_renderer_.load("/usr/share/fonts/truetype/open-sans/OpenSans-Regular.ttf", 48);
 
+    debug_axis_.emplace(0,
+                        DebugLine({glm::vec3(0., 0., 0.),
+                                   glm::vec3(1., 0., 0.)},
+                                  {0, 1},
+                                  glm::vec3(1., 0., 0.)));
+    debug_axis_.emplace(1,
+                        DebugLine({glm::vec3(0., 0., 0.),
+                                   glm::vec3(0., 1., 0.)},
+                                  {0, 1},
+                                  glm::vec3(0., 1., 0.)));
+    debug_axis_.emplace(2,
+                        DebugLine({glm::vec3(0., 0., 0.),
+                                   glm::vec3(0., 0., 1.)},
+                                  {0, 1},
+                                  glm::vec3(0., 0., 1.)));
+
     shaders_.at("screen").use();
     shaders_.at("screen").setInt("screenTexture", 0);
 
@@ -432,7 +448,7 @@ namespace owds {
 
     if(render_debug_)
     {
-      // 1.3 darw lines
+      // 1.3 draw lines
 
       lines_shader.use();
       lines_shader.setMat4("view", render_camera_.getViewMatrix());
@@ -442,7 +458,24 @@ namespace owds {
       for(auto& line_handle : cached_lines_)
         line_handle.second.draw(lines_shader);
 
-      // 1.4 draw text
+      // 1.4 draw debug axis
+
+      glDisable(GL_DEPTH_TEST);
+      glLineWidth(2);
+      glm::mat4 projection = glm::translate(glm::mat4(1), glm::vec3(0.94, -0.94, 0.));
+      glm::mat4 model = glm::scale(glm::mat4(1), glm::vec3(0.05, 0.05, 0.05));
+      lines_shader.setMat4("view", view);
+      lines_shader.setMat4("projection", projection);
+      lines_shader.setMat4("model", model);
+
+      debug_axis_.at(0).draw(lines_shader);
+      debug_axis_.at(1).draw(lines_shader);
+      debug_axis_.at(2).draw(lines_shader);
+
+      glEnable(GL_DEPTH_TEST);
+      glLineWidth(1);
+
+      // 1.5 draw text
 
       glEnable(GL_BLEND);
       glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

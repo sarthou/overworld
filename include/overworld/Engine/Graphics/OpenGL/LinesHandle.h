@@ -30,6 +30,17 @@ namespace owds {
       setupBuffers();
     }
 
+    LinesHandle(const std::vector<glm::vec3>& vertices,
+                const std::vector<unsigned int>& indices,
+                const glm::vec3& color) : enabled_(true)
+    {
+      this->vertices = vertices;
+      this->indices = indices;
+      this->color = color;
+
+      setupBuffers();
+    }
+
     ~LinesHandle()
     {
       glDeleteVertexArrays(1, &vao_);

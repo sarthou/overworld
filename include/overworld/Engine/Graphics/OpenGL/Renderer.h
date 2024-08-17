@@ -59,6 +59,7 @@ namespace owds {
     std::unordered_map<Model::Id, std::unordered_map<Mesh::Id, MeshHandle>> cached_models_;
     std::unordered_map<Model::Id, std::unordered_map<Mesh::Id, std::vector<InstanceData>>> current_mesh_batches_;
     std::unordered_map<unsigned int, LinesHandle> cached_lines_;
+    std::unordered_map<unsigned int, LinesHandle> debug_axis_;
 
     void loadWorld();
     void loadActor(const Actor& actor, const ShapeBox& shape);
