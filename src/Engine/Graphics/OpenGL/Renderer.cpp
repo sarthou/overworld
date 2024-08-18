@@ -461,11 +461,13 @@ namespace owds {
       // 1.4 draw debug axis
 
       glDisable(GL_DEPTH_TEST);
-      glLineWidth(2);
-      glm::mat4 projection = glm::translate(glm::mat4(1), glm::vec3(0.94, -0.94, 0.));
+      glLineWidth(3);
       glm::mat4 model = glm::scale(glm::mat4(1), glm::vec3(0.05, 0.05, 0.05));
+      glm::mat4 view_translation = glm::translate(glm::mat4(1), glm::vec3(0.75 * (double)screen_.width_ / (double)screen_.height_, -0.75, -1.));
+      view = view_translation * view;
+
+      lines_shader.setMat4("projection", render_camera_.getProjectionMatrix());
       lines_shader.setMat4("view", view);
-      lines_shader.setMat4("projection", projection);
       lines_shader.setMat4("model", model);
 
       debug_axis_.at(0).draw(lines_shader);
