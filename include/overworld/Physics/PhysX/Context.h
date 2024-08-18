@@ -50,7 +50,9 @@ namespace owds::physx {
 
     bool minimize_memory_footprint_;
 
-    static std::unique_ptr<owds::physx::SharedContext> shared_ctx_;
+    static std::unique_ptr<owds::physx::SharedContext>& createContext();
+
+    std::unique_ptr<owds::physx::SharedContext>& shared_ctx_;
   };
 } // namespace owds::physx
 
