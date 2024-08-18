@@ -23,13 +23,27 @@
 
 namespace owds {
 
-  Window::Window(const std::string& name)
+  void Window::init()
   {
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
+  }
+
+  void Window::release()
+  {
+    glfwTerminate();
+  }
+
+  void Window::pollEvent()
+  {
+    glfwPollEvents();
+  }
+
+  Window::Window(const std::string& name)
+  {
     // glfwWindowHint(GLFW_SAMPLES, 4);
     glfw_window_ = glfwCreateWindow(640, 480, name.c_str(), nullptr, nullptr);
 
@@ -39,65 +53,62 @@ namespace owds {
     glfwSetWindowIcon(glfw_window_, 1, icons);
     stbi_image_free(icons[0].pixels);
 
-    glfwMakeContextCurrent(glfw_window_);
     glfwSetWindowUserPointer(glfw_window_, this);
-    glfwSetWindowSizeCallback(glfw_window_, [](GLFWwindow* window, const int width, const int height) {
-      auto* const user_ptr = glfwGetWindowUserPointer(window);
-
-      const auto& ctx = static_cast<Window*>(user_ptr);
-      ctx->width_ = width;
-      ctx->height_ = height;
-      ctx->has_size_changed_ = true;
+    glfwSetWindowSizeCallback(glfw_window_, [](GLFWwindow* glfw_window, const int width, const int height) {
+      auto* const window = static_cast<Window*>(glfwGetWindowUserPointer(glfw_window));
+      window->cam_mutex_.lock();
+      window->camera_.setOutputResolution({(float)width, (float)height});
+      window->cam_mutex_.unlock();
     });
 
-    glfwSetKeyCallback(glfw_window_, [](GLFWwindow* window, const int key, const int scancode, const int action, const int mods) {
+    glfwSetKeyCallback(glfw_window_, [](GLFWwindow* glfw_window, const int key, const int scancode, const int action, const int mods) {
       (void)scancode;
       (void)mods;
 
       if(action == GLFW_REPEAT)
         return;
 
-      auto* const user_ptr = glfwGetWindowUserPointer(window);
-      const auto& ctx = static_cast<Window*>(user_ptr);
-
-      if(ctx->camera_ != nullptr)
-        ctx->camera_->processUserKeyboardInput(0.f, key, action == GLFW_PRESS);
+      auto* const window = static_cast<Window*>(glfwGetWindowUserPointer(glfw_window));
+      window->cam_mutex_.lock();
+      window->camera_.processUserKeyboardInput(0.f, key, action == GLFW_PRESS);
+      window->cam_mutex_.unlock();
     });
 
-    glfwSetCursorPosCallback(glfw_window_, [](GLFWwindow* window, const double xpos, const double ypos) {
-      auto* const user_ptr = glfwGetWindowUserPointer(window);
-      const auto& ctx = reinterpret_cast<Window*>(user_ptr);
-
-      if(ctx->camera_ != nullptr)
-        ctx->camera_->processUserMouseInput(0.f, static_cast<float>(xpos), static_cast<float>(ypos));
+    glfwSetCursorPosCallback(glfw_window_, [](GLFWwindow* glfw_window, const double xpos, const double ypos) {
+      auto* const window = static_cast<Window*>(glfwGetWindowUserPointer(glfw_window));
+      window->cam_mutex_.lock();
+      window->camera_.processUserMouseInput(0.f, static_cast<float>(xpos), static_cast<float>(ypos));
+      window->cam_mutex_.unlock();
     });
 
-    glfwSetScrollCallback(glfw_window_, [](GLFWwindow* window, double xoffset, double yoffset) {
-      auto* const user_ptr = glfwGetWindowUserPointer(window);
-      const auto& ctx = reinterpret_cast<Window*>(user_ptr);
-
-      if(ctx->camera_ != nullptr)
-        ctx->camera_->processUserMouseScroll(0.f, static_cast<float>(xoffset), static_cast<float>(yoffset));
+    glfwSetScrollCallback(glfw_window_, [](GLFWwindow* glfw_window, double xoffset, double yoffset) {
+      auto* const window = static_cast<Window*>(glfwGetWindowUserPointer(glfw_window));
+      window->cam_mutex_.lock();
+      window->camera_.processUserMouseScroll(0.f, static_cast<float>(xoffset), static_cast<float>(yoffset));
+      window->cam_mutex_.unlock();
     });
 
-    glfwSetMouseButtonCallback(glfw_window_, [](GLFWwindow* window, const int button, const int action, int mods) {
+    glfwSetMouseButtonCallback(glfw_window_, [](GLFWwindow* glfw_window, const int button, const int action, int mods) {
       (void)mods;
 
       if(action == GLFW_REPEAT)
         return;
 
-      auto* const user_ptr = glfwGetWindowUserPointer(window);
-      const auto& ctx = reinterpret_cast<Window*>(user_ptr);
-
-      if(ctx->camera_ != nullptr)
-        ctx->camera_->processUserMouseBtnInput(0.f, button, action == GLFW_PRESS);
+      auto* const window = static_cast<Window*>(glfwGetWindowUserPointer(glfw_window));
+      window->cam_mutex_.lock();
+      window->camera_.processUserMouseBtnInput(0.f, button, action == GLFW_PRESS);
+      window->cam_mutex_.unlock();
     });
   }
 
   Window::~Window()
   {
     glfwDestroyWindow(glfw_window_);
-    glfwTerminate();
+  }
+
+  void Window::makeCurrentContext() const
+  {
+    glfwMakeContextCurrent(glfw_window_);
   }
 
   WindowPlatformData Window::getPlatformData() const
@@ -109,17 +120,12 @@ namespace owds {
 
   void Window::doPollEvents(Renderer& renderer)
   {
-    glfwPollEvents();
-
-    camera_ = renderer.getRenderCamera();
-    if(camera_ != nullptr)
-      camera_->update();
-
-    if(has_size_changed_)
-    {
-      has_size_changed_ = false;
-      renderer.notifyResize(width_, height_);
-    }
+    cam_mutex_.lock();
+    camera_.update();
+    camera_.finalize();
+    renderer.setRenderCamera(camera_.getCamera());
+    camera_.clearChanges();
+    cam_mutex_.unlock();
   }
 
   bool Window::isCloseRequested() const

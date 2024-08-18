@@ -1,6 +1,9 @@
 #include <overworld/Compat/ROS.h>
 // should be first
 
+#include <thread>
+#include <urdf/model.h>
+
 #include "overworld/Engine/Common/Models/Loaders/ModelLoader.h"
 #include "overworld/Engine/Common/Models/ModelManager.h"
 #include "overworld/Engine/Graphics/OpenGL/Camera.h"
@@ -22,25 +25,30 @@ using DefaultEngine = owds::physx::World;
 #include <cmath>
 #include <iostream>
 
-int main()
-{
-  owds::Renderer renderer;
-  auto* cam = renderer.getRenderCamera();
-  cam->setCameraView(owds::CameraView_e::segmented_view);
-  cam->setProjection(owds::CameraProjection_e::perspective);
-  cam->setFieldOfView(80.f);
-  cam->setOutputAA(owds::ViewAntiAliasing_e::msaa_x8);
-  cam->setOutputResolution({640, 480});
-  cam->setPositionAndLookAt({5, 5, 1.7}, {0, 0, 0});
-  cam->setPlanes({0.1, 80.});
-  cam->finalize();
+// Should be last
+#define GLFW_EXPOSE_NATIVE_X11
+#include <GLFW/glfw3.h>
+#include <GLFW/glfw3native.h>
 
-  owds::Window window;
-  renderer.initialize(window);
+void worldThread(const std::string& world_name, owds::Window* window)
+{
+  std::cout << world_name << std::endl;
+  auto& cam = window->getCamera();
+  cam.setCameraView(owds::CameraView_e::segmented_view);
+  cam.setProjection(owds::CameraProjection_e::perspective);
+  cam.setFieldOfView(80.f);
+  cam.setOutputAA(owds::ViewAntiAliasing_e::msaa_x8);
+  cam.setOutputResolution({640, 480});
+  cam.setPositionAndLookAt({5, 5, 1.7}, {0, 0, 0});
+  cam.setPlanes({0.1, 80.});
+  cam.finalize();
+
+  owds::Renderer renderer;
+  renderer.initialize(*window);
 
   DefaultEngine world(owds::compat::owds_ros::getShareDirectory("overworld"));
 
-  std::cout << "================== WORLD CREATED ! ================" << std::endl;
+  std::cout << "================== WORLD " << world_name << " CREATED ! ================" << std::endl;
 
   world.setAmbientLight({0.5f, 0.2f, -0.3f},
                         {1.0f, 0.976f, 0.898f},
@@ -69,18 +77,63 @@ int main()
 
   std::cout << "================== WORLD ATTACHED ! ================" << std::endl;
 
+  //(void)world.loadRobotFromDescription(owds::compat::owds_ros::getShareDirectory("pr2_description") + "/robots/pr2.urdf", false);
   (void)world.loadRobotFromDescription("models/adream/adream.urdf");
+  //(void)world.loadRobotFromDescription("models/tutorials/Frame/frame.urdf");
   world.stepSimulation(1.f / 144.f);
 
   std::cout << "================== WORLD LOADED !! ================" << std::endl;
 
-  while(!window.isCloseRequested())
+  while(!window->isCloseRequested())
   {
-    window.doPollEvents(renderer);
+    window->doPollEvents(renderer);
     // world.stepSimulation(1.f / 144.f);
     renderer.commit();
-    window.swapBuffer();
+    window->swapBuffer();
   }
+}
+
+void urdfThread()
+{
+  urdf::Model urdf_model;
+
+  assert(urdf_model.initFile("/home/gsarthou/Robots/Dacobot2/ros2_ws/src/overworld/models/pr2.urdf"));
+
+  while(1)
+  {
+    /* code */
+  }
+}
+
+int main()
+{
+  owds::Window::init();
+
+  owds::Window window1("overworld_bob");
+  // owds::Window window2("overworld_alice");
+  //
+  window1.makeCurrentContext();
+  owds::Renderer::init();
+  glfwMakeContextCurrent(nullptr);
+
+  std::thread world1(worldThread, "overworld_bob", &window1);
+  // std::thread world2(worldThread, "overworld_alice", &window2);
+
+  // std::thread world1(urdfThread);
+  //  std::thread world2(urdfThread);
+  // usleep(1'000'000);
+  // urdfThread();
+
+  while(1)
+  {
+    owds::Window::pollEvent();
+    usleep(1000);
+  }
+
+  world1.join();
+  // world2.join();
+
+  owds::Window::release();
 
   return 0;
 }

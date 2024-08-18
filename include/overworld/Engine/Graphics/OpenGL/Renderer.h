@@ -31,14 +31,14 @@ namespace owds {
   {
   public:
     ~Renderer();
-    bool initialize(const Window& window);
+    static void init();
+
+    bool initialize(Window& window);
     void attachWorld(World* world) { world_ = world; }
-    void cleanup();
-    void notifyResize(std::uint32_t new_width, std::uint32_t new_height);
 
     void commit();
 
-    Camera* getRenderCamera() { return &render_camera_; }
+    void setRenderCamera(Camera* camera);
 
   private:
     World* world_ = nullptr;

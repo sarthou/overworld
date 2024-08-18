@@ -16,6 +16,7 @@
 #include "overworld/Engine/Common/World.h"
 #include "overworld/Engine/Graphics/Common/InstanceData.h"
 #include "overworld/Engine/Graphics/Common/ViewAntiAliasing.h"
+#include "overworld/Engine/Graphics/GLFW/Window.h"
 #include "overworld/Engine/Graphics/OpenGL/Cubemap.h"
 #include "overworld/Engine/Graphics/OpenGL/MeshHandle.h"
 #include "overworld/Helper/GlmMath.h"
@@ -45,18 +46,21 @@ MessageCallback(GLenum source,
 namespace owds {
 
   Renderer::~Renderer()
-  {
-  }
+  {}
 
-  bool Renderer::initialize(const Window& window)
+  void Renderer::init()
   {
-    (void)window;
-
     if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
       std::cout << "Failed to initialize GLAD" << std::endl;
-      return false;
     }
+  }
+
+  bool Renderer::initialize(Window& window)
+  {
+    window.makeCurrentContext();
+
+    setRenderCamera(window.getUpdatedCamera());
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_STENCIL_TEST);
@@ -74,9 +78,9 @@ namespace owds {
 
     glEnable(GL_MULTISAMPLE);
     screen_.init();
-    screen_.setSize(render_camera_.view_dimensions_[0], render_camera_.view_dimensions_[1]);
-    if(render_camera_.aa_setting_ != ViewAntiAliasing_e::off)
-      setAntiAliasing(render_camera_.aa_setting_);
+    screen_.setSize(render_camera_.getWidth(), render_camera_.getHeight());
+    if(render_camera_.getAASetting() != ViewAntiAliasing_e::off)
+      setAntiAliasing(render_camera_.getAASetting());
 
     Shader::shaders_directory = "/home/gsarthou/Robots/Dacobot2/ros2_ws/src/overworld/shaders/"; // TODO not hard coded
     shaders_.insert({
@@ -129,18 +133,6 @@ namespace owds {
     return true;
   }
 
-  void Renderer::cleanup()
-  {}
-
-  void Renderer::notifyResize(std::uint32_t new_width, std::uint32_t new_height)
-  {
-    screen_.setSize(new_width, new_height);
-    glViewport(0, 0, new_width, new_height);
-    render_camera_.setOutputResolution(std::array<float, 2>{(float)new_width, (float)new_height});
-    render_camera_.finalize();
-    screen_.reinitBuffers();
-  }
-
   void Renderer::commit()
   {
     if(world_ == nullptr)
@@ -160,6 +152,17 @@ namespace owds {
     loadWorld();
     loadDebugLines();
     render();
+  }
+
+  void Renderer::setRenderCamera(Camera* camera)
+  {
+    render_camera_ = *camera;
+    if(render_camera_.sizeHasChanged())
+    {
+      screen_.setSize(render_camera_.getWidth(), render_camera_.getHeight());
+      glViewport(0, 0, render_camera_.getWidth(), render_camera_.getHeight());
+      screen_.reinitBuffers();
+    }
   }
 
   void Renderer::loadWorld()
@@ -368,8 +371,8 @@ namespace owds {
     // glStencilFunc(GL_ALWAYS, 1, 0xFF); // all fragments should pass the stencil test
     // glStencilMask(0xFF);               // enable writing to the stencil buffer
 
-    render_collision_models_ = render_camera_.render_collision_models_;
-    render_debug_ = render_camera_.render_debug_;
+    render_collision_models_ = render_camera_.shouldRendercollisionModels();
+    render_debug_ = render_camera_.shouldRenderDebug();
 
     auto& light_shader = shaders_.at("default");
     auto& sky_shader = shaders_.at("sky");
@@ -423,7 +426,6 @@ namespace owds {
 
     light_shader.use();
     setLightsUniforms(light_shader);
-    render_camera_.updateMatrices();
     light_shader.setVec3("view_pose", render_camera_.getPosition());
     light_shader.setMat4("view", render_camera_.getViewMatrix());
     light_shader.setMat4("projection", render_camera_.getProjectionMatrix());

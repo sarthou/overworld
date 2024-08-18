@@ -2,7 +2,6 @@
 #define OWDS_GRAPHICS_OPENGL_CAMERA_H
 
 #include <array>
-#include <bitset>
 #include <cstdint>
 #include <functional>
 #include <glm/matrix.hpp>
@@ -16,12 +15,17 @@
 
 namespace owds {
 
+  class CameraUpdater;
+
   class Camera
   {
+    friend CameraUpdater;
+
   private:
-    unsigned long id_{};
     owds::CameraView_e view_type_{};
     owds::CameraProjection_e projection_type_{};
+    owds::ViewAntiAliasing_e aa_setting_;
+
     float field_of_view_ = 0.785398; // 45 deg
     glm::vec3 world_eye_position_{};
     glm::vec3 world_eye_front_{};
@@ -31,73 +35,43 @@ namespace owds {
     glm::vec2 view_angles_{-90.0f, 0.0f}; // yaw/pitch in deg
     glm::vec2 planes_{0.1, 100.};
 
-    glm::vec2 mouse_current_position_{};
-    glm::vec2 mouse_drag_start_position_{};
-    bool is_dragging_mouse_ = false;
+    bool render_debug_ = true;
+    bool render_collision_models_ = false;
 
-    bool key_state_front_ = false;
-    bool key_state_back_ = false;
-    bool key_state_left_ = false;
-    bool key_state_right_ = false;
-    bool key_state_up_ = false;
-    bool key_state_down_ = false;
-    bool key_state_debug_ = false;
-
-    std::bitset<16> mouse_btn_states_{};
-
-    float mouse_rotation_sensitivity_ = 0.1;
-    float mouse_translate_sensitivity_ = 0.035;
-    float mouse_scroll_sensitivity_ = 0.2;
+    std::array<float, 2> view_dimensions_{};
+    bool has_changed_size_ = false;
 
   public:
-    bool show_debug_stats_ = false;
-    bool render_collision_models_ = false;
-    bool render_debug_ = true;
-    owds::ViewAntiAliasing_e aa_setting_;
-    std::array<float, 2> view_dimensions_{};
-
     Camera() = default;
-    void setViewId(unsigned long id) { id_ = id; }
-
-    void updateViewMatrix();
-    void updateProjectionMatrix();
-    void updateMatrices();
-
-    void setCameraView(owds::CameraView_e view_type);
-    void setProjection(owds::CameraProjection_e proj);
-    void setFieldOfView(float fov);
-    void setOutputAA(owds::ViewAntiAliasing_e aa_setting);
-    void setOutputFPS(std::uint64_t desired_target_fps);
-    void setOutputResolution(const std::array<float, 2>& resolution);
-    void setPlanes(const std::array<float, 2>& near_far_planes);
-    void finalize();
-    void setPositionAndOrientation(const std::array<float, 3>& position, const std::array<float, 3>& orientation);
-    void setPositionAndLookAt(const std::array<float, 3>& eye_position, const std::array<float, 3>& dst_position);
-    void setPositionAndDirection(const std::array<float, 3>& eye_position, const std::array<float, 3>& eye_direction);
-    void setDirectionAndLookAt(const std::array<float, 3>& eye_direction, const std::array<float, 3>& dst_position);
-
-    void recomputeDirectionVector();
-
-    std::vector<glm::vec4> getFrustumCornersWorldSpace();
-
-    void processUserKeyboardInput(float delta_time, int key, bool is_down);
-    void processUserMouseBtnInput(float delta_time, char btn, bool is_down);
-    void processUserMouseInput(float delta_time, float x, float y);
-    void processUserMouseScroll(float delta_time, float xoffset, float yoffset);
-    void update();
 
     glm::vec3 getPosition() const { return world_eye_position_; }
     glm::vec3 getFrontPose() const { return world_eye_position_ + world_eye_front_; }
 
     glm::mat4 getViewMatrix() const { return view_matrix_; }
     glm::mat4 getProjectionMatrix() const { return proj_matrix_; }
+    ViewAntiAliasing_e getAASetting() const { return aa_setting_; }
 
-    float getNearPlane() { return planes_[0]; }
-    float getFarPlane() { return planes_[1]; }
+    float getNearPlane() const { return planes_[0]; }
+    float getFarPlane() const { return planes_[1]; }
+
+    float getWidth() const { return view_dimensions_.at(0); }
+    float getHeight() const { return view_dimensions_.at(1); }
+    bool sizeHasChanged() const { return has_changed_size_; }
+
+    bool shouldRenderDebug() const { return render_debug_; }
+    bool shouldRendercollisionModels() const { return render_collision_models_; }
+
+    std::vector<glm::vec4> getFrustumCornersWorldSpace();
 
   private:
     glm::mat4 view_matrix_;
     glm::mat4 proj_matrix_;
+
+    void updateViewMatrix();
+    void updateProjectionMatrix();
+    void updateMatrices();
+
+    void recomputeDirectionVector();
   };
 } // namespace owds
 

@@ -4,6 +4,7 @@
 #include <array>
 
 #include "overworld/Engine/Graphics/OpenGL/Camera.h"
+#include "overworld/Engine/Graphics/OpenGL/CameraUpdater.h"
 
 namespace owds {
   class Shader;
@@ -29,7 +30,7 @@ namespace owds {
     float far_plane_;
     std::vector<float> shadow_cascade_levels_;
 
-    glm::mat4 getLightSpaceMatrix(Camera& ref_cam, const glm::vec3& light_dir, float near_plane, float far_plane);
+    glm::mat4 getLightSpaceMatrix(CameraUpdater& ref_cam, const glm::vec3& light_dir, float near_plane, float far_plane);
   };
 
 } // namespace owds

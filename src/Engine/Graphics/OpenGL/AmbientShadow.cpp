@@ -89,23 +89,24 @@ namespace owds {
 
   void AmbientShadow::computeLightSpaceMatrices(Camera ref_cam, const glm::vec3& light_dir)
   {
+    CameraUpdater camera(&ref_cam);
+    camera.finalize();
     lightspace_matrices_.clear();
     for(size_t i = 0; i < shadow_cascade_levels_.size() + 1; ++i)
     {
       if(i == 0)
-        lightspace_matrices_.push_back(getLightSpaceMatrix(ref_cam, light_dir, near_plane_, shadow_cascade_levels_[i]));
+        lightspace_matrices_.push_back(getLightSpaceMatrix(camera, light_dir, near_plane_, shadow_cascade_levels_[i]));
       else if(i < shadow_cascade_levels_.size())
-        lightspace_matrices_.push_back(getLightSpaceMatrix(ref_cam, light_dir, shadow_cascade_levels_[i - 1], shadow_cascade_levels_[i]));
+        lightspace_matrices_.push_back(getLightSpaceMatrix(camera, light_dir, shadow_cascade_levels_[i - 1], shadow_cascade_levels_[i]));
       else
-        lightspace_matrices_.push_back(getLightSpaceMatrix(ref_cam, light_dir, shadow_cascade_levels_[i - 1], far_plane_));
+        lightspace_matrices_.push_back(getLightSpaceMatrix(camera, light_dir, shadow_cascade_levels_[i - 1], far_plane_));
     }
   }
 
-  glm::mat4 AmbientShadow::getLightSpaceMatrix(Camera& ref_cam, const glm::vec3& light_dir, float near_plane, float far_plane)
+  glm::mat4 AmbientShadow::getLightSpaceMatrix(CameraUpdater& ref_cam, const glm::vec3& light_dir, float near_plane, float far_plane)
   {
     ref_cam.setPlanes({near_plane, far_plane});
-    ref_cam.updateProjectionMatrix();
-    const auto corners = ref_cam.getFrustumCornersWorldSpace();
+    const auto corners = ref_cam.getCamera()->getFrustumCornersWorldSpace();
 
     glm::vec3 center = glm::vec3(0, 0, 0);
     for(const auto& v : corners)
