@@ -26,7 +26,7 @@ namespace owds::physx {
 
   void Actor::setup()
   {
-    const auto& sdk = owds::physx::Context::shared_ctx_->px_physics_;
+    const auto& sdk = owds::physx::Context::createContext()->px_physics_;
 
     px_material_ = sdk->createMaterial(0.5f, 0.5f, 0.5f);
 
@@ -224,7 +224,7 @@ namespace owds::physx {
 
     ::physx::PxDefaultMemoryInputData readBuffer(writeBuffer.getData(), writeBuffer.getSize());
 
-    const auto& sdk = owds::physx::Context::shared_ctx_->px_physics_;
+    const auto& sdk = owds::physx::Context::createContext()->px_physics_;
     const auto px_mesh = sdk->createTriangleMesh(readBuffer);
 
     assert(px_mesh);
@@ -234,7 +234,7 @@ namespace owds::physx {
 
   void Actor::setupPhysicsShape(const owds::ShapeCustomMesh& shape)
   {
-    const auto& s_ctx = owds::physx::Context::shared_ctx_;
+    const auto& s_ctx = owds::physx::Context::createContext();
 
     const auto params = createPxCookingParams(ctx_.minimize_memory_footprint_);
 

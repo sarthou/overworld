@@ -15,7 +15,7 @@ namespace owds::physx {
 
   void JointContinuous::setup()
   {
-    const auto& sdk = owds::physx::Context::shared_ctx_->px_physics_;
+    const auto& sdk = owds::physx::Context::createContext()->px_physics_;
     const auto quat_orientation0 = location_.origin_orientation_;
     const auto quat_orientation1 = location_.joint_orientation_;
 
