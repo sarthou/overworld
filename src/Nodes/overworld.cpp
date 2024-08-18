@@ -5,8 +5,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "overworld/Utility/Parameters.h"
-#include "overworld/Utility/ShellDisplay.h"
+#include "overworld/Utils/Parameters.h"
+#include "overworld/Utils/ShellDisplay.h"
 
 void handler(int sig)
 {

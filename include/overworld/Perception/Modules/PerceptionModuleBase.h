@@ -13,8 +13,8 @@
 #include "overworld/BasicTypes/Agent.h"
 #include "overworld/BasicTypes/Percept.h"
 #include "overworld/Bullet/PhysicsServers.h"
-#include "overworld/Utility/Ontology.h"
-#include "overworld/Utility/ShellDisplay.h"
+#include "overworld/Utils/Ontology.h"
+#include "overworld/Utils/ShellDisplay.h"
 
 namespace owds {
 

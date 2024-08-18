@@ -2,7 +2,7 @@
 
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/euler_angles.hpp>
-#include <overworld/Helper/BitCast.h>
+#include <overworld/Utils/BitCast.h>
 
 #include "overworld/Engine/Common/Models/Model.h"
 #include "overworld/Physics/PhysX/Context.h"

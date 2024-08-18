@@ -2,7 +2,7 @@
 
 #include <pluginlib/class_loader.h>
 
-#include "overworld/Utility/ShellDisplay.h"
+#include "overworld/Utils/ShellDisplay.h"
 
 namespace owds {
 

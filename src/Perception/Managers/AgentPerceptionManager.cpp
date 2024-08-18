@@ -1,7 +1,7 @@
 #include "overworld/Perception/Managers/AgentPerceptionManager.h"
 
 #include "overworld/BasicTypes/Hand.h"
-#include "overworld/Utility/ShellDisplay.h"
+#include "overworld/Utils/ShellDisplay.h"
 
 namespace owds {
 

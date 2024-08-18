@@ -7,7 +7,7 @@
 #include <vector>
 
 #include "overworld/Perception/Modules/PerceptionModuleBase.h"
-#include "overworld/Utility/ShellDisplay.h"
+#include "overworld/Utils/ShellDisplay.h"
 
 namespace owds {
 

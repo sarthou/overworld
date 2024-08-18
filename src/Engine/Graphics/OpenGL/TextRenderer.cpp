@@ -7,7 +7,7 @@
 
 #include "glad/glad.h"
 #include "overworld/Engine/Graphics/OpenGL/Shader.h"
-#include "overworld/Utility/ShellDisplay.h"
+#include "overworld/Utils/ShellDisplay.h"
 
 namespace owds {
 

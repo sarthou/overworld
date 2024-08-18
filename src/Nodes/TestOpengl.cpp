@@ -6,7 +6,7 @@
 
 #include "overworld/Engine/Common/Models/Loaders/ModelLoader.h"
 #include "overworld/Engine/Common/Models/ModelManager.h"
-#include "overworld/Engine/Graphics/OpenGL/Camera.h"
+#include "overworld/Engine/Graphics/Common/Camera.h"
 #include "overworld/Engine/Graphics/OpenGL/Renderer.h"
 
 // should be after glad

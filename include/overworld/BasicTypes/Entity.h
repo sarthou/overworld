@@ -10,7 +10,7 @@
 #include "overworld/BasicTypes/Shape.h"
 #include "overworld/Bullet/BulletClient.h"
 #include "overworld/Geometry/Pose.h"
-#include "overworld/Utility/CircularBuffer.h"
+#include "overworld/Utils/CircularBuffer.h"
 
 namespace owds {
 

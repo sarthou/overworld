@@ -12,8 +12,8 @@
 #include "overworld/Engine/Common/Models/ModelManager.h"
 #include "overworld/Engine/Common/Urdf/Actor.h"
 #include "overworld/Engine/Common/Urdf/Urdf.h"
-#include "overworld/Helper/GlmMath.h"
-#include "overworld/Helper/ROS.h"
+#include "overworld/Utils/GlmMath.h"
+#include "overworld/Utils/ROS.h"
 
 namespace owds {
   World::World(const std::filesystem::path& base_assets_path)

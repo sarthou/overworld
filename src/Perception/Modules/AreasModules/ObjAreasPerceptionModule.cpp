@@ -3,9 +3,9 @@
 #include <pluginlib/class_list_macros.h>
 #include <ros/package.h>
 
-#include "overworld/Utility/RosFiles.h"
-#include "overworld/Utility/Wavefront.h"
-#include "overworld/Utility/YamlReader.h"
+#include "overworld/Utils/RosFiles.h"
+#include "overworld/Utils/Wavefront.h"
+#include "overworld/Utils/YamlReader.h"
 
 namespace owds {
 

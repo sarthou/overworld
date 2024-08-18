@@ -1,4 +1,4 @@
-#include "overworld/Engine/Graphics/OpenGL/Camera.h"
+#include "overworld/Engine/Graphics/Common/Camera.h"
 
 // first
 #include <GLFW/glfw3.h>
@@ -13,7 +13,7 @@
 #include "overworld/Engine/Graphics/Common/CameraProjection.h"
 #include "overworld/Engine/Graphics/Common/CameraView.h"
 #include "overworld/Engine/Graphics/Common/ViewAntiAliasing.h"
-#include "overworld/Helper/GlmMath.h"
+#include "overworld/Utils/GlmMath.h"
 
 namespace owds {
 

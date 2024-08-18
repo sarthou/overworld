@@ -3,8 +3,8 @@
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
 
-#include "overworld/Helper/BitCast.h"
 #include "overworld/Physics/Bullet3/Context.h"
+#include "overworld/Utils/BitCast.h"
 
 namespace owds::bullet3 {
   Actor::Actor(

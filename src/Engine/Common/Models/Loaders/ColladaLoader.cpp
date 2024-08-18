@@ -13,7 +13,7 @@
 
 #include "overworld/Engine/Common/Models/Mesh.h"
 #include "overworld/Engine/Common/Models/Model.h"
-#include "overworld/Utility/ShellDisplay.h"
+#include "overworld/Utils/ShellDisplay.h"
 
 namespace owds {
 

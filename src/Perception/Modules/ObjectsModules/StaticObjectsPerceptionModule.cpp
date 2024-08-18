@@ -4,7 +4,7 @@
 #include <ros/package.h>
 #include <string>
 
-#include "overworld/Utility/YamlReader.h"
+#include "overworld/Utils/YamlReader.h"
 
 namespace owds {
 

@@ -166,9 +166,9 @@ owds_add_ros_library(overworld_engine_common
 owds_add_library(overworld_glad External/src/glad.c)
 
 owds_add_library(overworld_graphics
+    src/Engine/Graphics/Common/Camera.cpp
+    src/Engine/Graphics/GLFW/CameraUpdater.cpp
     src/Engine/Graphics/GLFW/Window.cpp
-    src/Engine/Graphics/OpenGL/Camera.cpp
-    src/Engine/Graphics/OpenGL/CameraUpdater.cpp
     src/Engine/Graphics/OpenGL/Cubemap.cpp
     src/Engine/Graphics/OpenGL/PointShadow.cpp
     src/Engine/Graphics/OpenGL/Renderer.cpp

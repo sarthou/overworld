@@ -1,7 +1,6 @@
 #include "overworld/Physics/PhysX/World.h"
 
 #include "overworld/Engine/Common/Urdf/Joints/Joint.h"
-#include "overworld/Helper/GlmMath.h"
 #include "overworld/Physics/PhysX/Actor.h"
 #include "overworld/Physics/PhysX/Context.h"
 #include "overworld/Physics/PhysX/Joints/JointContinuous.h"
@@ -10,6 +9,7 @@
 #include "overworld/Physics/PhysX/Joints/JointPlanar.h"
 #include "overworld/Physics/PhysX/Joints/JointPrismatic.h"
 #include "overworld/Physics/PhysX/Joints/JointRevolute.h"
+#include "overworld/Utils/GlmMath.h"
 
 namespace owds::physx {
   World::World(const std::filesystem::path& base_assets_path)

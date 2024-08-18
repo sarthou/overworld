@@ -2,10 +2,10 @@
 
 #include <glm/gtc/quaternion.hpp>
 
-#include "overworld/Helper/GlmMath.h"
 #include "overworld/Physics/PhysX/Actor.h"
 #include "overworld/Physics/PhysX/Context.h"
 #include "overworld/Physics/PhysX/SharedContext.h"
+#include "overworld/Utils/GlmMath.h"
 
 namespace owds::physx {
   JointPlanar::JointPlanar(owds::physx::Context& ctx, owds::JointLocation location)

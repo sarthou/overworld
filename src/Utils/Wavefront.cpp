@@ -1,4 +1,4 @@
-#include "overworld/Utility/Wavefront.h"
+#include "overworld/Utils/Wavefront.h"
 
 #include <fstream>
 #include <iomanip>

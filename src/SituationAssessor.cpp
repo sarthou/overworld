@@ -6,7 +6,7 @@
 #include "overworld/Perception/Modules/AreasModules/AreasEmulatedPerceptionModule.h"
 #include "overworld/Perception/Modules/HumansModules/HumansEmulatedPerceptionModule.h"
 #include "overworld/Perception/Modules/ObjectsModules/ObjectsEmulatedPerceptionModule.h"
-#include "overworld/Utility/BulletKeypressHandler.h"
+#include "overworld/Utils/BulletKeypressHandler.h"
 
 namespace owds {
 

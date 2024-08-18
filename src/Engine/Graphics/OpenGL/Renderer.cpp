@@ -19,7 +19,7 @@
 #include "overworld/Engine/Graphics/GLFW/Window.h"
 #include "overworld/Engine/Graphics/OpenGL/Cubemap.h"
 #include "overworld/Engine/Graphics/OpenGL/MeshHandle.h"
-#include "overworld/Helper/GlmMath.h"
+#include "overworld/Utils/GlmMath.h"
 
 // should be after glad
 #include <GLFW/glfw3.h>

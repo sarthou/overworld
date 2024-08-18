@@ -4,7 +4,7 @@
 #include "overworld/Bullet/BulletClient.h"
 #include "overworld/Geometry/GeometryUtils.h"
 #include "overworld/Perception/PerceptionManagers.h"
-#include "overworld/Utility/ShellDisplay.h"
+#include "overworld/Utils/ShellDisplay.h"
 
 namespace owds {
 

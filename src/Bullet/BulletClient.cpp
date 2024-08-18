@@ -3,8 +3,8 @@
 #include <fstream>
 
 #include "overworld/Bullet/PhysicsServers.h"
-#include "overworld/Utility/RosFiles.h"
-#include "overworld/Utility/ShellDisplay.h"
+#include "overworld/Utils/RosFiles.h"
+#include "overworld/Utils/ShellDisplay.h"
 
 namespace owds {
 

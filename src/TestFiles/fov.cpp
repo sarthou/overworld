@@ -9,7 +9,7 @@
 #include "overworld/Bullet/PhysicsServers.h"
 #include "overworld/Geometry/Pose.h"
 #include "overworld/Senders/ROSSender.h"
-#include "overworld/Utility/ShellDisplay.h"
+#include "overworld/Utils/ShellDisplay.h"
 
 using namespace std::chrono_literals;
 

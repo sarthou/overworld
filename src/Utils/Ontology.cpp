@@ -1,7 +1,7 @@
-#include "overworld/Utility/Ontology.h"
+#include "overworld/Utils/Ontology.h"
 
-#include "overworld/Utility/RosFiles.h"
-#include "overworld/Utility/Wavefront.h"
+#include "overworld/Utils/RosFiles.h"
+#include "overworld/Utils/Wavefront.h"
 
 namespace owds {
 

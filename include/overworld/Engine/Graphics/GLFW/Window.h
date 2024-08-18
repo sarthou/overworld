@@ -6,7 +6,7 @@
 #include <string>
 
 #include "overworld/Engine/Graphics/Common/WindowPlatformData.h"
-#include "overworld/Engine/Graphics/OpenGL/CameraUpdater.h"
+#include "overworld/Engine/Graphics/GLFW/CameraUpdater.h"
 
 class GLFWwindow;
 

@@ -3,7 +3,7 @@
 #include <limits>
 
 #include "overworld/BasicTypes/Hand.h"
-#include "overworld/Utility/ShellDisplay.h"
+#include "overworld/Utils/ShellDisplay.h"
 
 namespace owds {
 

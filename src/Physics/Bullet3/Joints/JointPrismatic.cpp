@@ -2,9 +2,9 @@
 
 #include <glm/gtc/quaternion.hpp>
 
-#include "overworld/Helper/BitCast.h"
 #include "overworld/Physics/Bullet3/Actor.h"
 #include "overworld/Physics/Bullet3/Context.h"
+#include "overworld/Utils/BitCast.h"
 
 namespace owds::bullet3 {
   JointPrismatic::JointPrismatic(owds::bullet3::Context& ctx, JointLocation location)

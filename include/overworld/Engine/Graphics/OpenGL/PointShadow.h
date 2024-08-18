@@ -3,7 +3,7 @@
 
 #include <array>
 
-#include "overworld/Engine/Graphics/OpenGL/Camera.h"
+#include "overworld/Engine/Graphics/Common/Camera.h"
 
 namespace owds {
   class Shader;

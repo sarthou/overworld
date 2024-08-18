@@ -2,10 +2,10 @@
 
 #include "overworld/Engine/Common/Shapes/Shape.h"
 #include "overworld/Engine/Common/Urdf/JointLocation.h"
-#include "overworld/Helper/GlmMath.h"
 #include "overworld/Physics/Bullet3/Actor.h"
 #include "overworld/Physics/Bullet3/Context.h"
 #include "overworld/Physics/Bullet3/Joints/JointPrismatic.h"
+#include "overworld/Utils/GlmMath.h"
 
 namespace owds::bullet3 {
   World::World(const std::filesystem::path& base_assets_path)
