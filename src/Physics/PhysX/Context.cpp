@@ -1,25 +1,18 @@
 #include "overworld/Physics/PhysX/Context.h"
 
+#include <iostream>
+
 #include "overworld/Engine/Common/Urdf/Joints/Joint.h"
 #include "overworld/Physics/PhysX/Actor.h"
 #include "overworld/Physics/PhysX/SharedContext.h"
 
 namespace owds::physx {
-  std::unique_ptr<owds::physx::SharedContext> Context::shared_ctx_ = nullptr;
 
-  Context::Context(const bool minimize_memory_footprint, const std::string& debugger_address)
+  Context::Context(const bool minimize_memory_footprint,
+                   const std::string& debugger_address) : shared_ctx_(createContext())
   {
-    if(shared_ctx_ != nullptr)
-    {
-      shared_ctx_->ref_counter_++;
-    }
-    else
-    {
-      shared_ctx_ = std::make_unique<SharedContext>(debugger_address);
-      shared_ctx_->ref_counter_ = 1;
-    }
-
     // Create new scene
+    (void)debugger_address;
     auto sceneDesc = ::physx::PxSceneDesc(shared_ctx_->px_physics_->getTolerancesScale());
     sceneDesc.gravity = ::physx::PxVec3(0.0f, 0, -9.81f);
     sceneDesc.cpuDispatcher = shared_ctx_->px_dispatcher_.get();
@@ -50,5 +43,12 @@ namespace owds::physx {
     {
       shared_ctx_ = nullptr;
     }
+  }
+
+  std::unique_ptr<owds::physx::SharedContext>& Context::createContext()
+  {
+    static std::unique_ptr<owds::physx::SharedContext> shared_ctx = std::make_unique<SharedContext>("0.0.0.0");
+    shared_ctx->ref_counter_++;
+    return shared_ctx;
   }
 } // namespace owds::physx
