@@ -17,6 +17,7 @@ namespace owds {
   {
     const auto absolute_path_str = path.string();
 
+    mut_.lock();
     if(!models_.count(absolute_path_str))
     {
       auto model = model_loader_.load(path);
@@ -26,6 +27,9 @@ namespace owds {
       models_[absolute_path_str] = std::move(model);
     }
 
-    return *models_[absolute_path_str];
+    owds::Model& res = *models_[absolute_path_str];
+    mut_.unlock();
+
+    return res;
   }
 } // namespace owds

@@ -3,6 +3,7 @@
 
 #include <filesystem>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <unordered_map>
 
@@ -27,6 +28,7 @@ namespace owds {
   protected:
     ModelLoader model_loader_;
     std::unordered_map<std::string, std::unique_ptr<owds::Model>> models_;
+    std::mutex mut_;
   };
 } // namespace owds
 
