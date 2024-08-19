@@ -1,7 +1,14 @@
 #ifndef OWDS_HELPER_ROS_H
 #define OWDS_HELPER_ROS_H
 
+#include <cassert>
+#include <filesystem>
+#include <string>
+
+#include "overworld/Compat/ROS.h"
+
 namespace owds {
+
   inline std::string rosPkgPathToPath(const std::string& filename)
   {
     const auto url_handler = filename.substr(0, 10);
@@ -21,6 +28,7 @@ namespace owds {
 
     return assets_path + "/" + relative_path;
   }
+
 } // namespace owds
 
 #endif // OWDS_HELPER_ROS_H

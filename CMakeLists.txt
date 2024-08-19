@@ -147,6 +147,15 @@ owds_generate_interfaces()
 # ##################################
 owds_add_ros_library(overworld_compat src/Compat/ROS.cpp)
 
+owds_add_ros_library(overworld_utility_lib
+    src/Utils/YamlReader.cpp
+    src/Utils/Ontology.cpp
+    src/Utils/XmlTokenize.cpp
+
+    # src/Utils/RosFiles.cpp
+    src/Utils/Wavefront.cpp)
+
+# #################################
 owds_add_ros_library(overworld_engine_common
     src/Engine/Common/Debug/DebugLine.cpp
     src/Engine/Common/Models/Loaders/ColladaLoader.cpp
@@ -157,10 +166,12 @@ owds_add_ros_library(overworld_engine_common
     src/Engine/Common/Models/Mesh.cpp
     src/Engine/Common/Models/Model.cpp
     src/Engine/Common/Models/ModelManager.cpp
+    src/Engine/Common/Urdf/UrdfLoader.cpp
     src/Engine/Common/Urdf/Joints/Joint.cpp
     src/Engine/Common/Urdf/Urdf.cpp
     src/Engine/Common/Urdf/Actor.cpp
     src/Engine/Common/World.cpp)
+target_link_libraries(overworld_engine_common PRIVATE overworld_utility_lib)
 
 # ##################################
 owds_add_library(overworld_glad External/src/glad.c)

@@ -14,6 +14,7 @@
 #include "overworld/Engine/Common/Models/Mesh.h"
 #include "overworld/Engine/Common/Models/Model.h"
 #include "overworld/Utils/ShellDisplay.h"
+#include "overworld/Utils/XmlTokenize.h"
 
 namespace owds {
 
@@ -29,82 +30,6 @@ namespace owds {
     std::string position_id;
     std::string normal_id;
   };
-
-  struct TokenFloatArray_t
-  {
-    std::vector<float>& values;
-    TokenFloatArray_t(std::vector<float>& float_array) : values(float_array)
-    {}
-
-    void add(const char* token)
-    {
-      float v = atof(token);
-      values.push_back(v);
-    }
-  };
-  struct TokenIntArray_t
-  {
-    std::vector<int>& values;
-    TokenIntArray_t(std::vector<int>& array) : values(array)
-    {}
-
-    void add(const char* token)
-    {
-      float v = atoi(token);
-      values.push_back(v);
-    }
-  };
-
-  template<typename AddToken>
-  void tokenize(const std::string& str, AddToken& token_adder, const std::string& delimiters = " \n")
-  {
-    std::string::size_type pos;
-    std::string::size_type last_pos = 0;
-    while(true)
-    {
-      pos = str.find_first_of(delimiters, last_pos);
-      if(pos == std::string::npos)
-      {
-        pos = str.length();
-        if(pos != last_pos)
-          token_adder.add(str.data() + last_pos);
-
-        break;
-      }
-      else if(pos != last_pos)
-        token_adder.add(str.data() + last_pos);
-
-      last_pos = pos + 1;
-    }
-  }
-
-  glm::vec3 getVector3FromXmlText(const char* text)
-  {
-    glm::vec3 vec(0, 0, 0);
-    std::vector<float> float_array;
-    TokenFloatArray_t adder(float_array);
-    float_array.reserve(3);
-    tokenize(text, adder);
-    assert(float_array.size() == 3);
-
-    vec = glm::vec3(float_array[0], float_array[1], float_array[2]);
-
-    return vec;
-  }
-
-  glm::vec4 getVector4FromXmlText(const char* text)
-  {
-    glm::vec4 vec(0, 0, 0, 0);
-    std::vector<float> float_array;
-    TokenFloatArray_t adder(float_array);
-    float_array.reserve(4);
-    tokenize(text, adder);
-    assert(float_array.size() == 4);
-
-    vec = glm::vec4(float_array[0], float_array[1], float_array[2], float_array[3]);
-
-    return vec;
-  }
 
   void getColorAndTexture(TiXmlElement* elem, std::map<std::string, EffectParam_t>& params, std::map<std::string, std::string>& images, Color& color, std::string& texture)
   {
