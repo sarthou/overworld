@@ -71,12 +71,19 @@ namespace owds {
       glm::vec3 axis = {1., 0., 0.};
     };
 
+    struct Urdf_t
+    {
+      std::string name;
+      std::map<std::string, Joint_t> joints;
+      std::map<std::string, Link_t> links;
+    };
+
   } // namespace urdf
 
   class UrdfLoader
   {
   public:
-    void read(const std::string& path);
+    urdf::Urdf_t read(const std::string& path);
 
   private:
     bool getXmlDocument(const std::string& path, TiXmlDocument& doc);

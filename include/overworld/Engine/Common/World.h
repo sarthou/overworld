@@ -13,13 +13,7 @@
 #include "overworld/Engine/Common/Lights/AmbientLight.h"
 #include "overworld/Engine/Common/Lights/PointLights.h"
 #include "overworld/Engine/Common/Shapes/Shape.h"
-
-namespace urdf {
-  class Material;
-  class Link;
-  class Joint;
-  class Geometry;
-} // namespace urdf
+#include "overworld/Engine/Common/Urdf/UrdfLoader.h"
 
 namespace owds {
   class Actor;
@@ -239,12 +233,9 @@ namespace owds {
     virtual void stepSimulation(float delta_ms) = 0;
 
   protected:
-    void processMaterial(owds::Urdf& robot, const urdf::Material& urdf_material);
-    void processLinks(owds::Urdf& robot, const urdf::Link& urdf_link);
-    void processLink(owds::Urdf& robot, const urdf::Link& urdf_link);
-    void processJoints(owds::Urdf& robot, const urdf::Link& urdf_link);
-    void processJoint(owds::Urdf& robot, const urdf::Joint& urdf_joint);
-    owds::Shape convertShape(const owds::Material& material, const urdf::Geometry& urdf_shape, glm::mat4& transform);
+    void processLink(owds::Urdf& robot, const urdf::Link_t& urdf_link);
+    void processJoint(owds::Urdf& robot, const urdf::Joint_t& urdf_joint);
+    owds::Shape convertShape(const urdf::Geometry_t& urdf_shape, glm::mat4& transform);
 
     std::filesystem::path base_assets_path_;
     owds::Model& preloaded_box_model_;

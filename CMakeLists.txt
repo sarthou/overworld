@@ -116,7 +116,6 @@ owds_depend_msg_package(sensor_msgs)
 owds_depend_msg_package(visualization_msgs)
 owds_depend_msg_package(geometry_msgs)
 owds_depend_msg_package(ontologenius)
-owds_depend_package(urdf)
 owds_depend_package(message_filters)
 
 # #####################################################################

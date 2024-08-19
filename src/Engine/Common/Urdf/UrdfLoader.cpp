@@ -14,17 +14,21 @@
 
 namespace owds {
 
-  void UrdfLoader::read(const std::string& path)
+  urdf::Urdf_t UrdfLoader::read(const std::string& path)
   {
+    urdf::Urdf_t urdf;
+
     TiXmlDocument doc;
     if(getXmlDocument(path, doc) == false)
-      return;
+      return urdf;
+
+    urdf.name = doc.RootElement()->Attribute("name");
 
     auto material_library = getMaterialLibrary(doc.RootElement());
-    auto links = getLinks(doc.RootElement(), material_library);
-    auto joints = getJoints(doc.RootElement());
+    urdf.links = getLinks(doc.RootElement(), material_library);
+    urdf.joints = getJoints(doc.RootElement());
 
-    std::cout << "done" << std::endl;
+    return urdf;
   }
 
   bool UrdfLoader::getXmlDocument(const std::string& path, TiXmlDocument& doc)

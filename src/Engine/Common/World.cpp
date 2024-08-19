@@ -4,7 +4,6 @@
 #include <cassert>
 #include <cstdint>
 #include <string>
-#include <urdf/model.h>
 
 #include "overworld/Compat/ROS.h"
 #include "overworld/Engine/Common/Models/Color.h"
@@ -12,6 +11,7 @@
 #include "overworld/Engine/Common/Models/ModelManager.h"
 #include "overworld/Engine/Common/Urdf/Actor.h"
 #include "overworld/Engine/Common/Urdf/Urdf.h"
+#include "overworld/Engine/Common/Urdf/UrdfLoader.h"
 #include "overworld/Utils/GlmMath.h"
 #include "overworld/Utils/ROS.h"
 
@@ -78,167 +78,80 @@ namespace owds {
 
   owds::Urdf& World::loadRobotFromDescription(const std::string& path, bool from_base_path)
   {
-    urdf::Model urdf_model;
+    UrdfLoader loader;
+    urdf::Urdf_t urdf_model;
+
     if(from_base_path)
-      assert(urdf_model.initFile((base_assets_path_ / path).string()));
+      urdf_model = loader.read((base_assets_path_ / path).string());
     else
-      assert(urdf_model.initFile(path));
+      urdf_model = loader.read(path);
 
     auto urdf = std::make_unique<owds::Urdf>();
     const auto urdf_ptr = urdf.get();
     loaded_urdfs_[urdf_ptr] = std::move(urdf);
 
-    urdf_ptr->name_ = urdf_model.name_;
+    urdf_ptr->name_ = urdf_model.name;
 
-    for(auto& [name, material] : urdf_model.materials_)
+    for(auto& [name, link] : urdf_model.links)
     {
-      processMaterial(*urdf_ptr, *material);
+      processLink(*urdf_ptr, link);
     }
 
-    for(auto& [name, link] : urdf_model.links_)
+    for(const auto& [name, joint] : urdf_model.joints)
     {
-      processLinks(*urdf_ptr, *link);
-    }
-
-    for(const auto& [name, joint] : urdf_model.joints_)
-    {
-      processJoint(*urdf_ptr, *joint);
-    }
-
-    for(auto& [name, link] : urdf_model.links_)
-    {
-      processJoints(*urdf_ptr, *link);
+      processJoint(*urdf_ptr, joint);
     }
 
     return *urdf_ptr;
   }
 
-  void World::processMaterial(owds::Urdf& robot, const urdf::Material& urdf_material)
+  void World::processLink(owds::Urdf& robot, const urdf::Link_t& urdf_link)
   {
-    robot.materials_[urdf_material.name] = {
-      urdf_material.name,
-      !urdf_material.texture_filename.empty() ?
-        owds::Color{1,                     1, 1, 0.}
-        :
-        owds::Color{urdf_material.color.r,
-                    urdf_material.color.g,
-                    urdf_material.color.b,
-                    urdf_material.color.a          },
-      owds::Color{1,                     1, 1, 0.}, // specular
-      -1.0, // shininess_
-      urdf_material.texture_filename.empty() ?
-        "" :
-        owds::rosPkgPathToPath(urdf_material.texture_filename),
-      "", // specular
-      "", // normal
-    };
-  }
-
-  void World::processLinks(owds::Urdf& robot, const urdf::Link& urdf_link)
-  {
-    for(auto& child_link : urdf_link.child_links)
-    {
-      processLinks(robot, *child_link);
-    }
-
-    processLink(robot, urdf_link);
-  }
-
-  void World::processLink(owds::Urdf& robot, const urdf::Link& urdf_link)
-  {
-    const auto material_name = urdf_link.visual ? urdf_link.visual->material_name : "";
-    const auto material = material_name.empty() ? owds::Material{
-                                                    "",
-                                                    owds::Color{1, 1, 1, 0.},
-                                                    owds::Color{1, 1, 1, 0.},
-                                                    -1.0,
-                                                    "", "", ""
-    } :
-                                                  robot.materials_.at(material_name);
-
     owds::Shape collision_shape = owds::ShapeDummy();
     std::vector<owds::Shape> visual_shapes;
 
-    if(urdf_link.collision)
+    if(urdf_link.collisions.size())
     {
-      auto& origin = urdf_link.collision->origin;
-      glm::vec3 position = ToV3({(float)origin.position.x, (float)origin.position.y, (float)origin.position.z});
-      glm::quat rotation = ToQT({(float)origin.rotation.x, (float)origin.rotation.y, (float)origin.rotation.z, (float)origin.rotation.w});
-      glm::mat4 translate = glm::translate(glm::mat4(1), position);
-      glm::mat4 rotate = glm::mat4_cast(rotation);
-      glm::mat4 transform = translate * rotate;
-      collision_shape = convertShape(material, *urdf_link.collision->geometry, transform); // TODO
+      auto& collision = urdf_link.collisions.front();
+      if(collision.type != urdf::GeometryType_e::geometry_none)
+      {
+        glm::mat4 translate = glm::translate(glm::mat4(1), collision.origin_translation);
+        glm::mat4 rotate = glm::mat4_cast(glm::quat(collision.origin_rotation));
+        glm::mat4 transform = translate * rotate;
+        (void)transform;
+        // collision_shape = convertShape(collision, transform); // TODO
+      }
     }
 
-    assert(urdf_link.collision_array.size() <= 1 && "Links with multiple collision shapes are not supported at this moment.");
+    assert(urdf_link.collisions.size() <= 1 && "Links with multiple collision shapes are not supported at this moment.");
 
-    visual_shapes.reserve(urdf_link.visual_array.size());
-
-    for(auto& visual_geometry : urdf_link.visual_array)
     {
-      auto& origin = visual_geometry->origin;
-      glm::vec3 position = ToV3({(float)origin.position.x, (float)origin.position.y, (float)origin.position.z});
-      glm::quat rotation = ToQT({(float)origin.rotation.x, (float)origin.rotation.y, (float)origin.rotation.z, (float)origin.rotation.w});
-      glm::mat4 translate = glm::translate(glm::mat4(1), position);
-      glm::mat4 rotate = glm::mat4_cast(rotation);
-      glm::mat4 transform = translate * rotate;
-      visual_shapes.emplace_back(convertShape(material, *visual_geometry->geometry, transform));
+      if(urdf_link.visual.type != urdf::GeometryType_e::geometry_none)
+      {
+        auto& visual = urdf_link.visual;
+        glm::mat4 translate = glm::translate(glm::mat4(1), visual.origin_translation);
+        glm::mat4 rotate = glm::mat4_cast(glm::quat(visual.origin_rotation));
+        glm::mat4 transform = translate * rotate;
+        visual_shapes.emplace_back(convertShape(visual, transform));
+      }
     }
 
     auto& link = createActor(collision_shape, visual_shapes);
 
-    if(urdf_link.parent_joint != nullptr)
-    {
-      auto transform = urdf_link.parent_joint->parent_to_joint_origin_transform;
-      link.setPositionAndOrientation({static_cast<float>(transform.position.x),
-                                      static_cast<float>(transform.position.y),
-                                      static_cast<float>(transform.position.z)},
-                                     {static_cast<float>(transform.rotation.x),
-                                      static_cast<float>(transform.rotation.y),
-                                      static_cast<float>(transform.rotation.z),
-                                      static_cast<float>(transform.rotation.w)});
-    }
-    else
-    {
-      link.setPositionAndOrientation({static_cast<float>(0),
-                                      static_cast<float>(0),
-                                      static_cast<float>(0)},
-                                     {static_cast<float>(0),
-                                      static_cast<float>(0),
-                                      static_cast<float>(0),
-                                      static_cast<float>(1.)});
-    }
+    link.setPositionAndOrientation({static_cast<float>(0),
+                                    static_cast<float>(0),
+                                    static_cast<float>(0)},
+                                   {static_cast<float>(0),
+                                    static_cast<float>(0),
+                                    static_cast<float>(0),
+                                    static_cast<float>(1.)}); // TODO where to do it well ?
 
-    if(urdf_link.inertial)
-    {
-      const auto& inertial = *urdf_link.inertial;
-      // link.setPositionAndOrientation({static_cast<float>(inertial.origin.position.x),
-      //                                 static_cast<float>(inertial.origin.position.y),
-      //                                 static_cast<float>(inertial.origin.position.z)},
-      //                                {static_cast<float>(inertial.origin.rotation.x),
-      //                                 static_cast<float>(inertial.origin.rotation.y),
-      //                                 static_cast<float>(inertial.origin.rotation.z),
-      //                                 static_cast<float>(inertial.origin.rotation.w)});
-      link.setMass(static_cast<float>(inertial.mass));
-    }
+    link.setMass(static_cast<float>(urdf_link.inertia.mass));
 
     robot.links_[urdf_link.name] = std::addressof(link);
   }
 
-  void World::processJoints(owds::Urdf& robot, const urdf::Link& urdf_link)
-  {
-    for(const auto& joint : urdf_link.child_joints)
-    {
-      processJoint(robot, *joint);
-    }
-
-    for(const auto& child_link : urdf_link.child_links)
-    {
-      processJoints(robot, *child_link);
-    }
-  }
-
-  void World::processJoint(owds::Urdf& robot, const urdf::Joint& urdf_joint)
+  void World::processJoint(owds::Urdf& robot, const urdf::Joint_t& urdf_joint)
   {
     (void)robot;
     // auto& link0 = *robot.links_.at(urdf_joint.parent_link_name);
@@ -247,7 +160,7 @@ namespace owds {
     // joint.parent_to_joint_origin_transform;
     switch(urdf_joint.type)
     {
-    case urdf::Joint::REVOLUTE:
+    case urdf::JointType_e::joint_revolute:
     {
       /*createJointRevolute(
         link0,
@@ -264,27 +177,27 @@ namespace owds {
 
       break;
     }
-    case urdf::Joint::CONTINUOUS:
+    case urdf::JointType_e::joint_continuous:
     {
       break;
     }
-    case urdf::Joint::PRISMATIC:
+    case urdf::JointType_e::joint_prismatic:
     {
       break;
     }
-    case urdf::Joint::FLOATING:
+    case urdf::JointType_e::joint_floating:
     {
       break;
     }
-    case urdf::Joint::PLANAR:
+    case urdf::JointType_e::joint_planar:
     {
       break;
     }
-    case urdf::Joint::FIXED:
+    case urdf::JointType_e::joint_fixed:
     {
       break;
     }
-    case urdf::Joint::UNKNOWN:
+    case urdf::JointType_e::joint_none:
     default:
     {
       assert(false && "Unrecognized/unsupported joint type.");
@@ -292,44 +205,38 @@ namespace owds {
     }
   }
 
-  owds::Shape World::convertShape(const owds::Material& material, const urdf::Geometry& urdf_shape, glm::mat4& transform)
+  owds::Shape World::convertShape(const urdf::Geometry_t& urdf_shape, glm::mat4& transform)
   {
     switch(urdf_shape.type)
     {
-    case urdf::Geometry::SPHERE:
+    case urdf::GeometryType_e::geometry_sphere:
     {
-      auto& sphere = dynamic_cast<const urdf::Sphere&>(urdf_shape);
-      return createShapeSphere(material.diffuse_color_,
-                               static_cast<float>(sphere.radius),
+      return createShapeSphere(urdf_shape.material.diffuse_color_,
+                               static_cast<float>(urdf_shape.scale.x),
                                transform);
     }
-    case urdf::Geometry::BOX:
+    case urdf::GeometryType_e::geometry_box:
     {
-      auto& box = dynamic_cast<const urdf::Box&>(urdf_shape);
-      return createShapeBox(material.diffuse_color_,
-                            {static_cast<float>(box.dim.x),
-                             static_cast<float>(box.dim.y),
-                             static_cast<float>(box.dim.z)},
+      return createShapeBox(urdf_shape.material.diffuse_color_,
+                            {static_cast<float>(urdf_shape.scale.x),
+                             static_cast<float>(urdf_shape.scale.y),
+                             static_cast<float>(urdf_shape.scale.z)},
                             transform);
     }
-    case urdf::Geometry::CYLINDER:
+    case urdf::GeometryType_e::geometry_cylinder:
     {
-      // I hope the cylinder is ok
-      auto& cylinder = dynamic_cast<const urdf::Cylinder&>(urdf_shape);
-      return createShapeCylinder(material.diffuse_color_,
-                                 static_cast<float>(cylinder.radius),
-                                 static_cast<float>(cylinder.length),
+      return createShapeCylinder(urdf_shape.material.diffuse_color_,
+                                 static_cast<float>(urdf_shape.scale.x),
+                                 static_cast<float>(urdf_shape.scale.y),
                                  transform);
     }
-    case urdf::Geometry::MESH:
+    case urdf::GeometryType_e::geometry_mesh:
     {
-      auto& mesh = dynamic_cast<const urdf::Mesh&>(urdf_shape);
-
-      return createShapeFromModel(material,
-                                  owds::rosPkgPathToPath(mesh.filename),
-                                  {static_cast<float>(mesh.scale.x),
-                                   static_cast<float>(mesh.scale.y),
-                                   static_cast<float>(mesh.scale.z)},
+      return createShapeFromModel(urdf_shape.material,
+                                  owds::rosPkgPathToPath(urdf_shape.file_name),
+                                  {static_cast<float>(urdf_shape.scale.x),
+                                   static_cast<float>(urdf_shape.scale.y),
+                                   static_cast<float>(urdf_shape.scale.z)},
                                   transform);
     }
     default:

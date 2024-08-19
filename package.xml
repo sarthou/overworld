@@ -69,7 +69,6 @@
   <depend condition="$ROS_VERSION == 2">builtin_interfaces</depend>
   <depend condition="$ROS_VERSION == 2">std_msgs</depend>
   <depend condition="$ROS_VERSION == 2">geometry_msgs</depend>
-  <depend condition="$ROS_VERSION == 2">urdf</depend>
   <depend condition="$ROS_VERSION == 2">message_filters</depend>
   <depend condition="$ROS_VERSION == 2">ontologenius</depend>
 

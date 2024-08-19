@@ -2,7 +2,6 @@
 // should be first
 
 #include <thread>
-#include <urdf/model.h>
 
 #include "overworld/Engine/Common/Models/Loaders/ModelLoader.h"
 #include "overworld/Engine/Common/Models/ModelManager.h"
@@ -93,36 +92,19 @@ void worldThread(const std::string& world_name, owds::Window* window)
   }
 }
 
-void urdfThread()
-{
-  urdf::Model urdf_model;
-
-  assert(urdf_model.initFile("/home/gsarthou/Robots/Dacobot2/ros2_ws/src/overworld/models/pr2.urdf"));
-
-  while(1)
-  {
-    /* code */
-  }
-}
-
 int main()
 {
   owds::Window::init();
 
   owds::Window window1("overworld_bob");
   // owds::Window window2("overworld_alice");
-  //
+
   window1.makeCurrentContext();
   owds::Renderer::init();
   glfwMakeContextCurrent(nullptr);
 
   std::thread world1(worldThread, "overworld_bob", &window1);
-  // std::thread world2(worldThread, "overworld_alice", &window2);
-
-  // std::thread world1(urdfThread);
-  //  std::thread world2(urdfThread);
-  // usleep(1'000'000);
-  // urdfThread();
+  //  std::thread world2(worldThread, "overworld_alice", &window2);
 
   while(1)
   {
