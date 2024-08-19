@@ -50,10 +50,21 @@ namespace owds {
 
   void Renderer::init()
   {
+    owds::Window::init();
+    owds::Window tmp;
+    tmp.makeCurrentContext();
+
     if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
       std::cout << "Failed to initialize GLAD" << std::endl;
     }
+
+    glfwMakeContextCurrent(nullptr);
+  }
+
+  void Renderer::release()
+  {
+    owds::Window::release();
   }
 
   bool Renderer::initialize(Window& window)

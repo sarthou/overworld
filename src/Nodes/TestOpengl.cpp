@@ -94,17 +94,13 @@ void worldThread(const std::string& world_name, owds::Window* window)
 
 int main()
 {
-  owds::Window::init();
+  owds::Renderer::init();
 
   owds::Window window1("overworld_bob");
-  // owds::Window window2("overworld_alice");
-
-  window1.makeCurrentContext();
-  owds::Renderer::init();
-  glfwMakeContextCurrent(nullptr);
+  owds::Window window2("overworld_alice");
 
   std::thread world1(worldThread, "overworld_bob", &window1);
-  //  std::thread world2(worldThread, "overworld_alice", &window2);
+  std::thread world2(worldThread, "overworld_alice", &window2);
 
   while(1)
   {
@@ -113,9 +109,9 @@ int main()
   }
 
   world1.join();
-  // world2.join();
+  world2.join();
 
-  owds::Window::release();
+  owds::Renderer::release();
 
   return 0;
 }

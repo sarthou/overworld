@@ -32,6 +32,7 @@ namespace owds {
   public:
     ~Renderer();
     static void init();
+    static void release();
 
     bool initialize(Window& window);
     void attachWorld(World* world) { world_ = world; }
