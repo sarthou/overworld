@@ -15,7 +15,6 @@ namespace owds {
 
   void PointShadow::init(size_t id, float far_plane)
   {
-    std::cout << "init PointShadow " << id << " far plane = " << far_plane << std::endl;
     far_plane *= 2.5;
     far_plane_[id] = far_plane;
     projection_matrix_[id] = glm::perspective(glm::radians(90.0f), 1.0f, 0.02f, far_plane);
