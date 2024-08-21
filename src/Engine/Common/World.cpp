@@ -422,4 +422,57 @@ namespace owds {
       debug_lines_[id].indices_.clear();
   }
 
+  int World::addCamera(unsigned int width, unsigned int height, float fov, owds::CameraView_e view_type, float near_plane, float far_plane)
+  {
+    cameras_.emplace_back(width, height, fov, view_type, near_plane, far_plane);
+    return cameras_.size() - 1;
+  }
+
+  bool World::setCameraPositionAndLookAt(int id, const std::array<float, 3>& eye_position, const std::array<float, 3>& dst_position)
+  {
+    if(id < (int)cameras_.size())
+    {
+      cameras_[id].setPositionAndLookAt(eye_position, dst_position);
+      return true;
+    }
+    else
+      return false;
+  }
+
+  bool World::setCameraPositionAndDirection(int id, const std::array<float, 3>& eye_position, const std::array<float, 3>& eye_direction)
+  {
+    if(id < (int)cameras_.size())
+    {
+      cameras_[id].setPositionAndDirection(eye_position, eye_direction);
+      return true;
+    }
+    else
+      return false;
+  }
+
+  void World::requestCameraRender(const std::vector<int>& ids)
+  {
+    for(auto id : ids)
+    {
+      if(id < (int)cameras_.size())
+        cameras_[id].requestUpdate();
+    }
+    has_render_request_ = true;
+
+    while(has_render_request_ == true)
+      usleep(1000);
+  }
+
+  void World::getCameraImage(int id, uint32_t** image, unsigned int& width, unsigned int& height)
+  {
+    if(id < (int)cameras_.size())
+    {
+      *image = cameras_[id].getImageData();
+      width = cameras_[id].getWidth();
+      height = cameras_[id].getHeight();
+    }
+    else
+      image = nullptr;
+  }
+
 } // namespace owds

@@ -2,12 +2,14 @@
 #define OWDS_COMMON_WORLD_H
 
 #include <array>
+#include <atomic>
 #include <filesystem>
 #include <glm/matrix.hpp>
 #include <string>
 #include <unordered_map>
 #include <vector>
 
+#include "overworld/Engine/Common/Camera/VirtualCamera.h"
 #include "overworld/Engine/Common/Debug/DebugLine.h"
 #include "overworld/Engine/Common/Debug/DebugText.h"
 #include "overworld/Engine/Common/Lights/AmbientLight.h"
@@ -222,6 +224,13 @@ namespace owds {
                      int replace_id = -1);
     void removeDebugLine(int id);
 
+    int addCamera(unsigned int width, unsigned int height, float fov, owds::CameraView_e view_type, float near_plane, float far_plane);
+    bool setCameraPositionAndLookAt(int id, const std::array<float, 3>& eye_position, const std::array<float, 3>& dst_position);
+    bool setCameraPositionAndDirection(int id, const std::array<float, 3>& eye_position, const std::array<float, 3>& eye_direction);
+    // requestCameraRender blocks until the request has been treated. Do not cahnge the cameras during this time
+    void requestCameraRender(const std::vector<int>& ids);
+    void getCameraImage(int id, uint32_t** image, unsigned int& width, unsigned int& height);
+
     /**
      * @param gravity Self-explanatory.
      */
@@ -247,6 +256,9 @@ namespace owds {
     PointLights point_lights_;
     std::vector<DebugText_t> debug_texts_;
     std::vector<DebugLine> debug_lines_;
+
+    std::vector<VirtualCamera> cameras_;
+    std::atomic<bool> has_render_request_;
   };
 } // namespace owds
 
