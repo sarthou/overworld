@@ -6,7 +6,7 @@
 #include <memory>
 #include <string>
 
-#include "overworld/Engine/Graphics/Common/Camera.h"
+#include "overworld/Engine/Common/Camera/Camera.h"
 #include "overworld/Engine/Graphics/Common/WindowPlatformData.h"
 #include "overworld/Engine/Graphics/OpenGL/Renderer.h"
 

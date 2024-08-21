@@ -1,5 +1,5 @@
-#ifndef OWDS_GRAPHICS_OPENGL_CAMERA_H
-#define OWDS_GRAPHICS_OPENGL_CAMERA_H
+#ifndef OWDS_CAMERA_H
+#define OWDS_CAMERA_H
 
 #include <array>
 #include <cstdint>
@@ -9,9 +9,9 @@
 #include <glm/vec3.hpp>
 #include <vector>
 
-#include "overworld/Engine/Graphics/Common/CameraProjection.h"
-#include "overworld/Engine/Graphics/Common/CameraView.h"
-#include "overworld/Engine/Graphics/Common/ViewAntiAliasing.h"
+#include "overworld/Engine/Common/Camera/CameraProjection.h"
+#include "overworld/Engine/Common/Camera/CameraView.h"
+#include "overworld/Engine/Common/Camera/ViewAntiAliasing.h"
 
 namespace owds {
 
@@ -75,4 +75,4 @@ namespace owds {
   };
 } // namespace owds
 
-#endif // OWDS_GRAPHICS_OPENGL_CAMERA_H
+#endif // OWDS_CAMERA_H

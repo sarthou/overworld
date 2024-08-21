@@ -1,14 +1,14 @@
-#include "overworld/Engine/Graphics/GLFW/CameraUpdater.h"
+#include "overworld/Engine/Common/Camera/CameraUpdater.h"
 
 #include <array>
 #include <cstdint>
 #include <glm/gtc/packing.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "overworld/Engine/Graphics/Common/Camera.h"
-#include "overworld/Engine/Graphics/Common/CameraProjection.h"
-#include "overworld/Engine/Graphics/Common/CameraView.h"
-#include "overworld/Engine/Graphics/Common/ViewAntiAliasing.h"
+#include "overworld/Engine/Common/Camera/Camera.h"
+#include "overworld/Engine/Common/Camera/CameraProjection.h"
+#include "overworld/Engine/Common/Camera/CameraView.h"
+#include "overworld/Engine/Common/Camera/ViewAntiAliasing.h"
 #include "overworld/Utils/GlmMath.h"
 
 namespace owds {

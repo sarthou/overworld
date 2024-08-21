@@ -1,5 +1,5 @@
-#ifndef OWDS_GRAPHICS_COMMON_CAMERAPROJECTION_H
-#define OWDS_GRAPHICS_COMMON_CAMERAPROJECTION_H
+#ifndef OWDS_CAMERAPROJECTION_H
+#define OWDS_CAMERAPROJECTION_H
 
 namespace owds {
   /**
@@ -16,4 +16,4 @@ namespace owds {
   };
 } // namespace owds
 
-#endif // OWDS_GRAPHICS_COMMON_CAMERAPROJECTION_H
+#endif // OWDS_CAMERAPROJECTION_H

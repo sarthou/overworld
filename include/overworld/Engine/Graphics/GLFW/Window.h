@@ -5,8 +5,8 @@
 #include <mutex>
 #include <string>
 
+#include "overworld/Engine/Common/Camera/CameraUpdater.h"
 #include "overworld/Engine/Graphics/Common/WindowPlatformData.h"
-#include "overworld/Engine/Graphics/GLFW/CameraUpdater.h"
 
 class GLFWwindow;
 

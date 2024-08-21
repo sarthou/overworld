@@ -1,5 +1,5 @@
-#ifndef OWDS_GRAPHICS_COMMON_VIEWANTIALIASING_H
-#define OWDS_GRAPHICS_COMMON_VIEWANTIALIASING_H
+#ifndef OWDS_VIEWANTIALIASING_H
+#define OWDS_VIEWANTIALIASING_H
 
 namespace owds {
   /**
@@ -22,4 +22,4 @@ namespace owds {
   };
 } // namespace owds
 
-#endif // OWDS_GRAPHICS_COMMON_VIEWANTIALIASING_H
+#endif // OWDS_VIEWANTIALIASING_H

@@ -3,8 +3,8 @@
 
 #include <array>
 
-#include "overworld/Engine/Graphics/Common/Camera.h"
-#include "overworld/Engine/Graphics/GLFW/CameraUpdater.h"
+#include "overworld/Engine/Common/Camera/Camera.h"
+#include "overworld/Engine/Common/Camera/CameraUpdater.h"
 
 namespace owds {
   class Shader;

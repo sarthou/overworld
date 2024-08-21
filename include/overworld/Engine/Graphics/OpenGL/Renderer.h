@@ -7,10 +7,10 @@
 #include <unordered_map>
 #include <vector>
 
+#include "overworld/Engine/Common/Camera/Camera.h"
 #include "overworld/Engine/Common/Models/Model.h"
 #include "overworld/Engine/Common/Shapes/Shape.h"
 #include "overworld/Engine/Common/Urdf/Actor.h"
-#include "overworld/Engine/Graphics/Common/Camera.h"
 #include "overworld/Engine/Graphics/Common/InstanceData.h"
 #include "overworld/Engine/Graphics/OpenGL/AmbientShadow.h"
 #include "overworld/Engine/Graphics/OpenGL/Cubemap.h"

@@ -7,6 +7,7 @@
 #include <variant>
 
 #include "glad/glad.h"
+#include "overworld/Engine/Common/Camera/ViewAntiAliasing.h"
 #include "overworld/Engine/Common/Lights/AmbientLight.h"
 #include "overworld/Engine/Common/Lights/PointLights.h"
 #include "overworld/Engine/Common/Models/Mesh.h"
@@ -15,7 +16,6 @@
 #include "overworld/Engine/Common/Urdf/Actor.h"
 #include "overworld/Engine/Common/World.h"
 #include "overworld/Engine/Graphics/Common/InstanceData.h"
-#include "overworld/Engine/Graphics/Common/ViewAntiAliasing.h"
 #include "overworld/Engine/Graphics/GLFW/Window.h"
 #include "overworld/Engine/Graphics/OpenGL/Cubemap.h"
 #include "overworld/Engine/Graphics/OpenGL/MeshHandle.h"
