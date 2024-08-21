@@ -122,6 +122,7 @@ namespace owds {
     bool key_state_up_ = false;
     bool key_state_down_ = false;
     bool key_state_debug_ = false;
+    bool key_state_shadows_ = false;
 
     std::bitset<16> mouse_btn_states_{};
 

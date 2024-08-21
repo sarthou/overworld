@@ -42,6 +42,13 @@ namespace owds {
       key_state_debug_ = is_down;
       break;
     }
+    case Key_e::key_f4:
+    {
+      if(is_down == false && key_state_shadows_)
+        camera_->render_shadows_ = !camera_->render_shadows_;
+      key_state_shadows_ = is_down;
+      break;
+    }
     case Key_e::key_w:
     case Key_e::key_up: key_state_front_ = is_down; break;
     case Key_e::key_s:

@@ -43,6 +43,9 @@ struct PointLight {
 uniform PointLight point_lights[NR_POINT_LIGHTS];
 uniform float nb_point_lights;
 
+uniform float use_ambient_shadows;
+uniform float use_point_shadows;
+
 uniform vec3 view_pose;
 
 uniform mat4 view;
@@ -164,6 +167,9 @@ vec4 calcPointLight(PointLight light, vec3 normal, vec3 viewDir)
 
 float pointShadowCalculation(PointLight light, vec3 fragPosWorldSpace)
 {
+  if(use_point_shadows == 0)
+    return 0.;
+
   vec3 fragToLight = FragPos - light.position.xyz;
   if(length(fragToLight) > light.far_plane)
     return 1.0;
@@ -190,6 +196,9 @@ float pointShadowCalculation(PointLight light, vec3 fragPosWorldSpace)
 
 float ambiantShadowCalculation(vec3 fragPosWorldSpace)
 {
+  if(use_ambient_shadows == 0)
+    return 0.;
+    
   // select cascade layer
   vec4 frag_pose_view_space = view * vec4(fragPosWorldSpace, 1.0);
   float depth_value = abs(frag_pose_view_space.z);

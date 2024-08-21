@@ -384,6 +384,7 @@ namespace owds {
 
     render_collision_models_ = render_camera_.shouldRendercollisionModels();
     render_debug_ = render_camera_.shouldRenderDebug();
+    render_shadows_ = render_camera_.shouldShadows();
 
     auto& light_shader = shaders_.at("default");
     auto& sky_shader = shaders_.at("sky");
@@ -394,33 +395,36 @@ namespace owds {
 
     // 0. draw scene as normal in depth buffers
 
-    // 0.1. ambient shadows
-    auto ambient_dir = -glm::normalize(world_->ambient_light_.getDirection());
-    shadow_.computeLightSpaceMatrices(render_camera_, ambient_dir);
-
-    shadow_shader.use();
-    shadow_.setLightMatrices();
-
-    shadow_.bindFrameBuffer();
-    glEnable(GL_DEPTH_TEST);
-
-    renderModels(shadow_shader, 2);
-
-    // 0.2 points shadows
-    for(size_t i = 0; i < PointLights::MAX_POINT_LIGHTS; i++)
+    if(render_shadows_)
     {
-      if(world_->point_lights_.isUsed(i))
+      // 0.1. ambient shadows
+      auto ambient_dir = -glm::normalize(world_->ambient_light_.getDirection());
+      shadow_.computeLightSpaceMatrices(render_camera_, ambient_dir);
+
+      shadow_shader.use();
+      shadow_.setLightMatrices();
+
+      shadow_.bindFrameBuffer();
+      glEnable(GL_DEPTH_TEST);
+
+      renderModels(shadow_shader, 2);
+
+      // 0.2 points shadows
+      for(size_t i = 0; i < PointLights::MAX_POINT_LIGHTS; i++)
       {
-        if(point_shadows_.isInit(i) == false)
-          point_shadows_.init(i, world_->point_lights_.getAttenuationDistance(i));
+        if(world_->point_lights_.isUsed(i))
+        {
+          if(point_shadows_.isInit(i) == false)
+            point_shadows_.init(i, world_->point_lights_.getAttenuationDistance(i));
 
-        point_shadows_.computeLightTransforms(i, glm::vec3(world_->point_lights_.getPosition(i)));
+          point_shadows_.computeLightTransforms(i, glm::vec3(world_->point_lights_.getPosition(i)));
 
-        shadow_point_shader.use();
-        point_shadows_.bindFrameBuffer(i);
-        point_shadows_.setUniforms(i, shadow_point_shader);
+          shadow_point_shader.use();
+          point_shadows_.bindFrameBuffer(i);
+          point_shadows_.setUniforms(i, shadow_point_shader);
 
-        renderModels(shadow_point_shader, 2);
+          renderModels(shadow_point_shader, 2);
+        }
       }
     }
 
@@ -436,7 +440,7 @@ namespace owds {
     // glStencilMask(0x00);
 
     light_shader.use();
-    setLightsUniforms(light_shader);
+    setLightsUniforms(light_shader, render_shadows_, render_shadows_);
     light_shader.setVec3("view_pose", render_camera_.getPosition());
     light_shader.setMat4("view", render_camera_.getViewMatrix());
     light_shader.setMat4("projection", render_camera_.getProjectionMatrix());
@@ -539,7 +543,7 @@ namespace owds {
     }
   }
 
-  void Renderer::setLightsUniforms(const Shader& shader)
+  void Renderer::setLightsUniforms(const Shader& shader, bool use_ambient_shadows, bool use_points_shadows)
   {
     AmbientLight& ambient = world_->ambient_light_;
 
@@ -547,6 +551,9 @@ namespace owds {
     shader.setVec4("dir_light.diffuse", ambient.getDiffuse());
     shader.setVec4("dir_light.specular", ambient.getSpecular());
     shader.setVec4("dir_light.direction", ambient.getDirection());
+
+    shader.setFloat("use_point_shadows", use_points_shadows ? 1.0 : 0.0);
+    shader.setFloat("use_ambient_shadows", use_ambient_shadows ? 1.0 : 0.0);
 
     glActiveTexture(GL_TEXTURE2);
     for(size_t i = 0; i < PointLights::MAX_POINT_LIGHTS; i++)

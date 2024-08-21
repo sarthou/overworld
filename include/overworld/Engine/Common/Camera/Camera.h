@@ -37,6 +37,7 @@ namespace owds {
 
     bool render_debug_ = true;
     bool render_collision_models_ = false;
+    bool render_shadows_ = true;
 
     std::array<float, 2> view_dimensions_{};
     bool has_changed_size_ = false;
@@ -60,6 +61,7 @@ namespace owds {
 
     bool shouldRenderDebug() const { return render_debug_; }
     bool shouldRendercollisionModels() const { return render_collision_models_; }
+    bool shouldShadows() const { return render_shadows_; }
 
     std::vector<glm::vec4> getFrustumCornersWorldSpace();
 

@@ -56,6 +56,7 @@ namespace owds {
 
     bool render_debug_ = true;
     bool render_collision_models_ = false;
+    bool render_shadows_ = true;
     std::unordered_map<std::string, Texture2D> loaded_textures_;
     std::unordered_map<Model::Id, std::unordered_map<Mesh::Id, MeshHandle>> cached_models_;
     std::unordered_map<Model::Id, std::unordered_map<Mesh::Id, std::vector<InstanceData>>> current_mesh_batches_;
@@ -77,7 +78,7 @@ namespace owds {
     void render();
     void renderModels(const Shader& shader, unsigned int texture_offset = 0);
 
-    void setLightsUniforms(const Shader& shader);
+    void setLightsUniforms(const Shader& shader, bool use_ambient_shadows = true, bool use_points_shadows = true);
     void setAntiAliasing(ViewAntiAliasing_e setting);
   };
 } // namespace owds
