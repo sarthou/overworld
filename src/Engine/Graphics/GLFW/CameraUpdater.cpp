@@ -1,6 +1,5 @@
 #include "overworld/Engine/Graphics/GLFW/CameraUpdater.h"
 
-#include <GLFW/glfw3.h>
 #include <array>
 #include <cstdint>
 #include <glm/gtc/packing.hpp>
@@ -28,31 +27,32 @@ namespace owds {
     camera_ = new Camera(*camera);
   }
 
-  void CameraUpdater::processUserKeyboardInput(const float delta_time, const int key, const bool is_down)
+  void CameraUpdater::processUserKeyboardInput(const float delta_time, Key_e key, const bool is_down)
   {
     if(camera_ == nullptr)
       return;
 
     switch(key)
     {
-    case GLFW_KEY_F2: camera_->render_collision_models_ = is_down; break;
-    case GLFW_KEY_F3:
+    case Key_e::key_f2: camera_->render_collision_models_ = is_down; break;
+    case Key_e::key_f3:
     {
       if(is_down == false && key_state_debug_)
         camera_->render_debug_ = !camera_->render_debug_;
       key_state_debug_ = is_down;
       break;
     }
-    case GLFW_KEY_W:
-    case GLFW_KEY_UP: key_state_front_ = is_down; break;
-    case GLFW_KEY_S:
-    case GLFW_KEY_DOWN: key_state_back_ = is_down; break;
-    case GLFW_KEY_A:
-    case GLFW_KEY_LEFT: key_state_left_ = is_down; break;
-    case GLFW_KEY_D:
-    case GLFW_KEY_RIGHT: key_state_right_ = is_down; break;
-    case GLFW_KEY_SPACE: key_state_up_ = is_down; break;
-    case GLFW_KEY_LEFT_SHIFT: key_state_down_ = is_down; break;
+    case Key_e::key_w:
+    case Key_e::key_up: key_state_front_ = is_down; break;
+    case Key_e::key_s:
+    case Key_e::key_down: key_state_back_ = is_down; break;
+    case Key_e::key_a:
+    case Key_e::key_left: key_state_left_ = is_down; break;
+    case Key_e::key_d:
+    case Key_e::key_right: key_state_right_ = is_down; break;
+    case Key_e::key_space: key_state_up_ = is_down; break;
+    case Key_e::key_left_shift: key_state_down_ = is_down; break;
+    default: break;
     }
 
     (void)delta_time;

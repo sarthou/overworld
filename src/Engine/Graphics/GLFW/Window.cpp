@@ -69,8 +69,61 @@ namespace owds {
         return;
 
       auto* const window = static_cast<Window*>(glfwGetWindowUserPointer(glfw_window));
+      Key_e owds_key = Key_e::key_unknown;
+      switch(key)
+      {
+      case GLFW_KEY_F1: owds_key = Key_e::key_f1; break;
+      case GLFW_KEY_F2: owds_key = Key_e::key_f2; break;
+      case GLFW_KEY_F3: owds_key = Key_e::key_f3; break;
+      case GLFW_KEY_F4: owds_key = Key_e::key_f4; break;
+      case GLFW_KEY_F5: owds_key = Key_e::key_f5; break;
+      case GLFW_KEY_F6: owds_key = Key_e::key_f6; break;
+      case GLFW_KEY_F7: owds_key = Key_e::key_f7; break;
+      case GLFW_KEY_F8: owds_key = Key_e::key_f8; break;
+      case GLFW_KEY_F9: owds_key = Key_e::key_f9; break;
+      case GLFW_KEY_F10: owds_key = Key_e::key_f10; break;
+      case GLFW_KEY_F11: owds_key = Key_e::key_f11; break;
+      case GLFW_KEY_F12: owds_key = Key_e::key_f12; break;
+      case GLFW_KEY_UP: owds_key = Key_e::key_up; break;
+      case GLFW_KEY_DOWN: owds_key = Key_e::key_down; break;
+      case GLFW_KEY_LEFT: owds_key = Key_e::key_left; break;
+      case GLFW_KEY_RIGHT: owds_key = Key_e::key_right; break;
+      case GLFW_KEY_ESCAPE: owds_key = Key_e::key_esc; break;
+      case GLFW_KEY_SPACE: owds_key = Key_e::key_space; break;
+      case GLFW_KEY_LEFT_SHIFT: owds_key = Key_e::key_left_shift; break;
+      case GLFW_KEY_MINUS: owds_key = Key_e::key_minus; break;
+      case GLFW_KEY_A: owds_key = Key_e::key_a; break;
+      case GLFW_KEY_B: owds_key = Key_e::key_b; break;
+      case GLFW_KEY_C: owds_key = Key_e::key_c; break;
+      case GLFW_KEY_D: owds_key = Key_e::key_d; break;
+      case GLFW_KEY_E: owds_key = Key_e::key_e; break;
+      case GLFW_KEY_F: owds_key = Key_e::key_f; break;
+      case GLFW_KEY_G: owds_key = Key_e::key_g; break;
+      case GLFW_KEY_H: owds_key = Key_e::key_h; break;
+      case GLFW_KEY_I: owds_key = Key_e::key_i; break;
+      case GLFW_KEY_J: owds_key = Key_e::key_j; break;
+      case GLFW_KEY_K: owds_key = Key_e::key_k; break;
+      case GLFW_KEY_L: owds_key = Key_e::key_l; break;
+      case GLFW_KEY_M: owds_key = Key_e::key_m; break;
+      case GLFW_KEY_N: owds_key = Key_e::key_n; break;
+      case GLFW_KEY_O: owds_key = Key_e::key_o; break;
+      case GLFW_KEY_P: owds_key = Key_e::key_p; break;
+      case GLFW_KEY_Q: owds_key = Key_e::key_q; break;
+      case GLFW_KEY_R: owds_key = Key_e::key_r; break;
+      case GLFW_KEY_S: owds_key = Key_e::key_s; break;
+      case GLFW_KEY_T: owds_key = Key_e::key_t; break;
+      case GLFW_KEY_U: owds_key = Key_e::key_u; break;
+      case GLFW_KEY_V: owds_key = Key_e::key_v; break;
+      case GLFW_KEY_W: owds_key = Key_e::key_w; break;
+      case GLFW_KEY_X: owds_key = Key_e::key_x; break;
+      case GLFW_KEY_Y: owds_key = Key_e::key_y; break;
+      case GLFW_KEY_Z: owds_key = Key_e::key_z; break;
+
+      default:
+        break;
+      }
       window->cam_mutex_.lock();
-      window->camera_.processUserKeyboardInput(0.f, key, action == GLFW_PRESS);
+      window->camera_.processUserKeyboardInput(0.f, owds_key, action == GLFW_PRESS);
       window->cam_mutex_.unlock();
     });
 
