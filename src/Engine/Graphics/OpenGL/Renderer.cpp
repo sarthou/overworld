@@ -375,58 +375,25 @@ namespace owds {
 
   void Renderer::render()
   {
+    render_collision_models_ = render_camera_.shouldRendercollisionModels();
+    bool render_shadows = render_camera_.shouldShadows();
+
+    // 0. draw scene as normal in depth buffers
+
+    if(render_shadows)
+      renderShadowDepth();
+
+    renderMainScreen(render_shadows);
+  }
+
+  void Renderer::renderMainScreen(bool render_shadows)
+  {
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     glDisable(GL_BLEND);
 
-    // glStencilFunc(GL_ALWAYS, 1, 0xFF); // all fragments should pass the stencil test
-    // glStencilMask(0xFF);               // enable writing to the stencil buffer
-
-    render_collision_models_ = render_camera_.shouldRendercollisionModels();
-    render_debug_ = render_camera_.shouldRenderDebug();
-    render_shadows_ = render_camera_.shouldShadows();
-
     auto& light_shader = shaders_.at("default");
     auto& sky_shader = shaders_.at("sky");
-    auto& shadow_shader = shaders_.at("depth");
-    auto& shadow_point_shader = shaders_.at("depthcube");
-    auto& text_shader = shaders_.at("text");
-    auto& lines_shader = shaders_.at("lines");
-
-    // 0. draw scene as normal in depth buffers
-
-    if(render_shadows_)
-    {
-      // 0.1. ambient shadows
-      auto ambient_dir = -glm::normalize(world_->ambient_light_.getDirection());
-      shadow_.computeLightSpaceMatrices(render_camera_, ambient_dir);
-
-      shadow_shader.use();
-      shadow_.setLightMatrices();
-
-      shadow_.bindFrameBuffer();
-      glEnable(GL_DEPTH_TEST);
-
-      renderModels(shadow_shader, 2);
-
-      // 0.2 points shadows
-      for(size_t i = 0; i < PointLights::MAX_POINT_LIGHTS; i++)
-      {
-        if(world_->point_lights_.isUsed(i))
-        {
-          if(point_shadows_.isInit(i) == false)
-            point_shadows_.init(i, world_->point_lights_.getAttenuationDistance(i));
-
-          point_shadows_.computeLightTransforms(i, glm::vec3(world_->point_lights_.getPosition(i)));
-
-          shadow_point_shader.use();
-          point_shadows_.bindFrameBuffer(i);
-          point_shadows_.setUniforms(i, shadow_point_shader);
-
-          renderModels(shadow_point_shader, 2);
-        }
-      }
-    }
 
     // 1. draw scene as normal in multisampled buffers
 
@@ -440,7 +407,7 @@ namespace owds {
     // glStencilMask(0x00);
 
     light_shader.use();
-    setLightsUniforms(light_shader, render_shadows_, render_shadows_);
+    setLightsUniforms(light_shader, render_shadows, render_shadows);
     light_shader.setVec3("view_pose", render_camera_.getPosition());
     light_shader.setMat4("view", render_camera_.getViewMatrix());
     light_shader.setMat4("projection", render_camera_.getProjectionMatrix());
@@ -463,53 +430,10 @@ namespace owds {
 
     sky_.draw(sky_shader);
 
-    if(render_debug_)
-    {
-      // 1.3 draw lines
-
-      lines_shader.use();
-      lines_shader.setMat4("view", render_camera_.getViewMatrix());
-      lines_shader.setMat4("projection", render_camera_.getProjectionMatrix());
-      lines_shader.setMat4("model", glm::mat4(1.));
-
-      for(auto& line_handle : cached_lines_)
-        line_handle.second.draw(lines_shader);
-
-      // 1.4 draw debug axis
-
-      glDisable(GL_DEPTH_TEST);
-      glLineWidth(3);
-      glm::mat4 model = glm::scale(glm::mat4(1), glm::vec3(0.05, 0.05, 0.05));
-      glm::mat4 view_translation = glm::translate(glm::mat4(1), glm::vec3(0.75 * (double)screen_.width_ / (double)screen_.height_, -0.75, -1.));
-      view = view_translation * view;
-
-      lines_shader.setMat4("projection", render_camera_.getProjectionMatrix());
-      lines_shader.setMat4("view", view);
-      lines_shader.setMat4("model", model);
-
-      debug_axis_.at(0).draw(lines_shader);
-      debug_axis_.at(1).draw(lines_shader);
-      debug_axis_.at(2).draw(lines_shader);
-
-      glEnable(GL_DEPTH_TEST);
-      glLineWidth(1);
-
-      // 1.5 draw text
-
-      glEnable(GL_BLEND);
-      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-      text_shader.use();
-      text_shader.setMat4("projection", render_camera_.getProjectionMatrix());
-      for(auto& debug : world_->debug_texts_)
-      {
-        if(debug.text.empty() == false)
-          text_renderer_.renderText(text_shader, render_camera_.getViewMatrix(), debug);
-      }
-    }
+    if(render_camera_.shouldRenderDebug();)
+      renderDebug();
 
     // 2. now blit multisampled buffer(s) to normal colorbuffer of intermediate FBO. Image is stored in screenTexture
-    glDisable(GL_BLEND);
     screen_.generateColorTexture();
 
     // 3. now render quad with scene's visuals as its texture image
@@ -522,6 +446,93 @@ namespace owds {
     // draw Screen quad
     shaders_.at("screen").use();
     screen_.draw();
+  }
+
+  void Renderer::renderShadowDepth()
+  {
+    auto& shadow_shader = shaders_.at("depth");
+    auto& shadow_point_shader = shaders_.at("depthcube");
+
+    // Ambient shadows
+    auto ambient_dir = -glm::normalize(world_->ambient_light_.getDirection());
+    shadow_.computeLightSpaceMatrices(render_camera_, ambient_dir);
+
+    shadow_shader.use();
+    shadow_.setLightMatrices();
+
+    shadow_.bindFrameBuffer();
+    glEnable(GL_DEPTH_TEST);
+
+    renderModels(shadow_shader, 2);
+
+    // Points shadows
+    for(size_t i = 0; i < PointLights::MAX_POINT_LIGHTS; i++)
+    {
+      if(world_->point_lights_.isUsed(i))
+      {
+        if(point_shadows_.isInit(i) == false)
+          point_shadows_.init(i, world_->point_lights_.getAttenuationDistance(i));
+
+        point_shadows_.computeLightTransforms(i, glm::vec3(world_->point_lights_.getPosition(i)));
+
+        shadow_point_shader.use();
+        point_shadows_.bindFrameBuffer(i);
+        point_shadows_.setUniforms(i, shadow_point_shader);
+
+        renderModels(shadow_point_shader, 2);
+      }
+    }
+  }
+
+  void Renderer::renderDebug()
+  {
+    auto& text_shader = shaders_.at("text");
+    auto& lines_shader = shaders_.at("lines");
+
+    // Draw lines
+
+    lines_shader.use();
+    lines_shader.setMat4("view", render_camera_.getViewMatrix());
+    lines_shader.setMat4("projection", render_camera_.getProjectionMatrix());
+    lines_shader.setMat4("model", glm::mat4(1.));
+
+    for(auto& line_handle : cached_lines_)
+      line_handle.second.draw(lines_shader);
+
+    // Draw debug axis
+
+    glDisable(GL_DEPTH_TEST);
+    glLineWidth(3);
+    glm::mat4 model = glm::scale(glm::mat4(1), glm::vec3(0.05, 0.05, 0.05));
+    glm::mat4 view = glm::mat4(glm::mat3(render_camera_.getViewMatrix()));
+    glm::mat4 view_translation = glm::translate(glm::mat4(1), glm::vec3(0.75 * (double)screen_.width_ / (double)screen_.height_, -0.75, -1.));
+    view = view_translation * view;
+
+    lines_shader.setMat4("projection", render_camera_.getProjectionMatrix());
+    lines_shader.setMat4("view", view);
+    lines_shader.setMat4("model", model);
+
+    debug_axis_.at(0).draw(lines_shader);
+    debug_axis_.at(1).draw(lines_shader);
+    debug_axis_.at(2).draw(lines_shader);
+
+    glEnable(GL_DEPTH_TEST);
+    glLineWidth(1);
+
+    // Draw text
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    text_shader.use();
+    text_shader.setMat4("projection", render_camera_.getProjectionMatrix());
+    for(auto& debug : world_->debug_texts_)
+    {
+      if(debug.text.empty() == false)
+        text_renderer_.renderText(text_shader, render_camera_.getViewMatrix(), debug);
+    }
+
+    glDisable(GL_BLEND);
   }
 
   void Renderer::renderModels(const Shader& shader, unsigned int texture_offset)
