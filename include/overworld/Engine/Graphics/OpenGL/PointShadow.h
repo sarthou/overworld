@@ -25,7 +25,7 @@ namespace owds {
     std::array<bool, MAX_POINTS> is_init_;
     std::array<unsigned int, MAX_POINTS> depth_framebuffer_;
     std::array<unsigned int, MAX_POINTS> depth_cubemap_;
-    unsigned int resolution_ = 2056;
+    unsigned int resolution_ = 1024;
 
     std::array<float, MAX_POINTS> far_plane_;
     std::array<glm::vec3, MAX_POINTS> positions_;

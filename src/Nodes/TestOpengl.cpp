@@ -36,10 +36,10 @@ void worldThread(const std::string& world_name, owds::Window* window)
   cam.setCameraView(owds::CameraView_e::segmented_view);
   cam.setProjection(owds::CameraProjection_e::perspective);
   cam.setFieldOfView(80.f);
-  cam.setOutputAA(owds::ViewAntiAliasing_e::msaa_x8);
+  cam.setOutputAA(owds::ViewAntiAliasing_e::msaa_x4);
   cam.setOutputResolution({640, 480});
   cam.setPositionAndLookAt({5, 5, 1.7}, {0, 0, 0});
-  cam.setPlanes({0.1, 80.});
+  cam.setPlanes({0.1, 60.});
   cam.finalize();
 
   owds::Renderer renderer;

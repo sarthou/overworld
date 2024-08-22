@@ -17,7 +17,7 @@ namespace owds {
   {
     near_plane_ = near_plane;
     far_plane_ = far_plane;
-    shadow_cascade_levels_ = {far_plane_ / 50.0f, far_plane_ / 25.0f, far_plane_ / 10.0f, far_plane_ / 2.0f};
+    shadow_cascade_levels_ = {far_plane_ / 25.0f, far_plane_ / 10.f, far_plane_ / 4.0f, far_plane_ / 2.0f};
     // shadow_cascade_levels_ = {far_plane_ / 2.0f};
 
     glGenBuffers(1, &matrices_uniform_buffer_);

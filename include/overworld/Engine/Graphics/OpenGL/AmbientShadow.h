@@ -24,7 +24,7 @@ namespace owds {
     unsigned int matrices_uniform_buffer_;
     unsigned int depth_framebuffer_;
     unsigned int depth_maps_;
-    unsigned int resolution_ = 4096;
+    unsigned int resolution_ = 2056;
 
     float near_plane_;
     float far_plane_;

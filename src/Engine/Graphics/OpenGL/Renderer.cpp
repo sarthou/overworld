@@ -430,7 +430,7 @@ namespace owds {
 
     sky_.draw(sky_shader);
 
-    if(render_camera_.shouldRenderDebug();)
+    if(render_camera_.shouldRenderDebug())
       renderDebug();
 
     // 2. now blit multisampled buffer(s) to normal colorbuffer of intermediate FBO. Image is stored in screenTexture
