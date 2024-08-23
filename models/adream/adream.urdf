@@ -1,14 +1,6 @@
 <?xml version="0.0" ?>
 <robot name="adream">
 
-  <material name="wall_material">
-    <texture filename="package://overworld/models/textures/adream_wall_texture.png"/>
-  </material>
-
-  <material name="floor_material">
-    <texture filename="package://overworld/models/textures/adream_floor_texture.png"/>
-  </material>
-
   <link concave="yes" name="adream_walls">
     <inertial>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -20,7 +12,6 @@
       <geometry>
         <mesh filename="package://overworld/models/adream/walls.obj" scale="1 1 1"/>
       </geometry>
-      <material name="wall_material"/>
     </visual>
     <collision>
       <origin rpy="0 0 1.57" xyz="0 0 0"/>
@@ -30,7 +21,7 @@
     </collision>
   </link>
 
-  <link name="adream_floor">
+  <link name="adream_floor_expe">
     <contact>
       <lateral_friction value="1"/>
     </contact>
@@ -42,15 +33,38 @@
     <visual>
       <origin rpy="0 0 1.57" xyz="0 0 0.0"/>
       <geometry>
-        <mesh filename="package://overworld/models/adream/floor.obj" scale="1 1 1"/>
+        <mesh filename="package://overworld/models/adream/floor_expe.obj" scale="1 1 1"/>
       </geometry>
-      <material name="floor_material"/>
     </visual>
     <collision>
       <contact_coefficients mu="1000.0" kp="0.00" kd="0.0"/>
       <origin rpy="0 0 1.57" xyz="0 0 0.0"/>
       <geometry>
-        <mesh filename="package://overworld/models/adream/floor.obj" scale="1 1 1"/>
+        <mesh filename="package://overworld/models/adream/floor_expe_collision.obj" scale="1 1 1"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="adream_floor_hall">
+    <contact>
+      <lateral_friction value="1"/>
+    </contact>
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value=".0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 1.57" xyz="0 0 0.0"/>
+      <geometry>
+        <mesh filename="package://overworld/models/adream/floor_hall.obj" scale="1 1 1"/>
+      </geometry>
+    </visual>
+    <collision>
+      <contact_coefficients mu="1000.0" kp="0.00" kd="0.0"/>
+      <origin rpy="0 0 1.57" xyz="0 0 0.0"/>
+      <geometry>
+        <mesh filename="package://overworld/models/adream/floor_hall_collision.obj" scale="1 1 1"/>
       </geometry>
     </collision>
   </link>
@@ -67,7 +81,7 @@
         <mesh filename="package://overworld/models/adream/window_h10_1.stl" scale="1 1 1"/>
       </geometry>
       <material name="black">
-        <color rgba="0 0 0 1"/>
+        <color rgba="0.03 0.03 0.03 1"/>
       </material>
     </visual>
   </link>
@@ -84,7 +98,7 @@
         <mesh filename="package://overworld/models/adream/window_h10_2.obj" scale="1 1 1"/>
       </geometry>
       <material name="black">
-        <color rgba="0 0 0 1"/>
+        <color rgba="0.03 0.03 0.03 1"/>
       </material>
     </visual>
   </link>
@@ -101,7 +115,7 @@
         <mesh filename="package://overworld/models/adream/window_h20_1.obj" scale="1 1 1"/>
       </geometry>
       <material name="black">
-        <color rgba="0 0 0 1"/>
+        <color rgba="0.03 0.03 0.03 1"/>
       </material>
     </visual>
   </link>
@@ -118,7 +132,7 @@
         <mesh filename="package://overworld/models/adream/window_h20_2.obj" scale="1 1 1"/>
       </geometry>
       <material name="black">
-        <color rgba="0 0 0 1"/>
+        <color rgba="0.03 0.03 0.03 1"/>
       </material>
     </visual>
   </link>
@@ -135,7 +149,7 @@
         <mesh filename="package://overworld/models/adream/window_h20_3.obj" scale="1 1 1"/>
       </geometry>
       <material name="black">
-        <color rgba="0 0 0 1"/>
+        <color rgba="1.0 0.948 0.8 1"/>
       </material>
     </visual>
   </link>
@@ -165,7 +179,12 @@
 
   <joint name="base_to_floor" type="fixed">
     <parent link="adream_walls"/>
-    <child link="adream_floor"/>
+    <child link="adream_floor_expe"/>
+  </joint>
+
+  <joint name="base_to_floor" type="fixed">
+    <parent link="adream_walls"/>
+    <child link="adream_floor_hall"/>
   </joint>
 
   <joint name="base_to_appartment" type="fixed">
