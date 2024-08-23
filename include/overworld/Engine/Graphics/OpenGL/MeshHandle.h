@@ -28,7 +28,6 @@ namespace owds {
 
     MeshHandle(const Mesh& mesh, const std::vector<Texture2D>& textures)
     {
-      this->id = (uint32_t)mesh.id_ * 1000000;
       this->vertices = mesh.vertices_;
       this->indices = mesh.indices_;
       this->textures = textures;
@@ -36,12 +35,13 @@ namespace owds {
       setupMesh();
     }
 
-    void drawId(const Shader& shader) const
+    void drawId(const Shader& shader, uint32_t model_id) const
     {
-      shader.setVec4("color", glm::vec4((uint8_t)(id >> 24) / 255.,
-                                        (uint8_t)(id >> 16) / 255.,
-                                        (uint8_t)(id >> 8) / 255.,
-                                        (uint8_t)(id) / 255.));
+      // model_id *= 4'000'000;
+      shader.setVec4("color", glm::vec4((uint8_t)(model_id >> 24) / 255.,
+                                        (uint8_t)(model_id >> 16) / 255.,
+                                        (uint8_t)(model_id >> 8) / 255.,
+                                        (uint8_t)(model_id) / 255.));
 
       glBindVertexArray(vao_);
       glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, 0);

@@ -648,7 +648,7 @@ namespace owds {
         for(const auto& transform : transforms)
         {
           shader.setMat4("model", transform.mvp_);
-          mesh.drawId(shader);
+          mesh.drawId(shader, (uint32_t)model_id);
         }
       }
     }
