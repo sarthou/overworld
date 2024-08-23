@@ -250,7 +250,7 @@ namespace owds {
                               float diffuse_strength,
                               float specular_strength)
   {
-    ambient_light_ = AmbientLight(glm::vec3(direction[0], direction[1], direction[2]),
+    ambient_light_ = AmbientLight(direction,
                                   glm::vec3(color[0], color[1], color[2]),
                                   ambient_strength, diffuse_strength, specular_strength);
   }

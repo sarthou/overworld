@@ -150,6 +150,7 @@ owds_add_ros_library(overworld_utility_lib
     src/Utils/YamlReader.cpp
     src/Utils/Ontology.cpp
     src/Utils/XmlTokenize.cpp
+    src/Utils/SolarAzEl.cpp
 
     # src/Utils/RosFiles.cpp
     src/Utils/Wavefront.cpp)

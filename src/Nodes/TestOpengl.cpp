@@ -60,7 +60,7 @@ void worldThread(const std::string& world_name, owds::Window* window)
 {
   std::cout << world_name << std::endl;
   auto& cam = window->getCamera();
-  cam.setFieldOfView(80.f);
+  cam.setFieldOfView(60.f);
   cam.setOutputAA(owds::ViewAntiAliasing_e::msaa_x4);
   cam.setOutputResolution({640, 480});
   cam.setPositionAndLookAt({6, 6, 1.7}, {0, 0, 0});
@@ -74,7 +74,7 @@ void worldThread(const std::string& world_name, owds::Window* window)
 
   std::cout << "================== WORLD " << world_name << " CREATED ! ================" << std::endl;
 
-  world.setAmbientLight({0.5f, 0.2f, -0.3f},
+  world.setAmbientLight({48.f, -2.f, 0.f},
                         {1.0f, 0.976f, 0.898f},
                         0.25, 0.4, 0.8);
 
