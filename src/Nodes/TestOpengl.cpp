@@ -24,7 +24,6 @@ using DefaultEngine = owds::physx::World;
 
 #include <cmath>
 #include <iostream>
-// #include <opencv2/highgui.hpp>
 #include <opencv2/opencv.hpp>
 
 // Should be last
@@ -36,6 +35,10 @@ void offscreenThread(DefaultEngine* world, std::vector<int> camera_ids)
 {
   usleep(1000000);
   world->requestCameraRender(camera_ids);
+
+  auto model_ids = world->getCameraSementation(camera_ids.front());
+  for(auto id : model_ids)
+    std::cout << "- " << id << std::endl;
 
   unsigned int w, h;
   unsigned char* image_data = nullptr;

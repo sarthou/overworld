@@ -230,6 +230,7 @@ namespace owds {
     // requestCameraRender blocks until the request has been treated. Do not cahnge the cameras during this time
     void requestCameraRender(const std::vector<int>& ids);
     void getCameraImage(int id, uint32_t** image, unsigned int& width, unsigned int& height);
+    std::unordered_set<uint32_t> getCameraSementation(int id);
 
     /**
      * @param gravity Self-explanatory.

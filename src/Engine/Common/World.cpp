@@ -475,4 +475,12 @@ namespace owds {
       image = nullptr;
   }
 
+  std::unordered_set<uint32_t> World::getCameraSementation(int id)
+  {
+    if(id < (int)cameras_.size())
+      return cameras_[id].getSegmentedIds();
+    else
+      return {};
+  }
+
 } // namespace owds

@@ -3,6 +3,7 @@
 
 #include <array>
 #include <cstdint>
+#include <unordered_set>
 
 #include "overworld/Engine/Common/Camera/CameraUpdater.h"
 #include "overworld/Engine/Common/Camera/CameraView.h"
@@ -22,6 +23,7 @@ namespace owds {
 
     uint32_t** getImageData() { return &image_; }
     uint8_t* getImage() { return (uint8_t*)image_; }
+    std::unordered_set<uint32_t> getSegmentedIds() const;
 
     unsigned int getWidth() const { return width_; }
     unsigned int getHeight() const { return height_; }

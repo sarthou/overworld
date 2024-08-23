@@ -2,6 +2,8 @@
 
 #include <array>
 #include <cstdint>
+#include <iostream>
+#include <unordered_set>
 
 #include "overworld/Engine/Common/Camera/CameraProjection.h"
 #include "overworld/Engine/Common/Camera/CameraView.h"
@@ -36,6 +38,15 @@ namespace owds {
   void VirtualCamera::setPositionAndDirection(const std::array<float, 3>& eye_position, const std::array<float, 3>& eye_direction)
   {
     camera_.setPositionAndDirection(eye_position, eye_direction);
+  }
+
+  std::unordered_set<uint32_t> VirtualCamera::getSegmentedIds() const
+  {
+    std::cout << "[VirtualCamera] getSegmentedIds" << std::endl;
+    uint32_t n = width_ * height_;
+    std::unordered_set<uint32_t> res(image_, image_ + n);
+    res.erase(std::numeric_limits<uint32_t>::max());
+    return res;
   }
 
 } // namespace owds
