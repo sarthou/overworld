@@ -7,6 +7,8 @@
 #include <variant>
 
 #include "glad/glad.h"
+#include "overworld/Engine/Common/Camera/Camera.h"
+#include "overworld/Engine/Common/Camera/CameraView.h"
 #include "overworld/Engine/Common/Camera/ViewAntiAliasing.h"
 #include "overworld/Engine/Common/Lights/AmbientLight.h"
 #include "overworld/Engine/Common/Lights/PointLights.h"
@@ -113,7 +115,7 @@ namespace owds {
       "text", {"text_shader.vs", "text_shader.fs"}
     });
     shaders_.insert({
-      "lines", {"lines_shader.vs", "lines_shader.fs"}
+      "color", {"color_shader.vs", "color_shader.fs"}
     });
 
     sky_.init("/home/gsarthou/Robots/Dacobot2/ros2_ws/src/overworld/models/textures/skybox/Footballfield/");
@@ -384,6 +386,8 @@ namespace owds {
       renderShadowDepth();
 
     renderMainScreen(render_shadows);
+
+    renderOffScreens(render_shadows);
   }
 
   void Renderer::renderMainScreen(bool render_shadows)
@@ -448,6 +452,83 @@ namespace owds {
     screen_.draw();
   }
 
+  void Renderer::renderOffScreens(bool render_shadows)
+  {
+    if(world_->has_render_request_)
+    {
+      for(size_t i = 0; i < world_->cameras_.size(); i++)
+      {
+        auto& virtual_camera = world_->cameras_[i];
+        if(i >= off_screens_.size())
+          off_screens_.emplace_back(virtual_camera.getWidth(), virtual_camera.getHeight());
+
+        off_screens_[i].bindFrameBuffer();
+
+        Camera* camera = virtual_camera.getCamera();
+        if(camera->getViewType() == CameraView_e::regular_view)
+          renderOffscreenRgb(camera, render_shadows);
+        else
+          renderOffscreenSegmented(camera);
+
+        off_screens_[i].getImage(virtual_camera.getImageData());
+      }
+      world_->has_render_request_ = false;
+    }
+  }
+
+  void Renderer::renderOffscreenRgb(Camera* camera, bool render_shadows)
+  {
+    auto& light_shader = shaders_.at("default");
+    auto& sky_shader = shaders_.at("sky");
+
+    // 1. draw scene as normal in multisampled buffers
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_FRAMEBUFFER_SRGB);
+    glDisable(GL_BLEND);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+    light_shader.use();
+    setLightsUniforms(light_shader, false, render_shadows); // We never use the ambient shadows for offscreen
+    light_shader.setVec3("view_pose", camera->getPosition());
+    light_shader.setMat4("view", camera->getViewMatrix());
+    light_shader.setMat4("projection", camera->getProjectionMatrix());
+
+    shadow_.setUniforms(light_shader, 1);
+    shadow_.setLightMatrices();
+
+    for(size_t i = 0; i < PointLights::MAX_POINT_LIGHTS; i++)
+      if(world_->point_lights_.isUsed(i))
+        point_shadows_.setUniforms(i, light_shader, 6);
+
+    renderModels(light_shader, 2);
+
+    // 1.2 draw background
+
+    sky_shader.use();
+    glm::mat4 view = glm::mat4(glm::mat3(camera->getViewMatrix()));
+    sky_shader.setMat4("view", view);
+    sky_shader.setMat4("projection", camera->getProjectionMatrix());
+
+    sky_.draw(sky_shader);
+  }
+
+  void Renderer::renderOffscreenSegmented(Camera* camera)
+  {
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glDisable(GL_BLEND);
+    glEnable(GL_DEPTH_TEST);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+    auto& shader = shaders_.at("color");
+
+    shader.use();
+    shader.setMat4("view", camera->getViewMatrix());
+    shader.setMat4("projection", camera->getProjectionMatrix());
+
+    renderModelsSegmented(shader);
+  }
+
   void Renderer::renderShadowDepth()
   {
     auto& shadow_shader = shaders_.at("depth");
@@ -487,7 +568,7 @@ namespace owds {
   void Renderer::renderDebug()
   {
     auto& text_shader = shaders_.at("text");
-    auto& lines_shader = shaders_.at("lines");
+    auto& lines_shader = shaders_.at("color");
 
     // Draw lines
 
@@ -549,6 +630,25 @@ namespace owds {
         {
           shader.setMat4("model", transform.mvp_);
           mesh.draw(shader, texture_offset);
+        }
+      }
+    }
+  }
+
+  void Renderer::renderModelsSegmented(const Shader& shader)
+  {
+    for(auto& [model_id, batch] : current_mesh_batches_)
+    {
+      auto& meshes = cached_models_.at(model_id);
+
+      for(auto& [mesh_id, transforms] : batch)
+      {
+        const auto& mesh = meshes.at(mesh_id);
+
+        for(const auto& transform : transforms)
+        {
+          shader.setMat4("model", transform.mvp_);
+          mesh.drawId(shader);
         }
       }
     }

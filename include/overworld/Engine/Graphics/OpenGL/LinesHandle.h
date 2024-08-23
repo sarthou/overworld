@@ -59,7 +59,7 @@ namespace owds {
 
     void draw(const Shader& shader) const
     {
-      shader.setVec3("color", color);
+      shader.setVec4("color", glm::vec4(color, 1.0));
 
       glBindVertexArray(vao_);
       glDrawElements(GL_LINES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, 0);

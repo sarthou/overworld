@@ -20,7 +20,7 @@ namespace owds {
     void setPositionAndLookAt(const std::array<float, 3>& eye_position, const std::array<float, 3>& dst_position);
     void setPositionAndDirection(const std::array<float, 3>& eye_position, const std::array<float, 3>& eye_direction);
 
-    uint32_t* getImageData() { return image_; }
+    uint32_t** getImageData() { return &image_; }
     uint8_t* getImage() { return (uint8_t*)image_; }
 
     unsigned int getWidth() const { return width_; }

@@ -467,7 +467,7 @@ namespace owds {
   {
     if(id < (int)cameras_.size())
     {
-      *image = cameras_[id].getImageData();
+      *image = *cameras_[id].getImageData();
       width = cameras_[id].getWidth();
       height = cameras_[id].getHeight();
     }

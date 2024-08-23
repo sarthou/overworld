@@ -13,11 +13,11 @@ namespace owds {
                                float near_plane, float far_plane) : width_(width),
                                                                     height_(height)
   {
-    camera_.setFieldOfView(fov);
-    camera_.setPlanes({near_plane, far_plane});
     camera_.setCameraView(view_type);
-    camera_.setOutputResolution({(float)width, (float)height});
     camera_.setProjection(CameraProjection_e::perspective);
+    camera_.setFieldOfView(fov);
+    camera_.setOutputResolution({(float)width, (float)height});
+    camera_.setPlanes({near_plane, far_plane});
     camera_.finalize();
 
     image_ = new uint32_t[width_ * height_];

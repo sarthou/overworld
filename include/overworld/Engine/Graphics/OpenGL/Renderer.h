@@ -16,6 +16,7 @@
 #include "overworld/Engine/Graphics/OpenGL/Cubemap.h"
 #include "overworld/Engine/Graphics/OpenGL/LinesHandle.h"
 #include "overworld/Engine/Graphics/OpenGL/MeshHandle.h"
+#include "overworld/Engine/Graphics/OpenGL/OffScreen.h"
 #include "overworld/Engine/Graphics/OpenGL/PointShadow.h"
 #include "overworld/Engine/Graphics/OpenGL/Screen.h"
 #include "overworld/Engine/Graphics/OpenGL/Shader.h"
@@ -46,6 +47,7 @@ namespace owds {
     Camera render_camera_;
     std::unordered_map<std::string, Shader> shaders_;
     Screen screen_;
+    std::vector<OffScreen> off_screens_;
     Cubemap sky_;
     AmbientShadow shadow_;
     PointShadow point_shadows_;
@@ -75,8 +77,14 @@ namespace owds {
     void loadModel(const Model& model, const Material& material);
     void loadDebugLines();
     void render();
+
     void renderModels(const Shader& shader, unsigned int texture_offset = 0);
+    void renderModelsSegmented(const Shader& shader);
+
     void renderMainScreen(bool render_shadows);
+    void renderOffScreens(bool render_shadows);
+    void renderOffscreenRgb(Camera* camera, bool render_shadows);
+    void renderOffscreenSegmented(Camera* camera);
     void renderShadowDepth();
     void renderDebug();
 
