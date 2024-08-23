@@ -1,0 +1,12 @@
+# Blender MTL File: 'adream_empty.blend'
+# Material Count: 1
+
+newmtl M_lino_orange
+Ns 237.689386
+Ka 1.000000 1.000000 1.000000
+Kd 0.381326 0.070360 0.020289
+Ks 0.582618 0.582618 0.582618
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2

@@ -1,0 +1,12 @@
+# Blender MTL File: 'adream_empty.blend'
+# Material Count: 1
+
+newmtl M_wood_white_painted
+Ns 575.999996
+Ka 1.000000 1.000000 1.000000
+Kd 0.722336 0.713819 0.558233
+Ks 0.030000 0.030000 0.030000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2

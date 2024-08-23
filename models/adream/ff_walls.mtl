@@ -1,0 +1,13 @@
+# Blender MTL File: 'adream_empty.blend'
+# Material Count: 1
+
+newmtl M_wall_paper_white
+Ns 575.999996
+Ka 1.000000 1.000000 1.000000
+Kd 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd wall_color.png
