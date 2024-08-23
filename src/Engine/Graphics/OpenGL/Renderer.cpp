@@ -586,7 +586,11 @@ namespace owds {
     glLineWidth(3);
     glm::mat4 model = glm::scale(glm::mat4(1), glm::vec3(0.05, 0.05, 0.05));
     glm::mat4 view = glm::mat4(glm::mat3(render_camera_.getViewMatrix()));
-    glm::mat4 view_translation = glm::translate(glm::mat4(1), glm::vec3(0.75 * (double)screen_.width_ / (double)screen_.height_, -0.75, -1.));
+    double aspect = (double)screen_.width_ / (double)screen_.height_;
+    double trans = tan(render_camera_.getFov() / 2.);
+    double trans_x = trans - 0.05;
+    double trans_y = trans - 0.05 * aspect;
+    glm::mat4 view_translation = glm::translate(glm::mat4(1), glm::vec3(trans_x * aspect, -trans_y, -1.));
     view = view_translation * view;
 
     lines_shader.setMat4("projection", render_camera_.getProjectionMatrix());

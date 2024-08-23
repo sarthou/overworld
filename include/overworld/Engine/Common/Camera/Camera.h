@@ -52,6 +52,7 @@ namespace owds {
     glm::mat4 getProjectionMatrix() const { return proj_matrix_; }
     ViewAntiAliasing_e getAASetting() const { return aa_setting_; }
     CameraView_e getViewType() const { return view_type_; }
+    float getFov() const { return field_of_view_; }
 
     float getNearPlane() const { return planes_[0]; }
     float getFarPlane() const { return planes_[1]; }
