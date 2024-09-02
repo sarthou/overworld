@@ -69,11 +69,11 @@ namespace owds {
       {
         diffuse_strength_ = 0.;
         specular_strength_ = 0.;
-        color_ = glm::vec4(0.31, 0.435f, 0.78f, 1.f);
+        color_ = glm::vec4(0.11, 0.15f, 0.31f, 1.f);
       }
       else if(z < 1.)
       {
-        auto night_color = glm::vec4(0.31, 0.435f, 0.78f, 1.f);
+        auto night_color = glm::vec4(0.11, 0.15f, 0.31f, 1.f);
         color_ = z * color_ + night_color * (1.f - z);
         diffuse_strength_ = z;
         specular_strength_ = z;
@@ -110,6 +110,7 @@ namespace owds {
     const glm::vec4& getAmbient() const { return ambient_; }
     const glm::vec4& getDiffuse() const { return diffuse_; }
     const glm::vec4& getSpecular() const { return specular_; }
+    const glm::vec4& getColor() const { return color_; }
 
   private:
     glm::vec4 direction_;

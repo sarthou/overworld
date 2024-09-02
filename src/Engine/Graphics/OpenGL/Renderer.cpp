@@ -431,6 +431,7 @@ namespace owds {
     glm::mat4 view = glm::mat4(glm::mat3(render_camera_.getViewMatrix()));
     sky_shader.setMat4("view", view);
     sky_shader.setMat4("projection", render_camera_.getProjectionMatrix());
+    sky_shader.setVec4("color", world_->ambient_light_.getColor());
 
     sky_.draw(sky_shader);
 
@@ -509,6 +510,7 @@ namespace owds {
     glm::mat4 view = glm::mat4(glm::mat3(camera->getViewMatrix()));
     sky_shader.setMat4("view", view);
     sky_shader.setMat4("projection", camera->getProjectionMatrix());
+    sky_shader.setVec4("color", world_->ambient_light_.getColor());
 
     sky_.draw(sky_shader);
   }
