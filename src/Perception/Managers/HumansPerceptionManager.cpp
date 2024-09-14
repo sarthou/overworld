@@ -73,6 +73,15 @@ namespace owds {
               inner_it->second->updatePose(percept.second->pose(), percept.second->lastStamp());
           }
         }
+        else
+        {
+          auto sensors = agent->getSensors();
+          for(auto& eye : sensors)
+          {
+            if(percept.second->isLocated())
+              eye.second->updatePose(percept.second->pose(), percept.second->lastStamp());
+          }
+        }
       }
     }
   }
