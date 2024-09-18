@@ -257,11 +257,14 @@ namespace owds {
               }
             } // object with pois but none in the fov
             else // object with no pois in the fov should be put in no_data and erased if pois are in the fov of another module
-              object_is_consider_with_no_poi = true;
+            {
+              //object_is_consider_with_no_poi = true;
+            }
           }
           else // object has no pois
             object_is_consider_with_no_poi = true;
         }
+        
         if(object_is_consider_with_no_poi)
         {
           no_data_objects.emplace(object.first, object.second);
