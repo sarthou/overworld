@@ -29,6 +29,8 @@ namespace owds {
       Pose pose_in_map;
       bool located_in_map = false;
       int nb_frame_unseen = 1000;
+      float best_confidence = 0.;
+      Percept<Object>* percept_to_merge = nullptr;
 
       // We try to find if the percept should be in hand
       for(auto& inner_it : it.second)
@@ -48,7 +50,16 @@ namespace owds {
           // We take the pose of the most recently perceived percept
           pose_in_map = inner_it.second.pose();
           located_in_map = true;
+
+          if(nb_frame_unseen > inner_it.second.getNbFrameUnseen())
+            best_confidence = 0.;
           nb_frame_unseen = inner_it.second.getNbFrameUnseen();
+
+          if(inner_it.second.getConfidence() >= best_confidence)
+          {
+            best_confidence = inner_it.second.getConfidence();
+            percept_to_merge = &inner_it.second;
+          }
         }
       }
 
@@ -95,7 +106,10 @@ namespace owds {
 
         percept->setNbFrameUnseen(nb_frame_unseen);
         for(auto& inner_it : it.second)
-          percept->merge(&inner_it.second);
+          percept->merge(&inner_it.second, false);
+
+        if(percept_to_merge != nullptr)
+          percept->merge(percept_to_merge, true);
       }
     }
   }
