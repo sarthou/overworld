@@ -212,6 +212,19 @@ namespace owds {
     {}
     virtual ~PerceptionModuleRosSyncBase() = default;
 
+    void reinitialize(const std::string& first_topic_name,
+                      const std::string& second_topic_name)
+    {
+      first_topic_name_ = first_topic_name;
+      second_topic_name_ = second_topic_name;
+
+      sub_0_.subscribe(*(this->n_), first_topic_name_, 1);
+      sub_1_.subscribe(*(this->n_), second_topic_name_, 1);
+      sync_.reset(new Sync(SyncPolicy(10), sub_0_, sub_1_));
+      sync_->registerCallback(&PerceptionModuleRosSyncBase::privatePerceptionCallback, this);
+      ShellDisplay::info("[" + this->module_name_ + "] subscribed to " + first_topic_name_ + " and " + second_topic_name_);
+    }
+
     virtual void initialize(const std::string& module_name,
                             ros::NodeHandle* n,
                             BulletClient* bullet_client,
