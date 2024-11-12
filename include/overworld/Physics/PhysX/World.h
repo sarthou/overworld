@@ -1,7 +1,11 @@
 #ifndef OWDS_PHYSICS_PHYSX_WORLD_H
 #define OWDS_PHYSICS_PHYSX_WORLD_H
 
+#include <array>
+#include <glm/vec3.hpp>
 #include <memory>
+#include <string>
+#include <vector>
 
 #include "overworld/Engine/Common/World.h"
 
@@ -33,59 +37,60 @@ namespace owds::physx {
 
     [[nodiscard]] const std::vector<std::reference_wrapper<owds::Actor>>& getActors() const override;
 
-    owds::JointRevolute& createJointRevolute [[nodiscard]] (
-      owds::Actor& parent,
-      const std::array<float, 3>& origin_position,
-      const std::array<float, 4>& origin_orientation,
-      owds::Actor& child,
-      const std::array<float, 3>& joint_position,
-      const std::array<float, 4>& joint_orientation) override;
-
-    owds::JointContinuous& createJointContinuous [[nodiscard]] (
-      owds::Actor& parent,
-      const std::array<float, 3>& origin_position,
-      const std::array<float, 4>& origin_orientation,
-      owds::Actor& child,
-      const std::array<float, 3>& joint_position,
-      const std::array<float, 4>& joint_orientation) override;
-
-    owds::JointPrismatic& createJointPrismatic [[nodiscard]] (
-      owds::Actor& parent,
-      const std::array<float, 3>& origin_position,
-      const std::array<float, 4>& origin_orientation,
-      owds::Actor& child,
-      const std::array<float, 3>& joint_position,
-      const std::array<float, 4>& joint_orientation) override;
-
-    owds::JointFixed& createJointFixed [[nodiscard]] (
-      owds::Actor& parent,
-      const std::array<float, 3>& origin_position,
-      const std::array<float, 4>& origin_orientation,
-      owds::Actor& child,
-      const std::array<float, 3>& joint_position,
-      const std::array<float, 4>& joint_orientation) override;
-
-    owds::JointFloating& createJointFloating [[nodiscard]] (
-      owds::Actor& parent,
-      const std::array<float, 3>& origin_position,
-      const std::array<float, 4>& origin_orientation,
-      owds::Actor& child,
-      const std::array<float, 3>& joint_position,
-      const std::array<float, 4>& joint_orientation) override;
-
-    owds::JointPlanar& createJointPlanar [[nodiscard]] (
-      owds::Actor& parent,
-      const std::array<float, 3>& origin_position,
-      const std::array<float, 4>& origin_orientation,
-      owds::Actor& child,
-      const std::array<float, 3>& joint_position,
-      const std::array<float, 4>& joint_orientation) override;
-
     void setGravity(const std::array<float, 3>& gravity) override;
     void stepSimulation(float delta) override;
 
   protected:
     std::unique_ptr<owds::physx::Context> ctx_;
+
+  private:
+    owds::JointRevolute& createJointRevolute [[nodiscard]] (
+      owds::Actor& parent,
+      const glm::vec3& origin_position,
+      const glm::quat& origin_orientation,
+      owds::Actor& child,
+      const glm::vec3& joint_position,
+      const glm::quat& joint_orientation) override;
+
+    owds::JointContinuous& createJointContinuous [[nodiscard]] (
+      owds::Actor& parent,
+      const glm::vec3& origin_position,
+      const glm::quat& origin_orientation,
+      owds::Actor& child,
+      const glm::vec3& joint_position,
+      const glm::quat& joint_orientation) override;
+
+    owds::JointPrismatic& createJointPrismatic [[nodiscard]] (
+      owds::Actor& parent,
+      const glm::vec3& origin_position,
+      const glm::quat& origin_orientation,
+      owds::Actor& child,
+      const glm::vec3& joint_position,
+      const glm::quat& joint_orientation) override;
+
+    owds::JointFixed& createJointFixed [[nodiscard]] (
+      owds::Actor& parent,
+      const glm::vec3& origin_position,
+      const glm::quat& origin_orientation,
+      owds::Actor& child,
+      const glm::vec3& joint_position,
+      const glm::quat& joint_orientation) override;
+
+    owds::JointFloating& createJointFloating [[nodiscard]] (
+      owds::Actor& parent,
+      const glm::vec3& origin_position,
+      const glm::quat& origin_orientation,
+      owds::Actor& child,
+      const glm::vec3& joint_position,
+      const glm::quat& joint_orientation) override;
+
+    owds::JointPlanar& createJointPlanar [[nodiscard]] (
+      owds::Actor& parent,
+      const glm::vec3& origin_position,
+      const glm::quat& origin_orientation,
+      owds::Actor& child,
+      const glm::vec3& joint_position,
+      const glm::quat& joint_orientation) override;
   };
 } // namespace owds::physx
 

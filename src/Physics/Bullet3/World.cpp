@@ -1,5 +1,9 @@
 #include "overworld/Physics/Bullet3/World.h"
 
+#include <array>
+#include <glm/vec3.hpp>
+#include <string>
+
 #include "overworld/Engine/Common/Shapes/Shape.h"
 #include "overworld/Engine/Common/Urdf/JointLocation.h"
 #include "overworld/Physics/Bullet3/Actor.h"
@@ -40,115 +44,6 @@ namespace owds::bullet3 {
     return ctx_->actor_list_;
   }
 
-  owds::JointRevolute& World::createJointRevolute(
-    owds::Actor& parent,
-    const std::array<float, 3>& origin_position,
-    const std::array<float, 4>& origin_orientation,
-    owds::Actor& child,
-    const std::array<float, 3>& joint_position,
-    const std::array<float, 4>& joint_orientation)
-  {
-    (void)parent;
-    (void)origin_position;
-    (void)origin_orientation;
-    (void)child;
-    (void)joint_position;
-    (void)joint_orientation;
-    assert(false && "not implemented");
-  }
-
-  owds::JointContinuous& World::createJointContinuous(
-    owds::Actor& parent,
-    const std::array<float, 3>& origin_position,
-    const std::array<float, 4>& origin_orientation,
-    owds::Actor& child,
-    const std::array<float, 3>& joint_position,
-    const std::array<float, 4>& joint_orientation)
-  {
-    (void)parent;
-    (void)origin_position;
-    (void)origin_orientation;
-    (void)child;
-    (void)joint_position;
-    (void)joint_orientation;
-    assert(false && "not implemented");
-  }
-
-  owds::JointPrismatic& World::createJointPrismatic(
-    owds::Actor& parent,
-    const std::array<float, 3>& origin_position,
-    const std::array<float, 4>& origin_orientation,
-    owds::Actor& child,
-    const std::array<float, 3>& joint_position,
-    const std::array<float, 4>& joint_orientation)
-  {
-    auto joint = std::make_unique<owds::bullet3::JointPrismatic>(
-      *ctx_,
-      owds::JointLocation(
-        parent,
-        ToV3(origin_position),
-        ToQT(origin_orientation),
-        child,
-        ToV3(joint_position),
-        ToQT(joint_orientation)));
-
-    joint->setup();
-
-    const auto joint_ptr = joint.get();
-    return *(ctx_->joints_[joint_ptr] = std::move(joint), joint_ptr);
-  }
-
-  owds::JointFixed& World::createJointFixed(
-    owds::Actor& parent,
-    const std::array<float, 3>& origin_position,
-    const std::array<float, 4>& origin_orientation,
-    owds::Actor& child,
-    const std::array<float, 3>& joint_position,
-    const std::array<float, 4>& joint_orientation)
-  {
-    (void)parent;
-    (void)origin_position;
-    (void)origin_orientation;
-    (void)child;
-    (void)joint_position;
-    (void)joint_orientation;
-    assert(false && "not implemented");
-  }
-
-  owds::JointFloating& World::createJointFloating(
-    owds::Actor& parent,
-    const std::array<float, 3>& origin_position,
-    const std::array<float, 4>& origin_orientation,
-    owds::Actor& child,
-    const std::array<float, 3>& joint_position,
-    const std::array<float, 4>& joint_orientation)
-  {
-    (void)parent;
-    (void)origin_position;
-    (void)origin_orientation;
-    (void)child;
-    (void)joint_position;
-    (void)joint_orientation;
-    assert(false && "not implemented");
-  }
-
-  owds::JointPlanar& World::createJointPlanar(
-    owds::Actor& parent,
-    const std::array<float, 3>& origin_position,
-    const std::array<float, 4>& origin_orientation,
-    owds::Actor& child,
-    const std::array<float, 3>& joint_position,
-    const std::array<float, 4>& joint_orientation)
-  {
-    (void)parent;
-    (void)origin_position;
-    (void)origin_orientation;
-    (void)child;
-    (void)joint_position;
-    (void)joint_orientation;
-    assert(false && "not implemented");
-  }
-
   void World::setGravity(const std::array<float, 3>& gravity)
   {
     ctx_->bt_scene_->setGravity(btVector3(
@@ -168,4 +63,108 @@ namespace owds::bullet3 {
       ctx_->actor_list_.emplace_back(*actor);
     }
   }
+
+  owds::JointRevolute& World::createJointRevolute(owds::Actor& parent,
+                                                  const glm::vec3& origin_position,
+                                                  const glm::quat& origin_orientation,
+                                                  owds::Actor& child,
+                                                  const glm::vec3& joint_position,
+                                                  const glm::quat& joint_orientation)
+  {
+    (void)parent;
+    (void)origin_position;
+    (void)origin_orientation;
+    (void)child;
+    (void)joint_position;
+    (void)joint_orientation;
+    assert(false && "not implemented");
+  }
+
+  owds::JointContinuous& World::createJointContinuous(owds::Actor& parent,
+                                                      const glm::vec3& origin_position,
+                                                      const glm::quat& origin_orientation,
+                                                      owds::Actor& child,
+                                                      const glm::vec3& joint_position,
+                                                      const glm::quat& joint_orientation)
+  {
+    (void)parent;
+    (void)origin_position;
+    (void)origin_orientation;
+    (void)child;
+    (void)joint_position;
+    (void)joint_orientation;
+    assert(false && "not implemented");
+  }
+
+  owds::JointPrismatic& World::createJointPrismatic(owds::Actor& parent,
+                                                    const glm::vec3& origin_position,
+                                                    const glm::quat& origin_orientation,
+                                                    owds::Actor& child,
+                                                    const glm::vec3& joint_position,
+                                                    const glm::quat& joint_orientation)
+  {
+    auto joint = std::make_unique<owds::bullet3::JointPrismatic>(
+      *ctx_,
+      owds::JointLocation(
+        parent,
+        origin_position,
+        origin_orientation,
+        child,
+        joint_position,
+        joint_orientation));
+
+    joint->setup();
+
+    const auto joint_ptr = joint.get();
+    return *(ctx_->joints_[joint_ptr] = std::move(joint), joint_ptr);
+  }
+
+  owds::JointFixed& World::createJointFixed(owds::Actor& parent,
+                                            const glm::vec3& origin_position,
+                                            const glm::quat& origin_orientation,
+                                            owds::Actor& child,
+                                            const glm::vec3& joint_position,
+                                            const glm::quat& joint_orientation)
+  {
+    (void)parent;
+    (void)origin_position;
+    (void)origin_orientation;
+    (void)child;
+    (void)joint_position;
+    (void)joint_orientation;
+    assert(false && "not implemented");
+  }
+
+  owds::JointFloating& World::createJointFloating(owds::Actor& parent,
+                                                  const glm::vec3& origin_position,
+                                                  const glm::quat& origin_orientation,
+                                                  owds::Actor& child,
+                                                  const glm::vec3& joint_position,
+                                                  const glm::quat& joint_orientation)
+  {
+    (void)parent;
+    (void)origin_position;
+    (void)origin_orientation;
+    (void)child;
+    (void)joint_position;
+    (void)joint_orientation;
+    assert(false && "not implemented");
+  }
+
+  owds::JointPlanar& World::createJointPlanar(owds::Actor& parent,
+                                              const glm::vec3& origin_position,
+                                              const glm::quat& origin_orientation,
+                                              owds::Actor& child,
+                                              const glm::vec3& joint_position,
+                                              const glm::quat& joint_orientation)
+  {
+    (void)parent;
+    (void)origin_position;
+    (void)origin_orientation;
+    (void)child;
+    (void)joint_position;
+    (void)joint_orientation;
+    assert(false && "not implemented");
+  }
+
 } // namespace owds::bullet3

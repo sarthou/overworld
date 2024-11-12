@@ -38,6 +38,20 @@ namespace owds {
   protected:
     explicit World(const std::filesystem::path& base_assets_path);
 
+    std::filesystem::path base_assets_path_;
+    owds::Model& preloaded_box_model_;
+    owds::Model& preloaded_cylinder_model_;
+    owds::Model& preloaded_sphere_model_;
+    std::unordered_map<owds::Urdf*, std::unique_ptr<owds::Urdf>> loaded_urdfs_;
+
+    AmbientLight ambient_light_;
+    PointLights point_lights_;
+    std::vector<DebugText_t> debug_texts_;
+    std::vector<DebugLine> debug_lines_;
+
+    std::vector<VirtualCamera> cameras_;
+    std::atomic<bool> has_render_request_;
+
   public:
     virtual ~World();
 
@@ -70,121 +84,6 @@ namespace owds {
      * @return
      */
     [[nodiscard]] virtual const std::vector<std::reference_wrapper<owds::Actor>>& getActors() const = 0;
-
-    /**
-     * The Unified Robotics Description Format specification mandates support for the following joint types:
-     * - Revolute joint(s)
-     * - Continuous joint(s)
-     * - Prismatic joint(s)
-     * - Fixed joint(s)
-     * - Floating joint(s)
-     * - Planar joint(s)
-     */
-
-    /**
-     * A hinge joint that rotates along the axis and has a limited range specified by the upper and lower limits.
-     * @param parent First actor
-     * @param origin_position Position of the joint relative to parent
-     * @param origin_position XYZ rotations, in radians
-     * @param child Second actor
-     * @param joint_position Same as origin_position but relative to child
-     * @param joint_orientation Same as origin_position but relative to child
-     */
-    virtual owds::JointRevolute& createJointRevolute [[nodiscard]] (
-      owds::Actor& parent,
-      const std::array<float, 3>& origin_position,
-      const std::array<float, 4>& origin_orientation,
-      owds::Actor& child,
-      const std::array<float, 3>& joint_position,
-      const std::array<float, 4>& joint_orientation) = 0;
-
-    /**
-     * A continuous hinge joint that rotates around the axis and has no upper and lower limits.
-     * @param parent First actor
-     * @param origin_position Position of the joint relative to parent
-     * @param origin_position XYZ rotations, in radians
-     * @param child Second actor
-     * @param joint_position Same as origin_position but relative to child
-     * @param joint_orientation Same as origin_position but relative to child
-     */
-    virtual owds::JointContinuous& createJointContinuous [[nodiscard]] (
-      owds::Actor& parent,
-      const std::array<float, 3>& origin_position,
-      const std::array<float, 4>& origin_orientation,
-      owds::Actor& child,
-      const std::array<float, 3>& joint_position,
-      const std::array<float, 4>& joint_orientation) = 0;
-
-    /**
-     * A sliding joint that slides along the axis, and has a limited range specified by the upper and lower limits.
-     *
-     * @param parent First actor
-     * @param origin_position Position of the joint relative to parent
-     * @param origin_position XYZ rotations, in radians
-     * @param child Second actor
-     * @param joint_position Same as origin_position but relative to child
-     * @param joint_orientation Same as origin_position but relative to child
-     */
-    virtual owds::JointPrismatic& createJointPrismatic [[nodiscard]] (
-      owds::Actor& parent,
-      const std::array<float, 3>& origin_position,
-      const std::array<float, 4>& origin_orientation,
-      owds::Actor& child,
-      const std::array<float, 3>& joint_position,
-      const std::array<float, 4>& joint_orientation) = 0;
-
-    /**
-     * All degrees of freedom are locked.
-     *
-     * @param parent First actor
-     * @param origin_position Position of the joint relative to parent
-     * @param origin_position XYZ rotations, in radians
-     * @param child Second actor
-     * @param joint_position Same as origin_position but relative to child
-     * @param joint_orientation Same as origin_position but relative to child
-     */
-    virtual owds::JointFixed& createJointFixed [[nodiscard]] (
-      owds::Actor& parent,
-      const std::array<float, 3>& origin_position,
-      const std::array<float, 4>& origin_orientation,
-      owds::Actor& child,
-      const std::array<float, 3>& joint_position,
-      const std::array<float, 4>& joint_orientation) = 0;
-
-    /**
-     * This joint allows motion for all 6 degrees of freedom.
-     *
-     * @param parent First actor
-     * @param origin_position Position of the joint relative to parent
-     * @param origin_position XYZ rotations, in radians
-     * @param child Second actor
-     * @param joint_position Same as origin_position but relative to child
-     * @param joint_orientation Same as origin_position but relative to child
-     */
-    virtual owds::JointFloating& createJointFloating [[nodiscard]] (
-      owds::Actor& parent,
-      const std::array<float, 3>& origin_position,
-      const std::array<float, 4>& origin_orientation,
-      owds::Actor& child,
-      const std::array<float, 3>& joint_position,
-      const std::array<float, 4>& joint_orientation) = 0;
-
-    /**
-     * This joint allows motion in a plane perpendicular to the axis.
-     * @param parent First actor
-     * @param origin_position Position of the joint relative to parent
-     * @param origin_position XYZ rotations, in radians
-     * @param child Second actor
-     * @param joint_position Same as origin_position but relative to child
-     * @param joint_orientation Same as origin_position but relative to child
-     */
-    virtual owds::JointPlanar& createJointPlanar [[nodiscard]] (
-      owds::Actor& parent,
-      const std::array<float, 3>& origin_position,
-      const std::array<float, 4>& origin_orientation,
-      owds::Actor& child,
-      const std::array<float, 3>& joint_position,
-      const std::array<float, 4>& joint_orientation) = 0;
 
     void setAmbientLight(const std::array<float, 3>& direction,
                          const std::array<float, 3>& color = {1.0, 1.0, 1.0},
@@ -247,19 +146,120 @@ namespace owds {
     void processJoint(owds::Urdf& robot, const urdf::Joint_t& urdf_joint);
     owds::Shape convertShape(const urdf::Geometry_t& urdf_shape, glm::mat4& transform);
 
-    std::filesystem::path base_assets_path_;
-    owds::Model& preloaded_box_model_;
-    owds::Model& preloaded_cylinder_model_;
-    owds::Model& preloaded_sphere_model_;
-    std::unordered_map<owds::Urdf*, std::unique_ptr<owds::Urdf>> loaded_urdfs_;
+    /**
+     * The Unified Robotics Description Format specification mandates support for the following joint types:
+     * - Revolute joint(s)
+     * - Continuous joint(s)
+     * - Prismatic joint(s)
+     * - Fixed joint(s)
+     * - Floating joint(s)
+     * - Planar joint(s)
+     */
 
-    AmbientLight ambient_light_;
-    PointLights point_lights_;
-    std::vector<DebugText_t> debug_texts_;
-    std::vector<DebugLine> debug_lines_;
+    /**
+     * A hinge joint that rotates along the axis and has a limited range specified by the upper and lower limits.
+     * @param parent First actor
+     * @param origin_position Position of the joint relative to parent
+     * @param origin_position XYZ rotations, in radians
+     * @param child Second actor
+     * @param joint_position Same as origin_position but relative to child
+     * @param joint_orientation Same as origin_position but relative to child
+     */
+    virtual owds::JointRevolute& createJointRevolute [[nodiscard]] (
+      owds::Actor& parent,
+      const glm::vec3& origin_position,
+      const glm::quat& origin_orientation,
+      owds::Actor& child,
+      const glm::vec3& joint_position,
+      const glm::quat& joint_orientation) = 0;
 
-    std::vector<VirtualCamera> cameras_;
-    std::atomic<bool> has_render_request_;
+    /**
+     * A continuous hinge joint that rotates around the axis and has no upper and lower limits.
+     * @param parent First actor
+     * @param origin_position Position of the joint relative to parent
+     * @param origin_position XYZ rotations, in radians
+     * @param child Second actor
+     * @param joint_position Same as origin_position but relative to child
+     * @param joint_orientation Same as origin_position but relative to child
+     */
+    virtual owds::JointContinuous& createJointContinuous [[nodiscard]] (
+      owds::Actor& parent,
+      const glm::vec3& origin_position,
+      const glm::quat& origin_orientation,
+      owds::Actor& child,
+      const glm::vec3& joint_position,
+      const glm::quat& joint_orientation) = 0;
+
+    /**
+     * A sliding joint that slides along the axis, and has a limited range specified by the upper and lower limits.
+     *
+     * @param parent First actor
+     * @param origin_position Position of the joint relative to parent
+     * @param origin_position XYZ rotations, in radians
+     * @param child Second actor
+     * @param joint_position Same as origin_position but relative to child
+     * @param joint_orientation Same as origin_position but relative to child
+     */
+    virtual owds::JointPrismatic& createJointPrismatic [[nodiscard]] (
+      owds::Actor& parent,
+      const glm::vec3& origin_position,
+      const glm::quat& origin_orientation,
+      owds::Actor& child,
+      const glm::vec3& joint_position,
+      const glm::quat& joint_orientation) = 0;
+
+    /**
+     * All degrees of freedom are locked.
+     *
+     * @param parent First actor
+     * @param origin_position Position of the joint relative to parent
+     * @param origin_position XYZ rotations, in radians
+     * @param child Second actor
+     * @param joint_position Same as origin_position but relative to child
+     * @param joint_orientation Same as origin_position but relative to child
+     */
+    virtual owds::JointFixed& createJointFixed [[nodiscard]] (
+      owds::Actor& parent,
+      const glm::vec3& origin_position,
+      const glm::quat& origin_orientation,
+      owds::Actor& child,
+      const glm::vec3& joint_position,
+      const glm::quat& joint_orientation) = 0;
+
+    /**
+     * This joint allows motion for all 6 degrees of freedom.
+     *
+     * @param parent First actor
+     * @param origin_position Position of the joint relative to parent
+     * @param origin_position XYZ rotations, in radians
+     * @param child Second actor
+     * @param joint_position Same as origin_position but relative to child
+     * @param joint_orientation Same as origin_position but relative to child
+     */
+    virtual owds::JointFloating& createJointFloating [[nodiscard]] (
+      owds::Actor& parent,
+      const glm::vec3& origin_position,
+      const glm::quat& origin_orientation,
+      owds::Actor& child,
+      const glm::vec3& joint_position,
+      const glm::quat& joint_orientation) = 0;
+
+    /**
+     * This joint allows motion in a plane perpendicular to the axis.
+     * @param parent First actor
+     * @param origin_position Position of the joint relative to parent
+     * @param origin_position XYZ rotations, in radians
+     * @param child Second actor
+     * @param joint_position Same as origin_position but relative to child
+     * @param joint_orientation Same as origin_position but relative to child
+     */
+    virtual owds::JointPlanar& createJointPlanar [[nodiscard]] (
+      owds::Actor& parent,
+      const glm::vec3& origin_position,
+      const glm::quat& origin_orientation,
+      owds::Actor& child,
+      const glm::vec3& joint_position,
+      const glm::quat& joint_orientation) = 0;
   };
 } // namespace owds
 
