@@ -2,7 +2,7 @@
 #define OWDS_PHYSICS_PHYSX_JOINTS_JOINTPRISMATIC_H
 
 #include "overworld/Engine/Common/Urdf/Joints/JointPrismatic.h"
-#include "overworld/Physics/PhysX/API.h"
+#include "overworld/Engine/Physics/PhysX/API.h"
 
 namespace owds::physx {
   class Context;

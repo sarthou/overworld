@@ -50,6 +50,18 @@ namespace owds {
       glm::vec3 origin_translation;
       glm::vec3 origin_rotation;
       glm::vec3 scale = {1., 1., 1.}; // x = radius y = length for cylinder and sphere
+
+      Geometry_t() = default;
+
+      Geometry_t(const std::string& file,
+                 glm::vec3 origin_translation = {0., 0., 0.},
+                 glm::vec3 origin_rotation = {0., 0., 0.},
+                 glm::vec3 scale = {1., 1., 1.}) : type(geometry_mesh),
+                                                   file_name(file),
+                                                   origin_translation(origin_translation),
+                                                   origin_rotation(origin_rotation),
+                                                   scale(scale)
+      {}
     };
 
     struct Link_t

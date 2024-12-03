@@ -21,7 +21,8 @@ namespace owds {
 
   public:
     virtual ~Actor() noexcept;
-    virtual void setup() = 0;
+    virtual void setup(const std::array<float, 3>& position,
+                       const std::array<float, 4>& orientation) = 0;
     virtual void remove() = 0;
 
     /**

@@ -3,14 +3,16 @@
 #include <glm/gtc/quaternion.hpp>
 
 #include "extensions/PxRevoluteJoint.h"
-#include "overworld/Physics/PhysX/Actor.h"
-#include "overworld/Physics/PhysX/Context.h"
-#include "overworld/Physics/PhysX/SharedContext.h"
+#include "overworld/Engine/Common/Urdf/JointLocation.h"
+#include "overworld/Engine/Physics/PhysX/Actors/Actor.h"
+#include "overworld/Engine/Physics/PhysX/Context.h"
+#include "overworld/Engine/Physics/PhysX/SharedContext.h"
 #include "overworld/Utils/GlmMath.h"
 
 namespace owds::physx {
-  JointRevolute::JointRevolute(owds::physx::Context& ctx, owds::JointLocation location)
-    : owds::JointRevolute(location), ctx_(ctx) {}
+
+  JointRevolute::JointRevolute(owds::physx::Context& ctx,
+                               owds::JointLocation location) : owds::JointRevolute(location), ctx_(ctx) {}
 
   void JointRevolute::setup()
   {

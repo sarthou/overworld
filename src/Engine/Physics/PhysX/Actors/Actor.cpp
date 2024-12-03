@@ -1,4 +1,4 @@
-#include "overworld/Physics/PhysX/Actor.h"
+#include "overworld/Engine/Physics/PhysX/Actors/Actor.h"
 
 #include <array>
 #include <glm/gtc/quaternion.hpp>
@@ -7,77 +7,17 @@
 #include <overworld/Utils/BitCast.h>
 
 #include "overworld/Engine/Common/Models/Model.h"
-#include "overworld/Physics/PhysX/Context.h"
-#include "overworld/Physics/PhysX/SharedContext.h"
+#include "overworld/Engine/Common/Urdf/Actor.h"
+#include "overworld/Engine/Physics/PhysX/Context.h"
+#include "overworld/Engine/Physics/PhysX/SharedContext.h"
 
 namespace owds::physx {
-  Actor::Actor(
-    owds::physx::Context& ctx,
-    const owds::Shape& collision_shape,
-    const std::vector<owds::Shape>& visual_shapes)
-    : owds::Actor(collision_shape, visual_shapes),
-      ctx_(ctx)
-  {
-    ctx_.queued_actors_registration_.emplace_back(this);
-  }
 
-  Actor::~Actor() noexcept
-  {
-    ctx_.px_scene_->removeActor(*px_actor_);
-  }
-
-  void Actor::setup()
-  {
-    const auto& sdk = owds::physx::Context::createContext()->px_physics_;
-
-    px_material_ = sdk->createMaterial(0.5f, 0.5f, 0.5f);
-
-    std::visit(([this](auto& elem) { setupPhysicsShape(elem); }), collision_shape_);
-
-    px_actor_ = sdk->createRigidDynamic(::physx::PxTransform(::physx::PxVec3(0, 0, 0)));
-
-    for(const auto& px_geometry : px_geometries_)
-    {
-      px_shapes_.emplace_back(sdk->createShape(
-        *px_geometry,
-        *px_material_,
-        false,
-        ::physx::PxShapeFlag::eSCENE_QUERY_SHAPE | ::physx::PxShapeFlag::eSIMULATION_SHAPE));
-      px_actor_->attachShape(*px_shapes_.back());
-    }
-
-    px_actor_->setRigidBodyFlag(::physx::PxRigidBodyFlag::eENABLE_GYROSCOPIC_FORCES, true);
-
-    ctx_.px_scene_->addActor(*px_actor_);
-  }
-
-  void Actor::setPhysicsEnabled(const bool enabled)
-  {
-    px_actor_->setRigidBodyFlag(::physx::PxRigidBodyFlag::eKINEMATIC, !enabled);
-    is_kinematic_ = !enabled;
-  }
-
-  void Actor::setSimulationEnabled(bool enabled)
-  {
-    px_actor_->setActorFlag(::physx::PxActorFlag::eDISABLE_SIMULATION, !enabled);
-  }
-
-  void Actor::remove()
-  {
-    ctx_.actors_.erase(this);
-  }
-
-  void Actor::setMass(const float mass_kg)
-  {
-    if(mass_kg <= 0)
-    {
-      setPhysicsEnabled(false);
-    }
-    else
-    {
-      px_actor_->setMass(static_cast<::physx::PxReal>(mass_kg));
-    }
-  }
+  Actor::Actor(owds::physx::Context& ctx,
+               const owds::Shape& collision_shape,
+               const std::vector<owds::Shape>& visual_shapes) : owds::Actor(collision_shape, visual_shapes),
+                                                                ctx_(ctx)
+  {}
 
   void Actor::setStaticFriction(const float coefficient)
   {
@@ -94,34 +34,9 @@ namespace owds::physx {
     px_material_->setRestitution(coefficient);
   }
 
-  void Actor::setPositionAndOrientation(const std::array<float, 3>& position, const std::array<float, 4>& orientation)
-  {
-    std::cout << "set pose of " << this->unique_id_ << " " << position[0] << " : " << position[1] << " : " << position[2] << std::endl;
-    const auto px_transform =
-      ::physx::PxTransform(
-        ::physx::PxVec3(
-          static_cast<::physx::PxReal>(position[0]),
-          static_cast<::physx::PxReal>(position[1]),
-          static_cast<::physx::PxReal>(position[2])),
-        ::physx::PxQuat(
-          static_cast<::physx::PxReal>(orientation[0]),
-          static_cast<::physx::PxReal>(orientation[1]),
-          static_cast<::physx::PxReal>(orientation[2]),
-          static_cast<::physx::PxReal>(orientation[3])));
-
-    if(is_kinematic_)
-    {
-      px_actor_->setKinematicTarget(px_transform);
-    }
-    else
-    {
-      px_actor_->setGlobalPose(px_transform);
-    }
-  }
-
   std::array<float, 16> Actor::getModelMatrix() const
   {
-    const auto px_pose = px_actor_->getGlobalPose();
+    const auto px_pose = px_base_->getGlobalPose();
     const auto translation_mat = glm::translate(glm::mat4(1), glm::vec3(px_pose.p.x, px_pose.p.y, px_pose.p.z));
     const auto rotation_mat = glm::mat4_cast(glm::quat(px_pose.q.w, px_pose.q.x, px_pose.q.y, px_pose.q.z));
 
@@ -130,7 +45,7 @@ namespace owds::physx {
 
   std::pair<std::array<float, 3>, std::array<float, 3>> Actor::getPositionAndOrientation() const
   {
-    const auto px_pose = px_actor_->getGlobalPose();
+    const auto px_pose = px_base_->getGlobalPose();
     const auto position = glm::vec3(px_pose.p.x, px_pose.p.y, px_pose.p.z);
     const auto euler_angles = glm::eulerAngles(glm::quat(px_pose.q.w, px_pose.q.x, px_pose.q.y, px_pose.q.z));
 
@@ -154,8 +69,7 @@ namespace owds::physx {
       static_cast<::physx::PxReal>(shape.height_) / 2));
   }
 
-  static auto createPxCookingParams(
-    const bool minimize_memory_footprint)
+  static auto createPxCookingParams(const bool minimize_memory_footprint)
   {
     auto params = ::physx::PxCookingParams(::physx::PxTolerancesScale());
     params.convexMeshCookingType = ::physx::PxConvexMeshCookingType::eQUICKHULL;
@@ -294,4 +208,5 @@ namespace owds::physx {
     px_geometries_.emplace_back(std::make_unique<::physx::PxSphereGeometry>(
       static_cast<::physx::PxReal>(shape.radius_)));
   }
+
 } // namespace owds::physx

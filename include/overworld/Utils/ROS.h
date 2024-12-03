@@ -13,7 +13,8 @@ namespace owds {
   {
     const auto url_handler = filename.substr(0, 10);
 
-    assert(url_handler == "package://");
+    if(url_handler != "package://")
+      return filename;
 
     const auto total_path = filename.substr(10);
 

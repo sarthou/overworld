@@ -2,7 +2,7 @@
 #define OWDS_PHYSICS_PHYSX_JOINTS_JOINTFLOATING_H
 
 #include "overworld/Engine/Common/Urdf/Joints/JointFloating.h"
-#include "overworld/Physics/PhysX/API.h"
+#include "overworld/Engine/Physics/PhysX/API.h"
 
 namespace owds::physx {
   class Context;

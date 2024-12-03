@@ -52,6 +52,8 @@ namespace owds {
     std::vector<VirtualCamera> cameras_;
     std::atomic<bool> has_render_request_;
 
+    std::unordered_map<std::size_t, Actor*> actors_;
+
   public:
     virtual ~World();
 
@@ -74,16 +76,36 @@ namespace owds {
     [[nodiscard]] owds::Shape createShapeSphere(const owds::Color& color, float radius, glm::mat4& transform);
     [[nodiscard]] owds::Shape createShapeFromModel(const owds::Material& material, const std::string& path, const std::array<float, 3>& scale, glm::mat4& transform);
 
-    [[nodiscard]] virtual owds::Actor& createActor(
-      const owds::Shape& collision_shape,
-      const std::vector<owds::Shape>& visual_shapes) = 0;
+    /* ACTORS */
 
+    size_t createStaticActor(const owds::urdf::Geometry_t& collision_geometry,
+                             const std::vector<owds::urdf::Geometry_t>& visual_geometries,
+                             const glm::vec3& position = {0., 0., 0.},
+                             const glm::vec3& rotation = {0., 0., 0.});
+
+    size_t createActor(const owds::urdf::Geometry_t& collision_geometry,
+                       const std::vector<owds::urdf::Geometry_t>& visual_geometries,
+                       const glm::vec3& position = {0., 0., 0.},
+                       const glm::vec3& rotation = {0., 0., 0.});
+
+  protected:
+    [[nodiscard]] virtual size_t createActor(const owds::Shape& collision_shape,
+                                             const std::vector<owds::Shape>& visual_shapes) = 0;
+
+    virtual size_t createStaticActor(const owds::Shape& collision_shape,
+                                     const std::vector<owds::Shape>& visual_shapes,
+                                     const glm::vec3& position,
+                                     const glm::quat& orientation) = 0;
+
+  public:
     [[nodiscard]] owds::Urdf& loadRobotFromDescription(const std::string& path, bool from_base_path = true);
 
     /**
      * @return
      */
-    [[nodiscard]] virtual const std::vector<std::reference_wrapper<owds::Actor>>& getActors() const = 0;
+    const std::unordered_map<std::size_t, Actor*>& getActors() const { return actors_; };
+
+    /* LIGHTS */
 
     void setAmbientLight(const std::array<float, 3>& direction,
                          const std::array<float, 3>& color = {1.0, 1.0, 1.0},
@@ -105,6 +127,8 @@ namespace owds {
     void setPointLightPosition(std::size_t id, const glm::vec3& position);
     void setPointLightAmbientStrength(std::size_t id, float strength);
 
+    /* DEBUG */
+
     int addDebugText(const std::string& text,
                      const std::array<float, 3>& position,
                      float height,
@@ -123,6 +147,8 @@ namespace owds {
                      int replace_id = -1);
     void removeDebugLine(int id);
 
+    /* CAMERAS */
+
     int addCamera(unsigned int width, unsigned int height, float fov, owds::CameraView_e view_type, float near_plane, float far_plane);
     bool setCameraPositionAndLookAt(int id, const std::array<float, 3>& eye_position, const std::array<float, 3>& dst_position);
     bool setCameraPositionAndDirection(int id, const std::array<float, 3>& eye_position, const std::array<float, 3>& eye_direction);
@@ -130,6 +156,8 @@ namespace owds {
     void requestCameraRender(const std::vector<int>& ids);
     void getCameraImage(int id, uint32_t** image, unsigned int& width, unsigned int& height);
     std::unordered_set<uint32_t> getCameraSementation(int id);
+
+    /* PHYSICS */
 
     /**
      * @param gravity Self-explanatory.
@@ -144,122 +172,9 @@ namespace owds {
   protected:
     void processLink(owds::Urdf& robot, const urdf::Link_t& urdf_link);
     void processJoint(owds::Urdf& robot, const urdf::Joint_t& urdf_joint);
+
+    owds::Shape convertShape(const urdf::Geometry_t& geometry);
     owds::Shape convertShape(const urdf::Geometry_t& urdf_shape, glm::mat4& transform);
-
-    /**
-     * The Unified Robotics Description Format specification mandates support for the following joint types:
-     * - Revolute joint(s)
-     * - Continuous joint(s)
-     * - Prismatic joint(s)
-     * - Fixed joint(s)
-     * - Floating joint(s)
-     * - Planar joint(s)
-     */
-
-    /**
-     * A hinge joint that rotates along the axis and has a limited range specified by the upper and lower limits.
-     * @param parent First actor
-     * @param origin_position Position of the joint relative to parent
-     * @param origin_position XYZ rotations, in radians
-     * @param child Second actor
-     * @param joint_position Same as origin_position but relative to child
-     * @param joint_orientation Same as origin_position but relative to child
-     */
-    virtual owds::JointRevolute& createJointRevolute [[nodiscard]] (
-      owds::Actor& parent,
-      const glm::vec3& origin_position,
-      const glm::quat& origin_orientation,
-      owds::Actor& child,
-      const glm::vec3& joint_position,
-      const glm::quat& joint_orientation) = 0;
-
-    /**
-     * A continuous hinge joint that rotates around the axis and has no upper and lower limits.
-     * @param parent First actor
-     * @param origin_position Position of the joint relative to parent
-     * @param origin_position XYZ rotations, in radians
-     * @param child Second actor
-     * @param joint_position Same as origin_position but relative to child
-     * @param joint_orientation Same as origin_position but relative to child
-     */
-    virtual owds::JointContinuous& createJointContinuous [[nodiscard]] (
-      owds::Actor& parent,
-      const glm::vec3& origin_position,
-      const glm::quat& origin_orientation,
-      owds::Actor& child,
-      const glm::vec3& joint_position,
-      const glm::quat& joint_orientation) = 0;
-
-    /**
-     * A sliding joint that slides along the axis, and has a limited range specified by the upper and lower limits.
-     *
-     * @param parent First actor
-     * @param origin_position Position of the joint relative to parent
-     * @param origin_position XYZ rotations, in radians
-     * @param child Second actor
-     * @param joint_position Same as origin_position but relative to child
-     * @param joint_orientation Same as origin_position but relative to child
-     */
-    virtual owds::JointPrismatic& createJointPrismatic [[nodiscard]] (
-      owds::Actor& parent,
-      const glm::vec3& origin_position,
-      const glm::quat& origin_orientation,
-      owds::Actor& child,
-      const glm::vec3& joint_position,
-      const glm::quat& joint_orientation) = 0;
-
-    /**
-     * All degrees of freedom are locked.
-     *
-     * @param parent First actor
-     * @param origin_position Position of the joint relative to parent
-     * @param origin_position XYZ rotations, in radians
-     * @param child Second actor
-     * @param joint_position Same as origin_position but relative to child
-     * @param joint_orientation Same as origin_position but relative to child
-     */
-    virtual owds::JointFixed& createJointFixed [[nodiscard]] (
-      owds::Actor& parent,
-      const glm::vec3& origin_position,
-      const glm::quat& origin_orientation,
-      owds::Actor& child,
-      const glm::vec3& joint_position,
-      const glm::quat& joint_orientation) = 0;
-
-    /**
-     * This joint allows motion for all 6 degrees of freedom.
-     *
-     * @param parent First actor
-     * @param origin_position Position of the joint relative to parent
-     * @param origin_position XYZ rotations, in radians
-     * @param child Second actor
-     * @param joint_position Same as origin_position but relative to child
-     * @param joint_orientation Same as origin_position but relative to child
-     */
-    virtual owds::JointFloating& createJointFloating [[nodiscard]] (
-      owds::Actor& parent,
-      const glm::vec3& origin_position,
-      const glm::quat& origin_orientation,
-      owds::Actor& child,
-      const glm::vec3& joint_position,
-      const glm::quat& joint_orientation) = 0;
-
-    /**
-     * This joint allows motion in a plane perpendicular to the axis.
-     * @param parent First actor
-     * @param origin_position Position of the joint relative to parent
-     * @param origin_position XYZ rotations, in radians
-     * @param child Second actor
-     * @param joint_position Same as origin_position but relative to child
-     * @param joint_orientation Same as origin_position but relative to child
-     */
-    virtual owds::JointPlanar& createJointPlanar [[nodiscard]] (
-      owds::Actor& parent,
-      const glm::vec3& origin_position,
-      const glm::quat& origin_orientation,
-      owds::Actor& child,
-      const glm::vec3& joint_position,
-      const glm::quat& joint_orientation) = 0;
   };
 } // namespace owds
 

@@ -1,15 +1,19 @@
 #include "overworld/Engine/Graphics/OpenGL/Renderer.h"
 
+#include <cstddef>
 #include <cstdint>
 #include <iostream>
+#include <set>
 #include <string>
 #include <unistd.h>
 #include <variant>
+#include <vector>
 
 #include "glad/glad.h"
 #include "overworld/Engine/Common/Camera/Camera.h"
 #include "overworld/Engine/Common/Camera/CameraView.h"
 #include "overworld/Engine/Common/Camera/ViewAntiAliasing.h"
+#include "overworld/Engine/Common/Debug/DebugLine.h"
 #include "overworld/Engine/Common/Lights/AmbientLight.h"
 #include "overworld/Engine/Common/Lights/PointLights.h"
 #include "overworld/Engine/Common/Models/Mesh.h"
@@ -21,6 +25,7 @@
 #include "overworld/Engine/Graphics/GLFW/Window.h"
 #include "overworld/Engine/Graphics/OpenGL/Cubemap.h"
 #include "overworld/Engine/Graphics/OpenGL/MeshHandle.h"
+#include "overworld/Engine/Graphics/OpenGL/Texture2D.h"
 #include "overworld/Utils/GlmMath.h"
 
 // should be after glad
@@ -184,55 +189,59 @@ namespace owds {
     {
       if(render_collision_models_)
       {
-        std::visit([this, &actor](const auto& shape_resolv) { loadActor(actor, shape_resolv); }, actor.get().collision_shape_);
+        std::visit([this, actor](const auto& shape_resolv) { loadActor(actor.second, shape_resolv); }, actor.second->collision_shape_);
       }
       else
       {
-        for(const auto& shape : actor.get().visual_shapes_)
+        for(const auto& shape : actor.second->visual_shapes_)
         {
-          std::visit([this, &actor](const auto& shape_resolv) { loadActor(actor, shape_resolv); }, shape);
+          std::visit([this, actor](const auto& shape_resolv) { loadActor(actor.second, shape_resolv); }, shape);
         }
       }
     }
   }
 
-  void Renderer::loadActor(const Actor& actor, const ShapeBox& shape)
+  void Renderer::loadActor(Actor* actor, const ShapeBox& shape)
   {
     const auto size_mat = glm::scale(glm::mat4(1.f), ToV3(shape.half_extents_));
-    const auto model_mat = shape.shape_transform_ * ToM4(actor.getModelMatrix()) * size_mat;
+    const auto model_mat = shape.shape_transform_ * ToM4(actor->getModelMatrix()) * size_mat;
 
     loadInstance(shape.box_model_, {"", shape.diffuse_color_, shape.diffuse_color_, 0., "", "", ""}, model_mat);
   }
 
-  void Renderer::loadActor(const Actor& actor, const ShapeCapsule& shape)
+  void Renderer::loadActor(Actor* actor, const ShapeCapsule& shape)
   {
     (void)actor; // todo
     (void)shape; // todo
   }
 
-  void Renderer::loadActor(const Actor& actor, const ShapeCustomMesh& shape)
+  void Renderer::loadActor(Actor* actor, const ShapeCustomMesh& shape)
   {
+    auto pose = actor->getPositionAndOrientation().first;
+    auto rot = actor->getPositionAndOrientation().second;
+    std::cout << "pose " << actor->unique_id_ << " => " << pose[0] << " : " << pose[1] << " : " << pose[2] << std::endl;
+    std::cout << "rot " << actor->unique_id_ << " => " << rot[0] << " : " << rot[1] << " : " << rot[2] << std::endl;
     const auto size_mat = glm::scale(glm::mat4(1.f), shape.scale_);
-    const auto model_mat = shape.shape_transform_ * ToM4(actor.getModelMatrix()) * size_mat;
+    const auto model_mat = shape.shape_transform_ * ToM4(actor->getModelMatrix()) * size_mat;
 
     loadInstance(shape.custom_model_, shape.material_, model_mat);
   }
 
-  void Renderer::loadActor(const Actor& actor, const ShapeCylinder& shape)
+  void Renderer::loadActor(Actor* actor, const ShapeCylinder& shape)
   {
     const auto size_mat = glm::scale(glm::mat4(1.f), glm::vec3(shape.radius_, shape.height_, shape.radius_));
-    const auto model_mat = shape.shape_transform_ * ToM4(actor.getModelMatrix()) * size_mat;
+    const auto model_mat = shape.shape_transform_ * ToM4(actor->getModelMatrix()) * size_mat;
 
     loadInstance(shape.cylinder_model_, {"", shape.diffuse_color_, shape.diffuse_color_, 0., "", "", ""}, model_mat);
   }
 
-  void Renderer::loadActor(const Actor& actor, const ShapeDummy& shape)
+  void Renderer::loadActor(Actor* actor, const ShapeDummy& shape)
   {
     (void)actor;
     (void)shape;
   }
 
-  void Renderer::loadActor(const Actor& actor, const ShapeSphere& shape)
+  void Renderer::loadActor(Actor* actor, const ShapeSphere& shape)
   {
     (void)actor; // todo
     (void)shape; // todo
@@ -242,7 +251,7 @@ namespace owds {
   {
     loadModel(model, material);
 
-    for(auto& mesh : model.meshes_)
+    for(const auto& mesh : model.meshes_)
       current_mesh_batches_[model.id_][mesh.id_].emplace_back(InstanceData{model_mat, {}}); // TODO add instance data ?
   }
 

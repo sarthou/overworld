@@ -65,12 +65,12 @@ namespace owds {
     std::unordered_map<unsigned int, LinesHandle> debug_axis_;
 
     void loadWorld();
-    void loadActor(const Actor& actor, const ShapeBox& shape);
-    void loadActor(const Actor& actor, const ShapeCapsule& shape);
-    void loadActor(const Actor& actor, const ShapeCustomMesh& shape);
-    void loadActor(const Actor& actor, const ShapeCylinder& shape);
-    void loadActor(const Actor& actor, const ShapeDummy& shape);
-    void loadActor(const Actor& actor, const ShapeSphere& shape);
+    void loadActor(Actor* actor, const ShapeBox& shape);
+    void loadActor(Actor* actor, const ShapeCapsule& shape);
+    void loadActor(Actor* actor, const ShapeCustomMesh& shape);
+    void loadActor(Actor* actor, const ShapeCylinder& shape);
+    void loadActor(Actor* actor, const ShapeDummy& shape);
+    void loadActor(Actor* actor, const ShapeSphere& shape);
     void loadInstance(const Model& model, const Material& material, const glm::mat4& model_mat);
     Material combineMaterials(const Material& shape_material, const Material& model_material);
     std::vector<Texture2D> loadTextures(Material& material);

@@ -37,7 +37,7 @@ namespace owds {
 
     void drawId(const Shader& shader, uint32_t model_id) const
     {
-      // model_id *= 4'000'000;
+      model_id *= 4'000'000;
       shader.setVec4("color", glm::vec4((uint8_t)(model_id >> 24) / 255.,
                                         (uint8_t)(model_id >> 16) / 255.,
                                         (uint8_t)(model_id >> 8) / 255.,

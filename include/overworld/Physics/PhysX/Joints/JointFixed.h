@@ -2,7 +2,7 @@
 #define OWDS_PHYSICS_PHYSX_JOINTS_JOINTFIXED_H
 
 #include "overworld/Engine/Common/Urdf/Joints/JointFixed.h"
-#include "overworld/Physics/PhysX/API.h"
+#include "overworld/Engine/Physics/PhysX/API.h"
 
 namespace owds::physx {
   class Context;
@@ -12,9 +12,8 @@ namespace owds::physx {
   public:
     using owds::JointFixed::JointFixed;
 
-    JointFixed(
-      owds::physx::Context& ctx,
-      owds::JointLocation location);
+    JointFixed(owds::physx::Context& ctx,
+               owds::JointLocation location);
 
     void setup() override;
     void remove() override;

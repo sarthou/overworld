@@ -17,14 +17,15 @@
 #include <overworld/Physics/Bullet3/World.h>
 using DefaultEngine = owds::bullet3::World;
 #else
-#include <overworld/Physics/PhysX/Actor.h>
-#include <overworld/Physics/PhysX/World.h>
+// #include "overworld/Engine/Physics/PhysX/Actor.h"
+#include "overworld/Engine/Physics/PhysX/World.h"
 using DefaultEngine = owds::physx::World;
 #endif
 
 #include <cmath>
 #include <iostream>
 #include <opencv2/opencv.hpp>
+#include <string>
 
 // Should be last
 #define GLFW_EXPOSE_NATIVE_X11
@@ -105,8 +106,19 @@ void worldThread(const std::string& world_name, owds::Window* window)
 
   std::cout << "================== WORLD ATTACHED ! ================" << std::endl;
 
+  std::string overworld_dir = owds::compat::owds_ros::getShareDirectory("overworld");
+  std::cout << "overworld_dir = " << overworld_dir << std::endl;
+
   //(void)world.loadRobotFromDescription(owds::compat::owds_ros::getShareDirectory("pr2_description") + "/robots/pr2.urdf", false);
-  (void)world.loadRobotFromDescription("models/adream/adream.urdf");
+  (void)world.createStaticActor(owds::urdf::Geometry_t(overworld_dir + "/models/adream/appartment_vhacd.obj"),
+                                {owds::urdf::Geometry_t(overworld_dir + "/models/adream/appartment.obj")},
+                                {0., 0., 0.}, {0., 0., 1.57});
+  (void)world.createActor(owds::urdf::Geometry_t(overworld_dir + "/models/adream/walls_vhacd.obj"),
+                          {owds::urdf::Geometry_t(overworld_dir + "/models/adream/walls.obj")},
+                          {0., 0., 0.}, {0., 0., 1.57});
+  std::cout << "plop" << std::endl;
+  (void)world.loadRobotFromDescription(overworld_dir + "/models/eve.urdf", false);
+  //(void)world.loadRobotFromDescription("models/adream/adream.urdf");
   //(void)world.loadRobotFromDescription("models/tutorials/Frame/frame.urdf");
   world.stepSimulation(1.f / 144.f);
 
@@ -117,7 +129,7 @@ void worldThread(const std::string& world_name, owds::Window* window)
   while(!window->isCloseRequested())
   {
     window->doPollEvents(renderer);
-    // world.stepSimulation(1.f / 144.f);
+    world.stepSimulation(1.f / 144.f);
     renderer.commit();
     window->swapBuffer();
   }

@@ -2,6 +2,7 @@
 
 #include "overworld/Engine/Common/Models/Loaders/ModelLoader.h"
 #include "overworld/Engine/Common/Models/Model.h"
+#include "overworld/Utils/ShellDisplay.h"
 
 namespace owds {
   ModelManager::ModelManager() = default;
@@ -22,6 +23,8 @@ namespace owds {
     {
       auto model = model_loader_.load(path);
 
+      if(model == nullptr)
+        ShellDisplay::error("Fail to load model: " + path.string());
       assert(model && "Failed to load model");
 
       models_[absolute_path_str] = std::move(model);

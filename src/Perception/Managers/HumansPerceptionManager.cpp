@@ -53,6 +53,9 @@ namespace owds {
   {
     fusioner_.fuseData(fusioned_percepts_, aggregated_);
     fromfusedToEntities();
+
+    for(auto& percept : aggregated_)
+      percept.second.clear();
   }
 
 } // namespace owds

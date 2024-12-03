@@ -2,15 +2,19 @@
 
 #include <glm/gtc/quaternion.hpp>
 
-#include "overworld/Physics/PhysX/Actor.h"
-#include "overworld/Physics/PhysX/Context.h"
-#include "overworld/Physics/PhysX/SharedContext.h"
+#include "overworld/Engine/Common/Urdf/JointLocation.h"
+#include "overworld/Engine/Physics/PhysX/Actors/Actor.h"
+#include "overworld/Engine/Physics/PhysX/Context.h"
+#include "overworld/Engine/Physics/PhysX/SharedContext.h"
 #include "overworld/Utils/BitCast.h"
 #include "overworld/Utils/GlmMath.h"
 
 namespace owds::physx {
-  JointFloating::JointFloating(owds::physx::Context& ctx, owds::JointLocation location)
-    : owds::JointFloating(location), ctx_(ctx) {}
+
+  JointFloating::JointFloating(owds::physx::Context& ctx,
+                               owds::JointLocation location) : owds::JointFloating(location),
+                                                               ctx_(ctx)
+  {}
 
   void JointFloating::setup()
   {

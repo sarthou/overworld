@@ -2,13 +2,20 @@
 
 #include <array>
 #include <cassert>
+#include <cstddef>
 #include <cstdint>
+#include <glm/matrix.hpp>
+#include <iostream>
 #include <string>
+#include <unordered_set>
+#include <vector>
 
 #include "overworld/Compat/ROS.h"
+#include "overworld/Engine/Common/Lights/AmbientLight.h"
 #include "overworld/Engine/Common/Models/Color.h"
 #include "overworld/Engine/Common/Models/Material.h"
 #include "overworld/Engine/Common/Models/ModelManager.h"
+#include "overworld/Engine/Common/Shapes/Shape.h"
 #include "overworld/Engine/Common/Urdf/Actor.h"
 #include "overworld/Engine/Common/Urdf/Urdf.h"
 #include "overworld/Engine/Common/Urdf/UrdfLoader.h"
@@ -26,7 +33,11 @@ namespace owds {
         base_assets_path / "models/basic_shapes/sphere.obj"))
   {}
 
-  World::~World() = default;
+  World::~World()
+  {
+    for(const auto& actor : actors_)
+      delete actor.second;
+  }
 
   owds::Shape World::createShapeBox(const owds::Color& color, const std::array<float, 3>& half_extents, glm::mat4& transform)
   {
@@ -76,6 +87,32 @@ namespace owds {
       transform};
   }
 
+  size_t World::createStaticActor(const owds::urdf::Geometry_t& collision_geometry,
+                                  const std::vector<owds::urdf::Geometry_t>& visual_geometries,
+                                  const glm::vec3& position,
+                                  const glm::vec3& rotation)
+  {
+    owds::Shape collision_shape = convertShape(collision_geometry);
+    std::vector<owds::Shape> visual_shapes;
+    for(const auto& geometry : visual_geometries)
+      visual_shapes.emplace_back(convertShape(geometry));
+
+    return createStaticActor(collision_shape, visual_shapes, position, glm::quat(rotation));
+  }
+
+  size_t World::createActor(const owds::urdf::Geometry_t& collision_geometry,
+                            const std::vector<owds::urdf::Geometry_t>& visual_geometries,
+                            const glm::vec3& position,
+                            const glm::vec3& rotation)
+  {
+    owds::Shape collision_shape = convertShape(collision_geometry);
+    std::vector<owds::Shape> visual_shapes;
+    for(const auto& geometry : visual_geometries)
+      visual_shapes.emplace_back(convertShape(geometry));
+
+    return createStaticActor(collision_shape, visual_shapes, position, glm::quat(rotation));
+  }
+
   owds::Urdf& World::loadRobotFromDescription(const std::string& path, bool from_base_path)
   {
     UrdfLoader loader;
@@ -87,7 +124,7 @@ namespace owds {
       urdf_model = loader.read(path);
 
     auto urdf = std::make_unique<owds::Urdf>();
-    const auto urdf_ptr = urdf.get();
+    auto* const urdf_ptr = urdf.get();
     loaded_urdfs_[urdf_ptr] = std::move(urdf);
 
     urdf_ptr->name_ = urdf_model.name;
@@ -110,91 +147,97 @@ namespace owds {
     owds::Shape collision_shape = owds::ShapeDummy();
     std::vector<owds::Shape> visual_shapes;
 
-    if(urdf_link.collisions.size())
+    if(urdf_link.collisions.empty() == false)
     {
-      auto& collision = urdf_link.collisions.front();
+      const auto& collision = urdf_link.collisions.front();
       if(collision.type != urdf::GeometryType_e::geometry_none)
       {
-        glm::mat4 translate = glm::translate(glm::mat4(1), collision.origin_translation);
-        glm::mat4 rotate = glm::mat4_cast(glm::quat(collision.origin_rotation));
-        glm::mat4 transform = translate * rotate;
-        (void)transform;
-        // collision_shape = convertShape(collision, transform); // TODO
+        // collision_shape = convertShape(collision); // TODO
       }
     }
 
     assert(urdf_link.collisions.size() <= 1 && "Links with multiple collision shapes are not supported at this moment.");
 
-    {
-      if(urdf_link.visual.type != urdf::GeometryType_e::geometry_none)
-      {
-        auto& visual = urdf_link.visual;
-        glm::mat4 translate = glm::translate(glm::mat4(1), visual.origin_translation);
-        glm::mat4 rotate = glm::mat4_cast(glm::quat(visual.origin_rotation));
-        glm::mat4 transform = translate * rotate;
-        visual_shapes.emplace_back(convertShape(visual, transform));
-      }
-    }
+    if(urdf_link.visual.type != urdf::GeometryType_e::geometry_none)
+      visual_shapes.emplace_back(convertShape(urdf_link.visual));
 
-    auto& link = createActor(collision_shape, visual_shapes);
+    size_t id = createActor(collision_shape, visual_shapes);
+    auto* link = actors_[id];
 
-    link.setPositionAndOrientation({static_cast<float>(0),
-                                    static_cast<float>(0),
-                                    static_cast<float>(0)},
-                                   {static_cast<float>(0),
-                                    static_cast<float>(0),
-                                    static_cast<float>(0),
-                                    static_cast<float>(1.)}); // TODO where to do it well ?
+    link->setPositionAndOrientation({static_cast<float>(0),
+                                     static_cast<float>(0),
+                                     static_cast<float>(0)},
+                                    {static_cast<float>(0),
+                                     static_cast<float>(0),
+                                     static_cast<float>(0),
+                                     static_cast<float>(1.)}); // TODO where to do it well ?
 
-    link.setMass(static_cast<float>(urdf_link.inertia.mass));
+    link->setMass(static_cast<float>(urdf_link.inertia.mass));
 
-    robot.links_[urdf_link.name] = std::addressof(link);
+    robot.links_[urdf_link.name] = link;
   }
 
   void World::processJoint(owds::Urdf& robot, const urdf::Joint_t& urdf_joint)
   {
     (void)robot;
-    // auto& link0 = *robot.links_.at(urdf_joint.parent_link_name);
-    // auto& link1 = *robot.links_.at(urdf_joint.child_link_name);
-
-    // joint.parent_to_joint_origin_transform;
+    auto& parent_link = *robot.links_.at(urdf_joint.parent_link);
+    auto& child_link = *robot.links_.at(urdf_joint.child_link);
     switch(urdf_joint.type)
     {
     case urdf::JointType_e::joint_revolute:
     {
-      /*createJointRevolute(
-        link0,
-        {},
-        {
-          static_cast<float>(urdf_joint.parent_to_joint_origin_transform.rotation.x),
-          static_cast<float>(urdf_joint.parent_to_joint_origin_transform.rotation.y),
-          static_cast<float>(urdf_joint.parent_to_joint_origin_transform.rotation.z),
-          static_cast<float>(urdf_joint.parent_to_joint_origin_transform.rotation.w),
-        },
-        link1,
-        {},
-        {});*/
-
+      //(void)createJointRevolute(parent_link, urdf_joint.origin_translation, {0., 0., 0., 1.}, child_link, {0., 0., 0.}, {0., 0., 0., 1.});
+      //(void)createJointRevolute(parent_link, urdf_joint.origin_translation, glm::quat(urdf_joint.origin_rotation), child_link, {0., 0., 0.}, {0., 0., 0., 1.});
+      std::cout << "create revolute joint between " << urdf_joint.parent_link << " and " << urdf_joint.child_link << std::endl;
+      std::cout << "rotation = " << urdf_joint.origin_rotation.x << " : " << urdf_joint.origin_rotation.y << " : " << urdf_joint.origin_rotation.z << std::endl;
+      std::cout << "position = " << urdf_joint.origin_translation.x << " : " << urdf_joint.origin_translation.y << " : " << urdf_joint.origin_translation.z << std::endl;
       break;
     }
     case urdf::JointType_e::joint_continuous:
     {
+      //(void)createJointContinuous(parent_link, urdf_joint.origin_translation, {0., 0., 0., 1.}, child_link, {0., 0., 0.}, {0., 0., 0., 1.});
+      //(void)createJointContinuous(parent_link, urdf_joint.origin_translation, glm::quat(urdf_joint.origin_rotation), child_link, {0., 0., 0.}, {0., 0., 0., 1.});
+      std::cout << "create revolute joint between " << urdf_joint.parent_link << " and " << urdf_joint.child_link << std::endl;
+      std::cout << "rotation = " << urdf_joint.origin_rotation.x << " : " << urdf_joint.origin_rotation.y << " : " << urdf_joint.origin_rotation.z << std::endl;
+      std::cout << "position = " << urdf_joint.origin_translation.x << " : " << urdf_joint.origin_translation.y << " : " << urdf_joint.origin_translation.z << std::endl;
       break;
     }
     case urdf::JointType_e::joint_prismatic:
     {
+      //(void)createJointPrismatic(parent_link, urdf_joint.origin_translation, {0., 0., 0., 1.}, child_link, {0., 0., 0.}, {0., 0., 0., 1.});
+      //(void)createJointPrismatic(parent_link, urdf_joint.origin_translation, glm::quat(urdf_joint.origin_rotation), child_link, {0., 0., 0.}, {0., 0., 0., 1.});
+      std::cout << "create prismatic joint between " << urdf_joint.parent_link << " and " << urdf_joint.child_link << std::endl;
+      std::cout << "rotation = " << urdf_joint.origin_rotation.x << " : " << urdf_joint.origin_rotation.y << " : " << urdf_joint.origin_rotation.z << std::endl;
+      std::cout << "position = " << urdf_joint.origin_translation.x << " : " << urdf_joint.origin_translation.y << " : " << urdf_joint.origin_translation.z << std::endl;
       break;
     }
     case urdf::JointType_e::joint_floating:
     {
+      //(void)createJointFloating(parent_link, urdf_joint.origin_translation, {0., 0., 0., 1.}, child_link, {0., 0., 0.}, {0., 0., 0., 1.});
+      //(void)createJointFloating(parent_link, urdf_joint.origin_translation, glm::quat(urdf_joint.origin_rotation), child_link, {0., 0., 0.}, {0., 0., 0., 1.});
+      std::cout << "create floating joint between " << urdf_joint.parent_link << " and " << urdf_joint.child_link << std::endl;
+      std::cout << "rotation = " << urdf_joint.origin_rotation.x << " : " << urdf_joint.origin_rotation.y << " : " << urdf_joint.origin_rotation.z << std::endl;
+      std::cout << "position = " << urdf_joint.origin_translation.x << " : " << urdf_joint.origin_translation.y << " : " << urdf_joint.origin_translation.z << std::endl;
       break;
     }
     case urdf::JointType_e::joint_planar:
     {
+      //(void)createJointPlanar(parent_link, urdf_joint.origin_translation, {0., 0., 0., 1.}, child_link, {0., 0., 0.}, {0., 0., 0., 1.});
+      //(void)createJointPlanar(parent_link, urdf_joint.origin_translation, glm::quat(urdf_joint.origin_rotation), child_link, {0., 0., 0.}, {0., 0., 0., 1.});
+      std::cout << "create planar joint between " << urdf_joint.parent_link << " and " << urdf_joint.child_link << std::endl;
+      std::cout << "rotation = " << urdf_joint.origin_rotation.x << " : " << urdf_joint.origin_rotation.y << " : " << urdf_joint.origin_rotation.z << std::endl;
+      std::cout << "position = " << urdf_joint.origin_translation.x << " : " << urdf_joint.origin_translation.y << " : " << urdf_joint.origin_translation.z << std::endl;
       break;
     }
     case urdf::JointType_e::joint_fixed:
     {
+      if(urdf_joint.parent_link == "base_footprint")
+        break;
+      //(void)createJointFixed(parent_link, urdf_joint.origin_translation, {0., 0., 0., 1.}, child_link, {0., 0., 0.}, {0., 0., 0., 1.});
+      //(void)createJointFixed(parent_link, urdf_joint.origin_translation, glm::quat(urdf_joint.origin_rotation), child_link, {0., 0., 0.}, {0., 0., 0., 1.});
+      std::cout << "create fixed joint between " << urdf_joint.parent_link << " and " << urdf_joint.child_link << std::endl;
+      std::cout << "rotation = " << urdf_joint.origin_rotation.x << " : " << urdf_joint.origin_rotation.y << " : " << urdf_joint.origin_rotation.z << std::endl;
+      std::cout << "position = " << urdf_joint.origin_translation.x << " : " << urdf_joint.origin_translation.y << " : " << urdf_joint.origin_translation.z << std::endl;
       break;
     }
     case urdf::JointType_e::joint_none:
@@ -203,6 +246,14 @@ namespace owds {
       assert(false && "Unrecognized/unsupported joint type.");
     }
     }
+  }
+
+  owds::Shape World::convertShape(const urdf::Geometry_t& geometry)
+  {
+    glm::mat4 translate = glm::translate(glm::mat4(1), geometry.origin_translation);
+    glm::mat4 rotate = glm::mat4_cast(glm::quat(geometry.origin_rotation));
+    glm::mat4 transform = translate * rotate;
+    return convertShape(geometry, transform);
   }
 
   owds::Shape World::convertShape(const urdf::Geometry_t& urdf_shape, glm::mat4& transform)
