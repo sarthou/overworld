@@ -219,12 +219,8 @@ namespace owds {
 
   void Renderer::loadActor(Actor* actor, const ShapeCustomMesh& shape)
   {
-    auto pose = actor->getPositionAndOrientation().first;
-    auto rot = actor->getPositionAndOrientation().second;
-    // std::cout << "pose " << actor->unique_id_ << " => " << pose[0] << " : " << pose[1] << " : " << pose[2] << std::endl;
-    // std::cout << "rot " << actor->unique_id_ << " => " << rot[0] << " : " << rot[1] << " : " << rot[2] << std::endl;
     const auto size_mat = glm::scale(glm::mat4(1.f), shape.scale_);
-    const auto model_mat = shape.shape_transform_ * ToM4(actor->getModelMatrix()) * size_mat;
+    const auto model_mat = ToM4(actor->getModelMatrix()) * shape.shape_transform_ * size_mat;
 
     loadInstance(shape.custom_model_, shape.material_, model_mat);
   }
@@ -232,7 +228,7 @@ namespace owds {
   void Renderer::loadActor(Actor* actor, const ShapeCylinder& shape)
   {
     const auto size_mat = glm::scale(glm::mat4(1.f), glm::vec3(shape.radius_, shape.height_, shape.radius_));
-    const auto model_mat = shape.shape_transform_ * ToM4(actor->getModelMatrix()) * size_mat;
+    const auto model_mat = ToM4(actor->getModelMatrix()) * shape.shape_transform_ * size_mat;
 
     loadInstance(shape.cylinder_model_, {"", shape.diffuse_color_, shape.diffuse_color_, 0., "", "", ""}, model_mat);
   }
