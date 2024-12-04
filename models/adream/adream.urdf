@@ -303,7 +303,7 @@
     <child link="adream_floor_expe"/>
   </joint>
 
-  <joint name="base_to_floor" type="fixed">
+  <joint name="base_to_floor_hall" type="fixed">
     <parent link="adream_walls"/>
     <child link="adream_floor_hall"/>
   </joint>
@@ -316,6 +316,46 @@
   <joint name="base_to_adream_window_h10_1" type="fixed">
     <parent link="adream_walls"/>
     <child link="adream_window_h10_1"/>
+  </joint>
+
+  <joint name="base_to_adream_window_h100_3" type="fixed">
+    <parent link="adream_walls"/>
+    <child link="adream_window_h100_3"/>
+  </joint>
+
+  <joint name="base_to_adream_window_h100_2" type="fixed">
+    <parent link="adream_walls"/>
+    <child link="adream_window_h100_2"/>
+  </joint>
+
+  <joint name="base_to_adream_window_h100_1" type="fixed">
+    <parent link="adream_walls"/>
+    <child link="adream_window_h100_1"/>
+  </joint>
+
+  <joint name="base_to_adream_gg_roof" type="fixed">
+    <parent link="adream_walls"/>
+    <child link="adream_gg_roof"/>
+  </joint>
+
+  <joint name="base_to_guard_rail" type="fixed">
+    <parent link="adream_walls"/>
+    <child link="guard_rail"/>
+  </joint>
+
+  <joint name="base_to_ff_floor" type="fixed">
+    <parent link="adream_walls"/>
+    <child link="ff_floor"/>
+  </joint>
+
+  <joint name="base_to_ff_walls" type="fixed">
+    <parent link="adream_walls"/>
+    <child link="ff_walls"/>
+  </joint>
+
+  <joint name="base_to_hall_roof" type="fixed">
+    <parent link="adream_walls"/>
+    <child link="hall_roof"/>
   </joint>
 
   <joint name="base_to_adream_window_h10_2" type="fixed">
