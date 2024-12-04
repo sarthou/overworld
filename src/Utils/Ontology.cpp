@@ -1,5 +1,8 @@
 #include "overworld/Utils/Ontology.h"
 
+#include <array>
+#include <string>
+
 #include "overworld/Utils/RosFiles.h"
 #include "overworld/Utils/Wavefront.h"
 
@@ -32,17 +35,17 @@ namespace owds {
       auto textures = onto->individuals.getOn(indiv_name, "hasTexture");
 
       Shape_t shape;
-      if(meshes.size())
+      if(meshes.empty() == false)
       {
         shape.type = SHAPE_MESH;
-        if(visual_meshes.size())
-          shape.visual_mesh_resource = visual_meshes.front().substr(visual_meshes.front().find("#") + 1);
+        if(visual_meshes.empty() == false)
+          shape.visual_mesh_resource = visual_meshes.front().substr(visual_meshes.front().find('#') + 1);
         else
-          shape.visual_mesh_resource = meshes.front().substr(meshes.front().find("#") + 1);
-        if(collision_meshes.size())
-          shape.colision_mesh_resource = collision_meshes.front().substr(collision_meshes.front().find("#") + 1);
+          shape.visual_mesh_resource = meshes.front().substr(meshes.front().find('#') + 1);
+        if(collision_meshes.empty() == false)
+          shape.colision_mesh_resource = collision_meshes.front().substr(collision_meshes.front().find('#') + 1);
         else
-          shape.colision_mesh_resource = meshes.front().substr(meshes.front().find("#") + 1);
+          shape.colision_mesh_resource = meshes.front().substr(meshes.front().find('#') + 1);
 
         bool is_wavefront = wavefront::isWavefront(shape.visual_mesh_resource);
         if(is_wavefront)
@@ -81,7 +84,7 @@ namespace owds {
     {
       auto masses = onto->individuals.getOn(indiv_name, "hasMass");
 
-      if(masses.size())
+      if(masses.empty() == false)
       {
         auto mass_str = masses.front().substr(masses.front().find("#") + 1);
         return std::stod(mass_str);
@@ -95,7 +98,7 @@ namespace owds {
       if(onto->individuals.exist(color_name) == false)
       {
         onto->feeder.addInheritage(color_name, "Color");
-        if(rgb_value != "")
+        if(rgb_value.empty() == false)
           onto->feeder.addProperty(color_name, "hexRgbValue", "hexrbg", rgb_value);
         onto->feeder.waitUpdate(1000);
       }

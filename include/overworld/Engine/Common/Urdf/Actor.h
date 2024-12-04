@@ -76,8 +76,6 @@ namespace owds {
     const std::size_t unique_id_{};
     const owds::Shape collision_shape_;
     const std::vector<owds::Shape> visual_shapes_;
-
-    std::set<owds::Joint*> joints_;
   };
 } // namespace owds
 

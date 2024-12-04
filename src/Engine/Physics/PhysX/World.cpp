@@ -3,14 +3,15 @@
 #include <array>
 #include <cstddef>
 #include <filesystem>
+#include <foundation/PxPhysicsVersion.h>
 #include <foundation/PxSimpleTypes.h>
 #include <foundation/PxVec3.h>
-#include <glm/vec3.hpp>
+#include <glm/detail/type_quat.hpp>
+#include <glm/ext/vector_float3.hpp>
 #include <string>
 #include <vector>
 
 #include "overworld/Engine/Common/Shapes/Shape.h"
-#include "overworld/Engine/Common/Urdf/Joints/Joint.h"
 #include "overworld/Engine/Common/Urdf/UrdfLoader.h"
 #include "overworld/Engine/Common/World.h"
 #include "overworld/Engine/Physics/PhysX/Actors/Actor.h"
@@ -80,9 +81,7 @@ namespace owds::physx {
 
   void World::insertUrdf(owds::Urdf* urdf)
   {
-    std::cout << "insertUrdf" << std::endl;
     urdf->finish();
-    std::cout << "finish" << std::endl;
     for(const auto& actor : urdf->links_)
       actors_.emplace(actor.second->unique_id_, actor.second);
   }

@@ -42,7 +42,6 @@ namespace owds {
     owds::Model& preloaded_box_model_;
     owds::Model& preloaded_cylinder_model_;
     owds::Model& preloaded_sphere_model_;
-    std::unordered_map<owds::Urdf*, std::unique_ptr<owds::Urdf>> loaded_urdfs_;
 
     AmbientLight ambient_light_;
     PointLights point_lights_;
@@ -53,28 +52,13 @@ namespace owds {
     std::atomic<bool> has_render_request_;
 
     std::unordered_map<std::size_t, Actor*> actors_;
+    std::unordered_map<std::size_t, Urdf*> urdfs_;
 
   public:
     virtual ~World();
 
     [[nodiscard]] virtual std::string getBackendName() const = 0;
     [[nodiscard]] virtual std::string getFullyQualifiedBackendName() const = 0;
-
-    /**
-     * The Unified Robotics Description Format specification mandates support for the following geometries:
-     * - Sphere(s)
-     * - Box(es)
-     * - Cylinder(s)
-     * - Custom mesh(es)
-     *
-     * Additionally, there are non-standard but commonly used geometries such as:
-     * - Capsule(s) / Pill(s)
-     */
-    [[nodiscard]] owds::Shape createShapeBox(const owds::Color& color, const std::array<float, 3>& half_extents, glm::mat4& transform);
-    [[nodiscard]] owds::Shape createShapeCapsule(const owds::Color& color, float radius, float height, glm::mat4& transform);
-    [[nodiscard]] owds::Shape createShapeCylinder(const owds::Color& color, float radius, float height, glm::mat4& transform);
-    [[nodiscard]] owds::Shape createShapeSphere(const owds::Color& color, float radius, glm::mat4& transform);
-    [[nodiscard]] owds::Shape createShapeFromModel(const owds::Material& material, const std::string& path, const std::array<float, 3>& scale, glm::mat4& transform);
 
     /* ACTORS */
 
@@ -88,26 +72,8 @@ namespace owds {
                        const glm::vec3& position = {0., 0., 0.},
                        const glm::vec3& rotation = {0., 0., 0.});
 
-  protected:
-    virtual size_t createActor(const owds::Shape& collision_shape,
-                               const std::vector<owds::Shape>& visual_shapes,
-                               const glm::vec3& position,
-                               const glm::quat& orientation) = 0;
-
-    virtual size_t createStaticActor(const owds::Shape& collision_shape,
-                                     const std::vector<owds::Shape>& visual_shapes,
-                                     const glm::vec3& position,
-                                     const glm::quat& orientation) = 0;
-
     size_t loadUrdf(const std::string& path, bool from_base_path = true);
 
-    virtual owds::Urdf* loadUrdf(const urdf::Urdf_t& urdf) = 0;
-    virtual void insertUrdf(owds::Urdf* urdf) = 0;
-
-  public:
-    /**
-     * @return
-     */
     const std::unordered_map<std::size_t, Actor*>& getActors() const { return actors_; };
 
     /* LIGHTS */
@@ -175,8 +141,27 @@ namespace owds {
     virtual void stepSimulation(float delta_ms) = 0;
 
   protected:
+    virtual size_t createActor(const owds::Shape& collision_shape,
+                               const std::vector<owds::Shape>& visual_shapes,
+                               const glm::vec3& position,
+                               const glm::quat& orientation) = 0;
+
+    virtual size_t createStaticActor(const owds::Shape& collision_shape,
+                                     const std::vector<owds::Shape>& visual_shapes,
+                                     const glm::vec3& position,
+                                     const glm::quat& orientation) = 0;
+
+    virtual owds::Urdf* loadUrdf(const urdf::Urdf_t& urdf) = 0;
+    virtual void insertUrdf(owds::Urdf* urdf) = 0;
+
     urdf::Urdf_t getUrdf(const std::string& path, bool from_base_path);
     void loadUrdfLink(owds::Urdf* urdf, const urdf::Urdf_t& model, const std::string& parent, const std::string& link_name);
+
+    owds::Shape createShapeBox(const owds::Color& color, const std::array<float, 3>& half_extents, glm::mat4& transform);
+    owds::Shape createShapeCapsule(const owds::Color& color, float radius, float height, glm::mat4& transform);
+    owds::Shape createShapeCylinder(const owds::Color& color, float radius, float height, glm::mat4& transform);
+    owds::Shape createShapeSphere(const owds::Color& color, float radius, glm::mat4& transform);
+    owds::Shape createShapeFromModel(const owds::Material& material, const std::string& path, const std::array<float, 3>& scale, glm::mat4& transform);
 
     owds::Shape convertShape(const urdf::Geometry_t& geometry);
     owds::Shape convertShape(const urdf::Geometry_t& urdf_shape, glm::mat4& transform);

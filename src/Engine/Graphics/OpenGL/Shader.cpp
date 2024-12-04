@@ -1,11 +1,13 @@
 #include "overworld/Engine/Graphics/OpenGL/Shader.h"
 
 #include <fstream>
+#include <glm/ext/matrix_float4x4.hpp>
+#include <glm/ext/vector_float2.hpp>
+#include <glm/ext/vector_float3.hpp>
+#include <glm/ext/vector_float4.hpp>
 #include <glm/gtc/packing.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/matrix.hpp>
-#include <glm/vec2.hpp>
-#include <glm/vec3.hpp>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -147,7 +149,7 @@ namespace owds {
       glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
       if(success == 0)
       {
-        glGetShaderInfoLog(shader, 1024, NULL, info_log);
+        glGetShaderInfoLog(shader, 1024, nullptr, info_log);
         std::cout << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << "\n"
                   << info_log << "\n -- --------------------------------------------------- -- " << std::endl;
       }
@@ -157,7 +159,7 @@ namespace owds {
       glGetProgramiv(shader, GL_LINK_STATUS, &success);
       if(success == 0)
       {
-        glGetProgramInfoLog(shader, 1024, NULL, info_log);
+        glGetProgramInfoLog(shader, 1024, nullptr, info_log);
         std::cout << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << "\n"
                   << info_log << "\n -- --------------------------------------------------- -- " << std::endl;
       }

@@ -36,6 +36,9 @@ namespace owds {
 
     virtual void setPhysicsEnabled(bool enabled) = 0;
 
+    // Each urdf is associated with a non-zero, unique id.
+    const std::size_t unique_id_{};
+
     std::string name_;
     owds::Actor* root_actor_;
     std::unordered_map<std::string, owds::Actor*> links_;

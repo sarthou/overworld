@@ -5,10 +5,11 @@
 #include <array>
 #include <cstdint>
 #include <cstdio>
+#include <glm/ext/vector_float2.hpp>
+#include <glm/ext/vector_float3.hpp>
+#include <glm/ext/vector_float4.hpp>
 #include <glm/gtc/packing.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <glm/vec2.hpp>
-#include <glm/vec3.hpp>
 
 #include "overworld/Engine/Common/Camera/CameraProjection.h"
 #include "overworld/Engine/Common/Camera/CameraView.h"

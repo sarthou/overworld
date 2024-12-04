@@ -1,8 +1,12 @@
 #include "overworld/Utils/YamlReader.h"
 
+#include <cstddef>
 #include <fstream>
 #include <iostream>
+#include <map>
 #include <regex>
+#include <string>
+#include <vector>
 
 namespace owds {
 
@@ -99,7 +103,7 @@ namespace owds {
     if((nb == 0) && (config.find("modules") != config.end()))
       displayElement(*config.find("modules"), nb);
 
-    for(auto& c : config)
+    for(const auto& c : config)
     {
       if((nb == 0) && (c.first == "modules"))
         continue;
@@ -117,7 +121,7 @@ namespace owds {
       if(it.second.data.value().size() > 1)
       {
         std::cout << std::endl;
-        for(auto& d : it.second.data.value())
+        for(const auto& d : it.second.data.value())
         {
           displayTab(nb + 1);
           std::cout << "- " << d << std::endl;

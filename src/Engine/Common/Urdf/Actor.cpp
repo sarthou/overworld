@@ -4,7 +4,6 @@
 #include <vector>
 
 #include "overworld/Engine/Common/Shapes/Shape.h"
-#include "overworld/Engine/Common/Urdf/Joints/Joint.h"
 
 namespace owds {
 
@@ -16,12 +15,6 @@ namespace owds {
                                                                 visual_shapes_(visual_shapes)
   {}
 
-  Actor::~Actor() noexcept
-  {
-    for(const auto& joint : joints_)
-    {
-      joint->remove();
-    }
-  }
+  Actor::~Actor() noexcept = default;
 
 } // namespace owds

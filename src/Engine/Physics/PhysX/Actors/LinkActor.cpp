@@ -1,12 +1,14 @@
 #include "overworld/Engine/Physics/PhysX/Actors/LinkActor.h"
 
 #include <array>
+#include <cassert>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/euler_angles.hpp>
 #include <iostream>
 #include <overworld/Utils/BitCast.h>
 
 #include "overworld/Engine/Common/Models/Model.h"
+#include "overworld/Engine/Common/Shapes/Shape.h"
 #include "overworld/Engine/Physics/PhysX/Actors/Actor.h"
 #include "overworld/Engine/Physics/PhysX/Context.h"
 #include "overworld/Engine/Physics/PhysX/SharedContext.h"

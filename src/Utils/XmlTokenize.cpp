@@ -1,5 +1,10 @@
 #include "overworld/Utils/XmlTokenize.h"
 
+#include <cassert>
+#include <glm/ext/vector_float3.hpp>
+#include <glm/ext/vector_float4.hpp>
+#include <vector>
+
 namespace owds {
 
   glm::vec3 getVector3FromXmlText(const char* text)

@@ -6,6 +6,8 @@
 #include <foundation/PxSimpleTypes.h>
 #include <foundation/PxTransform.h>
 #include <foundation/PxVec3.h>
+#include <glm/detail/type_quat.hpp>
+#include <glm/ext/vector_float3.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/euler_angles.hpp>
 #include <iostream>
@@ -77,7 +79,6 @@ namespace owds::physx {
 
   void Urdf::addJoint(const urdf::Joint_t& joint)
   {
-    std::cout << "create a joint from " << joint.child_link << std::endl;
     auto* px_link = px_links_[joint.child_link];
     ::physx::PxArticulationJointReducedCoordinate* px_joint = static_cast<::physx::PxArticulationJointReducedCoordinate*>(px_link->getInboundJoint());
     switch(joint.type)

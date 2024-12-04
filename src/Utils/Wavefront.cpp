@@ -1,10 +1,15 @@
 #include "overworld/Utils/Wavefront.h"
 
+#include <array>
+#include <cstddef>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <map>
 #include <regex>
 #include <sstream>
+#include <string>
+#include <vector>
 
 namespace owds {
 

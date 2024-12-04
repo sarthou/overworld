@@ -5,8 +5,8 @@
 #include <assimp/scene.h>
 #include <filesystem>
 #include <fstream>
-#include <glm/vec2.hpp>
-#include <glm/vec3.hpp>
+#include <glm/ext/vector_float2.hpp>
+#include <glm/ext/vector_float3.hpp>
 #include <iostream>
 
 #include "overworld/Engine/Common/Models/Loaders/ColladaLoader.h"
@@ -142,9 +142,9 @@ namespace owds {
   {
     for(unsigned int i = 0; i < mesh.indices_.size(); i = i + 3)
     {
-      glm::vec3& vertex0 = mesh.vertices_.at(mesh.indices_.at(i)).position_;
-      glm::vec3& vertex1 = mesh.vertices_.at(mesh.indices_.at(i + 1)).position_;
-      glm::vec3& vertex2 = mesh.vertices_.at(mesh.indices_.at(i + 2)).position_;
+      const glm::vec3& vertex0 = mesh.vertices_.at(mesh.indices_.at(i)).position_;
+      const glm::vec3& vertex1 = mesh.vertices_.at(mesh.indices_.at(i + 1)).position_;
+      const glm::vec3& vertex2 = mesh.vertices_.at(mesh.indices_.at(i + 2)).position_;
 
       glm::vec3 normal = glm::cross((vertex1 - vertex0), (vertex2 - vertex0));
 

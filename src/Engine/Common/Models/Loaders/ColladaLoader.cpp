@@ -3,6 +3,10 @@
 #include <cstddef>
 #include <cstdlib>
 #include <fstream>
+#include <glm/ext/matrix_float3x3.hpp>
+#include <glm/ext/matrix_float4x4.hpp>
+#include <glm/ext/vector_float3.hpp>
+#include <glm/ext/vector_float4.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <map>
@@ -160,9 +164,9 @@ namespace owds {
         std::string up_text = up_axis->GetText();
         if(up_text == "X_UP")
           tr_ = glm::mat3(glm::rotate(glm::mat4(1.0f), glm::radians(-90.f), glm::vec3(0, 1, 0)));
-        if(up_text == "Y_UP")
-          tr_ = glm::mat3(glm::rotate(glm::mat4(1.0f), glm::radians(90.f), glm::vec3(1, 0, 0)));
-        // if(up_text == "Z_UP") // client and COLLADA are both Z_UP so no transform needed (identity)
+        // if(up_text == "Y_UP")
+        //   tr_ = glm::mat3(glm::rotate(glm::mat4(1.0f), glm::radians(90.f), glm::vec3(1, 0, 0)));
+        //  if(up_text == "Z_UP") // client and COLLADA are both Z_UP so no transform needed (identity)
       }
     }
   }

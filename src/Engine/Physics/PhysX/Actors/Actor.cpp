@@ -1,15 +1,31 @@
 #include "overworld/Engine/Physics/PhysX/Actors/Actor.h"
 
 #include <array>
+#include <cassert>
+#include <common/PxTolerancesScale.h>
+#include <cooking/PxBVH34MidphaseDesc.h>
+#include <cooking/PxSDFDesc.h>
+#include <cooking/PxTriangleMeshDesc.h>
+#include <extensions/PxDefaultStreams.h>
+#include <glm/detail/type_quat.hpp>
+#include <glm/ext/matrix_float4x4.hpp>
+#include <glm/ext/vector_float3.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/euler_angles.hpp>
 #include <iostream>
-#include <overworld/Utils/BitCast.h>
 
 #include "overworld/Engine/Common/Models/Model.h"
+#include "overworld/Engine/Common/Shapes/Shape.h"
+#include "overworld/Engine/Common/Shapes/ShapeBox.h"
+#include "overworld/Engine/Common/Shapes/ShapeCapsule.h"
+#include "overworld/Engine/Common/Shapes/ShapeCustomMesh.h"
+#include "overworld/Engine/Common/Shapes/ShapeCylinder.h"
+#include "overworld/Engine/Common/Shapes/ShapeDummy.h"
+#include "overworld/Engine/Common/Shapes/ShapeSphere.h"
 #include "overworld/Engine/Common/Urdf/Actor.h"
 #include "overworld/Engine/Physics/PhysX/Context.h"
 #include "overworld/Engine/Physics/PhysX/SharedContext.h"
+#include "overworld/Utils/BitCast.h"
 
 namespace owds::physx {
 
@@ -138,10 +154,10 @@ namespace owds::physx {
       break;
     }
 
-    ::physx::PxDefaultMemoryInputData readBuffer(writeBuffer.getData(), writeBuffer.getSize());
+    ::physx::PxDefaultMemoryInputData read_buffer(writeBuffer.getData(), writeBuffer.getSize());
 
     const auto& sdk = owds::physx::Context::createContext()->px_physics_;
-    const auto px_mesh = sdk->createTriangleMesh(readBuffer);
+    const auto px_mesh = sdk->createTriangleMesh(read_buffer);
 
     assert(px_mesh);
 

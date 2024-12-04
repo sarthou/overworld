@@ -2,6 +2,9 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <glm/ext/matrix_float3x3.hpp>
+#include <glm/ext/matrix_float4x4.hpp>
+#include <glm/ext/vector_float3.hpp>
 #include <iostream>
 #include <set>
 #include <string>
@@ -96,7 +99,7 @@ namespace owds {
 
     glEnable(GL_MULTISAMPLE);
     screen_.init();
-    screen_.setSize(render_camera_.getWidth(), render_camera_.getHeight());
+    screen_.setSize((unsigned int)render_camera_.getWidth(), (unsigned int)render_camera_.getHeight());
     if(render_camera_.getAASetting() != ViewAntiAliasing_e::off)
       setAntiAliasing(render_camera_.getAASetting());
 
@@ -187,8 +190,6 @@ namespace owds {
   {
     for(const auto& actor : world_->getActors())
     {
-      std::cout << "load actor " << actor.first << std::endl;
-
       if(render_collision_models_)
       {
         std::visit([this, actor](const auto& shape_resolv) { loadActor(actor.second, shape_resolv); }, actor.second->collision_shape_);

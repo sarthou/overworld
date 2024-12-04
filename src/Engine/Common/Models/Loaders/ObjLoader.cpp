@@ -5,9 +5,9 @@
 #include <cstddef>
 #include <cstdio>
 #include <cstring>
+#include <glm/ext/vector_float3.hpp>
 #include <glm/gtc/packing.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <glm/vec3.hpp>
 #include <memory>
 #include <string>
 #include <vector>

@@ -1,9 +1,10 @@
 #include "overworld/Engine/Graphics/OpenGL/AmbientShadow.h"
 
-#include <array>
+#include <algorithm>
+#include <glm/ext/matrix_float4x4.hpp>
+#include <glm/ext/vector_float3.hpp>
 #include <glm/gtc/packing.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <glm/vec3.hpp>
 #include <iostream>
 #include <limits>
 #include <vector>

@@ -109,16 +109,16 @@ void worldThread(const std::string& world_name, owds::Window* window)
   std::string overworld_dir = owds::compat::owds_ros::getShareDirectory("overworld");
   std::cout << "overworld_dir = " << overworld_dir << std::endl;
 
-  (void)world.createStaticActor(owds::urdf::Geometry_t(overworld_dir + "/models/adream/appartment_vhacd.obj"),
-                                {owds::urdf::Geometry_t(overworld_dir + "/models/adream/appartment.obj")},
-                                {0., 0., 0.}, {0., 0., 1.57});
+  //(void)world.createStaticActor(owds::urdf::Geometry_t(overworld_dir + "/models/adream/appartment_vhacd.obj"),
+  //                              {owds::urdf::Geometry_t(overworld_dir + "/models/adream/appartment.obj")},
+  //                              {0., 0., 0.}, {0., 0., 1.57});
   //(void)world.createActor(owds::urdf::Geometry_t(overworld_dir + "/models/adream/walls_vhacd.obj"),
   //                        {owds::urdf::Geometry_t(overworld_dir + "/models/adream/walls.obj")},
   //                        {0., 0., 0.}, {0., 0., 1.57});
 
-  //(void)world.loadUrdf(owds::compat::owds_ros::getShareDirectory("pr2_description") + "/robots/pr2.urdf", false);
-  (void)world.loadUrdf(overworld_dir + "/models/eve.urdf", false);
-  //(void)world.loadRobotFromDescription("models/adream/adream.urdf");
+  (void)world.loadUrdf(owds::compat::owds_ros::getShareDirectory("pr2_description") + "/robots/pr2.urdf", false);
+  //(void)world.loadUrdf(overworld_dir + "/models/eve.urdf", false);
+  (void)world.loadUrdf("models/adream/adream.urdf");
   //(void)world.loadRobotFromDescription("models/tutorials/Frame/frame.urdf");
   world.stepSimulation(1.f / 144.f);
 

@@ -1,12 +1,13 @@
 #include "overworld/Engine/Graphics/OpenGL/PointShadow.h"
 
 #include <array>
+#include <cstddef>
+#include <glm/ext/vector_float3.hpp>
 #include <glm/gtc/packing.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <glm/vec3.hpp>
 #include <iostream>
 #include <limits>
-#include <vector>
+#include <string>
 
 #include "glad/glad.h"
 #include "overworld/Engine/Graphics/OpenGL/Shader.h"

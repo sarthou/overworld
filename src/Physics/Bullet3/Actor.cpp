@@ -1,6 +1,9 @@
 #include "overworld/Physics/Bullet3/Actor.h"
 
+#include <glm/detail/type_quat.hpp>
 #include <glm/ext/matrix_transform.hpp>
+#include <glm/ext/vector_float3.hpp>
+#include <glm/ext/vector_float4.hpp>
 #include <glm/gtc/quaternion.hpp>
 
 #include "overworld/Physics/Bullet3/Context.h"

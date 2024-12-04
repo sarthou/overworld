@@ -4,18 +4,31 @@
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
+#include <glm/detail/type_quat.hpp>
+#include <glm/ext/matrix_float4x4.hpp>
+#include <glm/ext/vector_float3.hpp>
 #include <glm/matrix.hpp>
 #include <iostream>
 #include <string>
+#include <unistd.h>
 #include <unordered_set>
 #include <vector>
 
 #include "overworld/Compat/ROS.h"
+#include "overworld/Engine/Common/Camera/CameraView.h"
+#include "overworld/Engine/Common/Debug/DebugLine.h"
+#include "overworld/Engine/Common/Debug/DebugText.h"
 #include "overworld/Engine/Common/Lights/AmbientLight.h"
 #include "overworld/Engine/Common/Models/Color.h"
 #include "overworld/Engine/Common/Models/Material.h"
 #include "overworld/Engine/Common/Models/ModelManager.h"
 #include "overworld/Engine/Common/Shapes/Shape.h"
+#include "overworld/Engine/Common/Shapes/ShapeBox.h"
+#include "overworld/Engine/Common/Shapes/ShapeCapsule.h"
+#include "overworld/Engine/Common/Shapes/ShapeCustomMesh.h"
+#include "overworld/Engine/Common/Shapes/ShapeCylinder.h"
+#include "overworld/Engine/Common/Shapes/ShapeDummy.h"
+#include "overworld/Engine/Common/Shapes/ShapeSphere.h"
 #include "overworld/Engine/Common/Urdf/Actor.h"
 #include "overworld/Engine/Common/Urdf/Urdf.h"
 #include "overworld/Engine/Common/Urdf/UrdfLoader.h"
@@ -23,14 +36,13 @@
 #include "overworld/Utils/ROS.h"
 
 namespace owds {
-  World::World(const std::filesystem::path& base_assets_path)
-    : base_assets_path_(base_assets_path),
-      preloaded_box_model_(owds::ModelManager::get().load(
-        base_assets_path / "models/basic_shapes/cube.obj")),
-      preloaded_cylinder_model_(owds::ModelManager::get().load(
-        base_assets_path / "models/basic_shapes/cylinder.obj")),
-      preloaded_sphere_model_(owds::ModelManager::get().load(
-        base_assets_path / "models/basic_shapes/sphere.obj"))
+  World::World(const std::filesystem::path& base_assets_path) : base_assets_path_(base_assets_path),
+                                                                preloaded_box_model_(owds::ModelManager::get().load(
+                                                                  base_assets_path / "models/basic_shapes/cube.obj")),
+                                                                preloaded_cylinder_model_(owds::ModelManager::get().load(
+                                                                  base_assets_path / "models/basic_shapes/cylinder.obj")),
+                                                                preloaded_sphere_model_(owds::ModelManager::get().load(
+                                                                  base_assets_path / "models/basic_shapes/sphere.obj"))
   {}
 
   World::~World()
@@ -39,53 +51,7 @@ namespace owds {
       delete actor.second;
   }
 
-  owds::Shape World::createShapeBox(const owds::Color& color, const std::array<float, 3>& half_extents, glm::mat4& transform)
-  {
-    return owds::ShapeBox{
-      half_extents,
-      color,
-      preloaded_box_model_,
-      transform};
-  }
-
-  owds::Shape World::createShapeCapsule(const owds::Color& color, const float radius, const float height, glm::mat4& transform)
-  {
-    return owds::ShapeCapsule{
-      radius,
-      height,
-      color,
-      preloaded_cylinder_model_,
-      preloaded_sphere_model_,
-      transform};
-  }
-
-  owds::Shape World::createShapeCylinder(const owds::Color& color, const float radius, const float height, glm::mat4& transform)
-  {
-    return owds::ShapeCylinder{
-      radius,
-      height,
-      color,
-      preloaded_cylinder_model_,
-      transform};
-  }
-
-  owds::Shape World::createShapeSphere(const owds::Color& color, const float radius, glm::mat4& transform)
-  {
-    return owds::ShapeSphere{
-      radius,
-      color,
-      preloaded_sphere_model_,
-      transform};
-  }
-
-  owds::Shape World::createShapeFromModel(const owds::Material& material, const std::string& path, const std::array<float, 3>& scale, glm::mat4& transform)
-  {
-    return owds::ShapeCustomMesh{
-      glm::vec3(scale[0], scale[1], scale[2]),
-      material,
-      owds::ModelManager::get().load(path),
-      transform};
-  }
+  /* ACTORS */
 
   size_t World::createStaticActor(const owds::urdf::Geometry_t& collision_geometry,
                                   const std::vector<owds::urdf::Geometry_t>& visual_geometries,
@@ -108,6 +74,7 @@ namespace owds {
   {
     owds::Shape collision_shape = convertShape(collision_geometry);
     std::vector<owds::Shape> visual_shapes;
+    visual_shapes.reserve(visual_geometries.size());
     for(const auto& geometry : visual_geometries)
       visual_shapes.emplace_back(convertShape(geometry));
 
@@ -127,91 +94,13 @@ namespace owds {
 
     insertUrdf(urdf);
 
-    /*auto urdf = std::make_unique<owds::Urdf>();
-    auto* const urdf_ptr = urdf.get();
-    loaded_urdfs_[urdf_ptr] = std::move(urdf);
+    urdf->name_ = urdf_model.name;
+    urdfs_[urdf->unique_id_] = urdf;
 
-    urdf_ptr->name_ = urdf_model.name;*/
-
-    return 0;
+    return urdf->unique_id_;
   }
 
-  void World::loadUrdfLink(owds::Urdf* urdf, const urdf::Urdf_t& model, const std::string& parent, const std::string& link_name)
-  {
-    const auto& link = model.links.at(link_name);
-    owds::Shape visual_shape = convertShape(link.visual);
-    std::vector<owds::Shape> collision_shapes;
-    for(const auto& geometry : link.collisions)
-      collision_shapes.emplace_back(convertShape(geometry));
-    if(collision_shapes.empty())
-      collision_shapes.emplace_back(ShapeDummy());
-
-    if(parent.empty())
-      urdf->addLink(parent, link_name, {0., 0., 0.}, {0., 0., 0.}, collision_shapes.front(), {visual_shape});
-    else
-    {
-      std::string joint_name = model.link_to_parent_joint.at(link_name);
-      urdf::Joint_t joint = model.joints.at(joint_name);
-      urdf->addLink(parent, link_name, joint.origin_translation, joint.origin_rotation, collision_shapes.front(), {visual_shape});
-    }
-
-    auto childs_it = model.tree.find(link_name);
-    if(childs_it != model.tree.end())
-    {
-      for(const auto& child : childs_it->second)
-      {
-        const auto& child_joint = model.joints.at(child);
-        loadUrdfLink(urdf, model, link_name, child_joint.child_link);
-      }
-    }
-  }
-
-  owds::Shape World::convertShape(const urdf::Geometry_t& geometry)
-  {
-    glm::mat4 translate = glm::translate(glm::mat4(1), geometry.origin_translation);
-    glm::mat4 rotate = glm::mat4_cast(glm::quat(geometry.origin_rotation));
-    glm::mat4 transform = translate * rotate;
-    return convertShape(geometry, transform);
-  }
-
-  owds::Shape World::convertShape(const urdf::Geometry_t& urdf_shape, glm::mat4& transform)
-  {
-    switch(urdf_shape.type)
-    {
-    case urdf::GeometryType_e::geometry_sphere:
-    {
-      return createShapeSphere(urdf_shape.material.diffuse_color_,
-                               static_cast<float>(urdf_shape.scale.x),
-                               transform);
-    }
-    case urdf::GeometryType_e::geometry_box:
-    {
-      return createShapeBox(urdf_shape.material.diffuse_color_,
-                            {static_cast<float>(urdf_shape.scale.x),
-                             static_cast<float>(urdf_shape.scale.y),
-                             static_cast<float>(urdf_shape.scale.z)},
-                            transform);
-    }
-    case urdf::GeometryType_e::geometry_cylinder:
-    {
-      return createShapeCylinder(urdf_shape.material.diffuse_color_,
-                                 static_cast<float>(urdf_shape.scale.x),
-                                 static_cast<float>(urdf_shape.scale.y),
-                                 transform);
-    }
-    case urdf::GeometryType_e::geometry_mesh:
-    {
-      return createShapeFromModel(urdf_shape.material,
-                                  owds::rosPkgPathToPath(urdf_shape.file_name),
-                                  {static_cast<float>(urdf_shape.scale.x),
-                                   static_cast<float>(urdf_shape.scale.y),
-                                   static_cast<float>(urdf_shape.scale.z)},
-                                  transform);
-    }
-    default:
-      return ShapeDummy();
-    }
-  }
+  /* LIGHTS */
 
   void World::setAmbientLight(const std::array<float, 3>& direction,
                               const std::array<float, 3>& color,
@@ -274,6 +163,8 @@ namespace owds {
     point_lights_.setAmbientStrength(id, strength);
   }
 
+  /* DEBUG */
+
   int World::addDebugText(const std::string& text,
                           const std::array<float, 3>& position,
                           float height,
@@ -314,7 +205,7 @@ namespace owds {
         debug_texts_[id] = debug;
       else
       {
-        id = debug_texts_.size();
+        id = (int)debug_texts_.size();
         debug_texts_.emplace_back(debug);
       }
       return id;
@@ -344,7 +235,7 @@ namespace owds {
   {
     std::vector<glm::vec3> glm_vertices;
     glm_vertices.reserve(vertices.size());
-    for(auto& vertex : vertices)
+    for(const auto& vertex : vertices)
       glm_vertices.emplace_back(ToV3(vertex));
 
     DebugLine debug{
@@ -391,10 +282,12 @@ namespace owds {
       debug_lines_[id].indices_.clear();
   }
 
+  /* CAMERAS */
+
   int World::addCamera(unsigned int width, unsigned int height, float fov, owds::CameraView_e view_type, float near_plane, float far_plane)
   {
     cameras_.emplace_back(width, height, fov, view_type, near_plane, far_plane);
-    return cameras_.size() - 1;
+    return (int)cameras_.size() - 1;
   }
 
   bool World::setCameraPositionAndLookAt(int id, const std::array<float, 3>& eye_position, const std::array<float, 3>& dst_position)
@@ -452,6 +345,8 @@ namespace owds {
       return {};
   }
 
+  /* PRIVATE */
+
   urdf::Urdf_t World::getUrdf(const std::string& path, bool from_base_path)
   {
     UrdfLoader loader;
@@ -463,6 +358,132 @@ namespace owds {
       urdf_model = loader.read(path);
 
     return urdf_model;
+  }
+
+  void World::loadUrdfLink(owds::Urdf* urdf, const urdf::Urdf_t& model, const std::string& parent, const std::string& link_name)
+  {
+    const auto& link = model.links.at(link_name);
+    owds::Shape visual_shape = convertShape(link.visual);
+    std::vector<owds::Shape> collision_shapes;
+    collision_shapes.reserve(link.collisions.size());
+    for(const auto& geometry : link.collisions)
+      collision_shapes.emplace_back(convertShape(geometry));
+    if(collision_shapes.empty())
+      collision_shapes.emplace_back(ShapeDummy());
+
+    if(parent.empty())
+      urdf->addLink(parent, link_name, {0., 0., 0.}, {0., 0., 0.}, collision_shapes.front(), {visual_shape});
+    else
+    {
+      std::string joint_name = model.link_to_parent_joint.at(link_name);
+      urdf::Joint_t joint = model.joints.at(joint_name);
+      urdf->addLink(parent, link_name, joint.origin_translation, joint.origin_rotation, collision_shapes.front(), {visual_shape});
+    }
+
+    auto childs_it = model.tree.find(link_name);
+    if(childs_it != model.tree.end())
+    {
+      for(const auto& child : childs_it->second)
+      {
+        const auto& child_joint = model.joints.at(child);
+        loadUrdfLink(urdf, model, link_name, child_joint.child_link);
+      }
+    }
+  }
+
+  owds::Shape World::createShapeBox(const owds::Color& color, const std::array<float, 3>& half_extents, glm::mat4& transform)
+  {
+    return owds::ShapeBox{
+      half_extents,
+      color,
+      preloaded_box_model_,
+      transform};
+  }
+
+  owds::Shape World::createShapeCapsule(const owds::Color& color, const float radius, const float height, glm::mat4& transform)
+  {
+    return owds::ShapeCapsule{
+      radius,
+      height,
+      color,
+      preloaded_cylinder_model_,
+      preloaded_sphere_model_,
+      transform};
+  }
+
+  owds::Shape World::createShapeCylinder(const owds::Color& color, const float radius, const float height, glm::mat4& transform)
+  {
+    return owds::ShapeCylinder{
+      radius,
+      height,
+      color,
+      preloaded_cylinder_model_,
+      transform};
+  }
+
+  owds::Shape World::createShapeSphere(const owds::Color& color, const float radius, glm::mat4& transform)
+  {
+    return owds::ShapeSphere{
+      radius,
+      color,
+      preloaded_sphere_model_,
+      transform};
+  }
+
+  owds::Shape World::createShapeFromModel(const owds::Material& material, const std::string& path, const std::array<float, 3>& scale, glm::mat4& transform)
+  {
+    return owds::ShapeCustomMesh{
+      glm::vec3(scale[0], scale[1], scale[2]),
+      material,
+      owds::ModelManager::get().load(path),
+      transform};
+  }
+
+  owds::Shape World::convertShape(const urdf::Geometry_t& geometry)
+  {
+    glm::mat4 translate = glm::translate(glm::mat4(1), geometry.origin_translation);
+    glm::mat4 rotate = glm::mat4_cast(glm::quat(geometry.origin_rotation));
+    glm::mat4 transform = translate * rotate;
+    return convertShape(geometry, transform);
+  }
+
+  owds::Shape World::convertShape(const urdf::Geometry_t& urdf_shape, glm::mat4& transform)
+  {
+    switch(urdf_shape.type)
+    {
+    case urdf::GeometryType_e::geometry_sphere:
+    {
+      return createShapeSphere(urdf_shape.material.diffuse_color_,
+                               static_cast<float>(urdf_shape.scale.x),
+                               transform);
+    }
+    case urdf::GeometryType_e::geometry_box:
+    {
+      return createShapeBox(urdf_shape.material.diffuse_color_,
+                            {static_cast<float>(urdf_shape.scale.x / 2.),
+                             static_cast<float>(urdf_shape.scale.y / 2.),
+                             static_cast<float>(urdf_shape.scale.z / 2.)},
+                            transform);
+    }
+    case urdf::GeometryType_e::geometry_cylinder:
+    {
+      return createShapeCylinder(urdf_shape.material.diffuse_color_,
+                                 static_cast<float>(urdf_shape.scale.x),
+                                 static_cast<float>(urdf_shape.scale.y),
+                                 transform);
+    }
+    case urdf::GeometryType_e::geometry_mesh:
+    {
+      return createShapeFromModel(urdf_shape.material,
+                                  owds::rosPkgPathToPath(urdf_shape.file_name),
+                                  {static_cast<float>(urdf_shape.scale.x),
+                                   static_cast<float>(urdf_shape.scale.y),
+                                   static_cast<float>(urdf_shape.scale.z)},
+                                  transform);
+    }
+    default:
+      return ShapeDummy();
+    }
   }
 
 } // namespace owds
