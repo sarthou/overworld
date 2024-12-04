@@ -48,7 +48,7 @@ namespace owds::bullet3 {
     ctx_.actors_.erase(this);
   }
 
-  void Actor::setPhysicsEnabled(const bool enabled)
+  void Actor::setPhysicsEnabled(bool enabled)
   {
     assert(bt_actor_);
 
@@ -65,7 +65,7 @@ namespace owds::bullet3 {
     }
   }
 
-  void Actor::setSimulationEnabled(const bool enabled)
+  void Actor::setSimulationEnabled(bool enabled)
   {
     assert(bt_actor_);
 

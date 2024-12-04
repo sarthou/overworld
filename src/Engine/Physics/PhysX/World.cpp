@@ -17,12 +17,7 @@
 #include "overworld/Engine/Physics/PhysX/Actors/DynamicActor.h"
 #include "overworld/Engine/Physics/PhysX/Actors/StaticActor.h"
 #include "overworld/Engine/Physics/PhysX/Context.h"
-#include "overworld/Physics/PhysX/Joints/JointContinuous.h"
-#include "overworld/Physics/PhysX/Joints/JointFixed.h"
-#include "overworld/Physics/PhysX/Joints/JointFloating.h"
-#include "overworld/Physics/PhysX/Joints/JointPlanar.h"
-#include "overworld/Physics/PhysX/Joints/JointPrismatic.h"
-#include "overworld/Physics/PhysX/Joints/JointRevolute.h"
+#include "overworld/Engine/Physics/PhysX/Urdf.h"
 #include "overworld/Utils/GlmMath.h"
 
 namespace owds::physx {
@@ -46,11 +41,15 @@ namespace owds::physx {
            "." + std::to_string(PX_PHYSICS_VERSION_BUGFIX);
   }
 
-  size_t World::createActor(const owds::Shape& collision_shape, const std::vector<owds::Shape>& visual_shapes)
+  size_t World::createActor(const owds::Shape& collision_shape,
+                            const std::vector<owds::Shape>& visual_shapes,
+                            const glm::vec3& position,
+                            const glm::quat& orientation)
   {
     owds::physx::Actor* actor = new owds::physx::DynamicActor(*ctx_, collision_shape, visual_shapes);
 
-    actor->setup({0., 0., 0.}, {0., 0., 0., 1.});
+    actor->setup({position.x, position.y, position.z},
+                 {orientation.x, orientation.y, orientation.z, orientation.w});
     actors_.emplace(actor->unique_id_, actor);
 
     return actor->unique_id_;
@@ -68,6 +67,24 @@ namespace owds::physx {
     actors_.emplace(actor->unique_id_, actor);
 
     return actor->unique_id_;
+  }
+
+  owds::Urdf* World::loadUrdf(const urdf::Urdf_t& model)
+  {
+    (void)model;
+    owds::physx::Urdf* urdf = new owds::physx::Urdf(*ctx_);
+    urdf->setup();
+
+    return urdf;
+  }
+
+  void World::insertUrdf(owds::Urdf* urdf)
+  {
+    std::cout << "insertUrdf" << std::endl;
+    urdf->finish();
+    std::cout << "finish" << std::endl;
+    for(const auto& actor : urdf->links_)
+      actors_.emplace(actor.second->unique_id_, actor.second);
   }
 
   void World::setGravity(const std::array<float, 3>& gravity)

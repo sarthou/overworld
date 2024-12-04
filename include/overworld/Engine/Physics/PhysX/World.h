@@ -32,22 +32,26 @@ namespace owds::physx {
 
     using owds::World::createActor;
     using owds::World::createStaticActor;
+    using owds::World::loadUrdf;
 
     size_t createActor(const owds::Shape& collision_shape,
-                       const std::vector<owds::Shape>& visual_shapes) override;
+                       const std::vector<owds::Shape>& visual_shapes,
+                       const glm::vec3& position,
+                       const glm::quat& orientation) override;
 
     size_t createStaticActor(const owds::Shape& collision_shape,
                              const std::vector<owds::Shape>& visual_shapes,
                              const glm::vec3& position,
                              const glm::quat& orientation) override;
 
+    owds::Urdf* loadUrdf(const urdf::Urdf_t& model) override;
+    void insertUrdf(owds::Urdf* urdf) override;
+
     void setGravity(const std::array<float, 3>& gravity) override;
     void stepSimulation(float delta) override;
 
   protected:
     std::unique_ptr<owds::physx::Context> ctx_;
-
-  private:
   };
 } // namespace owds::physx
 

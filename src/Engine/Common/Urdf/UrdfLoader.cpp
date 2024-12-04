@@ -5,6 +5,8 @@
 #include <map>
 #include <string>
 #include <tinyxml.h>
+#include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include "overworld/Engine/Common/Models/Material.h"
@@ -27,6 +29,17 @@ namespace owds {
     auto material_library = getMaterialLibrary(doc.RootElement());
     urdf.links = getLinks(doc.RootElement(), material_library);
     urdf.joints = getJoints(doc.RootElement());
+    getTree(urdf);
+
+    auto roots = findRootLink(urdf.joints);
+    if(roots.empty())
+      ShellDisplay::error("[UrdfLoader] No root found in: " + path);
+    else
+    {
+      if(roots.size() > 1)
+        ShellDisplay::error("[UrdfLoader] Multiple roots found in: " + path);
+      urdf.root_link = *roots.begin();
+    }
 
     return urdf;
   }
@@ -272,6 +285,37 @@ namespace owds {
     }
 
     return res;
+  }
+
+  std::unordered_set<std::string> UrdfLoader::findRootLink(const std::map<std::string, urdf::Joint_t>& joints)
+  {
+    std::unordered_set<std::string> parents;
+    std::unordered_set<std::string> childs;
+
+    for(const auto& joint : joints)
+    {
+      parents.insert(joint.second.parent_link);
+      childs.insert(joint.second.child_link);
+    }
+
+    for(const auto& child : childs)
+      parents.erase(child);
+
+    return parents;
+  }
+
+  void UrdfLoader::getTree(urdf::Urdf_t& model)
+  {
+    for(const auto& joint : model.joints)
+    {
+      auto it = model.tree.find(joint.second.parent_link);
+      if(it != model.tree.end())
+        it->second.insert(joint.first);
+      else
+        model.tree.emplace(joint.second.parent_link, std::unordered_set<std::string>{joint.first});
+
+      model.link_to_parent_joint[joint.second.child_link] = joint.first;
+    }
   }
 
 } // namespace owds

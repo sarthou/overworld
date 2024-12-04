@@ -27,7 +27,7 @@ namespace owds {
     camera_ = new Camera(*camera);
   }
 
-  void CameraUpdater::processUserKeyboardInput(const float delta_time, Key_e key, const bool is_down)
+  void CameraUpdater::processUserKeyboardInput(const float delta_time, Key_e key, bool is_down)
   {
     if(camera_ == nullptr)
       return;
@@ -67,7 +67,7 @@ namespace owds {
     (void)is_down;
   }
 
-  void CameraUpdater::processUserMouseBtnInput(const float delta_time, const char btn, const bool is_down)
+  void CameraUpdater::processUserMouseBtnInput(const float delta_time, const char btn, bool is_down)
   {
     if(camera_ == nullptr)
       return;

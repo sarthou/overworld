@@ -21,7 +21,7 @@ namespace owds::physx {
 
   DynamicActor::~DynamicActor() noexcept
   {
-    ctx_.px_scene_->removeActor(*px_actor_);
+    remove();
   }
 
   void DynamicActor::setup(const std::array<float, 3>& position,
@@ -55,7 +55,7 @@ namespace owds::physx {
     ctx_.px_scene_->addActor(*px_actor_);
   }
 
-  void DynamicActor::setPhysicsEnabled(const bool enabled)
+  void DynamicActor::setPhysicsEnabled(bool enabled)
   {
     px_actor_->setRigidBodyFlag(::physx::PxRigidBodyFlag::eKINEMATIC, !enabled);
     is_kinematic_ = !enabled;

@@ -20,7 +20,7 @@ namespace owds::physx {
       const owds::Shape& collision_shape,
       const std::vector<owds::Shape>& visual_shapes);
 
-    virtual ~Actor() noexcept override = default;
+    ~Actor() noexcept override = default;
 
     Actor(const Actor& other) = delete;
     Actor& operator=(const Actor& other) = delete;
@@ -42,8 +42,8 @@ namespace owds::physx {
 
     void setPositionAndOrientation(const std::array<float, 3>& position, const std::array<float, 4>& orientation) override = 0;
 
-    [[nodiscard]] std::array<float, 16> getModelMatrix() const override;
-    [[nodiscard]] std::pair<std::array<float, 3>, std::array<float, 3>> getPositionAndOrientation() const override;
+    std::array<float, 16> getModelMatrix() const override;
+    std::pair<std::array<float, 3>, std::array<float, 3>> getPositionAndOrientation() const override;
 
     void setupPhysicsShape(const owds::ShapeBox& shape);
     void setupPhysicsShape(const owds::ShapeCapsule& shape);

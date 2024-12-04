@@ -187,6 +187,8 @@ namespace owds {
   {
     for(const auto& actor : world_->getActors())
     {
+      std::cout << "load actor " << actor.first << std::endl;
+
       if(render_collision_models_)
       {
         std::visit([this, actor](const auto& shape_resolv) { loadActor(actor.second, shape_resolv); }, actor.second->collision_shape_);
@@ -219,8 +221,8 @@ namespace owds {
   {
     auto pose = actor->getPositionAndOrientation().first;
     auto rot = actor->getPositionAndOrientation().second;
-    std::cout << "pose " << actor->unique_id_ << " => " << pose[0] << " : " << pose[1] << " : " << pose[2] << std::endl;
-    std::cout << "rot " << actor->unique_id_ << " => " << rot[0] << " : " << rot[1] << " : " << rot[2] << std::endl;
+    // std::cout << "pose " << actor->unique_id_ << " => " << pose[0] << " : " << pose[1] << " : " << pose[2] << std::endl;
+    // std::cout << "rot " << actor->unique_id_ << " => " << rot[0] << " : " << rot[1] << " : " << rot[2] << std::endl;
     const auto size_mat = glm::scale(glm::mat4(1.f), shape.scale_);
     const auto model_mat = shape.shape_transform_ * ToM4(actor->getModelMatrix()) * size_mat;
 

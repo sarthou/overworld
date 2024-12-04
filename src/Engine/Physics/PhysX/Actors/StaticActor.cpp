@@ -61,7 +61,7 @@ namespace owds::physx {
     ctx_.px_scene_->addActor(*px_actor_);
   }
 
-  void StaticActor::setPhysicsEnabled(const bool enabled)
+  void StaticActor::setPhysicsEnabled(bool enabled)
   {
     (void)enabled;
     assert(false && "Static actors cannot have physics.");

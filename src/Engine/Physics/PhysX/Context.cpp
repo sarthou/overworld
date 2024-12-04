@@ -12,7 +12,7 @@
 
 namespace owds::physx {
 
-  Context::Context(const bool minimize_memory_footprint,
+  Context::Context(bool minimize_memory_footprint,
                    const std::string& debugger_address) : shared_ctx_(createContext())
   {
     // Create new scene

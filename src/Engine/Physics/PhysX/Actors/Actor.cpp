@@ -69,7 +69,7 @@ namespace owds::physx {
       static_cast<::physx::PxReal>(shape.height_) / 2));
   }
 
-  static auto createPxCookingParams(const bool minimize_memory_footprint)
+  static auto createPxCookingParams(bool minimize_memory_footprint)
   {
     auto params = ::physx::PxCookingParams(::physx::PxTolerancesScale());
     params.convexMeshCookingType = ::physx::PxConvexMeshCookingType::eQUICKHULL;

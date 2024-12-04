@@ -89,17 +89,22 @@ namespace owds {
                        const glm::vec3& rotation = {0., 0., 0.});
 
   protected:
-    [[nodiscard]] virtual size_t createActor(const owds::Shape& collision_shape,
-                                             const std::vector<owds::Shape>& visual_shapes) = 0;
+    virtual size_t createActor(const owds::Shape& collision_shape,
+                               const std::vector<owds::Shape>& visual_shapes,
+                               const glm::vec3& position,
+                               const glm::quat& orientation) = 0;
 
     virtual size_t createStaticActor(const owds::Shape& collision_shape,
                                      const std::vector<owds::Shape>& visual_shapes,
                                      const glm::vec3& position,
                                      const glm::quat& orientation) = 0;
 
-  public:
-    [[nodiscard]] owds::Urdf& loadRobotFromDescription(const std::string& path, bool from_base_path = true);
+    size_t loadUrdf(const std::string& path, bool from_base_path = true);
 
+    virtual owds::Urdf* loadUrdf(const urdf::Urdf_t& urdf) = 0;
+    virtual void insertUrdf(owds::Urdf* urdf) = 0;
+
+  public:
     /**
      * @return
      */
@@ -170,8 +175,8 @@ namespace owds {
     virtual void stepSimulation(float delta_ms) = 0;
 
   protected:
-    void processLink(owds::Urdf& robot, const urdf::Link_t& urdf_link);
-    void processJoint(owds::Urdf& robot, const urdf::Joint_t& urdf_joint);
+    urdf::Urdf_t getUrdf(const std::string& path, bool from_base_path);
+    void loadUrdfLink(owds::Urdf* urdf, const urdf::Urdf_t& model, const std::string& parent, const std::string& link_name);
 
     owds::Shape convertShape(const urdf::Geometry_t& geometry);
     owds::Shape convertShape(const urdf::Geometry_t& urdf_shape, glm::mat4& transform);

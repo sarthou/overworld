@@ -197,16 +197,11 @@ target_compile_options(overworld_graphics PRIVATE $<$<CXX_COMPILER_ID:Clang>:-Wn
 # ##################################
 if(OWDS_USE_PHYSX)
     set(OWDS_PHYSICS_SRC
-
-        # src/Physics/PhysX/Joints/JointContinuous.cpp
-        # src/Physics/PhysX/Joints/JointFixed.cpp
-        # src/Physics/PhysX/Joints/JointFloating.cpp
-        # src/Physics/PhysX/Joints/JointPlanar.cpp
-        # src/Physics/PhysX/Joints/JointPrismatic.cpp
-        # src/Physics/PhysX/Joints/JointRevolute.cpp
         src/Engine/Physics/PhysX/Actors/Actor.cpp
         src/Engine/Physics/PhysX/Actors/DynamicActor.cpp
+        src/Engine/Physics/PhysX/Actors/LinkActor.cpp
         src/Engine/Physics/PhysX/Actors/StaticActor.cpp
+        src/Engine/Physics/PhysX/Urdf.cpp
         src/Engine/Physics/PhysX/Context.cpp
         src/Engine/Physics/PhysX/SharedContext.cpp
         src/Engine/Physics/PhysX/World.cpp)

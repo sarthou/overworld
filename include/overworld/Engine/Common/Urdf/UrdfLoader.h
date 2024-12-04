@@ -5,6 +5,8 @@
 #include <map>
 #include <string>
 #include <tinyxml.h>
+#include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include "overworld/Engine/Common/Models/Material.h"
@@ -86,8 +88,11 @@ namespace owds {
     struct Urdf_t
     {
       std::string name;
+      std::string root_link;
       std::map<std::string, Joint_t> joints;
       std::map<std::string, Link_t> links;
+      std::unordered_map<std::string, std::unordered_set<std::string>> tree; // link to joints
+      std::unordered_map<std::string, std::string> link_to_parent_joint;
     };
 
   } // namespace urdf
@@ -105,6 +110,8 @@ namespace owds {
     urdf::Inertia_t getInertia(TiXmlElement* element);
     urdf::Geometry_t getGeometry(TiXmlElement* element, const std::map<std::string, Material>& materials);
     std::map<std::string, urdf::Joint_t> getJoints(TiXmlElement* root);
+    std::unordered_set<std::string> findRootLink(const std::map<std::string, urdf::Joint_t>& joints);
+    void getTree(urdf::Urdf_t& model);
   };
 
 } // namespace owds
