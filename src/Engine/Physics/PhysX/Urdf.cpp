@@ -81,21 +81,34 @@ namespace owds::physx {
   {
     auto* px_link = px_links_[joint.child_link];
     ::physx::PxArticulationJointReducedCoordinate* px_joint = static_cast<::physx::PxArticulationJointReducedCoordinate*>(px_link->getInboundJoint());
+    ::physx::PxArticulationAxis::Enum axis(::physx::PxArticulationAxis::eCOUNT);
     switch(joint.type)
     {
     case urdf::JointType_e::joint_revolute:
       px_joint->setJointType(::physx::PxArticulationJointType::eREVOLUTE);
       if(joint.axis[0] != 0.)
-        px_joint->setMotion(::physx::PxArticulationAxis::eTWIST, ::physx::PxArticulationMotion::eFREE); // Unbounded rotation around twist axis
+        axis = ::physx::PxArticulationAxis::eTWIST;
       else if(joint.axis[1] != 0.)
-        px_joint->setMotion(::physx::PxArticulationAxis::eSWING1, ::physx::PxArticulationMotion::eFREE); // Unbounded rotation around swing1 axis
+        axis = ::physx::PxArticulationAxis::eSWING1;
       else if(joint.axis[2] != 0.)
-        px_joint->setMotion(::physx::PxArticulationAxis::eSWING2, ::physx::PxArticulationMotion::eFREE); // Unbounded rotation around swing2 axis
-      else
-        std::cout << "-----------> no axis set" << std::endl;
-      // px_joint->setMotion(::physx::PxArticulationAxis::eTWIST, ::physx::PxArticulationMotion::eLIMITED); // Limited rotation around the twist axis
-      // px_joint->setLimit(::physx::PxArticulationAxis::eTWIST, -::physx::PxPi / 4, ::physx::PxPi / 4);    // ±45 degrees
+        axis = ::physx::PxArticulationAxis::eSWING2;
+
+      if(axis != ::physx::PxArticulationAxis::eCOUNT)
+      {
+        if(joint.limited)
+        {
+          px_joint->setMotion(axis, ::physx::PxArticulationMotion::eLIMITED);
+          ::physx::PxArticulationLimit limit;
+          limit.low = joint.limit.first;
+          limit.high = joint.limit.second;
+          px_joint->setLimitParams(axis, limit);
+        }
+        else
+          px_joint->setMotion(axis, ::physx::PxArticulationMotion::eFREE);
+      }
+
       break;
+
     case urdf::JointType_e::joint_continuous:
       px_joint->setJointType(::physx::PxArticulationJointType::eREVOLUTE);
       if(joint.axis[0] != 0.)
@@ -107,22 +120,35 @@ namespace owds::physx {
       else
         std::cout << "-----------> no axis set" << std::endl;
       break;
+
     case urdf::JointType_e::joint_prismatic:
       px_joint->setJointType(::physx::PxArticulationJointType::ePRISMATIC);
       if(joint.axis[0] != 0.)
-        px_joint->setMotion(::physx::PxArticulationAxis::eX, ::physx::PxArticulationMotion::eFREE); // Unbounded rotation around X axis
+        axis = ::physx::PxArticulationAxis::eX;
       else if(joint.axis[1] != 0.)
-        px_joint->setMotion(::physx::PxArticulationAxis::eY, ::physx::PxArticulationMotion::eFREE); // Unbounded rotation around Y axis
+        axis = ::physx::PxArticulationAxis::eY;
       else if(joint.axis[2] != 0.)
-        px_joint->setMotion(::physx::PxArticulationAxis::eZ, ::physx::PxArticulationMotion::eFREE); // Unbounded rotation around Z axis
-      else
-        std::cout << "-----------> no axis set" << std::endl;
-      // px_joint->setMotion(::physx::PxArticulationAxis::eX, ::physx::PxArticulationMotion::eLIMITED); // Limited translation along X-axis
-      // px_joint->setLimit(::physx::PxArticulationAxis::eX, 0.0f, 1.0f);                               // Translation range: 0 to 1 unit
+        axis = ::physx::PxArticulationAxis::eZ;
+
+      if(axis != ::physx::PxArticulationAxis::eCOUNT)
+      {
+        if(joint.limited)
+        {
+          px_joint->setMotion(axis, ::physx::PxArticulationMotion::eLIMITED);
+          ::physx::PxArticulationLimit limit;
+          limit.low = joint.limit.first;
+          limit.high = joint.limit.second;
+          px_joint->setLimitParams(axis, limit);
+        }
+        else
+          px_joint->setMotion(axis, ::physx::PxArticulationMotion::eFREE);
+      }
       break;
+
     case urdf::JointType_e::joint_fixed:
       px_joint->setJointType(::physx::PxArticulationJointType::eFIX);
       break;
+
     case urdf::JointType_e::joint_floating:
       px_joint->setJointType(::physx::PxArticulationJointType::eUNDEFINED); // Free 6-DOF motion
       px_joint->setMotion(::physx::PxArticulationAxis::eX, ::physx::PxArticulationMotion::eFREE);
@@ -132,6 +158,7 @@ namespace owds::physx {
       px_joint->setMotion(::physx::PxArticulationAxis::eSWING1, ::physx::PxArticulationMotion::eFREE);
       px_joint->setMotion(::physx::PxArticulationAxis::eSWING2, ::physx::PxArticulationMotion::eFREE);
       break;
+
     case urdf::JointType_e::joint_planar:
       // TODO consider joint axis
       px_joint->setJointType(::physx::PxArticulationJointType::eUNDEFINED);                           // Planar motion needs custom configuration

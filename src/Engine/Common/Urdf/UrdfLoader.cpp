@@ -267,10 +267,10 @@ namespace owds {
       auto* origin = joint_elem->FirstChildElement("origin");
       if(origin != nullptr)
       {
-        auto* translation = origin->Attribute("xyz");
+        const auto* translation = origin->Attribute("xyz");
         if(translation != nullptr)
           joint.origin_translation = getVector3FromXmlText(translation);
-        auto* rotation = origin->Attribute("rpy");
+        const auto* rotation = origin->Attribute("rpy");
         if(rotation != nullptr)
           joint.origin_rotation = getVector3FromXmlText(rotation);
       }
@@ -279,6 +279,19 @@ namespace owds {
       if(axis != nullptr)
       {
         joint.axis = getVector3FromXmlText(axis->Attribute("xyz"));
+      }
+
+      auto* limit = joint_elem->FirstChildElement("limit");
+      if(limit != nullptr)
+      {
+        const char* lower_text = limit->Attribute("lower");
+        if(lower_text != nullptr)
+          joint.limit.first = std::atof(lower_text);
+
+        const char* upper_text = limit->Attribute("upper");
+        if(upper_text != nullptr)
+          joint.limit.second = std::atof(upper_text);
+        joint.limited = true;
       }
 
       res.emplace(joint.name, joint);

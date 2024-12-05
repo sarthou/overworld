@@ -83,6 +83,8 @@ namespace owds {
       std::string parent_link;
       std::string child_link;
       glm::vec3 axis = {1., 0., 0.};
+      std::pair<float, float> limit;
+      bool limited = false;
     };
 
     struct Urdf_t
