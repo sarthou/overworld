@@ -76,8 +76,8 @@ if(OWDS_USE_PHYSX)
 
     if(NOT physx_POPULATED)
         FetchContent_Populate(PhysX)
-        message(STATUS "PhysX source dir: ${physx_SOURCE_DIR}")
-        message(STATUS "PhysX binary dir: ${physx_BINARY_DIR}")
+        message(WARNING "PhysX source dir: ${physx_SOURCE_DIR}")
+        message(WARNING "PhysX binary dir: ${physx_BINARY_DIR}")
 
         # todo: figure out this doesn't work
         # We need to call this script so that packman can download NVidia's proprietary PhysXgpu shared binary
@@ -109,6 +109,8 @@ if(OWDS_USE_PHYSX)
 
         add_subdirectory(${physx_SOURCE_DIR}/physx/compiler/public/ ${physx_BINARY_DIR}/physx/)
     endif()
+
+    link_directories(${physx_SOURCE_DIR}/physx/bin/linux.clang/release)
 endif()
 
 owds_depend_msg_package(std_msgs)
