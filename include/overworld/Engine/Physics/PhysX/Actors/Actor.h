@@ -52,6 +52,9 @@ namespace owds::physx {
     void setupPhysicsShape(const owds::ShapeDummy& shape);
     void setupPhysicsShape(const owds::ShapeSphere& shape);
 
+    static bool use_cache_input;
+    static bool use_cache_output;
+
   protected:
     owds::physx::Context& ctx_;
     // std::vector<owds::Shape> visual_shapes_;

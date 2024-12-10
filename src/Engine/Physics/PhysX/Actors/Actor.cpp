@@ -1,18 +1,25 @@
 #include "overworld/Engine/Physics/PhysX/Actors/Actor.h"
 
+#include <algorithm>
 #include <array>
 #include <cassert>
+#include <chrono>
 #include <common/PxTolerancesScale.h>
 #include <cooking/PxBVH34MidphaseDesc.h>
 #include <cooking/PxSDFDesc.h>
 #include <cooking/PxTriangleMeshDesc.h>
+#include <cstddef>
 #include <extensions/PxDefaultStreams.h>
+#include <filesystem>
+#include <fstream>
 #include <glm/detail/type_quat.hpp>
 #include <glm/ext/matrix_float4x4.hpp>
 #include <glm/ext/vector_float3.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/euler_angles.hpp>
 #include <iostream>
+#include <string>
+#include <sys/stat.h>
 
 #include "overworld/Engine/Common/Models/Model.h"
 #include "overworld/Engine/Common/Shapes/Shape.h"
@@ -27,7 +34,12 @@
 #include "overworld/Engine/Physics/PhysX/SharedContext.h"
 #include "overworld/Utils/BitCast.h"
 
+using namespace std::chrono;
+
 namespace owds::physx {
+
+  bool Actor::use_cache_input = false;
+  bool Actor::use_cache_output = false;
 
   Actor::Actor(owds::physx::Context& ctx,
                const owds::Shape& collision_shape,
@@ -109,9 +121,10 @@ namespace owds::physx {
     return params;
   }
 
-  static auto createPxTriangleMesh(const ::physx::PxCookingParams& cooking_params,
-                                   const std::vector<::physx::PxVec3>& vertices,
-                                   const std::vector<std::uint32_t>& indices)
+  static void cookTriangleMesh(const ::physx::PxCookingParams& cooking_params,
+                               const std::vector<::physx::PxVec3>& vertices,
+                               const std::vector<std::uint32_t>& indices,
+                               ::physx::PxDefaultMemoryOutputStream& buffer)
   {
     auto sdf_desc = ::physx::PxSDFDesc();
     sdf_desc.spacing = 0.05f;
@@ -132,10 +145,9 @@ namespace owds::physx {
 
     // assert(PxValidateConvexMesh(params, mesh_desc));
 
-    ::physx::PxDefaultMemoryOutputStream writeBuffer;
     ::physx::PxTriangleMeshCookingResult::Enum result;
 
-    assert(PxCookTriangleMesh(cooking_params, mesh_desc, writeBuffer, &result));
+    assert(PxCookTriangleMesh(cooking_params, mesh_desc, buffer, &result));
 
     using ResultTy = decltype(result);
 
@@ -153,8 +165,83 @@ namespace owds::physx {
       assert(false && "eFAILURE");
       break;
     }
+  }
 
-    ::physx::PxDefaultMemoryInputData read_buffer(writeBuffer.getData(), writeBuffer.getSize());
+  static ::physx::PxTriangleMesh* loadCookedFromDisk(const std::string& path)
+  {
+    struct stat stat_buffer;
+    if(stat(path.c_str(), &stat_buffer) == 0)
+    {
+      std::ifstream in_file(path, std::ios::binary | std::ios::ate);
+      if(!in_file.is_open())
+      {
+        std::cerr << "Failed to open file for reading: " << path << std::endl;
+        return nullptr;
+      }
+
+      std::streamsize size = in_file.tellg();
+      in_file.seekg(0, std::ios::beg);
+
+      std::vector<char> buffer(size);
+      if(!in_file.read(buffer.data(), size))
+      {
+        std::cerr << "Failed to read data from file: " << path << std::endl;
+        return nullptr;
+      }
+
+      ::physx::PxDefaultMemoryInputData read_buffer(reinterpret_cast<::physx::PxU8*>(buffer.data()), static_cast<::physx::PxU32>(size));
+      const auto& sdk = owds::physx::Context::createContext()->px_physics_;
+      ::physx::PxTriangleMesh* triangle_mesh = sdk->createTriangleMesh(read_buffer);
+      if(triangle_mesh == nullptr)
+      {
+        std::cerr << "Failed to create triangle mesh from cooked data!" << std::endl;
+        return nullptr;
+      }
+
+      if(Actor::use_cache_input == false)
+      {
+        Actor::use_cache_input = true;
+        std::cout << "Cooked mesh successfully loaded from /tmp/overworld " << std::endl;
+      }
+      return triangle_mesh;
+    }
+    else
+      return nullptr;
+  }
+
+  static bool saveCookedData(const ::physx::PxDefaultMemoryOutputStream& buffer, const std::string& path)
+  {
+    std::string directory = path.substr(0, path.find_last_of('/'));
+    std::filesystem::create_directories(directory);
+
+    std::ofstream out_file(path, std::ios::binary);
+    if(!out_file.is_open())
+    {
+      std::cerr << "Failed to open file for writing: " << path << std::endl;
+      return false;
+    }
+    out_file.write((const char*)buffer.getData(), buffer.getSize());
+    out_file.close();
+
+    if(Actor::use_cache_output == false)
+    {
+      Actor::use_cache_output = true;
+      std::cout << "Cooked mesh saved to /tmp/overworld" << std::endl;
+    }
+    return true;
+  }
+
+  static auto createPxTriangleMesh(const ::physx::PxCookingParams& cooking_params,
+                                   const std::vector<::physx::PxVec3>& vertices,
+                                   const std::vector<std::uint32_t>& indices,
+                                   const std::string& path)
+  {
+    ::physx::PxDefaultMemoryOutputStream write_buffer;
+    cookTriangleMesh(cooking_params, vertices, indices, write_buffer);
+
+    saveCookedData(write_buffer, path);
+
+    ::physx::PxDefaultMemoryInputData read_buffer(write_buffer.getData(), write_buffer.getSize());
 
     const auto& sdk = owds::physx::Context::createContext()->px_physics_;
     const auto px_mesh = sdk->createTriangleMesh(read_buffer);
@@ -164,16 +251,54 @@ namespace owds::physx {
     return px_mesh;
   }
 
+  static ::physx::PxTriangleMesh* createPxTriangleMesh(const owds::Mesh& mesh,
+                                                       const ::physx::PxCookingParams& params,
+                                                       const std::string& path)
+  {
+    std::vector<::physx::PxVec3> vertices;
+    vertices.reserve(mesh.vertices_.size());
+
+    for(const auto& vertex : mesh.vertices_)
+    {
+      vertices.emplace_back(
+        vertex.position_.x,
+        vertex.position_.y,
+        vertex.position_.z);
+    }
+
+    return createPxTriangleMesh(params, vertices, mesh.indices_, path);
+  }
+
+  static std::string getModelName(const std::string& path)
+  {
+    std::string res;
+    size_t pose = path.find_last_of('/');
+    if(pose == std::string::npos)
+      res = path;
+    else
+      res = path.substr(pose + 1);
+
+    std::replace(res.begin(), res.end(), '.', '_');
+
+    return res;
+  }
+
   void Actor::setupPhysicsShape(const owds::ShapeCustomMesh& shape)
   {
     const auto& s_ctx = owds::physx::Context::createContext();
 
     const auto params = createPxCookingParams(ctx_.minimize_memory_footprint_);
 
+    std::string model_name = getModelName(shape.custom_model_.get().source_path_);
+
     for(const auto& mesh : shape.custom_model_.get().meshes_)
     {
       if(!s_ctx->px_cached_meshes.count(mesh.id_))
       {
+        std::string bin_path = "/tmp/overworld/" + model_name;
+        if(mesh.name_.empty() == false)
+          bin_path += "_" + mesh.name_ + ".bin";
+
         if(mesh.vertices_.size() < 4)
         {
           printf("[%s:%s] Ignoring! Less than 4 vertices..\n",
@@ -182,18 +307,11 @@ namespace owds::physx {
           continue;
         }
 
-        std::vector<::physx::PxVec3> vertices;
-        vertices.reserve(mesh.vertices_.size());
-
-        for(const auto& vertex : mesh.vertices_)
-        {
-          vertices.emplace_back(
-            vertex.position_.x,
-            vertex.position_.y,
-            vertex.position_.z);
-        }
-
-        s_ctx->px_cached_meshes[mesh.id_] = createPxTriangleMesh(params, vertices, mesh.indices_);
+        auto* tringle_mesh = loadCookedFromDisk(bin_path);
+        if(tringle_mesh != nullptr)
+          s_ctx->px_cached_meshes[mesh.id_] = tringle_mesh;
+        else
+          s_ctx->px_cached_meshes[mesh.id_] = createPxTriangleMesh(mesh, params, bin_path);
       }
 
       px_geometries_.emplace_back(std::make_unique<::physx::PxTriangleMeshGeometry>(
