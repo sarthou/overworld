@@ -78,8 +78,8 @@ namespace owds {
     {
       std::string name;
       JointType_e type = joint_none;
-      glm::vec3 origin_translation;
-      glm::vec3 origin_rotation;
+      glm::vec3 origin_translation = {0., 0., 0.};
+      glm::vec3 origin_rotation = {0., 0., 0.};
       std::string parent_link;
       std::string child_link;
       glm::vec3 axis = {1., 0., 0.};
