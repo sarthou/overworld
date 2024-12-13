@@ -81,13 +81,16 @@ namespace owds {
     return createActor(collision_shape, visual_shapes, position, glm::quat(rotation));
   }
 
-  size_t World::loadUrdf(const std::string& path, bool from_base_path)
+  size_t World::loadUrdf(const std::string& path,
+                         const std::array<float, 3>& position,
+                         const std::array<float, 3>& orientation,
+                         bool from_base_path)
   {
     auto urdf_model = getUrdf(path, from_base_path);
 
     auto* urdf = loadUrdf(urdf_model);
 
-    loadUrdfLink(urdf, urdf_model, "", urdf_model.root_link);
+    loadUrdfLink(urdf, urdf_model, "", urdf_model.root_link, position, orientation);
 
     for(const auto& joint : urdf_model.joints)
       urdf->addJoint(joint.second);
@@ -360,7 +363,11 @@ namespace owds {
     return urdf_model;
   }
 
-  void World::loadUrdfLink(owds::Urdf* urdf, const urdf::Urdf_t& model, const std::string& parent, const std::string& link_name)
+  void World::loadUrdfLink(owds::Urdf* urdf, const urdf::Urdf_t& model,
+                           const std::string& parent,
+                           const std::string& link_name,
+                           const std::array<float, 3>& position,
+                           const std::array<float, 3>& orientation)
   {
     const auto& link = model.links.at(link_name);
     owds::Shape visual_shape = convertShape(link.visual);
@@ -372,7 +379,7 @@ namespace owds {
       collision_shapes.emplace_back(ShapeDummy());
 
     if(parent.empty())
-      urdf->addLink(parent, link_name, {0., 0., 0.}, {0., 0., 0.}, collision_shapes.front(), {visual_shape});
+      urdf->addLink(parent, link_name, ToV3(position), ToV3(orientation), collision_shapes.front(), {visual_shape});
     else
     {
       std::string joint_name = model.link_to_parent_joint.at(link_name);
@@ -386,7 +393,7 @@ namespace owds {
       for(const auto& child : childs_it->second)
       {
         const auto& child_joint = model.joints.at(child);
-        loadUrdfLink(urdf, model, link_name, child_joint.child_link);
+        loadUrdfLink(urdf, model, link_name, child_joint.child_link, position, orientation);
       }
     }
   }

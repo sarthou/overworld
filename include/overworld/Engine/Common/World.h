@@ -72,7 +72,10 @@ namespace owds {
                        const glm::vec3& position = {0., 0., 0.},
                        const glm::vec3& rotation = {0., 0., 0.});
 
-    size_t loadUrdf(const std::string& path, bool from_base_path = true);
+    size_t loadUrdf(const std::string& path,
+                    const std::array<float, 3>& position,
+                    const std::array<float, 3>& orientation,
+                    bool from_base_path = true);
 
     const std::unordered_map<std::size_t, Actor*>& getActors() const { return actors_; };
 
@@ -155,7 +158,11 @@ namespace owds {
     virtual void insertUrdf(owds::Urdf* urdf) = 0;
 
     urdf::Urdf_t getUrdf(const std::string& path, bool from_base_path);
-    void loadUrdfLink(owds::Urdf* urdf, const urdf::Urdf_t& model, const std::string& parent, const std::string& link_name);
+    void loadUrdfLink(owds::Urdf* urdf, const urdf::Urdf_t& model,
+                      const std::string& parent,
+                      const std::string& link_name,
+                      const std::array<float, 3>& position,
+                      const std::array<float, 3>& orientation);
 
     owds::Shape createShapeBox(const owds::Color& color, const std::array<float, 3>& half_extents, glm::mat4& transform);
     owds::Shape createShapeCapsule(const owds::Color& color, float radius, float height, glm::mat4& transform);
