@@ -84,6 +84,11 @@ namespace owds {
       return res;
     }
 
+    bool keyExists(const std::string& key)
+    {
+      return (elements_.find(key) != elements_.end());
+    }
+
   private:
     std::map<std::string, YamlElement> elements_;
 
