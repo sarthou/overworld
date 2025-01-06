@@ -21,8 +21,8 @@ namespace owds {
 
   public:
     virtual ~Actor() noexcept;
-    virtual void setup(const std::array<float, 3>& position,
-                       const std::array<float, 4>& orientation) = 0;
+    virtual void setup(const std::array<double, 3>& position,
+                       const std::array<double, 4>& orientation) = 0;
     virtual void remove() = 0;
 
     /**
@@ -59,7 +59,7 @@ namespace owds {
      * @param position Absolute position.
      * @param orientation Absolute rotation, in radians.
      */
-    virtual void setPositionAndOrientation(const std::array<float, 3>& position, const std::array<float, 4>& orientation) = 0;
+    virtual void setPositionAndOrientation(const std::array<double, 3>& position, const std::array<double, 4>& orientation) = 0;
 
     /**
      * @return todo: document this

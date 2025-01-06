@@ -22,8 +22,8 @@ namespace owds::physx {
     remove();
   }
 
-  void StaticActor::setup(const std::array<float, 3>& position,
-                          const std::array<float, 4>& orientation)
+  void StaticActor::setup(const std::array<double, 3>& position,
+                          const std::array<double, 4>& orientation)
   {
     const auto& sdk = owds::physx::Context::createContext()->px_physics_;
 
@@ -81,7 +81,7 @@ namespace owds::physx {
     (void)mass_kg;
   }
 
-  void StaticActor::setPositionAndOrientation(const std::array<float, 3>& position, const std::array<float, 4>& orientation)
+  void StaticActor::setPositionAndOrientation(const std::array<double, 3>& position, const std::array<double, 4>& orientation)
   {
     (void)position;
     (void)orientation;

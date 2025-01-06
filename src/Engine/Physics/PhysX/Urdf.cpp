@@ -2,6 +2,7 @@
 
 #include <PxArticulationLink.h>
 #include <array>
+#include <cstddef>
 #include <foundation/PxQuat.h>
 #include <foundation/PxSimpleTypes.h>
 #include <foundation/PxTransform.h>
@@ -195,6 +196,23 @@ namespace owds::physx {
   std::pair<std::array<double, 3>, std::array<double, 4>> Urdf::getPositionAndOrientation()
   {
     return root_actor_->getPositionAndOrientation();
+  }
+
+  void Urdf::setPositionAndOrientation(const std::array<double, 3>& position, const std::array<double, 4>& orientation)
+  {
+    const auto px_transform =
+      ::physx::PxTransform(
+        ::physx::PxVec3(
+          static_cast<::physx::PxReal>(position[0]),
+          static_cast<::physx::PxReal>(position[1]),
+          static_cast<::physx::PxReal>(position[2])),
+        ::physx::PxQuat(
+          static_cast<::physx::PxReal>(orientation[0]),
+          static_cast<::physx::PxReal>(orientation[1]),
+          static_cast<::physx::PxReal>(orientation[2]),
+          static_cast<::physx::PxReal>(orientation[3])));
+
+    px_articulation_->setRootGlobalPose(px_transform);
   }
 
 } // namespace owds::physx

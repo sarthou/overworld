@@ -26,8 +26,8 @@ namespace owds::physx {
     StaticActor(StaticActor&& other) noexcept = delete;
     StaticActor& operator=(StaticActor&& other) = delete;
 
-    void setup(const std::array<float, 3>& position,
-               const std::array<float, 4>& orientation) override;
+    void setup(const std::array<double, 3>& position,
+               const std::array<double, 4>& orientation) override;
     void remove() override;
 
     void setMass(float mass_kg) override;
@@ -35,7 +35,7 @@ namespace owds::physx {
     void setPhysicsEnabled(bool enabled) override;
     void setSimulationEnabled(bool enabled) override;
 
-    void setPositionAndOrientation(const std::array<float, 3>& position, const std::array<float, 4>& orientation) override;
+    void setPositionAndOrientation(const std::array<double, 3>& position, const std::array<double, 4>& orientation) override;
 
   private:
     PxPtr<::physx::PxRigidStatic> px_actor_;

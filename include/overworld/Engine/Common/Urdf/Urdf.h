@@ -39,6 +39,7 @@ namespace owds {
     virtual size_t getNumJoints() = 0;
 
     virtual std::pair<std::array<double, 3>, std::array<double, 4>> getPositionAndOrientation() = 0;
+    virtual void setPositionAndOrientation(const std::array<double, 3>& position, const std::array<double, 4>& orientation) = 0;
 
     // Each urdf is associated with a non-zero, unique id.
     const std::size_t unique_id_{};

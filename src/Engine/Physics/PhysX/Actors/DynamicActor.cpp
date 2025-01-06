@@ -24,8 +24,8 @@ namespace owds::physx {
     remove();
   }
 
-  void DynamicActor::setup(const std::array<float, 3>& position,
-                           const std::array<float, 4>& orientation)
+  void DynamicActor::setup(const std::array<double, 3>& position,
+                           const std::array<double, 4>& orientation)
   {
     const auto& sdk = owds::physx::Context::createContext()->px_physics_;
 
@@ -76,7 +76,7 @@ namespace owds::physx {
     px_actor_->setMass(static_cast<::physx::PxReal>(mass_kg));
   }
 
-  void DynamicActor::setPositionAndOrientation(const std::array<float, 3>& position, const std::array<float, 4>& orientation)
+  void DynamicActor::setPositionAndOrientation(const std::array<double, 3>& position, const std::array<double, 4>& orientation)
   {
     std::cout << "set pose of " << this->unique_id_ << " " << position[0] << " : " << position[1] << " : " << position[2] << std::endl;
     const auto px_transform =

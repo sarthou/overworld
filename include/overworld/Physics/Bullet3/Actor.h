@@ -1,6 +1,7 @@
 #ifndef OWDS_PHYSICS_BULLET3_ACTOR_H
 #define OWDS_PHYSICS_BULLET3_ACTOR_H
 
+#include <array>
 #include <memory>
 #include <vector>
 
@@ -41,7 +42,7 @@ namespace owds::bullet3 {
     void setStaticFriction(float coefficient) override;
     void setDynamicFriction(float coefficient) override;
     void setRestitution(float coefficient) override;
-    void setPositionAndOrientation(const std::array<float, 3>& position, const std::array<float, 4>& orientation) override;
+    void setPositionAndOrientation(const std::array<double, 3>& position, const std::array<double, 4>& orientation) override;
 
     [[nodiscard]] std::array<float, 16> getModelMatrix() const override;
     [[nodiscard]] std::pair<std::array<double, 3>, std::array<double, 4>> getPositionAndOrientation() const override;

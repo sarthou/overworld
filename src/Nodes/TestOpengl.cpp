@@ -1,6 +1,7 @@
 #include <overworld/Compat/ROS.h>
 // should be first
 
+#include <cstddef>
 #include <thread>
 
 #include "overworld/Engine/Common/Camera/Camera.h"
@@ -122,7 +123,6 @@ void worldThread(const std::string& world_name, owds::Window* window)
   //(void)world.loadRobotFromDescription("models/tutorials/Frame/frame.urdf");
 
   world.setTimeStep(1.f / 60.f);
-  world.stepSimulation();
 
   std::cout << "================== WORLD LOADED !! ================" << std::endl;
 
@@ -130,6 +130,11 @@ void worldThread(const std::string& world_name, owds::Window* window)
 
   std::cout << "pr2 has " << world.getNumJoints(pr2_id) << " joints" << std::endl;
   auto pr2_pose = world.getBasePositionAndOrientation(pr2_id);
+  std::cout << "pr2_pose = " << pr2_pose.first[0] << " : " << pr2_pose.first[1] << " : " << pr2_pose.first[2] << std::endl;
+
+  world.setBasePositionAndOrientation(pr2_id, {4., 4., 0.}, {0., 0., 0., 1.});
+  world.stepSimulation();
+  pr2_pose = world.getBasePositionAndOrientation(pr2_id);
   std::cout << "pr2_pose = " << pr2_pose.first[0] << " : " << pr2_pose.first[1] << " : " << pr2_pose.first[2] << std::endl;
 
   while(!window->isCloseRequested())

@@ -1,5 +1,6 @@
 #include "overworld/Physics/Bullet3/Actor.h"
 
+#include <array>
 #include <glm/detail/type_quat.hpp>
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/ext/vector_float3.hpp>
@@ -117,7 +118,7 @@ namespace owds::bullet3 {
     bt_actor_->setRestitution(coefficient);
   }
 
-  void Actor::setPositionAndOrientation(const std::array<float, 3>& position, const std::array<float, 4>& orientation)
+  void Actor::setPositionAndOrientation(const std::array<double, 3>& position, const std::array<double, 4>& orientation)
   {
     assert(bt_actor_);
 
