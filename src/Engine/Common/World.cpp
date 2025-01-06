@@ -168,6 +168,15 @@ namespace owds {
     }
   }
 
+  bool World::setJointState(int body_id, const std::string& joint_name, double position, double velocity)
+  {
+    auto urdf_it = urdfs_.find(body_id);
+    if(urdf_it != urdfs_.end())
+      return urdf_it->second->setJointState(joint_name, position, velocity);
+    else
+      return false;
+  }
+
   /* LIGHTS */
 
   void World::setAmbientLight(const std::array<float, 3>& direction,

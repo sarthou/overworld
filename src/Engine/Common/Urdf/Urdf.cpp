@@ -1,6 +1,7 @@
 #include "overworld/Engine/Common/Urdf/Urdf.h"
 
 #include <cstddef>
+#include <string>
 
 #include "overworld/Engine/Common/Urdf/UrdfLoader.h"
 
@@ -12,5 +13,18 @@ namespace owds {
   {}
 
   Urdf::~Urdf() noexcept = default;
+
+  bool Urdf::setJointState(const std::string& joint_name, double position, double velocity)
+  {
+    auto joint_it = joints_.find(joint_name);
+    if(joint_it != joints_.end())
+    {
+      joint_it->second->setPosition(position);
+      joint_it->second->setVelocity(velocity);
+      return true;
+    }
+    else
+      return false;
+  }
 
 } // namespace owds

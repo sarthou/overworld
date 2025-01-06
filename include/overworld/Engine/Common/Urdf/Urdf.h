@@ -8,11 +8,11 @@
 
 #include "overworld/Engine/Common/Models/Material.h"
 #include "overworld/Engine/Common/Shapes/Shape.h"
+#include "overworld/Engine/Common/Urdf/Joint.h"
 #include "overworld/Engine/Common/Urdf/UrdfLoader.h"
 
 namespace owds {
   class Actor;
-  class Joint;
 
   class Urdf
   {
@@ -41,6 +41,7 @@ namespace owds {
     virtual std::pair<std::array<double, 3>, std::array<double, 4>> getPositionAndOrientation() = 0;
     virtual void setPositionAndOrientation(const std::array<double, 3>& position, const std::array<double, 4>& orientation) = 0;
     virtual void setVelocity(const std::array<double, 3>& linear_velocity, const std::array<double, 3>& angular_velocity) = 0;
+    bool setJointState(const std::string& joint_name, double position, double velocity);
 
     // Each urdf is associated with a non-zero, unique id.
     const std::size_t unique_id_{};

@@ -134,6 +134,7 @@ void worldThread(const std::string& world_name, owds::Window* window)
 
   world.setBasePositionAndOrientation(pr2_id, {4., 4., 0.}, {0., 0., 0., 1.});
   // world.setBaseVelocity(pr2_id, {0., 0., 0.}, {0., 0., 0.2});
+  world.setJointState(pr2_id, "head_pan_joint", 0.9, -0.4);
   world.stepSimulation();
   pr2_pose = world.getBasePositionAndOrientation(pr2_id);
   std::cout << "pr2_pose = " << pr2_pose.first[0] << " : " << pr2_pose.first[1] << " : " << pr2_pose.first[2] << std::endl;

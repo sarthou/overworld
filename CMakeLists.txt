@@ -174,6 +174,7 @@ owds_add_ros_library(overworld_engine_common
     src/Engine/Common/Urdf/UrdfLoader.cpp
     src/Engine/Common/Urdf/Urdf.cpp
     src/Engine/Common/Urdf/Actor.cpp
+    src/Engine/Common/Urdf/Joint.cpp
     src/Engine/Common/World.cpp)
 target_link_libraries(overworld_engine_common PRIVATE overworld_utility_lib)
 
@@ -202,6 +203,7 @@ if(OWDS_USE_PHYSX)
         src/Engine/Physics/PhysX/Actors/DynamicActor.cpp
         src/Engine/Physics/PhysX/Actors/LinkActor.cpp
         src/Engine/Physics/PhysX/Actors/StaticActor.cpp
+        src/Engine/Physics/PhysX/Joint.cpp
         src/Engine/Physics/PhysX/Urdf.cpp
         src/Engine/Physics/PhysX/Context.cpp
         src/Engine/Physics/PhysX/SharedContext.cpp

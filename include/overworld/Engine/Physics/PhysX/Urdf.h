@@ -8,6 +8,7 @@
 #include <unordered_set>
 #include <vector>
 
+#include "overworld/Engine/Common/Urdf/Joint.h"
 #include "overworld/Engine/Common/Urdf/Urdf.h"
 #include "overworld/Engine/Physics/PhysX/API.h"
 

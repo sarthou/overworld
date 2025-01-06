@@ -18,10 +18,12 @@
 #include <unordered_set>
 
 #include "overworld/Engine/Common/Models/Model.h"
+#include "overworld/Engine/Common/Urdf/Joint.h"
 #include "overworld/Engine/Common/Urdf/Urdf.h"
 #include "overworld/Engine/Common/Urdf/UrdfLoader.h"
 #include "overworld/Engine/Physics/PhysX/Actors/LinkActor.h"
 #include "overworld/Engine/Physics/PhysX/Context.h"
+#include "overworld/Engine/Physics/PhysX/Joint.h"
 #include "overworld/Engine/Physics/PhysX/SharedContext.h"
 #include "solver/PxSolverDefs.h"
 
@@ -174,6 +176,19 @@ namespace owds::physx {
 
     default:
       break;
+    }
+
+    if(px_joint != nullptr)
+    {
+      int int_axis = -1;
+      if((axis == ::physx::PxArticulationAxis::eX) || (axis == ::physx::PxArticulationAxis::eTWIST))
+        int_axis = 0;
+      else if((axis == ::physx::PxArticulationAxis::eY) || (axis == ::physx::PxArticulationAxis::eSWING1))
+        int_axis = 1;
+      else if((axis == ::physx::PxArticulationAxis::eZ) || (axis == ::physx::PxArticulationAxis::eSWING2))
+        int_axis = 2;
+
+      joints_[joint.name] = new ::owds::physx::Joint(ctx_, px_joint, joint.type, int_axis);
     }
   }
 
