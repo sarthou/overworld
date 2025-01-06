@@ -151,6 +151,23 @@ namespace owds {
     }
   }
 
+  void World::setBaseVelocity(int body_id, const std::array<double, 3>& linear_velocity, const std::array<double, 3>& angular_velocity)
+  {
+    auto urdf_it = urdfs_.find(body_id);
+    if(urdf_it != urdfs_.end())
+    {
+      urdf_it->second->setVelocity(linear_velocity, angular_velocity);
+    }
+    else
+    {
+      auto actor_it = actors_.find(body_id);
+      if(actor_it != actors_.end())
+      {
+        actor_it->second->setVelocity(linear_velocity, angular_velocity);
+      }
+    }
+  }
+
   /* LIGHTS */
 
   void World::setAmbientLight(const std::array<float, 3>& direction,

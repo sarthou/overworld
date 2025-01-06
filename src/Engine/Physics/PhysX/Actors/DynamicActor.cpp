@@ -97,4 +97,17 @@ namespace owds::physx {
       px_actor_->setGlobalPose(px_transform);
   }
 
+  void DynamicActor::setVelocity(const std::array<double, 3>& linear_velocity, const std::array<double, 3>& angular_velocity)
+  {
+    px_actor_->setLinearVelocity(::physx::PxVec3(
+      static_cast<::physx::PxReal>(linear_velocity[0]),
+      static_cast<::physx::PxReal>(linear_velocity[1]),
+      static_cast<::physx::PxReal>(linear_velocity[2])));
+
+    px_actor_->setAngularVelocity(::physx::PxVec3(
+      static_cast<::physx::PxReal>(angular_velocity[0]),
+      static_cast<::physx::PxReal>(angular_velocity[1]),
+      static_cast<::physx::PxReal>(angular_velocity[2])));
+  }
+
 } // namespace owds::physx

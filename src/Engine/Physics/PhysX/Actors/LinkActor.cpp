@@ -76,4 +76,11 @@ namespace owds::physx {
     assert(false && "LinkActor can only be moved through their joint");
   }
 
+  void LinkActor::setVelocity(const std::array<double, 3>& linear_velocity, const std::array<double, 3>& angular_velocity)
+  {
+    (void)linear_velocity;
+    (void)angular_velocity;
+    assert(false && "LinkActor velocity can only be set through their joint");
+  }
+
 } // namespace owds::physx

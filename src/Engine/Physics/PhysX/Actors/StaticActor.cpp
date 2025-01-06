@@ -88,4 +88,11 @@ namespace owds::physx {
     assert(false && "Static actors cannot be moved.");
   }
 
+  void StaticActor::setVelocity(const std::array<double, 3>& linear_velocity, const std::array<double, 3>& angular_velocity)
+  {
+    (void)linear_velocity;
+    (void)angular_velocity;
+    assert(false && "Static actors velocity cannot be set.");
+  }
+
 } // namespace owds::physx

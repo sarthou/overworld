@@ -41,6 +41,7 @@ namespace owds::physx {
     void setRestitution(float coefficient) override;
 
     void setPositionAndOrientation(const std::array<double, 3>& position, const std::array<double, 4>& orientation) override = 0;
+    void setVelocity(const std::array<double, 3>& linear_velocity, const std::array<double, 3>& angular_velocity) override = 0;
 
     std::array<float, 16> getModelMatrix() const override;
     std::pair<std::array<double, 3>, std::array<double, 4>> getPositionAndOrientation() const override;

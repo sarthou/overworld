@@ -79,6 +79,7 @@ namespace owds {
     int getNumJoints(size_t urdf_id) const;
     std::pair<std::array<double, 3>, std::array<double, 4>> getBasePositionAndOrientation(int body_id) const;
     void setBasePositionAndOrientation(int body_id, const std::array<double, 3>& position, const std::array<double, 4>& orientation);
+    void setBaseVelocity(int body_id, const std::array<double, 3>& linear_velocity, const std::array<double, 3>& angular_velocity);
 
     const std::unordered_map<std::size_t, Actor*>& getActors() const { return actors_; };
 

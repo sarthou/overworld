@@ -215,4 +215,17 @@ namespace owds::physx {
     px_articulation_->setRootGlobalPose(px_transform);
   }
 
+  void Urdf::setVelocity(const std::array<double, 3>& linear_velocity, const std::array<double, 3>& angular_velocity)
+  {
+    px_articulation_->setRootLinearVelocity(::physx::PxVec3(
+      static_cast<::physx::PxReal>(linear_velocity[0]),
+      static_cast<::physx::PxReal>(linear_velocity[1]),
+      static_cast<::physx::PxReal>(linear_velocity[2])));
+
+    px_articulation_->setRootAngularVelocity(::physx::PxVec3(
+      static_cast<::physx::PxReal>(angular_velocity[0]),
+      static_cast<::physx::PxReal>(angular_velocity[1]),
+      static_cast<::physx::PxReal>(angular_velocity[2])));
+  }
+
 } // namespace owds::physx
