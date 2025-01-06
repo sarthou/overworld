@@ -116,20 +116,26 @@ void worldThread(const std::string& world_name, owds::Window* window)
   //                        {owds::urdf::Geometry_t(overworld_dir + "/models/adream/walls.obj")},
   //                        {0., 0., 0.}, {0., 0., 1.57});
 
-  (void)world.loadUrdf(owds::compat::owds_ros::getShareDirectory("pr2_description") + "/robots/pr2.urdf", false);
+  size_t pr2_id = world.loadUrdf(owds::compat::owds_ros::getShareDirectory("pr2_description") + "/robots/pr2.urdf", {4., 3., 0.}, {0., 0., 0.}, false);
   //(void)world.loadUrdf(overworld_dir + "/models/eve.urdf", false);
-  (void)world.loadUrdf("models/adream/adream.urdf");
+  //(void)world.loadUrdf("models/adream/adream.urdf", {0., 0., 0.}, {0., 0., 0.});
   //(void)world.loadRobotFromDescription("models/tutorials/Frame/frame.urdf");
-  world.stepSimulation(1.f / 144.f);
+
+  world.setTimeStep(1.f / 60.f);
+  world.stepSimulation();
 
   std::cout << "================== WORLD LOADED !! ================" << std::endl;
 
   std::thread offscreen_thread(offscreenThread, &world, cam_ids);
 
+  std::cout << "pr2 has " << world.getNumJoints(pr2_id) << " joints" << std::endl;
+  auto pr2_pose = world.getBasePositionAndOrientation(pr2_id);
+  std::cout << "pr2_pose = " << pr2_pose.first[0] << " : " << pr2_pose.first[1] << " : " << pr2_pose.first[2] << std::endl;
+
   while(!window->isCloseRequested())
   {
     window->doPollEvents(renderer);
-    world.stepSimulation(1.f / 144.f);
+    world.stepSimulation();
     renderer.commit();
     window->swapBuffer();
   }
