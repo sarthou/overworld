@@ -52,6 +52,12 @@ namespace owds::physx {
 
   protected:
     std::unique_ptr<owds::physx::Context> ctx_;
+
+  private:
+    void performRaycastsInParallel(const std::vector<std::array<float, 3>>& origins,
+                                   const std::vector<std::array<float, 3>>& destinations,
+                                   float max_distance,
+                                   std::vector<RaycastHitResult_t>& results) override;
   };
 } // namespace owds::physx
 

@@ -10,6 +10,12 @@
 namespace owds {
   class Joint;
 
+  struct ActorData_t
+  {
+    size_t actor_id;
+    size_t body_id;
+  };
+
   class Actor
   {
     friend class Joint;

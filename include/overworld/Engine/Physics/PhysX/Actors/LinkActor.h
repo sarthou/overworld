@@ -20,6 +20,7 @@ namespace owds::physx {
     LinkActor(
       owds::physx::Context& ctx,
       ::physx::PxArticulationLink* px_link,
+      size_t body_id,
       const owds::Shape& collision_shape,
       const std::vector<owds::Shape>& visual_shapes);
 
@@ -45,6 +46,7 @@ namespace owds::physx {
 
   private:
     PxPtr<::physx::PxArticulationLink> px_link_;
+    size_t body_id_;
   };
 
 } // namespace owds::physx

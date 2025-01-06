@@ -31,6 +31,19 @@ namespace owds {
 
   class Renderer;
 
+  struct RaycastHitResult_t
+  {
+    bool hit;                      // Whether the ray hit something
+    std::array<float, 3> position; // Hit position (x, y, z)
+    std::array<float, 3> normal;   // Hit normal (x, y, z)
+    float distance;                // Distance to the hit
+    // std::string actor_name;
+    size_t actor_id;
+    size_t body_id;
+
+    RaycastHitResult_t() : hit(false), position{0, 0, 0}, normal{0, 0, 0}, distance(0.0f), actor_id(-1) {}
+  };
+
   class World
   {
     friend Renderer;
@@ -88,7 +101,13 @@ namespace owds {
     void setDynamicFriction(int body_id, int link_index, double friction);
     void setRestitution(int body_id, int link_index, double restitution);
 
-    const std::unordered_map<std::size_t, Actor*>& getActors() const { return actors_; };
+    const std::unordered_map<std::size_t, Actor*>& getActors() const { return actors_; }
+
+    /* COLISIONS */
+
+    std::vector<RaycastHitResult_t> raycasts(const std::vector<std::array<float, 3>>& origins,
+                                             const std::vector<std::array<float, 3>>& destinations,
+                                             float max_distance);
 
     /* LIGHTS */
 
@@ -183,6 +202,11 @@ namespace owds {
 
     owds::Shape convertShape(const urdf::Geometry_t& geometry);
     owds::Shape convertShape(const urdf::Geometry_t& urdf_shape, glm::mat4& transform);
+
+    virtual void performRaycastsInParallel(const std::vector<std::array<float, 3>>& origins,
+                                           const std::vector<std::array<float, 3>>& destinations,
+                                           float max_distance,
+                                           std::vector<RaycastHitResult_t>& results) = 0;
   };
 } // namespace owds
 

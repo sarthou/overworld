@@ -17,9 +17,11 @@ namespace owds::physx {
 
   LinkActor::LinkActor(owds::physx::Context& ctx,
                        ::physx::PxArticulationLink* px_link,
+                       size_t body_id,
                        const owds::Shape& collision_shape,
                        const std::vector<owds::Shape>& visual_shapes) : owds::physx::Actor(ctx, collision_shape, visual_shapes),
-                                                                        px_link_(px_link)
+                                                                        px_link_(px_link),
+                                                                        body_id_(body_id)
   {}
 
   LinkActor::~LinkActor() noexcept
@@ -46,6 +48,11 @@ namespace owds::physx {
         ::physx::PxShapeFlag::eSCENE_QUERY_SHAPE | ::physx::PxShapeFlag::eSIMULATION_SHAPE));
       px_link_->attachShape(*px_shapes_.back());
     }
+
+    ActorData_t* data = new ActorData_t();
+    data->actor_id = unique_id_;
+    data->body_id = body_id_;
+    px_link_->userData = data;
   }
 
   void LinkActor::setPhysicsEnabled(bool enabled)

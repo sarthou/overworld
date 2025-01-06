@@ -139,6 +139,13 @@ void worldThread(const std::string& world_name, owds::Window* window)
   pr2_pose = world.getBasePositionAndOrientation(pr2_id);
   std::cout << "pr2_pose = " << pr2_pose.first[0] << " : " << pr2_pose.first[1] << " : " << pr2_pose.first[2] << std::endl;
 
+  auto ray_res = world.raycasts({
+                                  {0., 0., 0.}
+  },
+                                {{4., 4., 0.1}}, 10);
+  for(auto& res : ray_res)
+    std::cout << "- " << res.actor_id << "=" << res.body_id << " : " << res.distance << std::endl;
+
   while(!window->isCloseRequested())
   {
     window->doPollEvents(renderer);

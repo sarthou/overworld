@@ -52,6 +52,11 @@ namespace owds::physx {
 
     setPhysicsEnabled(false);
 
+    ActorData_t* data = new ActorData_t();
+    data->actor_id = unique_id_;
+    data->body_id = -1;
+    px_actor_->userData = data;
+
     ctx_.px_scene_->addActor(*px_actor_);
   }
 

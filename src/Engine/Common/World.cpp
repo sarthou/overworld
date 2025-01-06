@@ -183,7 +183,7 @@ namespace owds {
     {
       auto actor_it = actors_.find(body_id);
       if(actor_it != actors_.end())
-        actor_it->second->setMass(mass_kg);
+        actor_it->second->setMass((float)mass_kg);
     }
   }
 
@@ -196,7 +196,7 @@ namespace owds {
     {
       auto actor_it = actors_.find(body_id);
       if(actor_it != actors_.end())
-        actor_it->second->setStaticFriction(friction);
+        actor_it->second->setStaticFriction((float)friction);
     }
   }
 
@@ -209,7 +209,7 @@ namespace owds {
     {
       auto actor_it = actors_.find(body_id);
       if(actor_it != actors_.end())
-        actor_it->second->setDynamicFriction(friction);
+        actor_it->second->setDynamicFriction((float)friction);
     }
   }
 
@@ -222,8 +222,21 @@ namespace owds {
     {
       auto actor_it = actors_.find(body_id);
       if(actor_it != actors_.end())
-        actor_it->second->setRestitution(restitution);
+        actor_it->second->setRestitution((float)restitution);
     }
+  }
+
+  /* COLISIONS */
+
+  std::vector<RaycastHitResult_t> World::raycasts(const std::vector<std::array<float, 3>>& origins,
+                                                  const std::vector<std::array<float, 3>>& destinations,
+                                                  float max_distance)
+  {
+    std::vector<RaycastHitResult_t> results;
+
+    performRaycastsInParallel(origins, destinations, max_distance, results);
+
+    return results;
   }
 
   /* LIGHTS */

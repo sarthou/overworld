@@ -73,7 +73,7 @@ namespace owds::physx {
           static_cast<::physx::PxReal>(rot.w)));
 
     ::physx::PxArticulationLink* px_link = px_articulation_->createLink(parent_ptr, px_transform);
-    LinkActor* link_actor = new LinkActor(ctx_, px_link, collision_shape, visual_shapes);
+    LinkActor* link_actor = new LinkActor(ctx_, px_link, unique_id_, collision_shape, visual_shapes);
     link_actor->setup({0., 0., 0.}, {0., 0., 0., 1.}); // position is not used for link actors
 
     px_links_[link_name] = px_link;
