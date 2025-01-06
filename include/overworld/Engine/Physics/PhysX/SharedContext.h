@@ -23,8 +23,6 @@ namespace owds::physx {
     PxPtr<::physx::PxCudaContextManager> px_cuda_context_manager_;
     PxPtr<::physx::PxMaterial> px_default_material_;
 
-    std::unordered_map<owds::Mesh::Id, PxPtr<::physx::PxTriangleMesh>> px_cached_meshes;
-
     explicit SharedContext(const std::string& debugger_address);
     ~SharedContext() noexcept;
   };

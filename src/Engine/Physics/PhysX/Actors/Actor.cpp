@@ -285,37 +285,30 @@ namespace owds::physx {
 
   void Actor::setupPhysicsShape(const owds::ShapeCustomMesh& shape)
   {
-    const auto& s_ctx = owds::physx::Context::createContext();
-
     const auto params = createPxCookingParams(ctx_.minimize_memory_footprint_);
 
     std::string model_name = getModelName(shape.custom_model_.get().source_path_);
 
     for(const auto& mesh : shape.custom_model_.get().meshes_)
     {
-      if(!s_ctx->px_cached_meshes.count(mesh.id_))
+      std::string bin_path = "/tmp/overworld/" + model_name;
+      if(mesh.name_.empty() == false)
+        bin_path += "_" + mesh.name_ + ".bin";
+
+      if(mesh.vertices_.size() < 4)
       {
-        std::string bin_path = "/tmp/overworld/" + model_name;
-        if(mesh.name_.empty() == false)
-          bin_path += "_" + mesh.name_ + ".bin";
-
-        if(mesh.vertices_.size() < 4)
-        {
-          printf("[%s:%s] Ignoring! Less than 4 vertices..\n",
-                 shape.custom_model_.get().source_path_.c_str(),
-                 mesh.name_.c_str());
-          continue;
-        }
-
-        auto* tringle_mesh = loadCookedFromDisk(bin_path);
-        if(tringle_mesh != nullptr)
-          s_ctx->px_cached_meshes[mesh.id_] = tringle_mesh;
-        else
-          s_ctx->px_cached_meshes[mesh.id_] = createPxTriangleMesh(mesh, params, bin_path);
+        printf("[%s:%s] Ignoring! Less than 4 vertices..\n",
+               shape.custom_model_.get().source_path_.c_str(),
+               mesh.name_.c_str());
+        continue;
       }
 
+      auto* tringle_mesh = loadCookedFromDisk(bin_path);
+      if(tringle_mesh == nullptr)
+        tringle_mesh = createPxTriangleMesh(mesh, params, bin_path);
+
       px_geometries_.emplace_back(std::make_unique<::physx::PxTriangleMeshGeometry>(
-        s_ctx->px_cached_meshes[mesh.id_].get(),
+        tringle_mesh,
         ::physx::PxMeshScale(::physx::PxVec3(
           static_cast<::physx::PxReal>(shape.scale_.x),
           static_cast<::physx::PxReal>(shape.scale_.y),
