@@ -34,7 +34,7 @@ namespace owds::bullet3 {
     [[nodiscard]] const std::vector<std::reference_wrapper<owds::Actor>>& getActors() const override;
 
     void setGravity(const std::array<float, 3>& gravity) override;
-    void stepSimulation(float delta) override;
+    void stepSimulation(float delta = 0) override;
 
   protected:
     std::unique_ptr<Context> ctx_;

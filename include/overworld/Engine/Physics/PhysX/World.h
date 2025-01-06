@@ -48,7 +48,7 @@ namespace owds::physx {
     void insertUrdf(owds::Urdf* urdf) override;
 
     void setGravity(const std::array<float, 3>& gravity) override;
-    void stepSimulation(float delta) override;
+    void stepSimulation(float delta = 0) override;
 
   protected:
     std::unique_ptr<owds::physx::Context> ctx_;

@@ -138,12 +138,12 @@ namespace owds {
      */
     virtual void setGravity(const std::array<float, 3>& gravity) = 0;
 
-    /**
-     * @param delta_ms Time elapsed since last physics update, in milliseconds.
-     */
-    virtual void stepSimulation(float delta_ms) = 0;
+    void setTimeStep(double delta_ms) { time_step_ = delta_ms; }
+    virtual void stepSimulation(float delta_ms = 0) = 0;
 
   protected:
+    double time_step_;
+
     virtual size_t createActor(const owds::Shape& collision_shape,
                                const std::vector<owds::Shape>& visual_shapes,
                                const glm::vec3& position,
