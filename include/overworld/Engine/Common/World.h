@@ -81,6 +81,12 @@ namespace owds {
     void setBasePositionAndOrientation(int body_id, const std::array<double, 3>& position, const std::array<double, 4>& orientation);
     void setBaseVelocity(int body_id, const std::array<double, 3>& linear_velocity, const std::array<double, 3>& angular_velocity);
     bool setJointState(int body_id, const std::string& joint_name, double position, double velocity = 0);
+    int getLinkId(int body_id, const std::string& link_name);
+
+    void setMass(int body_id, int link_index, double mass_kg);
+    void setStaticFriction(int body_id, int link_index, double friction);
+    void setDynamicFriction(int body_id, int link_index, double friction);
+    void setRestitution(int body_id, int link_index, double restitution);
 
     const std::unordered_map<std::size_t, Actor*>& getActors() const { return actors_; };
 

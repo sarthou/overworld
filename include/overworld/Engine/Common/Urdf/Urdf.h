@@ -43,12 +43,20 @@ namespace owds {
     virtual void setVelocity(const std::array<double, 3>& linear_velocity, const std::array<double, 3>& angular_velocity) = 0;
     bool setJointState(const std::string& joint_name, double position, double velocity);
 
+    int getLinkId(const std::string& link_name);
+
+    void setMass(int link_index, double mass_kg);
+    void setStaticFriction(int link_index, double friction);
+    void setDynamicFriction(int link_index, double friction);
+    void setRestitution(int link_index, double restitution);
+
     // Each urdf is associated with a non-zero, unique id.
     const std::size_t unique_id_{};
 
     std::string name_;
     owds::Actor* root_actor_;
     std::unordered_map<std::string, owds::Actor*> links_;
+    std::unordered_map<size_t, owds::Actor*> id_links_;
     std::unordered_map<std::string, owds::Joint*> joints_;
     std::unordered_map<std::string, owds::Material> materials_;
   };

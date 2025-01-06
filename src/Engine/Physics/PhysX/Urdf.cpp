@@ -78,6 +78,7 @@ namespace owds::physx {
 
     px_links_[link_name] = px_link;
     links_[link_name] = link_actor;
+    id_links_[link_actor->unique_id_] = link_actor;
     if(parent_ptr == nullptr)
       root_actor_ = link_actor;
   }

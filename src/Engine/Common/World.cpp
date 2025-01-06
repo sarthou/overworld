@@ -116,16 +116,12 @@ namespace owds {
   {
     auto urdf_it = urdfs_.find(body_id);
     if(urdf_it != urdfs_.end())
-    {
       return urdf_it->second->getPositionAndOrientation();
-    }
     else
     {
       auto actor_it = actors_.find(body_id);
       if(actor_it != actors_.end())
-      {
         return actor_it->second->getPositionAndOrientation();
-      }
       else
         return std::pair<std::array<double, 3>, std::array<double, 4>>{
           {0., 0., 0.},
@@ -138,16 +134,12 @@ namespace owds {
   {
     auto urdf_it = urdfs_.find(body_id);
     if(urdf_it != urdfs_.end())
-    {
       urdf_it->second->setPositionAndOrientation(position, orientation);
-    }
     else
     {
       auto actor_it = actors_.find(body_id);
       if(actor_it != actors_.end())
-      {
         actor_it->second->setPositionAndOrientation(position, orientation);
-      }
     }
   }
 
@@ -155,16 +147,12 @@ namespace owds {
   {
     auto urdf_it = urdfs_.find(body_id);
     if(urdf_it != urdfs_.end())
-    {
       urdf_it->second->setVelocity(linear_velocity, angular_velocity);
-    }
     else
     {
       auto actor_it = actors_.find(body_id);
       if(actor_it != actors_.end())
-      {
         actor_it->second->setVelocity(linear_velocity, angular_velocity);
-      }
     }
   }
 
@@ -175,6 +163,67 @@ namespace owds {
       return urdf_it->second->setJointState(joint_name, position, velocity);
     else
       return false;
+  }
+
+  int World::getLinkId(int body_id, const std::string& link_name)
+  {
+    auto urdf_it = urdfs_.find(body_id);
+    if(urdf_it != urdfs_.end())
+      return urdf_it->second->getLinkId(link_name);
+    else
+      return -1;
+  }
+
+  void World::setMass(int body_id, int link_index, double mass_kg)
+  {
+    auto urdf_it = urdfs_.find(body_id);
+    if(urdf_it != urdfs_.end())
+      urdf_it->second->setMass(link_index, mass_kg);
+    else
+    {
+      auto actor_it = actors_.find(body_id);
+      if(actor_it != actors_.end())
+        actor_it->second->setMass(mass_kg);
+    }
+  }
+
+  void World::setStaticFriction(int body_id, int link_index, double friction)
+  {
+    auto urdf_it = urdfs_.find(body_id);
+    if(urdf_it != urdfs_.end())
+      urdf_it->second->setStaticFriction(link_index, friction);
+    else
+    {
+      auto actor_it = actors_.find(body_id);
+      if(actor_it != actors_.end())
+        actor_it->second->setStaticFriction(friction);
+    }
+  }
+
+  void World::setDynamicFriction(int body_id, int link_index, double friction)
+  {
+    auto urdf_it = urdfs_.find(body_id);
+    if(urdf_it != urdfs_.end())
+      urdf_it->second->setDynamicFriction(link_index, friction);
+    else
+    {
+      auto actor_it = actors_.find(body_id);
+      if(actor_it != actors_.end())
+        actor_it->second->setDynamicFriction(friction);
+    }
+  }
+
+  void World::setRestitution(int body_id, int link_index, double restitution)
+  {
+    auto urdf_it = urdfs_.find(body_id);
+    if(urdf_it != urdfs_.end())
+      urdf_it->second->setRestitution(link_index, restitution);
+    else
+    {
+      auto actor_it = actors_.find(body_id);
+      if(actor_it != actors_.end())
+        actor_it->second->setRestitution(restitution);
+    }
   }
 
   /* LIGHTS */

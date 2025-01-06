@@ -34,8 +34,8 @@ namespace owds::physx {
 
     void setPhysicsEnabled(bool enabled) override = 0;
     void setSimulationEnabled(bool enabled) override = 0;
-    void setMass(float mass_kg) override = 0;
 
+    void setMass(float mass_kg) override = 0;
     void setStaticFriction(float coefficient) override;
     void setDynamicFriction(float coefficient) override;
     void setRestitution(float coefficient) override;
