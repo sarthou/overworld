@@ -70,7 +70,7 @@ namespace owds {
      *
      * @return todo: document this
      */
-    [[nodiscard]] virtual std::pair<std::array<float, 3>, std::array<float, 3>> getPositionAndOrientation() const = 0;
+    [[nodiscard]] virtual std::pair<std::array<double, 3>, std::array<double, 4>> getPositionAndOrientation() const = 0;
 
     // Each actor is associated with a non-zero, unique id.
     const std::size_t unique_id_{};

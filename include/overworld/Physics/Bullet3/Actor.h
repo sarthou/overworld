@@ -44,7 +44,7 @@ namespace owds::bullet3 {
     void setPositionAndOrientation(const std::array<float, 3>& position, const std::array<float, 4>& orientation) override;
 
     [[nodiscard]] std::array<float, 16> getModelMatrix() const override;
-    [[nodiscard]] std::pair<std::array<float, 3>, std::array<float, 3>> getPositionAndOrientation() const override;
+    [[nodiscard]] std::pair<std::array<double, 3>, std::array<double, 4>> getPositionAndOrientation() const override;
 
     void setupPhysicsShape(const owds::ShapeBox& shape);
     void setupPhysicsShape(const owds::ShapeCapsule& shape);

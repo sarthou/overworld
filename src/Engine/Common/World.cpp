@@ -103,6 +103,37 @@ namespace owds {
     return urdf->unique_id_;
   }
 
+  int World::getNumJoints(size_t urdf_id) const
+  {
+    auto it = urdfs_.find(urdf_id);
+    if(it == urdfs_.end())
+      return -1;
+    else
+      return it->second->getNumJoints();
+  }
+
+  std::pair<std::array<double, 3>, std::array<double, 4>> World::getBasePositionAndOrientation(int body_id) const
+  {
+    auto urdf_it = urdfs_.find(body_id);
+    if(urdf_it != urdfs_.end())
+    {
+      return urdf_it->second->getPositionAndOrientation();
+    }
+    else
+    {
+      auto actor_it = actors_.find(body_id);
+      if(actor_it != actors_.end())
+      {
+        return actor_it->second->getPositionAndOrientation();
+      }
+      else
+        return std::pair<std::array<double, 3>, std::array<double, 4>>{
+          {0., 0., 0.},
+          {0., 0., 0., 0.}
+        };
+    }
+  }
+
   /* LIGHTS */
 
   void World::setAmbientLight(const std::array<float, 3>& direction,

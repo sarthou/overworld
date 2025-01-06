@@ -43,7 +43,7 @@ namespace owds::physx {
     void setPositionAndOrientation(const std::array<float, 3>& position, const std::array<float, 4>& orientation) override = 0;
 
     std::array<float, 16> getModelMatrix() const override;
-    std::pair<std::array<float, 3>, std::array<float, 3>> getPositionAndOrientation() const override;
+    std::pair<std::array<double, 3>, std::array<double, 4>> getPositionAndOrientation() const override;
 
     void setupPhysicsShape(const owds::ShapeBox& shape);
     void setupPhysicsShape(const owds::ShapeCapsule& shape);

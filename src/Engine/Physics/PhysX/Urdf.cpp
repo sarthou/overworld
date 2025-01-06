@@ -75,12 +75,16 @@ namespace owds::physx {
 
     px_links_[link_name] = px_link;
     links_[link_name] = link_actor;
+    if(parent_ptr == nullptr)
+      root_actor_ = link_actor;
   }
 
   void Urdf::addJoint(const urdf::Joint_t& joint)
   {
     auto* px_link = px_links_[joint.child_link];
     ::physx::PxArticulationJointReducedCoordinate* px_joint = static_cast<::physx::PxArticulationJointReducedCoordinate*>(px_link->getInboundJoint());
+    px_joints_[joint.name] = px_joint;
+
     ::physx::PxArticulationAxis::Enum axis(::physx::PxArticulationAxis::eCOUNT);
     switch(joint.type)
     {
@@ -181,6 +185,16 @@ namespace owds::physx {
   {
     for(const auto& link : px_links_)
       link.second->setActorFlag(::physx::PxActorFlag::eDISABLE_GRAVITY, !enabled);
+  }
+
+  size_t Urdf::getNumJoints()
+  {
+    return px_joints_.size();
+  }
+
+  std::pair<std::array<double, 3>, std::array<double, 4>> Urdf::getPositionAndOrientation()
+  {
+    return root_actor_->getPositionAndOrientation();
   }
 
 } // namespace owds::physx

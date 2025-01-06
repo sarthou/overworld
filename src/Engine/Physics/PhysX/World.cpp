@@ -99,7 +99,7 @@ namespace owds::physx {
     ctx_->px_scene_->simulate(delta != 0 ? delta : time_step_);
 
     if(ctx_->px_scene_->checkResults(true))
-    ctx_->px_scene_->fetchResults(true);
+      ctx_->px_scene_->fetchResults(true);
     else
       std::cout << "error " << std::endl;
   }

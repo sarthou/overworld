@@ -46,7 +46,8 @@ namespace owds::physx {
 
     // void setPositionAndOrientation(const std::array<float, 3>& position, const std::array<float, 4>& orientation);
 
-    // std::pair<std::array<float, 3>, std::array<float, 3>> getPositionAndOrientation() const override {};
+    virtual size_t getNumJoints() override;
+    std::pair<std::array<double, 3>, std::array<double, 4>> getPositionAndOrientation() override;
 
   protected:
     owds::physx::Context& ctx_;

@@ -36,6 +36,10 @@ namespace owds {
 
     virtual void setPhysicsEnabled(bool enabled) = 0;
 
+    virtual size_t getNumJoints() = 0;
+
+    virtual std::pair<std::array<double, 3>, std::array<double, 4>> getPositionAndOrientation() = 0;
+
     // Each urdf is associated with a non-zero, unique id.
     const std::size_t unique_id_{};
 
