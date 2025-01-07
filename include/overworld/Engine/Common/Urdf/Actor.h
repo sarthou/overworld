@@ -9,6 +9,7 @@
 
 namespace owds {
   class Joint;
+  struct AABB_t;
 
   struct ActorData_t
   {
@@ -68,6 +69,9 @@ namespace owds {
     virtual void setPositionAndOrientation(const std::array<double, 3>& position, const std::array<double, 4>& orientation) = 0;
 
     virtual void setVelocity(const std::array<double, 3>& linear_velocity, const std::array<double, 3>& angular_velocity) = 0;
+
+    virtual AABB_t getAABB() = 0;
+    virtual AABB_t getLocalAABB() = 0;
 
     /**
      * @return todo: document this

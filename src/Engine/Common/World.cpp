@@ -239,6 +239,36 @@ namespace owds {
     return results;
   }
 
+  AABB_t World::getAABB(int body_id, int link_index)
+  {
+    auto urdf_it = urdfs_.find(body_id);
+    if(urdf_it != urdfs_.end())
+      return urdf_it->second->getAABB(link_index);
+    else
+    {
+      auto actor_it = actors_.find(body_id);
+      if(actor_it != actors_.end())
+        return actor_it->second->getAABB();
+      else
+        return AABB_t();
+    }
+  }
+
+  AABB_t World::getLocalAABB(int body_id, int link_index)
+  {
+    auto urdf_it = urdfs_.find(body_id);
+    if(urdf_it != urdfs_.end())
+      return urdf_it->second->getLocalAABB(link_index);
+    else
+    {
+      auto actor_it = actors_.find(body_id);
+      if(actor_it != actors_.end())
+        return actor_it->second->getLocalAABB();
+      else
+        return AABB_t();
+    }
+  }
+
   /* LIGHTS */
 
   void World::setAmbientLight(const std::array<float, 3>& direction,

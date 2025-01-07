@@ -5,6 +5,7 @@
 
 #include "overworld/Engine/Common/Urdf/Actor.h"
 #include "overworld/Engine/Common/Urdf/UrdfLoader.h"
+#include "overworld/Engine/Common/World.h"
 
 namespace owds {
 
@@ -63,6 +64,24 @@ namespace owds {
     auto link_it = id_links_.find(link_index);
     if(link_it != id_links_.end())
       link_it->second->setRestitution((float)restitution);
+  }
+
+  AABB_t Urdf::getAABB(int link_index)
+  {
+    auto link_it = id_links_.find(link_index);
+    if(link_it != id_links_.end())
+      return link_it->second->getAABB();
+    else
+      return AABB_t();
+  }
+
+  AABB_t Urdf::getLocalAABB(int link_index)
+  {
+    auto link_it = id_links_.find(link_index);
+    if(link_it != id_links_.end())
+      return link_it->second->getLocalAABB();
+    else
+      return AABB_t();
   }
 
 } // namespace owds

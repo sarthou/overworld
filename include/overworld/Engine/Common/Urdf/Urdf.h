@@ -13,6 +13,7 @@
 
 namespace owds {
   class Actor;
+  struct AABB_t;
 
   class Urdf
   {
@@ -49,6 +50,9 @@ namespace owds {
     void setStaticFriction(int link_index, double friction);
     void setDynamicFriction(int link_index, double friction);
     void setRestitution(int link_index, double restitution);
+
+    AABB_t getAABB(int link_index);
+    AABB_t getLocalAABB(int link_index);
 
     // Each urdf is associated with a non-zero, unique id.
     const std::size_t unique_id_{};

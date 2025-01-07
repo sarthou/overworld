@@ -30,6 +30,7 @@
 #include "overworld/Engine/Common/Shapes/ShapeDummy.h"
 #include "overworld/Engine/Common/Shapes/ShapeSphere.h"
 #include "overworld/Engine/Common/Urdf/Actor.h"
+#include "overworld/Engine/Common/World.h"
 #include "overworld/Engine/Physics/PhysX/Context.h"
 #include "overworld/Engine/Physics/PhysX/SharedContext.h"
 #include "overworld/Utils/BitCast.h"
@@ -60,6 +61,41 @@ namespace owds::physx {
   void Actor::setRestitution(const float coefficient)
   {
     px_material_->setRestitution(coefficient);
+  }
+
+  owds::AABB_t Actor::getAABB()
+  {
+    ::physx::PxBounds3 px_aabb = px_base_->getWorldBounds();
+    AABB_t aabb({px_aabb.minimum.x, px_aabb.minimum.y, px_aabb.minimum.z},
+                {px_aabb.maximum.x, px_aabb.maximum.y, px_aabb.maximum.z});
+    return aabb;
+  }
+
+  owds::AABB_t Actor::getLocalAABB()
+  {
+    auto nb_shapes = px_base_->getNbShapes();
+    std::vector<::physx::PxShape*> shapes;
+    shapes.resize(nb_shapes);
+
+    px_base_->getShapes(shapes.data(), nb_shapes);
+
+    ::physx::PxBounds3 px_aabb;
+    for(auto* shape : shapes)
+    {
+      ::physx::PxGeometryHolder px_geom = shape->getGeometry();
+      auto local_pose = shape->getLocalPose();
+      ::physx::PxBounds3 geom_bounds;
+      ::physx::PxGeometryQuery::computeGeomBounds(geom_bounds, px_geom.any(), ::physx::PxTransform(::physx::PxIdentity));
+      ::physx::PxBounds3 shape_local_bounds = ::physx::PxBounds3::transformSafe(local_pose, geom_bounds);
+      if(px_aabb.isValid())
+        px_aabb.include(shape_local_bounds);
+      else
+        px_aabb = shape_local_bounds;
+    }
+
+    AABB_t aabb({px_aabb.minimum.x, px_aabb.minimum.y, px_aabb.minimum.z},
+                {px_aabb.maximum.x, px_aabb.maximum.y, px_aabb.maximum.z});
+    return aabb;
   }
 
   std::array<float, 16> Actor::getModelMatrix() const

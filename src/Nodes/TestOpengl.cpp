@@ -146,6 +146,12 @@ void worldThread(const std::string& world_name, owds::Window* window)
   for(auto& res : ray_res)
     std::cout << "- " << res.actor_id << "=" << res.body_id << " : " << res.distance << std::endl;
 
+  auto aabb = world.getAABB(1, 3);
+  auto l_aabb = world.getLocalAABB(1, 3);
+
+  std::cout << "AABB = " << aabb.min[0] << " : " << aabb.min[1] << " : " << aabb.min[2] << " == " << aabb.max[0] << " : " << aabb.max[1] << " : " << aabb.max[2] << std::endl;
+  std::cout << "LAABB = " << l_aabb.min[0] << " : " << l_aabb.min[1] << " : " << l_aabb.min[2] << " == " << l_aabb.max[0] << " : " << l_aabb.max[1] << " : " << l_aabb.max[2] << std::endl;
+
   while(!window->isCloseRequested())
   {
     window->doPollEvents(renderer);

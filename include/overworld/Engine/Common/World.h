@@ -44,6 +44,23 @@ namespace owds {
     RaycastHitResult_t() : hit(false), position{0, 0, 0}, normal{0, 0, 0}, distance(0.0f), actor_id(-1) {}
   };
 
+  struct AABB_t
+  {
+  public:
+    std::array<float, 3> min = {0., 0., 0.};
+    std::array<float, 3> max = {0., 0., 0.};
+
+    AABB_t() : valid_(false) {}
+    AABB_t(const std::array<float, 3>& aabb_min,
+           const std::array<float, 3>& aabb_max) : min(aabb_min),
+                                                   max(aabb_max), valid_(true) {}
+
+    bool isValid() const { return valid_; }
+
+  private:
+    bool valid_;
+  };
+
   class World
   {
     friend Renderer;
@@ -108,6 +125,9 @@ namespace owds {
     std::vector<RaycastHitResult_t> raycasts(const std::vector<std::array<float, 3>>& origins,
                                              const std::vector<std::array<float, 3>>& destinations,
                                              float max_distance);
+
+    AABB_t getAABB(int body_id, int link_index = -1);
+    AABB_t getLocalAABB(int body_id, int link_index = -1);
 
     /* LIGHTS */
 
