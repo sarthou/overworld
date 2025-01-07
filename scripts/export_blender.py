@@ -27,8 +27,8 @@ def exportOneObject(obj, export_path_before , export_path_after):
         bpy.ops.anim.keyframe_clear_v3d()
     
     if "STL" in extensions_types:
-        bpy.ops.export_mesh.stl(filepath = export_path_before + "STL" + export_path_after + obj.name + ".stl" ,  check_existing=False, 
-        use_selection = True , axis_forward = 'X' , axis_up = 'Z')
+        bpy.ops.wm.stl_export(filepath = export_path_before + "STL" + export_path_after + obj.name + ".stl" ,  check_existing=False, 
+        export_selected_objects=True , forward_axis = 'X' , up_axis = 'Z')
     if "OBJ" in extensions_types:
         bpy.ops.wm.obj_export(filepath=export_path_before + "OBJ" + export_path_after + obj.name + ".obj" , check_existing=False,
         export_selected_objects=True, forward_axis='X',up_axis='Z')
