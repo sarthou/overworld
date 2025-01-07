@@ -6,7 +6,7 @@ import yaml
 import os
 import copy
 #### Argument 
-mesh_root_path = "/home/avigne/Projets/supervision/catkin_ws/src/restaurant_resources/models/" #chemin recepteur des exports
+mesh_root_path = "/path/to/replace" #chemin recepteur des exports
 root = bpy.data.scenes["Adream"].collection
 root_visible = bpy.context.view_layer.layer_collection  
 #### script
