@@ -269,6 +269,16 @@ namespace owds {
     }
   }
 
+  std::unordered_set<int> World::getOverlappingObjects(int body_id, int link_index)
+  {
+    Actor* actor = getActor(body_id, link_index);
+
+    if(actor == nullptr)
+      return {};
+
+    return getOverlappingActors(actor);
+  }
+
   /* LIGHTS */
 
   void World::setAmbientLight(const std::array<float, 3>& direction,
@@ -512,6 +522,28 @@ namespace owds {
       return cameras_[id].getSegmentedIds();
     else
       return {};
+  }
+
+  /* PROTECTED */
+
+  Actor* World::getActor(int body_id, int link_index)
+  {
+    Actor* actor = nullptr;
+    auto urdf_it = urdfs_.find(body_id);
+    if(urdf_it != urdfs_.end())
+    {
+      auto link_it = urdf_it->second->id_links_.find(link_index);
+      if(link_it != urdf_it->second->id_links_.end())
+        actor = static_cast<Actor*>(link_it->second);
+    }
+    else
+    {
+      auto actor_it = actors_.find(body_id);
+      if(actor_it != actors_.end())
+        actor = static_cast<Actor*>(actor_it->second);
+    }
+
+    return actor;
   }
 
   /* PRIVATE */

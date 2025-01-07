@@ -61,6 +61,14 @@ namespace owds {
     bool valid_;
   };
 
+  struct ContactPoint_t
+  {
+    std::array<float, 3> position; // World-space position of the contact
+    std::array<float, 3> normal;   // Normal at the contact point
+    float separation;              // Separation distance (negative for penetration)
+    float impulse;                 // Normal impulse applied at the contact point
+  };
+
   class World
   {
     friend Renderer;
@@ -129,7 +137,7 @@ namespace owds {
     AABB_t getAABB(int body_id, int link_index = -1);
     AABB_t getLocalAABB(int body_id, int link_index = -1);
 
-    virtual std::unordered_set<int> getOverlappingObjects(int body_id, int link_index) = 0;
+    std::unordered_set<int> getOverlappingObjects(int body_id, int link_index);
 
     /* LIGHTS */
 
@@ -196,6 +204,8 @@ namespace owds {
   protected:
     double time_step_;
 
+    Actor* getActor(int body_id, int link_index = -1);
+
     virtual size_t createActor(const owds::Shape& collision_shape,
                                const std::vector<owds::Shape>& visual_shapes,
                                const glm::vec3& position,
@@ -215,6 +225,8 @@ namespace owds {
                       const std::string& link_name,
                       const std::array<float, 3>& position,
                       const std::array<float, 3>& orientation);
+
+    virtual std::unordered_set<int> getOverlappingActors(Actor* actor) = 0;
 
     owds::Shape createShapeBox(const owds::Color& color, const std::array<float, 3>& half_extents, glm::mat4& transform);
     owds::Shape createShapeCapsule(const owds::Color& color, float radius, float height, glm::mat4& transform);

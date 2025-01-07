@@ -170,10 +170,10 @@ int main()
   owds::Renderer::init();
 
   owds::Window window1("overworld_bob");
-  // owds::Window window2("overworld_alice");
+  owds::Window window2("overworld_alice");
 
   std::thread world1(worldThread, "overworld_bob", &window1);
-  // std::thread world2(worldThread, "overworld_alice", &window2);
+  std::thread world2(worldThread, "overworld_alice", &window2);
 
   while(1)
   {
@@ -182,7 +182,7 @@ int main()
   }
 
   world1.join();
-  // world2.join();
+  world2.join();
 
   owds::Renderer::release();
 

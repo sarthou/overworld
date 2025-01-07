@@ -47,13 +47,13 @@ namespace owds::physx {
     owds::Urdf* loadUrdf(const urdf::Urdf_t& model) override;
     void insertUrdf(owds::Urdf* urdf) override;
 
-    std::unordered_set<int> getOverlappingObjects(int body_id, int link_index) override;
-
     void setGravity(const std::array<float, 3>& gravity) override;
     void stepSimulation(float delta = 0) override;
 
   protected:
     std::unique_ptr<owds::physx::Context> ctx_;
+
+    std::unordered_set<int> getOverlappingActors(::owds::Actor* actor) override;
 
   private:
     void performRaycastsInParallel(const std::vector<std::array<float, 3>>& origins,

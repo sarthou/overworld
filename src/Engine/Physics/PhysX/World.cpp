@@ -87,26 +87,9 @@ namespace owds::physx {
       actors_.emplace(actor.second->unique_id_, actor.second);
   }
 
-  std::unordered_set<int> World::getOverlappingObjects(int body_id, int link_index)
+  std::unordered_set<int> World::getOverlappingActors(::owds::Actor* owds_actor)
   {
-    Actor* actor = nullptr;
-    auto urdf_it = urdfs_.find(body_id);
-    if(urdf_it != urdfs_.end())
-    {
-      auto link_it = urdf_it->second->id_links_.find(link_index);
-      if(link_it != urdf_it->second->id_links_.end())
-        actor = static_cast<Actor*>(link_it->second);
-    }
-    else
-    {
-      auto actor_it = actors_.find(body_id);
-      if(actor_it != actors_.end())
-        actor = static_cast<Actor*>(actor_it->second);
-    }
-
-    if(actor == nullptr)
-      return {};
-
+    Actor* actor = static_cast<Actor*>(owds_actor);
     std::unordered_set<int> res;
     const auto& shapes = actor->getShapes();
 
