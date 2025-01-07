@@ -1,4 +1,7 @@
 import bpy
+import sys 
+import pip
+pip.main(['install','pyaml'])
 import yaml
 import os
 import copy
