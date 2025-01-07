@@ -73,14 +73,8 @@ namespace owds::physx {
 
   owds::AABB_t Actor::getLocalAABB()
   {
-    auto nb_shapes = px_base_->getNbShapes();
-    std::vector<::physx::PxShape*> shapes;
-    shapes.resize(nb_shapes);
-
-    px_base_->getShapes(shapes.data(), nb_shapes);
-
     ::physx::PxBounds3 px_aabb;
-    for(auto* shape : shapes)
+    for(auto& shape : px_shapes_)
     {
       ::physx::PxGeometryHolder px_geom = shape->getGeometry();
       auto local_pose = shape->getLocalPose();

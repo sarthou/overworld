@@ -87,6 +87,85 @@ namespace owds::physx {
       actors_.emplace(actor.second->unique_id_, actor.second);
   }
 
+  std::unordered_set<int> World::getOverlappingObjects(int body_id, int link_index)
+  {
+    Actor* actor = nullptr;
+    auto urdf_it = urdfs_.find(body_id);
+    if(urdf_it != urdfs_.end())
+    {
+      auto link_it = urdf_it->second->id_links_.find(link_index);
+      if(link_it != urdf_it->second->id_links_.end())
+        actor = static_cast<Actor*>(link_it->second);
+    }
+    else
+    {
+      auto actor_it = actors_.find(body_id);
+      if(actor_it != actors_.end())
+        actor = static_cast<Actor*>(actor_it->second);
+    }
+
+    if(actor == nullptr)
+      return {};
+
+    std::unordered_set<int> res;
+    const auto& shapes = actor->getShapes();
+
+    for(auto& shape : shapes)
+    {
+      ::physx::PxGeometryHolder px_geom = shape->getGeometry();
+      if(px_geom.getType() == ::physx::PxGeometryType::eINVALID)
+        continue;
+
+      auto local_pose = shape->getLocalPose();
+      ::physx::PxTransform world_pose = actor->getGlobalPose() * local_pose;
+
+      ::physx::PxOverlapHit hit_buffer[256];
+      ::physx::PxOverlapBuffer overlap_buffer(hit_buffer, 256);
+      ::physx::PxQueryFilterData filter_data;
+      filter_data.flags = ::physx::PxQueryFlag::eDYNAMIC | ::physx::PxQueryFlag::eSTATIC;
+
+      bool has_hit = false;
+
+      if(px_geom.getType() == ::physx::PxGeometryType::eTRIANGLEMESH)
+      {
+        ::physx::PxBounds3 aabb;
+        ::physx::PxGeometryQuery::computeGeomBounds(aabb, px_geom.any(), world_pose);
+
+        ::physx::PxBoxGeometry box_geom((aabb.maximum - aabb.minimum) * 0.5f);
+        ::physx::PxTransform box_pose(aabb.getCenter());
+
+        has_hit = ctx_->px_scene_->overlap(box_geom, box_pose, overlap_buffer, filter_data);
+      }
+      else
+      {
+        has_hit = ctx_->px_scene_->overlap(px_geom.any(), world_pose, overlap_buffer, filter_data);
+      }
+
+      if(has_hit)
+      {
+        for(::physx::PxU32 j = 0; j < overlap_buffer.getNbAnyHits(); ++j)
+        {
+          ::physx::PxActor* hit_actor = overlap_buffer.getAnyHit(j).actor;
+          ::physx::PxRigidActor* rigid_actor = hit_actor->is<::physx::PxRigidActor>();
+
+          if(rigid_actor != nullptr)
+          {
+            ActorData_t* data = static_cast<ActorData_t*>(rigid_actor->userData);
+            if(data != nullptr)
+            {
+              if(data->body_id > 0)
+                res.insert(data->body_id);
+              else if(data->actor_id > 0)
+                res.insert(data->actor_id);
+            }
+          }
+        }
+      }
+    }
+
+    return res;
+  }
+
   void World::setGravity(const std::array<float, 3>& gravity)
   {
     ctx_->px_scene_->setGravity(::physx::PxVec3(

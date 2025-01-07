@@ -129,6 +129,8 @@ namespace owds {
     AABB_t getAABB(int body_id, int link_index = -1);
     AABB_t getLocalAABB(int body_id, int link_index = -1);
 
+    virtual std::unordered_set<int> getOverlappingObjects(int body_id, int link_index) = 0;
+
     /* LIGHTS */
 
     void setAmbientLight(const std::array<float, 3>& direction,

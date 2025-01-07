@@ -152,6 +152,10 @@ void worldThread(const std::string& world_name, owds::Window* window)
   std::cout << "AABB = " << aabb.min[0] << " : " << aabb.min[1] << " : " << aabb.min[2] << " == " << aabb.max[0] << " : " << aabb.max[1] << " : " << aabb.max[2] << std::endl;
   std::cout << "LAABB = " << l_aabb.min[0] << " : " << l_aabb.min[1] << " : " << l_aabb.min[2] << " == " << l_aabb.max[0] << " : " << l_aabb.max[1] << " : " << l_aabb.max[2] << std::endl;
 
+  auto overlap = world.getOverlappingObjects(1, 2);
+  for(auto over : overlap)
+    std::cout << "- " << over << std::endl;
+
   while(!window->isCloseRequested())
   {
     window->doPollEvents(renderer);
