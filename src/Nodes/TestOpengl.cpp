@@ -1,37 +1,11 @@
-#include <overworld/Compat/ROS.h>
-// should be first
-
-#include <cstddef>
-#include <thread>
-
-#include "overworld/Engine/Common/Camera/Camera.h"
-#include "overworld/Engine/Common/Camera/CameraView.h"
-#include "overworld/Engine/Common/Models/Loaders/ModelLoader.h"
-#include "overworld/Engine/Common/Models/ModelManager.h"
-#include "overworld/Engine/Graphics/OpenGL/Renderer.h"
-
-// should be after glad
-#include "overworld/Engine/Graphics/GLFW/Window.h"
-
-#if !OWDS_USE_PHYSX
-#include <overworld/Physics/Bullet3/Actor.h>
-#include <overworld/Physics/Bullet3/World.h>
-using DefaultEngine = owds::bullet3::World;
-#else
-// #include "overworld/Engine/Physics/PhysX/Actor.h"
-#include "overworld/Engine/Physics/PhysX/World.h"
-using DefaultEngine = owds::physx::World;
-#endif
-
 #include <cmath>
+#include <cstddef>
 #include <iostream>
 #include <opencv2/opencv.hpp>
 #include <string>
+#include <thread>
 
-// Should be last
-#define GLFW_EXPOSE_NATIVE_X11
-#include <GLFW/glfw3.h>
-#include <GLFW/glfw3native.h>
+#include "overworld/Engine/Engine.h"
 
 void offscreenThread(DefaultEngine* world, std::vector<int> camera_ids)
 {
@@ -60,50 +34,40 @@ void offscreenThread(DefaultEngine* world, std::vector<int> camera_ids)
 
 void worldThread(const std::string& world_name, owds::Window* window)
 {
+  owds::Engine engine(world_name, window);
+  engine.initView();
   std::cout << world_name << std::endl;
-  auto& cam = window->getCamera();
-  cam.setFieldOfView(60.f);
-  cam.setOutputAA(owds::ViewAntiAliasing_e::msaa_x4);
-  cam.setOutputResolution({640, 480});
-  cam.setPositionAndLookAt({6, 6, 1.7}, {0, 0, 0});
-  cam.setPlanes({0.1, 60.});
-  cam.finalize();
-
-  owds::Renderer renderer;
-  renderer.initialize(*window);
-
-  DefaultEngine world(owds::compat::owds_ros::getShareDirectory("overworld"));
 
   std::cout << "================== WORLD " << world_name << " CREATED ! ================" << std::endl;
 
-  world.setAmbientLight({48.f, -2.f, 0.f},
-                        {1.0f, 0.976f, 0.898f},
-                        0.25, 0.4, 0.8);
+  engine.world.setAmbientLight({48.f, -2.f, 0.f},
+                               {1.0f, 0.976f, 0.898f},
+                               0.25, 0.4, 0.8);
 
-  world.addPointLight({5.f, 7.0f, 2.9f},
-                      {1.0f, 1.0f, 1.0f},
-                      0.4, 0.5, 1.0,
-                      6.f);
+  engine.world.addPointLight({5.f, 7.0f, 2.9f},
+                             {1.0f, 1.0f, 1.0f},
+                             0.4, 0.5, 1.0,
+                             6.f);
 
-  world.addPointLight({8.5f, 7.0f, 2.9f},
-                      {1.0f, 1.0f, 1.0f},
-                      0.5, 0.6, 1.0,
-                      6.0f);
+  engine.world.addPointLight({8.5f, 7.0f, 2.9f},
+                             {1.0f, 1.0f, 1.0f},
+                             0.5, 0.6, 1.0,
+                             6.0f);
 
-  world.addPointLight({5.f, 12.0f, 2.9f},
-                      {1.0f, 1.0f, 1.0f},
-                      0.4, 0.5, 1.0,
-                      6.f);
+  engine.world.addPointLight({5.f, 12.0f, 2.9f},
+                             {1.0f, 1.0f, 1.0f},
+                             0.4, 0.5, 1.0,
+                             6.f);
 
-  world.addDebugText("overworld", {5, 5, 5}, 0.5, {0., 0.5, 1.0});
+  engine.world.addDebugText("overworld", {5, 5, 5}, 0.5, {0., 0.5, 1.0});
 
-  world.addDebugLine({0, 0, 0}, {1, 1, 1});
+  engine.world.addDebugLine({0, 0, 0}, {1, 1, 1});
 
-  auto cam_id = world.addCamera(640, 480, 80, owds::CameraView_e::segmented_view, 0.1, 60.);
-  world.setCameraPositionAndLookAt(cam_id, {6, 6, 1.7}, {0, 0, 0});
+  auto cam_id = engine.world.addCamera(640, 480, 80, owds::CameraView_e::segmented_view, 0.1, 60.);
+  engine.world.setCameraPositionAndLookAt(cam_id, {6, 6, 1.7}, {0, 0, 0});
   std::vector<int> cam_ids = {cam_id};
 
-  renderer.attachWorld(&world);
+  engine.finalise();
 
   std::cout << "================== WORLD ATTACHED ! ================" << std::endl;
 
@@ -117,52 +81,44 @@ void worldThread(const std::string& world_name, owds::Window* window)
   //                        {owds::urdf::Geometry_t(overworld_dir + "/models/adream/walls.obj")},
   //                        {0., 0., 0.}, {0., 0., 1.57});
 
-  size_t pr2_id = world.loadUrdf(owds::compat::owds_ros::getShareDirectory("pr2_description") + "/robots/pr2.urdf", {4., 3., 0.}, {0., 0., 0.}, false);
+  size_t pr2_id = engine.world.loadUrdf(owds::compat::owds_ros::getShareDirectory("pr2_description") + "/robots/pr2.urdf", {4., 3., 0.}, {0., 0., 0.}, false);
   //(void)world.loadUrdf(overworld_dir + "/models/eve.urdf", false);
-  //(void)world.loadUrdf("models/adream/adream.urdf", {0., 0., 0.}, {0., 0., 0.});
+  (void)engine.world.loadUrdf("models/adream/adream.urdf", {0., 0., 0.}, {0., 0., 0.});
   //(void)world.loadRobotFromDescription("models/tutorials/Frame/frame.urdf");
-
-  world.setTimeStep(1.f / 60.f);
 
   std::cout << "================== WORLD LOADED !! ================" << std::endl;
 
-  std::thread offscreen_thread(offscreenThread, &world, cam_ids);
+  std::thread offscreen_thread(offscreenThread, &engine.world, cam_ids);
 
-  std::cout << "pr2 has " << world.getNumJoints(pr2_id) << " joints" << std::endl;
-  auto pr2_pose = world.getBasePositionAndOrientation(pr2_id);
+  std::cout << "pr2 has " << engine.world.getNumJoints(pr2_id) << " joints" << std::endl;
+  auto pr2_pose = engine.world.getBasePositionAndOrientation(pr2_id);
   std::cout << "pr2_pose = " << pr2_pose.first[0] << " : " << pr2_pose.first[1] << " : " << pr2_pose.first[2] << std::endl;
 
-  world.setBasePositionAndOrientation(pr2_id, {4., 4., 0.}, {0., 0., 0., 1.});
-  // world.setBaseVelocity(pr2_id, {0., 0., 0.}, {0., 0., 0.2});
-  world.setJointState(pr2_id, "head_pan_joint", 0.9, -0.4);
-  world.stepSimulation();
-  pr2_pose = world.getBasePositionAndOrientation(pr2_id);
+  engine.world.setBasePositionAndOrientation(pr2_id, {4., 4., 0.}, {0., 0., 0., 1.});
+  // engine.world.setBaseVelocity(pr2_id, {0., 0., 0.}, {0., 0., 0.2});
+  engine.world.setJointState(pr2_id, "head_pan_joint", 0.9, -0.4);
+  engine.world.stepSimulation();
+  pr2_pose = engine.world.getBasePositionAndOrientation(pr2_id);
   std::cout << "pr2_pose = " << pr2_pose.first[0] << " : " << pr2_pose.first[1] << " : " << pr2_pose.first[2] << std::endl;
 
-  auto ray_res = world.raycasts({
-                                  {0., 0., 0.}
+  auto ray_res = engine.world.raycasts({
+                                         {0., 0., 0.}
   },
-                                {{4., 4., 0.1}}, 10);
+                                       {{4., 4., 0.1}}, 10);
   for(auto& res : ray_res)
     std::cout << "- " << res.actor_id << "=" << res.body_id << " : " << res.distance << std::endl;
 
-  auto aabb = world.getAABB(1, 3);
-  auto l_aabb = world.getLocalAABB(1, 3);
+  auto aabb = engine.world.getAABB(1, 3);
+  auto l_aabb = engine.world.getLocalAABB(1, 3);
 
   std::cout << "AABB = " << aabb.min[0] << " : " << aabb.min[1] << " : " << aabb.min[2] << " == " << aabb.max[0] << " : " << aabb.max[1] << " : " << aabb.max[2] << std::endl;
   std::cout << "LAABB = " << l_aabb.min[0] << " : " << l_aabb.min[1] << " : " << l_aabb.min[2] << " == " << l_aabb.max[0] << " : " << l_aabb.max[1] << " : " << l_aabb.max[2] << std::endl;
 
-  auto overlap = world.getOverlappingObjects(1, 2);
+  auto overlap = engine.world.getOverlappingObjects(1, 2);
   for(auto over : overlap)
     std::cout << "- " << over << std::endl;
 
-  while(!window->isCloseRequested())
-  {
-    window->doPollEvents(renderer);
-    world.stepSimulation();
-    renderer.commit();
-    window->swapBuffer();
-  }
+  engine.run();
 }
 
 int main()
