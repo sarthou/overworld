@@ -65,12 +65,12 @@ namespace owds {
     std::unordered_map<unsigned int, LinesHandle> debug_axis_;
 
     void loadWorld();
-    void loadActor(Actor* actor, const ShapeBox& shape);
-    void loadActor(Actor* actor, const ShapeCapsule& shape);
-    void loadActor(Actor* actor, const ShapeCustomMesh& shape);
-    void loadActor(Actor* actor, const ShapeCylinder& shape);
-    void loadActor(Actor* actor, const ShapeDummy& shape);
-    void loadActor(Actor* actor, const ShapeSphere& shape);
+    void loadActor(Actor* actor, const ShapeBox& shape, bool default_material = false);
+    void loadActor(Actor* actor, const ShapeCapsule& shape, bool default_material = false);
+    void loadActor(Actor* actor, const ShapeCustomMesh& shape, bool default_material = false);
+    void loadActor(Actor* actor, const ShapeCylinder& shape, bool default_material = false);
+    void loadActor(Actor* actor, const ShapeDummy& shape, bool default_material = false);
+    void loadActor(Actor* actor, const ShapeSphere& shape, bool default_material = false);
     void loadInstance(const Model& model, const Material& material, const glm::mat4& model_mat);
     Material combineMaterials(const Material& shape_material, const Material& model_material);
     std::vector<Texture2D> loadTextures(Material& material);
@@ -90,6 +90,8 @@ namespace owds {
 
     void setLightsUniforms(const Shader& shader, bool use_ambient_shadows = true, bool use_points_shadows = true);
     void setAntiAliasing(ViewAntiAliasing_e setting);
+
+    Material createColisionMaterial(size_t uid);
   };
 } // namespace owds
 

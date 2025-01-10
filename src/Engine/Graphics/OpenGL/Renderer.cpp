@@ -192,7 +192,7 @@ namespace owds {
     {
       if(render_collision_models_)
       {
-        std::visit([this, actor](const auto& shape_resolv) { loadActor(actor.second, shape_resolv); }, actor.second->collision_shape_);
+        std::visit([this, actor](const auto& shape_resolv) { loadActor(actor.second, shape_resolv, true); }, actor.second->collision_shape_);
       }
       else
       {
@@ -204,46 +204,58 @@ namespace owds {
     }
   }
 
-  void Renderer::loadActor(Actor* actor, const ShapeBox& shape)
+  void Renderer::loadActor(Actor* actor, const ShapeBox& shape, bool default_material)
   {
     const auto size_mat = glm::scale(glm::mat4(1.f), ToV3(shape.half_extents_));
     const auto model_mat = shape.shape_transform_ * ToM4(actor->getModelMatrix()) * size_mat;
 
-    loadInstance(shape.box_model_, {"", shape.diffuse_color_, shape.diffuse_color_, 0., "", "", ""}, model_mat);
+    if(default_material == false)
+      loadInstance(shape.box_model_, {"", shape.diffuse_color_, shape.diffuse_color_, 0., "", "", ""}, model_mat);
+    else
+      loadInstance(shape.box_model_, createColisionMaterial(actor->unique_id_), model_mat);
   }
 
-  void Renderer::loadActor(Actor* actor, const ShapeCapsule& shape)
+  void Renderer::loadActor(Actor* actor, const ShapeCapsule& shape, bool default_material)
   {
     (void)actor; // todo
     (void)shape; // todo
+    (void)default_material;
   }
 
-  void Renderer::loadActor(Actor* actor, const ShapeCustomMesh& shape)
+  void Renderer::loadActor(Actor* actor, const ShapeCustomMesh& shape, bool default_material)
   {
     const auto size_mat = glm::scale(glm::mat4(1.f), shape.scale_);
     const auto model_mat = ToM4(actor->getModelMatrix()) * shape.shape_transform_ * size_mat;
 
-    loadInstance(shape.custom_model_, shape.material_, model_mat);
+    if(default_material == false)
+      loadInstance(shape.custom_model_, shape.material_, model_mat);
+    else
+      loadInstance(shape.custom_model_, createColisionMaterial(actor->unique_id_), model_mat);
   }
 
-  void Renderer::loadActor(Actor* actor, const ShapeCylinder& shape)
+  void Renderer::loadActor(Actor* actor, const ShapeCylinder& shape, bool default_material)
   {
     const auto size_mat = glm::scale(glm::mat4(1.f), glm::vec3(shape.radius_, shape.height_, shape.radius_));
     const auto model_mat = ToM4(actor->getModelMatrix()) * shape.shape_transform_ * size_mat;
 
-    loadInstance(shape.cylinder_model_, {"", shape.diffuse_color_, shape.diffuse_color_, 0., "", "", ""}, model_mat);
+    if(default_material == false)
+      loadInstance(shape.cylinder_model_, {"", shape.diffuse_color_, shape.diffuse_color_, 0., "", "", ""}, model_mat);
+    else
+      loadInstance(shape.cylinder_model_, createColisionMaterial(actor->unique_id_), model_mat);
   }
 
-  void Renderer::loadActor(Actor* actor, const ShapeDummy& shape)
+  void Renderer::loadActor(Actor* actor, const ShapeDummy& shape, bool default_material)
   {
     (void)actor;
     (void)shape;
+    (void)default_material;
   }
 
-  void Renderer::loadActor(Actor* actor, const ShapeSphere& shape)
+  void Renderer::loadActor(Actor* actor, const ShapeSphere& shape, bool default_material)
   {
     (void)actor; // todo
     (void)shape; // todo
+    (void)default_material;
   }
 
   void Renderer::loadInstance(const Model& model, const Material& material, const glm::mat4& model_mat)
@@ -716,6 +728,17 @@ namespace owds {
       samples = 16;
 
     screen_.initBuffers(samples);
+  }
+
+  Material Renderer::createColisionMaterial(size_t uid)
+  {
+    Material material;
+    float id = (float)(uid % 60) / 100.f + 0.2;
+    material.diffuse_color_ = {id, id, id, 1.f};
+    material.specular_color_ = {id, id, id, 1.f};
+    material.shininess_ = 0;
+
+    return material;
   }
 
 } // namespace owds
