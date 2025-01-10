@@ -74,6 +74,8 @@ namespace owds {
       }
     }
 
+    void setKeyCallback(const std::function<void(Key_e, bool)>& callback) { window_->setKeyCallback(callback); }
+
   private:
     Renderer renderer_;
     std::string name_;

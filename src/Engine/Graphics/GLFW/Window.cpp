@@ -125,6 +125,7 @@ namespace owds {
       window->cam_mutex_.lock();
       window->camera_.processUserKeyboardInput(0.f, owds_key, action == GLFW_PRESS);
       window->cam_mutex_.unlock();
+      window->key_callback_(owds_key, action == GLFW_PRESS);
     });
 
     glfwSetCursorPosCallback(glfw_window_, [](GLFWwindow* glfw_window, const double xpos, const double ypos) {

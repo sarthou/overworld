@@ -2,6 +2,7 @@
 #define OWDS_GRAPHICS_GLFW3_WINDOW_H
 
 #include <cstdint>
+#include <functional>
 #include <mutex>
 #include <string>
 
@@ -34,6 +35,8 @@ namespace owds {
     CameraUpdater& getCamera() { return camera_; }
     Camera* getUpdatedCamera() { return camera_.getCamera(); }
 
+    void setKeyCallback(const std::function<void(Key_e, bool)>& callback) { key_callback_ = callback; }
+
   protected:
     std::uint32_t width_ = 640;
     std::uint32_t height_ = 480;
@@ -41,6 +44,13 @@ namespace owds {
     GLFWwindow* glfw_window_ = nullptr;
     CameraUpdater camera_;
     std::mutex cam_mutex_;
+    std::function<void(Key_e, bool)> key_callback_;
+
+    void defaultKeyCallback(Key_e& key, bool pressed)
+    {
+      (void)key;
+      (void)pressed;
+    }
   };
 } // namespace owds
 

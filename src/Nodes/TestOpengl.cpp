@@ -32,10 +32,16 @@ void offscreenThread(DefaultEngine* world, std::vector<int> camera_ids)
   cv::waitKey();
 }
 
+void keyCallback(owds::Key_e key, bool pressed)
+{
+  std::cout << key << " => " << pressed << std::endl;
+}
+
 void worldThread(const std::string& world_name, owds::Window* window)
 {
   owds::Engine engine(world_name, window);
   engine.initView();
+  engine.setKeyCallback(keyCallback);
   std::cout << world_name << std::endl;
 
   std::cout << "================== WORLD " << world_name << " CREATED ! ================" << std::endl;
