@@ -54,7 +54,7 @@ namespace owds {
     TextRenderer text_renderer_;
     float max_fps_ = 120;
     float delta_time_;
-    float last_frame_;
+    float last_frame_ = 0;
 
     bool render_collision_models_ = false;
 

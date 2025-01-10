@@ -13,6 +13,7 @@ namespace owds {
     glm::vec3 position;
     glm::vec3 color;
     float height = 0.2;
+    double remaining_time = 0;
   };
 
 } // namespace owds

@@ -160,8 +160,13 @@ namespace owds {
       return;
 
     float current_frame = glfwGetTime();
+    if(last_frame_ <= 0)
+      last_frame_ = current_frame;
     delta_time_ = current_frame - last_frame_;
     last_frame_ = current_frame;
+
+    world_->processDebugLifeTime((double)delta_time_);
+
     float sleep_time = 1.0f / max_fps_ - delta_time_;
     if(sleep_time > 0.0)
       sleep(sleep_time);
@@ -384,6 +389,12 @@ namespace owds {
 
     for(size_t i = 0; i < world_->debug_lines_.size(); i++)
     {
+      if(world_->debug_lines_[i].indices_.empty())
+      {
+        cached_lines_.erase(world_->debug_lines_[i].id_);
+        continue;
+      }
+
       auto cache_it = cached_lines_.find(world_->debug_lines_[i].id_);
       if(cache_it == cached_lines_.end())
         cached_lines_.emplace(world_->debug_lines_[i].id_, world_->debug_lines_[i]);

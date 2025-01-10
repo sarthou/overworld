@@ -349,6 +349,7 @@ namespace owds {
                           float height,
                           const std::array<float, 3>& color,
                           bool centered,
+                          double life_time,
                           int replace_id)
   {
     DebugText_t debug{
@@ -356,7 +357,8 @@ namespace owds {
       centered,
       ToV3(position),
       ToV3(color),
-      height};
+      height,
+      life_time};
 
     if(replace_id >= 0)
     {
@@ -400,16 +402,18 @@ namespace owds {
   int World::addDebugLine(const std::array<float, 3>& position_from,
                           const std::array<float, 3>& position_to,
                           const std::array<float, 3>& color,
+                          double life_time,
                           int replace_id)
   {
     return addDebugLine({position_from, position_to},
                         {0, 1},
-                        color, replace_id);
+                        color, life_time, replace_id);
   }
 
   int World::addDebugLine(const std::vector<std::array<float, 3>>& vertices,
                           const std::vector<unsigned int>& indices,
                           const std::array<float, 3>& color,
+                          double life_time,
                           int replace_id)
   {
     std::vector<glm::vec3> glm_vertices;
@@ -420,7 +424,8 @@ namespace owds {
     DebugLine debug{
       glm_vertices,
       indices,
-      ToV3(color)};
+      ToV3(color),
+      life_time};
 
     if(replace_id >= 0)
     {
@@ -459,6 +464,37 @@ namespace owds {
   {
     if(id >= 0 && id < (int)debug_lines_.size())
       debug_lines_[id].indices_.clear();
+  }
+
+  void World::processDebugLifeTime(double delta)
+  {
+    std::vector<int> lines;
+    for(size_t i = 0; i < debug_lines_.size(); i++)
+    {
+      if(debug_lines_[i].remaining_time_ > 0)
+      {
+        debug_lines_[i].remaining_time_ -= delta;
+        if(debug_lines_[i].remaining_time_ <= 0)
+          lines.push_back(i);
+      }
+    }
+
+    for(auto id : lines)
+      removeDebugLine(id);
+
+    std::vector<int> texts;
+    for(size_t i = 0; i < debug_texts_.size(); i++)
+    {
+      if(debug_texts_[i].remaining_time > 0)
+      {
+        debug_texts_[i].remaining_time -= delta;
+        if(debug_texts_[i].remaining_time <= 0)
+          texts.push_back(i);
+      }
+    }
+
+    for(auto id : texts)
+      removeDebugText(id);
   }
 
   /* CAMERAS */
