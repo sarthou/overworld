@@ -350,7 +350,9 @@ namespace owds {
                           const std::array<float, 3>& color,
                           bool centered,
                           double life_time,
-                          int replace_id)
+                          int replace_id,
+                          int body_id,
+                          int link_index)
   {
     DebugText_t debug{
       text,
@@ -358,7 +360,8 @@ namespace owds {
       ToV3(position),
       ToV3(color),
       height,
-      life_time};
+      life_time,
+      getActor(body_id, link_index)};
 
     if(replace_id >= 0)
     {
@@ -403,18 +406,23 @@ namespace owds {
                           const std::array<float, 3>& position_to,
                           const std::array<float, 3>& color,
                           double life_time,
-                          int replace_id)
+                          int replace_id,
+                          int body_id,
+                          int link_index)
   {
     return addDebugLine({position_from, position_to},
                         {0, 1},
-                        color, life_time, replace_id);
+                        color, life_time, replace_id,
+                        body_id, link_index);
   }
 
   int World::addDebugLine(const std::vector<std::array<float, 3>>& vertices,
                           const std::vector<unsigned int>& indices,
                           const std::array<float, 3>& color,
                           double life_time,
-                          int replace_id)
+                          int replace_id,
+                          int body_id,
+                          int link_index)
   {
     std::vector<glm::vec3> glm_vertices;
     glm_vertices.reserve(vertices.size());
@@ -425,7 +433,8 @@ namespace owds {
       glm_vertices,
       indices,
       ToV3(color),
-      life_time};
+      life_time,
+      getActor(body_id, link_index)};
 
     if(replace_id >= 0)
     {

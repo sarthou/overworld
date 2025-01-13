@@ -65,9 +65,9 @@ void worldThread(const std::string& world_name, owds::Window* window)
                              0.4, 0.5, 1.0,
                              6.f);
 
-  engine.world.addDebugText("overworld", {5, 5, 5}, 0.5, {0., 0.5, 1.0});
+  engine.world.addDebugText("overworld", {5, 5, 5}, 0.5, {0., 0.5, 1.0}, true, 10.);
 
-  engine.world.addDebugLine({0, 0, 0}, {1, 1, 1});
+  engine.world.addDebugLine({0, 0, 0}, {1, 1, 1}, {1., 1., 1.}, 10.);
 
   auto cam_id = engine.world.addCamera(640, 480, 80, owds::CameraView_e::segmented_view, 0.1, 60.);
   engine.world.setCameraPositionAndLookAt(cam_id, {6, 6, 1.7}, {0, 0, 0});
@@ -88,8 +88,11 @@ void worldThread(const std::string& world_name, owds::Window* window)
   //                        {0., 0., 0.}, {0., 0., 1.57});
 
   size_t pr2_id = engine.world.loadUrdf(owds::compat::owds_ros::getShareDirectory("pr2_description") + "/robots/pr2.urdf", {4., 3., 0.}, {0., 0., 0.}, false);
+  engine.world.addDebugText("Pr2", {0, 0, 1.5}, 0.5, {0.5, 0., 1.0}, true, 0, -1, 1, 2);
+  engine.world.addDebugLine({0, 0, 0}, {1, 1, 1}, {1., 1., 1.}, 0., -1, 1, 2);
+
   //(void)world.loadUrdf(overworld_dir + "/models/eve.urdf", false);
-  (void)engine.world.loadUrdf("models/adream/adream.urdf", {0., 0., 0.}, {0., 0., 0.});
+  //(void)engine.world.loadUrdf("models/adream/adream.urdf", {0., 0., 0.}, {0., 0., 0.});
   //(void)world.loadRobotFromDescription("models/tutorials/Frame/frame.urdf");
 
   std::cout << "================== WORLD LOADED !! ================" << std::endl;
@@ -132,10 +135,10 @@ int main()
   owds::Renderer::init();
 
   owds::Window window1("overworld_bob");
-  owds::Window window2("overworld_alice");
+  // owds::Window window2("overworld_alice");
 
   std::thread world1(worldThread, "overworld_bob", &window1);
-  std::thread world2(worldThread, "overworld_alice", &window2);
+  // std::thread world2(worldThread, "overworld_alice", &window2);
 
   while(1)
   {
@@ -144,7 +147,7 @@ int main()
   }
 
   world1.join();
-  world2.join();
+  // world2.join();
 
   owds::Renderer::release();
 

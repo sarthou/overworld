@@ -6,6 +6,8 @@
 
 namespace owds {
 
+  class Actor;
+
   struct DebugText_t
   {
     std::string text;
@@ -14,6 +16,7 @@ namespace owds {
     glm::vec3 color;
     float height = 0.2;
     double remaining_time = 0;
+    Actor* linked_actor = nullptr;
   };
 
 } // namespace owds

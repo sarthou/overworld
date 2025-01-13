@@ -13,6 +13,7 @@
 #include "overworld/Engine/Graphics/OpenGL/Shader.h"
 
 namespace owds {
+  class Actor;
 
   class LinesHandle
   {
@@ -20,19 +21,20 @@ namespace owds {
     std::vector<glm::vec3> vertices;
     std::vector<unsigned int> indices;
     glm::vec3 color;
+    Actor* actor;
 
-    LinesHandle(const DebugLine& lines) : enabled_(true)
+    LinesHandle(const DebugLine& lines) : vertices(lines.vertices_),
+                                          indices(lines.indices_),
+                                          color(lines.color_),
+                                          actor(lines.linked_actor_),
+                                          enabled_(true)
     {
-      vertices = lines.vertices_;
-      indices = lines.indices_;
-      color = lines.color_;
-
       setupBuffers();
     }
 
     LinesHandle(const std::vector<glm::vec3>& vertices,
                 const std::vector<unsigned int>& indices,
-                const glm::vec3& color) : enabled_(true)
+                const glm::vec3& color) : actor(nullptr), enabled_(true)
     {
       this->vertices = vertices;
       this->indices = indices;

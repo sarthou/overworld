@@ -93,9 +93,10 @@ namespace owds {
     return true;
   }
 
-  void TextRenderer::renderText(Shader& shader, const glm::mat4& view_matrix, const DebugText_t& text)
+  void TextRenderer::renderText(Shader& shader, const glm::mat4& view_matrix, const glm::vec4& shift_pose, const DebugText_t& text)
   {
     renderText(shader, view_matrix,
+               shift_pose,
                text.text,
                text.position,
                text.height,
@@ -103,7 +104,7 @@ namespace owds {
                text.centered);
   }
 
-  void TextRenderer::renderText(Shader& shader, const glm::mat4& view_matrix, const std::string& text, const glm::vec3& position, float height, const glm::vec3& color, bool center)
+  void TextRenderer::renderText(Shader& shader, const glm::mat4& view_matrix, const glm::vec4& shift_pose, const std::string& text, const glm::vec3& position, float height, const glm::vec3& color, bool center)
   {
     shader.use();
     shader.setVec3("text_color", color);
@@ -118,7 +119,7 @@ namespace owds {
     float z = position.z;
 
     glm::vec4 center_in_world(x, y, z, 1.);
-    glm::vec4 center_in_cam = view_matrix * center_in_world;
+    glm::vec4 center_in_cam = view_matrix * (center_in_world + shift_pose);
 
     x = center_in_cam.x;
     y = center_in_cam.y;

@@ -169,19 +169,22 @@ namespace owds {
                      const std::array<float, 3>& color = {1.0, 1.0, 1.0},
                      bool centered = true,
                      double life_time = 0,
-                     int replace_id = -1);
+                     int replace_id = -1,
+                     int body_id = -1, int link_index = -1);
     void removeDebugText(int id);
 
     int addDebugLine(const std::array<float, 3>& position_from,
                      const std::array<float, 3>& position_to,
                      const std::array<float, 3>& color = {1.0, 1.0, 1.0},
                      double life_time = 0,
-                     int replace_id = -1);
+                     int replace_id = -1,
+                     int body_id = -1, int link_index = -1);
     int addDebugLine(const std::vector<std::array<float, 3>>& vertices,
                      const std::vector<unsigned int>& indices,
                      const std::array<float, 3>& color = {1.0, 1.0, 1.0},
                      double life_time = 0,
-                     int replace_id = -1);
+                     int replace_id = -1,
+                     int body_id = -1, int link_index = -1);
     void removeDebugLine(int id);
 
     void processDebugLifeTime(double delta);

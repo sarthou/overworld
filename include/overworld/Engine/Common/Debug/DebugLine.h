@@ -5,6 +5,7 @@
 #include <vector>
 
 namespace owds {
+  class Actor;
 
   class DebugLine
   {
@@ -12,11 +13,13 @@ namespace owds {
     DebugLine(const std::vector<glm::vec3>& vertices,
               const std::vector<unsigned int>& indices,
               const glm::vec3& color,
-              double remaining_time = 0) : id_(id_counter++),
-                                           vertices_(vertices),
-                                           indices_(indices),
-                                           color_(color),
-                                           remaining_time_(remaining_time)
+              double remaining_time = 0,
+              Actor* linked_actor = nullptr) : id_(id_counter++),
+                                               vertices_(vertices),
+                                               indices_(indices),
+                                               color_(color),
+                                               remaining_time_(remaining_time),
+                                               linked_actor_(linked_actor)
     {
     }
 
@@ -25,6 +28,7 @@ namespace owds {
     std::vector<unsigned int> indices_;
     glm::vec3 color_;
     double remaining_time_ = 0;
+    Actor* linked_actor_;
 
   private:
     static unsigned int id_counter;

@@ -611,7 +611,16 @@ namespace owds {
     lines_shader.setMat4("model", glm::mat4(1.));
 
     for(auto& line_handle : cached_lines_)
+    {
+      if(line_handle.second.actor == nullptr)
+        lines_shader.setMat4("model", glm::mat4(1.));
+      else
+      {
+        auto pose = line_handle.second.actor->getPositionAndOrientation().first;
+        lines_shader.setMat4("model", glm::translate(glm::mat4(1), glm::vec3(pose[0], pose[1], pose[2])));
+      }
       line_handle.second.draw(lines_shader);
+    }
 
     // Draw debug axis
 
@@ -646,8 +655,15 @@ namespace owds {
     text_shader.setMat4("projection", render_camera_.getProjectionMatrix());
     for(auto& debug : world_->debug_texts_)
     {
+      glm::vec4 actor_pose(0., 0., 0., 0.);
+      if(debug.linked_actor != nullptr)
+      {
+        auto pose = debug.linked_actor->getPositionAndOrientation().first;
+        actor_pose = glm::vec4(pose[0], pose[1], pose[2], 0.);
+      }
+
       if(debug.text.empty() == false)
-        text_renderer_.renderText(text_shader, render_camera_.getViewMatrix(), debug);
+        text_renderer_.renderText(text_shader, render_camera_.getViewMatrix(), actor_pose, debug);
     }
 
     glDisable(GL_BLEND);
