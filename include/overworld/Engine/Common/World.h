@@ -110,6 +110,10 @@ namespace owds {
                        const glm::vec3& position = {0., 0., 0.},
                        const glm::vec3& rotation = {0., 0., 0.});
 
+    size_t createVisualActor(const std::vector<owds::urdf::Geometry_t>& visual_geometries,
+                             const glm::vec3& position = {0., 0., 0.},
+                             const glm::vec3& rotation = {0., 0., 0.});
+
     size_t loadUrdf(const std::string& path,
                     const std::array<float, 3>& position,
                     const std::array<float, 3>& orientation,

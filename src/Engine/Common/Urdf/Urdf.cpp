@@ -9,7 +9,7 @@
 
 namespace owds {
 
-  static std::size_t u_global_id_counter = 1;
+  static std::size_t u_global_id_counter = 100000;
 
   Urdf::Urdf() : unique_id_(u_global_id_counter++)
   {}
