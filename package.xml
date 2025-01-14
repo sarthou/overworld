@@ -15,54 +15,33 @@
 
   <!-- ROS1 -->
   <buildtool_depend condition="$ROS_VERSION == 1">catkin</buildtool_depend>
-  <build_depend condition="$ROS_VERSION == 1">ontologenius</build_depend>
-  <build_depend condition="$ROS_VERSION == 1">roscpp</build_depend>
-  <build_depend condition="$ROS_VERSION == 1">std_msgs</build_depend>
-  <build_depend condition="$ROS_VERSION == 1">tf2</build_depend>
-  <build_depend condition="$ROS_VERSION == 1">tf2_ros</build_depend>
-  <build_depend condition="$ROS_VERSION == 1">tf2_geometry_msgs</build_depend>
-  <build_depend condition="$ROS_VERSION == 1">tf2_eigen</build_depend>
-  <build_depend condition="$ROS_VERSION == 1">bullet</build_depend>
-  <build_depend condition="$ROS_VERSION == 1">roslib</build_depend>
-  <build_depend condition="$ROS_VERSION == 1">eigen</build_depend>
-  <build_depend condition="$ROS_VERSION == 1">`message_filters`</build_depend>
-  <build_depend condition="$ROS_VERSION == 1">sensor_msgs</build_depend>
-  <build_depend condition="$ROS_VERSION == 1">visualization_msgs</build_depend>
-  <build_depend condition="$ROS_VERSION == 1">geometry_msgs</build_depend>
-  <build_depend condition="$ROS_VERSION == 1">cv_bridge</build_depend>
-  <build_depend condition="$ROS_VERSION == 1">pluginlib</build_depend>
-  <build_export_depend condition="$ROS_VERSION == 1">ontologenius</build_export_depend>
-  <build_export_depend condition="$ROS_VERSION == 1">roscpp</build_export_depend>
-  <build_export_depend condition="$ROS_VERSION == 1">std_msgs</build_export_depend>
-  <build_export_depend condition="$ROS_VERSION == 1">tf2</build_export_depend>
-  <build_export_depend condition="$ROS_VERSION == 1">tf2_ros</build_export_depend>
-  <build_export_depend condition="$ROS_VERSION == 1">tf2_geometry_msgs</build_export_depend>
-  <build_export_depend condition="$ROS_VERSION == 1">tf2_eigen</build_export_depend>
-  <build_export_depend condition="$ROS_VERSION == 1">bullet</build_export_depend>
-  <build_export_depend condition="$ROS_VERSION == 1">eigen</build_export_depend>
-  <build_export_depend condition="$ROS_VERSION == 1">message_filters</build_export_depend>
-  <build_export_depend condition="$ROS_VERSION == 1">sensor_msgs</build_export_depend>
-  <build_export_depend condition="$ROS_VERSION == 1">visualization_msgs</build_export_depend>
-  <build_export_depend condition="$ROS_VERSION == 1">geometry_msgs</build_export_depend>
-  <build_export_depend condition="$ROS_VERSION == 1">optitrack_mss</build_export_depend>
-  <build_export_depend condition="$ROS_VERSION == 1">cv_bridge</build_export_depend>
-  <exec_depend condition="$ROS_VERSION == 1">ontologenius</exec_depend>
-  <exec_depend condition="$ROS_VERSION == 1">roscpp</exec_depend>
-  <exec_depend condition="$ROS_VERSION == 1">std_msgs</exec_depend>
-  <exec_depend condition="$ROS_VERSION == 1">tf2</exec_depend>
-  <exec_depend condition="$ROS_VERSION == 1">tf2_ros</exec_depend>
-  <exec_depend condition="$ROS_VERSION == 1">tf2_geometry_msgs</exec_depend>
-  <exec_depend condition="$ROS_VERSION == 1">tf2_eigen</exec_depend>
-  <exec_depend condition="$ROS_VERSION == 1">bullet</exec_depend>
-  <exec_depend condition="$ROS_VERSION == 1">roslib</exec_depend>
-  <exec_depend condition="$ROS_VERSION == 1">eigen</exec_depend>
-  <exec_depend condition="$ROS_VERSION == 1">message_filters</exec_depend>
-  <exec_depend condition="$ROS_VERSION == 1">sensor_msgs</exec_depend>
-  <exec_depend condition="$ROS_VERSION == 1">visualization_msgs</exec_depend>
-  <exec_depend condition="$ROS_VERSION == 1">geometry_msgs</exec_depend>
-  <exec_depend condition="$ROS_VERSION == 1">cv_bridge</exec_depend>
-  <exec_depend condition="$ROS_VERSION == 1">pluginlib</exec_depend>
 
+  <depend>std_msgs</depend>
+
+  <depend condition="$ROS_VERSION == 1">message_generation</depend>
+  <depend condition="$ROS_VERSION == 1">diagnostic_msgs</depend>
+  <depend condition="$ROS_VERSION == 1">rospy</depend>
+  <depend condition="$ROS_VERSION == 1">roscpp</depend>
+  <depend condition="$ROS_VERSION == 1">tinyxml</depend>
+  <depend condition="$ROS_VERSION == 1">cv_bridge</depend>
+  <depend condition="$ROS_VERSION == 1">cmake_modules</depend>
+  <depend condition="$ROS_VERSION == 1">pluginlib</depend>
+  <depend condition="$ROS_VERSION == 1">rostest</depend>
+  <depend condition="$ROS_VERSION == 1">ontologenius</depend>
+  <depend condition="$ROS_VERSION == 1">tf2</depend>
+  <depend condition="$ROS_VERSION == 1">tf2_ros</depend>
+  <depend condition="$ROS_VERSION == 1">tf2_geometry_msgs</depend>
+  <depend condition="$ROS_VERSION == 1">tf2_eigen</depend>
+  <depend condition="$ROS_VERSION == 1">bullet</depend>
+  <depend condition="$ROS_VERSION == 1">roslib</depend>
+  <depend condition="$ROS_VERSION == 1">eigen</depend>
+  <depend condition="$ROS_VERSION == 1">message_filters</depend>
+  <depend condition="$ROS_VERSION == 1">sensor_msgs</depend>
+  <depend condition="$ROS_VERSION == 1">visualization_msgs</depend>
+  <depend condition="$ROS_VERSION == 1">geometry_msgs</depend>
+  <depend condition="$ROS_VERSION == 1">optitrack_msgs</depend>
+
+  <exec_depend condition="$ROS_VERSION == 1">message_runtime</exec_depend>
 
   <!-- ROS2 -->
   <depend condition="$ROS_VERSION == 2">rclcpp</depend>
