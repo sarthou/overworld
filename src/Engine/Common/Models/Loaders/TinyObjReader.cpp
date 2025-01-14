@@ -163,11 +163,11 @@ namespace tinyobj {
   static inline double parseReal(const char** token, double default_value = 0.0)
   {
     (*token) += strspn((*token), " \t");
-    const char* end = (*token) + strcspn((*token), " \t\r");
-    double val = default_value;
-    if(std::from_chars((*token), end, val).ec != std::errc{})
+    char* end = nullptr;
+    double val = std::strtod(*token, &end);
+    if(end == *token)
       val = default_value;
-    (*token) = end;
+    *token = end;
     return val;
   }
 
