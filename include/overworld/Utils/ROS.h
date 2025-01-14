@@ -5,7 +5,7 @@
 #include <filesystem>
 #include <string>
 
-#include "overworld/Compat/ROS.h"
+#include "overworld/Utils/Commands.h"
 
 namespace owds {
 
@@ -24,7 +24,7 @@ namespace owds {
       parent_path = parent_path.parent_path();
     }
 
-    const auto assets_path = compat::owds_ros::getShareDirectory(parent_path.string());
+    const auto assets_path = findPackage(parent_path.string());
     const auto relative_path = total_path.substr(parent_path.string().size() + 1);
 
     return assets_path + "/" + relative_path;
