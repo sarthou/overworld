@@ -1,5 +1,10 @@
 #include "overworld/Engine/Graphics/OpenGL/TextRenderer.h"
 
+#include <ft2build.h>
+#include FT_FREETYPE_H
+#include FT_GLYPH_H
+// Before Freetype
+
 #include <freetype/freetype.h>
 #include <glm/ext/matrix_float4x4.hpp>
 #include <glm/ext/vector_float3.hpp>
