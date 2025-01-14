@@ -31,7 +31,10 @@ namespace owds {
 
     void addObject(const std::string& name,
                    const std::array<double, 3>& translation,
-                   const std::array<double, 3>& rotation);
+                   const std::array<double, 3>& rotation,
+                  const std::array<double,3>& scale);
+
+    bool readConfiguration(std::string path);
   };
 
 } // namespace owds

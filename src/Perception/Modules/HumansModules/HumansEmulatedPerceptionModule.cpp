@@ -4,8 +4,7 @@ namespace owds {
 
   bool HumansEmulatedPerceptionModule::perceptionCallback(const std::vector<BodyPart*>& msg)
   {
-    for(auto& percept : percepts_)
-      percept.second.setUnseen();
+    setAllPerceptsUnseen();
 
     for(auto body_part : msg)
     {

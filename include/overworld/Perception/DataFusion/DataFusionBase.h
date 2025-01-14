@@ -9,6 +9,7 @@
 #include "ontologenius/OntologiesManipulator.h"
 #include "overworld/BasicTypes/Object.h"
 #include "overworld/BasicTypes/Percept.h"
+#include "overworld/Perception/DataFusion/DataFusionBase.h"
 
 namespace owds {
 
@@ -24,12 +25,12 @@ namespace owds {
     }
 
     void fuseData(std::unordered_map<std::string, Percept<Object>*>& fusioned_percepts,
-                  std::map<std::string, std::vector<Percept<Object>>>& aggregated_);
+                  std::map<std::string, std::map<std::string, Percept<Object>>>& aggregated_);
 
     // Todo: const can't be used because of the reasoning on the hand
     template<typename T>
     void fuseData(std::unordered_map<std::string, Percept<T>*>& fusioned_percepts,
-                  std::map<std::string, std::vector<Percept<T>>>& aggregated_);
+                  std::map<std::string, std::map<std::string, Percept<T>>>& aggregated_);
 
   protected:
     std::string method_name_;
@@ -40,38 +41,40 @@ namespace owds {
   // Todo: const can't be used because of the reasoning on the hand
   template<typename T>
   void DataFusionBase::fuseData(std::unordered_map<std::string, Percept<T>*>& fusioned_percepts,
-                                std::map<std::string, std::vector<Percept<T>>>& aggregated_)
+                                std::map<std::string, std::map<std::string, Percept<T>>>& aggregated_)
   {
-    for(auto& pair : aggregated_)
+    for(auto& it : aggregated_)
     {
-      if(pair.second.size() == 0)
+      if(it.second.size() == 0)
         continue;
 
-      auto fused_percept_it = fusioned_percepts.find(pair.first);
+      auto fused_percept_it = fusioned_percepts.find(it.first);
       if(fused_percept_it == fusioned_percepts.end())
-        fused_percept_it = fusioned_percepts.emplace(pair.first, new Percept<T>(pair.second.front())).first;
+        fused_percept_it = fusioned_percepts.emplace(it.first, new Percept<T>(it.second.begin()->second)).first;
 
       Percept<T>* percept = fused_percept_it->second;
-      std::string percept_id = pair.first;
+      percept->setSensorId(it.second.begin()->second.getSensorId());
+      percept->setModuleName(it.second.begin()->second.getModuleName());
+      std::string percept_id = it.first;
 
       Pose pose_in_hand;
       Pose pose_in_map;
       int nb_frame_unseen = 1000;
 
-      for(auto& obj : pair.second)
+      for(auto& inner_it : it.second)
       {
-        if(obj.isLocated() && nb_frame_unseen >= obj.getNbFrameUnseen())
+        if(inner_it.second.isLocated() && nb_frame_unseen >= inner_it.second.getNbFrameUnseen())
         {
           // We take the pose of the most recently perceived percept
-          pose_in_map = obj.pose();
-          nb_frame_unseen = obj.getNbFrameUnseen();
+          pose_in_map = inner_it.second.pose();
+          nb_frame_unseen = inner_it.second.getNbFrameUnseen();
         }
       }
       percept->setNbFrameUnseen(nb_frame_unseen);
-      for(auto& obj : pair.second)
-        percept->merge(&obj);
+      for(auto& inner_it : it.second)
+        percept->merge(&inner_it.second);
     }
-  };
+  }
 } // namespace owds
 
 #endif // OWDS_DATAFUSIONBASE_H

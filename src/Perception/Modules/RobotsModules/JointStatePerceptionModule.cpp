@@ -66,6 +66,21 @@ namespace owds {
     if(left_hand_link_ != "")
       links_to_entity_.emplace_back(left_hand_link_, owds::BODY_PART_LEFT_HAND);
 
+    auto robot_body_parts = onto_->individuals.getOn(robot_name_, "hasBodyPart");
+    for(const auto& part : robot_body_parts)
+    {
+      auto robot_sensors_ids = onto_->individuals.getOn(part, "hasSensor");
+      for(const auto& robot_sensor_id : robot_sensors_ids)
+      {
+        auto vect = onto_->individuals.getOn(robot_sensor_id, "hasFrameId");
+        if(!vect.empty())
+        {
+          links_to_entity_.emplace_back(vect.front(), owds::BODY_PART_SENSOR);
+        }
+        else
+          links_to_entity_.emplace_back(robot_sensor_id, owds::BODY_PART_SENSOR);
+      }
+    }
     loadRobotModel();
 
     auto p = bullet_client_->findJointAndLinkIndices(robot_bullet_id_);
@@ -123,7 +138,7 @@ namespace owds {
     }
     for(const auto& link_pair : links_to_entity_)
     {
-      b3LinkState link = bullet_client_->getLinkState(robot_bullet_id_, links_name_id_[link_pair.first]);
+      b3LinkState link = bullet_client_->getLinkState(robot_bullet_id_, links_name_id_.at(link_pair.first));
       double* pos = link.m_worldLinkFramePosition;
       double* rot = link.m_worldLinkFrameOrientation;
       percepts_.at(link_pair.first).updatePose({

@@ -1,0 +1,7 @@
+<launch>
+  <arg name="configuration_file" default="$(find overworld)/config/tuto.yaml"/>
+  <arg name="robot_name" default="eve"/>
+  <arg name="simulate" default="false"/>
+
+  <node name="overworld" pkg="overworld" type="overworld_node" output="screen" args="-c $(arg configuration_file) -n $(arg robot_name) -s $(arg simulate)"/>
+</launch>

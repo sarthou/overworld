@@ -32,20 +32,24 @@ namespace owds {
       true_id_ = (parameter_value == "true");
     else if(parameter_name == "topic")
       topic_name_ = parameter_value;
+    else if(parameter_name == "sensor_id")
+      sensor_id_ = parameter_value;
     else
       ShellDisplay::warning("[StaticObjectsPerceptionModule] Unknown parameter " + parameter_name);
   }
 
   bool FakeObjectPerceptionModule::perceptionCallback(const overworld::EntitiesPoses& msg)
   {
-    for(auto& percept : percepts_)
-      percept.second.setUnseen();
+    setAllPerceptsUnseen();
 
     for(auto& obj : msg.entities)
     {
       auto it_percept = percepts_.find(obj.id);
       if(it_percept == percepts_.end())
+      {
         it_percept = percepts_.insert(std::make_pair(obj.id, createPercept(obj.id))).first;
+        it_percept->second.setSensorId(sensor_id_.empty() ? robot_agent_->getHead()->id() : sensor_id_);
+      }
 
       std::string frame_id = obj.pose.header.frame_id;
       if(frame_id[0] == '/')

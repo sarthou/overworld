@@ -34,7 +34,6 @@ namespace owds {
     onto_->close();
 
     auto head_names = onto_->individuals.getOn(human_name_, "hasHead");
-
     if(head_names.size() == 0)
     {
       ShellDisplay::error("No head defined in the ontology for human: '" + human_name_ + "'.");

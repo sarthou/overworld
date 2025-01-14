@@ -46,6 +46,7 @@ namespace owds {
     }
     catch(std::ifstream::failure e)
     {
+      (void)e;
       std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
     }
     const char* v_shader_code = vertex_code.c_str();
@@ -80,6 +81,7 @@ namespace owds {
       }
       catch(std::ifstream::failure e)
       {
+        (void)e;
         std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
       }
       const char* g_shader_code = geometry_code.c_str();

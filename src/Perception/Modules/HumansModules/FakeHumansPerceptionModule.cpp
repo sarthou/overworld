@@ -25,6 +25,10 @@ namespace owds {
 
   bool FakeHumansPerceptionModule::perceptionCallback(const overworld::AgentsPose& msg)
   {
+    for(auto& percept : percepts_) // TODO add the sensors
+      percept.second.setSensorId(robot_agent_->getHead()->id());
+    // An agent can have several sensors, which one do we set if more than one sensor sees the percept?
+
     if(msg.agents.size() == 0)
       return false;
     for(auto& agent : msg.agents)

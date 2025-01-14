@@ -165,6 +165,38 @@ namespace owds {
     return {pose_diff[0] / dt, pose_diff[1] / dt, pose_diff[2] / dt};
   }
 
+  std::array<double, 3> Entity::direction() const
+  {
+    if(last_poses_.size() < 2)
+      return {0.0, 0.0, 0.0};
+
+    const Pose& last_pose = last_poses_.back().pose;
+    const Pose& previous_pose = last_poses_.at(last_poses_.size() - 2).pose;
+
+    std::array<double, 3> direction = {
+      last_pose.getX() - previous_pose.getX(),
+      last_pose.getY() - previous_pose.getY(),
+      last_pose.getZ() - previous_pose.getZ()};
+
+    double norm = sqrt(direction[0] * direction[0] + direction[1] * direction[1] + direction[2] * direction[2]);
+    if(norm > 0)
+    {
+      direction[0] /= norm;
+      direction[1] /= norm;
+      direction[2] /= norm;
+    }
+
+    return direction;
+  }
+
+  double Entity::speed() const
+  {
+    std::array<double, 3> translation_speed = computeTranslationSpeed();
+    return sqrt(translation_speed[0] * translation_speed[0] +
+                translation_speed[1] * translation_speed[1] +
+                translation_speed[2] * translation_speed[2]);
+  }
+
   void Entity::setId(const std::string& id, bool is_true_id)
   {
     id_ = id;

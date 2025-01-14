@@ -1,5 +1,8 @@
-# Ubuntu 20.04 should have at least cmake 3.16
+<<<<<<< HEAD# Ubuntu 20.04 should have at least cmake 3.16
 cmake_minimum_required(VERSION 3.16)
+=======
+cmake_minimum_required(VERSION 3.8)
+>>>>>>> origin/dev
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 project(overworld)
 
@@ -222,41 +225,38 @@ owds_add_ros_library(overworld_physics
 
 target_compile_definitions(overworld_physics
     PUBLIC
-        _DEBUG
-        PX_ENABLE_ASSERTS
-        $<$<BOOL:${OWDS_USE_PHYSX}>:OWDS_USE_PHYSX>)
+    _DEBUG
+    PX_ENABLE_ASSERTS
+    $<$<BOOL:${OWDS_USE_PHYSX}>:OWDS_USE_PHYSX>)
 
 if(OWDS_USE_PHYSX)
     target_link_libraries(overworld_physics
         PUBLIC
-            PhysX
-            PhysXCommon
-            PhysXCooking
-            PhysXExtensions
-            PhysXFoundation
-            PhysXPvdSDK
-            cuda)
+        PhysX
+        PhysXCommon
+        PhysXCooking
+        PhysXExtensions
+        PhysXFoundation
+        PhysXPvdSDK
+        cuda)
 else()
     target_include_directories(overworld_physics PUBLIC ${BULLET_INCLUDE_DIR})
     target_link_libraries(overworld_physics PUBLIC ${BULLET_LIBRARIES})
 endif()
 
-###################################
-
+# ##################################
 owds_add_ros_library(overworld_utility_lib
     src/Utility/YamlReader.cpp
     src/Utility/Ontology.cpp
     src/Utility/RosFiles.cpp
     src/Utility/Wavefront.cpp)
 
-###################################
-
+# ##################################
 owds_add_library(overworld_bullet_lib
     src/Bullet/PhysicsServers.cpp
     src/Bullet/BulletClient.cpp)
 
-###################################
-
+# ##################################
 owds_add_library(overworld_types_lib
     src/Geometry/Pose.cpp
     src/Geometry/Polygon.cpp
@@ -266,8 +266,7 @@ owds_add_library(overworld_types_lib
     src/BasicTypes/Object.cpp
     src/BasicTypes/Hand.cpp)
 
-###################################
-
+# ##################################
 owds_add_library(overworld_perception_lib
     src/Perception/Managers/AgentPerceptionManager.cpp
     src/Perception/Managers/AreasPerceptionManager.cpp
@@ -280,15 +279,13 @@ owds_add_library(overworld_perception_lib
     src/Perception/PerceptionManagers.cpp
     src/Perception/DataFusion/DataFusionBase.cpp)
 
-###################################
-
+# ##################################
 owds_add_ros_library(overworld_facts_lib
     src/Facts/Publisher/FactsPublisher.cpp
     src/Facts/Publisher/OntologeniusFactsPublisher.cpp
     src/Facts/FactsCalculator.cpp)
 
-###################################
-
+# ##################################
 owds_add_ros_library(overworld_sender_lib
     src/Senders/ApproachSender.cpp
     src/Senders/ROSSender.cpp
@@ -296,8 +293,7 @@ owds_add_ros_library(overworld_sender_lib
     src/Senders/Bernie.cpp
     src/Senders/RelationsSender.cpp)
 
-###################################
-
+# ##################################
 owds_add_library(overworld_modules_plugin
     src/Perception/Modules/ObjectsModules/StaticObjectsPerceptionModule.cpp
     src/Perception/Modules/ObjectsModules/FakeObjectPerceptionModule.cpp
@@ -307,57 +303,266 @@ owds_add_library(overworld_modules_plugin
     src/Perception/Modules/HumansModules/FakeHumansPerceptionModule.cpp
     src/Perception/Modules/AreasModules/ObjAreasPerceptionModule.cpp)
 
-###################################
+# ##################################
+# # The catkin_package macro generates cmake config files for your package
+# # Declare things to be passed to dependent projects
+# # INCLUDE_DIRS: uncomment this if your package contains header files
+# # LIBRARIES: libraries you create in this project that dependent projects also need
+# # CATKIN_DEPENDS: catkin_packages dependent projects also need
+# # DEPENDS: system dependencies of this project that dependent projects also need
+catkin_package(
+    INCLUDE_DIRS include ${BULLET_INCLUDE_DIRS}
+    LIBRARIES ${PROJECT_NAME}_bullet_lib ${PROJECT_NAME}_types_lib ${PROJECT_NAME}_utility_lib
+    CATKIN_DEPENDS ontologenius roscpp std_msgs tf2 tf2_ros roslib
+
+    # DEPENDS system_lib
+)
+
+# ##########
+# # Build ##
+# ##########
+include_directories(
+    include
+    ${ontologenius_INCLUDE_DIRS}
+    ${EIGEN3_INCLUDE_DIRS}
+    ${catkin_INCLUDE_DIRS}
+    ${CURL_INCLUDE_DIRS}
+)
+add_definitions(${EIGEN3_DEFINITIONS})
+
+# ################
+# Libraries   #
+# ################
+add_library(Bullet3 INTERFACE)
+target_include_directories(Bullet3 INTERFACE ${BULLET_INCLUDE_DIRS})
+target_link_libraries(Bullet3 INTERFACE
+    ${BULLET_LIBS}
+    ${CMAKE_DL_LIBS}
+    ${catkin_LIBRARIES}
+    Threads::Threads)
+
+add_library(${PROJECT_NAME}_utility_lib STATIC
+    src/Utility/YamlReader.cpp
+    src/Utility/Ontology.cpp
+    src/Utility/RosFiles.cpp
+    src/Utility/Wavefront.cpp
+)
+target_link_libraries(${PROJECT_NAME}_utility_lib PUBLIC
+    ${catkin_LIBRARIES}
+    ${ontologenius_LIBRARIES})
+set_target_properties(${PROJECT_NAME}_utility_lib PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
+add_library(${PROJECT_NAME}_bullet_lib STATIC
+    src/Bullet/PhysicsServers.cpp
+    src/Bullet/BulletClient.cpp
+)
+target_link_libraries(${PROJECT_NAME}_bullet_lib PUBLIC
+    Bullet3
+    ${PROJECT_NAME}_utility_lib)
+set_target_properties(${PROJECT_NAME}_bullet_lib PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
+add_library(${PROJECT_NAME}_types_lib STATIC
+    src/Geometry/Pose.cpp
+    src/Geometry/Polygon.cpp
+    src/BasicTypes/Area.cpp
+    src/BasicTypes/Entity.cpp
+    src/BasicTypes/BodyPart.cpp
+    src/BasicTypes/Object.cpp
+    src/BasicTypes/Hand.cpp
+    src/BasicTypes/Sensors/SensorBase.cpp
+)
+target_link_libraries(${PROJECT_NAME}_types_lib PUBLIC
+    ${catkin_LIBRARIES}
+    ${PROJECT_NAME}_bullet_lib)
+set_target_properties(${PROJECT_NAME}_types_lib PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
+add_library(${PROJECT_NAME}_perception_lib STATIC
+    src/Perception/Managers/AgentPerceptionManager.cpp
+    src/Perception/Managers/AreasPerceptionManager.cpp
+    src/Perception/Managers/ObjectsPerceptionManager.cpp
+    src/Perception/Managers/RobotsPerceptionManager.cpp
+    src/Perception/Managers/HumansPerceptionManager.cpp
+    src/Perception/Modules/ObjectsModules/ObjectsEmulatedPerceptionModule.cpp
+    src/Perception/Modules/HumansModules/HumansEmulatedPerceptionModule.cpp
+    src/Perception/Modules/AreasModules/AreasEmulatedPerceptionModule.cpp
+    src/Perception/PerceptionManagers.cpp
+    src/Perception/DataFusion/DataFusionBase.cpp
+)
+target_link_libraries(${PROJECT_NAME}_perception_lib PUBLIC
+    ${catkin_LIBRARIES}
+    ${PROJECT_NAME}_bullet_lib
+    ${PROJECT_NAME}_types_lib
+    ${PROJECT_NAME}_utility_lib)
+
+add_library(${PROJECT_NAME}_facts_lib STATIC
+    src/Facts/Publisher/FactsPublisher.cpp
+    src/Facts/Publisher/OntologeniusFactsPublisher.cpp
+    src/Facts/FactsCalculator.cpp
+)
+target_link_libraries(${PROJECT_NAME}_facts_lib PUBLIC
+    ${catkin_LIBRARIES}
+    ${PROJECT_NAME}_bullet_lib
+    ${PROJECT_NAME}_types_lib)
+
+add_library(${PROJECT_NAME}_sender_lib STATIC
+    src/Senders/ApproachSender.cpp
+    src/Senders/ROSSender.cpp
+    src/Senders/PoseSender.cpp
+    src/Senders/Bernie.cpp
+    src/Senders/RelationsSender.cpp
+)
+target_link_libraries(${PROJECT_NAME}_sender_lib PUBLIC
+    ${catkin_LIBRARIES}
+    Bullet3 # For b3CameraImage
+    ${CURL_LIBRARIES}
+    ${PROJECT_NAME}_types_lib
+    ${PROJECT_NAME}_perception_lib)
+
+# ################
+# Plugins    #
+# ################
+add_library(overworld_modules_plugin MODULE
+    src/Perception/Modules/ObjectsModules/StaticObjectsPerceptionModule.cpp
+    src/Perception/Modules/ObjectsModules/FakeObjectPerceptionModule.cpp
+    src/Perception/Modules/RobotsModules/JointStatePerceptionModule.cpp
+    src/Perception/Modules/HumansModules/StampedPosePerceptionModule.cpp
+    src/Perception/Modules/HumansModules/FakeHumanPerceptionModule.cpp
+    src/Perception/Modules/HumansModules/FakeHumansPerceptionModule.cpp
+    src/Perception/Modules/AreasModules/ObjAreasPerceptionModule.cpp
+)
+target_link_libraries(overworld_modules_plugin PUBLIC
+    ${catkin_LIBRARIES}
+    ${PROJECT_NAME}_bullet_lib
+    ${PROJECT_NAME}_types_lib
+    ${PROJECT_NAME}_utility_lib)
 
 add_library(overworld_reasoner_plugin
-    src/OntologeniusPlugins/ReasonerEgocentric.cpp)
+    src/OntologeniusPlugins/ReasonerEgocentric.cpp
+)
+add_dependencies(overworld_reasoner_plugin overworld_gencpp ${catkin_EXPORTED_TARGETS})
+target_link_libraries(overworld_reasoner_plugin PUBLIC
+    ${catkin_LIBRARIES}
+    ${ontologenius_LIBRARIES})
 
-###################################
+# ################
+# Nodes     #
+# ################
+add_executable(${PROJECT_NAME}_node src/Nodes/overworld.cpp src/SituationAssessor.cpp)
+target_link_libraries(${PROJECT_NAME}_node PRIVATE
+    ${PROJECT_NAME}_perception_lib
+    ${PROJECT_NAME}_sender_lib
+    ${PROJECT_NAME}_facts_lib
+    ${catkin_LIBRARIES}
+    ${ontologenius_LIBRARIES})
+add_dependencies(${PROJECT_NAME}_node overworld_gencpp)
 
-owds_add_ros_executable(overworld_node
-    src/Nodes/overworld.cpp
-    src/SituationAssessor.cpp)
+add_executable(plugins src/Nodes/plugins.cpp)
+target_link_libraries(plugins ${catkin_LIBRARIES}
+    ${PROJECT_NAME}_bullet_lib)
 
-target_link_libraries(overworld_node
-    PRIVATE
-        overworld_perception_lib
-        overworld_sender_lib
-        overworld_facts_lib)
+add_executable(teleop src/Nodes/teleop.cpp)
+target_link_libraries(teleop ${catkin_LIBRARIES})
+add_dependencies(teleop overworld_gencpp)
 
-###################################
+# ################
+# Test files   #
+# ################
+add_executable(${PROJECT_NAME}_bullet_test src/TestFiles/bullet_test.cpp)
+target_link_libraries(${PROJECT_NAME}_bullet_test PRIVATE
+    ${PROJECT_NAME}_bullet_lib
+    ${PROJECT_NAME}_types_lib
+    ${PROJECT_NAME}_perception_lib
+    ${PROJECT_NAME}_utility_lib
+    ${catkin_LIBRARIES})
 
-owds_add_ros_executable(plugins
-    src/Nodes/plugins.cpp)
+add_executable(${PROJECT_NAME}_fov_test src/TestFiles/fov.cpp)
+target_link_libraries(${PROJECT_NAME}_fov_test PRIVATE
+    ${PROJECT_NAME}_bullet_lib
+    ${PROJECT_NAME}_types_lib
+    ${PROJECT_NAME}_perception_lib
+    ${PROJECT_NAME}_utility_lib
+    ${PROJECT_NAME}_sender_lib
+    ${catkin_LIBRARIES})
 
-target_link_libraries(plugins
-    PRIVATE
-        overworld_bullet_lib)
+add_executable(${PROJECT_NAME}_multi_server_test src/TestFiles/multi_server_test.cpp)
+target_link_libraries(${PROJECT_NAME}_multi_server_test PRIVATE
+    ${PROJECT_NAME}_bullet_lib
+    ${catkin_LIBRARIES})
 
-###################################
+add_executable(${PROJECT_NAME}_config_test src/TestFiles/config_test.cpp)
+target_link_libraries(${PROJECT_NAME}_config_test PRIVATE
+    ${PROJECT_NAME}_types_lib
+    ${PROJECT_NAME}_perception_lib
+    ${catkin_LIBRARIES})
+add_dependencies(${PROJECT_NAME}_config_test overworld_gencpp)
 
-owds_add_ros_executable(teleop
-    src/Nodes/teleop.cpp)
+add_executable(${PROJECT_NAME}_gravity_test src/TestFiles/gravity.cpp)
+target_link_libraries(${PROJECT_NAME}_gravity_test PRIVATE
+    ${PROJECT_NAME}_types_lib
+    ${PROJECT_NAME}_bullet_lib
+    ${catkin_LIBRARIES})
+add_dependencies(${PROJECT_NAME}_gravity_test overworld_gencpp)
 
-###################################
+add_executable(${PROJECT_NAME}_area_test src/TestFiles/area.cpp)
+target_link_libraries(${PROJECT_NAME}_area_test PRIVATE
+    ${PROJECT_NAME}_types_lib)
+
+add_executable(${PROJECT_NAME}_approach_test src/TestFiles/approach_sender.cpp)
+target_link_libraries(${PROJECT_NAME}_approach_test PRIVATE
+    ${PROJECT_NAME}_sender_lib)
+
+add_executable(${PROJECT_NAME}_object_spawn src/TestFiles/object_spawn.cpp)
+target_link_libraries(${PROJECT_NAME}_object_spawn PRIVATE
+    ${PROJECT_NAME}_sender_lib
+    ${catkin_LIBRARIES}
+    ${ontologenius_LIBRARIES})
 
 # ##################################
-
+# #            Install            ##
 # ##################################
-owds_add_ros_executable(overworld_opengl src/Nodes/TestOpengl.cpp)
-target_compile_options(overworld_opengl PRIVATE $<$<CXX_COMPILER_ID:Clang>:-Wno-gnu-zero-variadic-macro-arguments>)
-target_link_libraries(overworld_opengl
-    PUBLIC
-    overworld_graphics
-    overworld_physics)
+install(TARGETS
+    ${PROJECT_NAME}_bullet_lib
+    ${PROJECT_NAME}_types_lib
+    ${PROJECT_NAME}_utility_lib
+    overworld_reasoner_plugin
+    overworld_modules_plugin
+    ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
 
-# ##################################
-owds_install_libs(overworld_graphics
-    overworld_glad
-    overworld_engine_common)
+install(TARGETS
+    ${PROJECT_NAME}_node
+    plugins
+    teleop
+    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
-owds_install_executables(overworld_opengl)
+install(DIRECTORY include/${PROJECT_NAME}/
+    DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+    FILES_MATCHING PATTERN "*.h"
+    PATTERN ".svn" EXCLUDE
+)
 
-# ##################################
-owds_export_extra_directory(docs/)
-owds_export_extra_directory(models/)
-owds_finalize()
+install(DIRECTORY launch/
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
+)
+
+install(DIRECTORY config/
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/config
+)
+
+install(DIRECTORY models/
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/models
+)
+
+install(DIRECTORY ontologies/
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/ontologies
+)
+
+install(FILES
+    modules_plugins.xml
+    reasoners_plugins.xml
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)

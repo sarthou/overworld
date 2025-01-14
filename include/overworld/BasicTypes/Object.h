@@ -19,11 +19,11 @@ namespace owds {
   public:
     explicit Object(const std::string& id, bool is_true_id = true);
 
-    void setPointsOfInterest(const std::vector<PointOfInterest>& points_of_interest);
-    void addPointOfInterest(const PointOfInterest& point_of_interest);
-    void emptyPointsOfInterest();
-    const std::vector<PointOfInterest>& getPointsOfInterest() const;
-    void setAllPoiUnseen();
+    void setPointsOfInterest(const std::string& module_name, const std::vector<PointOfInterest>& points_of_interest);
+    void addPointOfInterest(const std::string& module_name, const PointOfInterest& point_of_interest);
+    void emptyPointsOfInterest(const std::string& module_name);
+    const std::vector<PointOfInterest>& getPointsOfInterest(const std::string& module_name) const;
+    void setAllPoiUnseen(const std::string& module_name);
 
     void setStatic(bool is_static = true) { is_static_ = is_static; }
     bool isStatic() const { return is_static_; }
@@ -38,6 +38,8 @@ namespace owds {
     Pose pose() const;
     Pose pose(unsigned int id) const;
     Pose pose(const ros::Time& stamp) const;
+
+    std::array<double, 3> direction() const override;
 
     void setInHand(Hand* hand) { hand_in_ = hand; }
     void removeFromHand() { hand_in_ = nullptr; }
@@ -64,7 +66,7 @@ namespace owds {
     bool isA(const std::string& type);
 
   protected:
-    std::vector<PointOfInterest> points_of_interest_;
+    std::unordered_map<std::string, std::vector<PointOfInterest>> points_of_interest_;
     bool is_static_;
     Hand* hand_in_;
     CircularBuffer<HandStamped_t, 30> last_hands_;

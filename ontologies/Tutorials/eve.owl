@@ -1,0 +1,103 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="https://gitlab.laas.fr/discuter/overworld_tutorials/-/blob/master/ontologies/agents#"
+     xmlns:agents="https://gitlab.laas.fr/discuter/overworld_tutorials/-/blob/master/ontologies/agents#"
+     xmlns:cg_agents="https://github.com/RIS-WITH/common_ground_ontology/blob/master/CG_agents#"
+     xmlns:cg_entities="https://github.com/RIS-WITH/common_ground_ontology/blob/master/CG_entities#"
+     xmlns:cg_sensors="https://github.com/RIS-WITH/common_ground_ontology/blob/master/CG_sensors#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+    <owl:Ontology rdf:about="https://gitlab.laas.fr/discuter/overworld_tutorials/-/blob/master/ontologies/agents">
+      <owl:imports rdf:resource="https://github.com/RIS-WITH/common_ground_ontology/blob/master/CG_agents"/>
+      <owl:imports rdf:resource="https://github.com/RIS-WITH/common_ground_ontology/blob/master/CG_sensors"/>
+    </owl:Ontology>
+    
+
+
+    <!-- 
+    /////////////////////////////////////////////////////////////////////////////////////// 
+    // 
+    // Individuals 
+    // 
+    /////////////////////////////////////////////////////////////////////////////////////// 
+     -->
+
+
+
+    <!-- agents#eve_fov -->
+
+    <owl:NamedIndividual rdf:about="agents#eve_fov">
+        <rdf:type rdf:resource="cg_sensors#FieldOfView"/>
+        <cg_sensors:fovHasClipNear rdf:datatype="http://www.w3.org/2002/07/owl#real">0.1</cg_sensors:fovHasClipNear>
+        <cg_sensors:fovHasClipFar rdf:datatype="http://www.w3.org/2002/07/owl#real">12</cg_sensors:fovHasClipFar>
+        <cg_sensors:fovHasHeight rdf:datatype="http://www.w3.org/2002/07/owl#real">70</cg_sensors:fovHasHeight>
+        <cg_sensors:fovHasWidth rdf:datatype="http://www.w3.org/2002/07/owl#real">102.4</cg_sensors:fovHasWidth>
+    </owl:NamedIndividual>
+
+
+
+    <!-- agents#head_camera_frame -->
+
+    <owl:NamedIndividual rdf:about="agents#head_camera_frame">
+        <rdf:type rdf:resource="cg_sensors#FrameId"/>
+    </owl:NamedIndividual>
+
+
+
+    <!-- agents#eve_eye -->
+    
+    <owl:NamedIndividual rdf:about="agents#eve_eye">
+        <rdf:type rdf:resource="cg_sensors#Sensor"/>
+        <cg_sensors:hasFieldOfView rdf:resource="agents#eve_fov"/>
+        <cg_sensors:hasFrameId rdf:resource="agents#head_camera_frame"/>
+        <cg_sensors:isStatic rdf:datatype="http://www.w3.org/2002/07/owl#bool">false</cg_sensors:isStatic>
+    </owl:NamedIndividual>
+
+
+
+    <!-- agents#base_link -->
+    
+    <owl:NamedIndividual rdf:about="agents#base_link">
+        <rdf:type rdf:resource="cg_agents#Base"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- agents#left_gripper_frame -->
+    
+    <owl:NamedIndividual rdf:about="agents#left_gripper_frame">
+        <rdf:type rdf:resource="cg_agents#Hand"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- agents#right_gripper_frame -->
+    
+    <owl:NamedIndividual rdf:about="agents#right_gripper_frame">
+        <rdf:type rdf:resource="cg_agents#Hand"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- agents#eve_head -->
+    
+    <owl:NamedIndividual rdf:about="agents#eve_head">
+        <rdf:type rdf:resource="cg_agents#Head"/>
+        <cg_sensors:hasSensor rdf:resource="agents#eve_eye"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- agents#eve -->
+    
+    <owl:NamedIndividual rdf:about="agents#eve">
+        <rdf:type rdf:resource="cg_agents#Robot"/>
+        <cg_agents:hasBase rdf:resource="agents#base_link"/>
+        <cg_agents:hasHead rdf:resource="agents#eve_head"/>
+        <cg_agents:hasRightHand rdf:resource="agents#right_gripper_frame"/>
+        <cg_agents:hasLeftHand rdf:resource="agents#left_gripper_frame"/>
+    </owl:NamedIndividual>
+
+</rdf:RDF>

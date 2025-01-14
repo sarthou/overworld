@@ -1,13 +1,13 @@
 modules:
   robot:
     JointStatePerceptionModule: robot_joints
+  humans:
+    FakeHumanPerceptionModule: steve_module
   objects:
     FakeObjectPerceptionModule:
       - fake_1
       - fake_2
     StaticObjectsPerceptionModule: static
-  areas:
-    ObjAreasPerceptionModule: obj_area
 
 robot_joints:
   min_period : 0.09
@@ -16,16 +16,13 @@ robot_joints:
 fake_1:
   topic: /overworld/fake_objects_poses
   sensor_id: 
-    - eve_left_eye
+    - eve_eye
 
 fake_2:
   true_id: false
   topic: /overworld/fake_false_objects_poses
   sensor_id:
-    - eve_right_eye
+    - eve_eye
 
 static:
   file: package://overworld/config/adream.yaml
-
-obj_area:
-  file: package://overworld/config/adream_areas.yaml
