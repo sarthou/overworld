@@ -1,6 +1,6 @@
 #include "overworld/Engine/Graphics/GLFW/Window.h"
 
-#include "overworld/Compat/ROS.h"
+#include "overworld/Utils/Commands.h"
 // should be first
 
 #include <memory>
@@ -48,7 +48,7 @@ namespace owds {
     glfw_window_ = glfwCreateWindow(640, 480, name.c_str(), nullptr, nullptr);
 
     GLFWimage icons[1];
-    std::string icon_path(owds::compat::owds_ros::getShareDirectory("overworld") + "/docs/images/overworld_light.png");
+    std::string icon_path(findPackage("overworld") + "/docs/images/overworld_light.png");
     icons[0].pixels = stbi_load(icon_path.c_str(), &icons[0].width, &icons[0].height, 0, 4); // rgba channels
     glfwSetWindowIcon(glfw_window_, 1, icons);
     stbi_image_free(icons[0].pixels);

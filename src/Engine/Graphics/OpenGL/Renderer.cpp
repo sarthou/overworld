@@ -29,6 +29,7 @@
 #include "overworld/Engine/Graphics/OpenGL/Cubemap.h"
 #include "overworld/Engine/Graphics/OpenGL/MeshHandle.h"
 #include "overworld/Engine/Graphics/OpenGL/Texture2D.h"
+#include "overworld/Utils/Commands.h"
 #include "overworld/Utils/GlmMath.h"
 
 // should be after glad
@@ -103,7 +104,8 @@ namespace owds {
     if(render_camera_.getAASetting() != ViewAntiAliasing_e::off)
       setAntiAliasing(render_camera_.getAASetting());
 
-    Shader::shaders_directory = "/home/gsarthou/Robots/Dacobot2/ros2_ws/src/overworld/shaders/"; // TODO not hard coded
+    std::string owds_path = findPackage("overworld");
+    Shader::shaders_directory = owds_path + "/shaders/";
     shaders_.insert({
       "default", {"light_shader.vs", "light_shader.fs"}
     });
@@ -126,7 +128,7 @@ namespace owds {
       "color", {"color_shader.vs", "color_shader.fs"}
     });
 
-    sky_.init("/home/gsarthou/Robots/Dacobot2/ros2_ws/src/overworld/models/textures/skybox/Footballfield/");
+    sky_.init(owds_path + "/models/textures/skybox/Footballfield/");
 
     shadow_.init(render_camera_.getNearPlane(), render_camera_.getFarPlane());
     text_renderer_.init();

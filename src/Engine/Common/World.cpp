@@ -14,7 +14,6 @@
 #include <unordered_set>
 #include <vector>
 
-#include "overworld/Compat/ROS.h"
 #include "overworld/Engine/Common/Camera/CameraView.h"
 #include "overworld/Engine/Common/Debug/DebugLine.h"
 #include "overworld/Engine/Common/Debug/DebugText.h"
