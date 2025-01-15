@@ -4,11 +4,10 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include "ontologenius/OntologiesManipulator.h"
 #include "overworld/BasicTypes/BodyPart.h"
 #include "overworld/BasicTypes/FieldOfView.h"
 #include "overworld/BasicTypes/PointOfInterest.h"
-#include "overworld/Utility/CircularBuffer.h"
+#include "overworld/Utils/CircularBuffer.h"
 
 namespace owds {
 
@@ -20,7 +19,7 @@ namespace owds {
                     bool is_static = false,
                     const FieldOfView& field_of_view = FieldOfView(60, 80, 0.1, 12));
 
-    void clearPoses() { objects_seen_ids_.empty(); }
+    void clearPoses() { objects_seen_ids_.clear(); }
 
     void setPerceptseen(const std::string& percept_id) { objects_seen_ids_.insert(percept_id); };
     void resetPerceptseen(const std::string& percept_id) { objects_seen_ids_.erase(percept_id); };

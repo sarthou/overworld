@@ -4,9 +4,9 @@
 
 namespace owds {
 
-  Polygon::Polygon(const std::vector<point_t>& poly_points, double hysteresis) : points_(poly_points),
-                                                                                 base_points_(poly_points),
-                                                                                 hysteresis_(hysteresis)
+  Polygon::Polygon(const std::vector<point_t>& poly_points, double hysteresis) : base_points_(poly_points),
+                                                                                 hysteresis_(hysteresis),
+                                                                                 points_(poly_points)
   {
     computeInOutPolygons();
   }
@@ -42,7 +42,7 @@ namespace owds {
   int Polygon::isInside(const point_t& p, const std::vector<point_t>& vertex) const
   {
     int cross = 0;
-    for(int i = 0, j = vertex.size() - 1; i < vertex.size(); j = i++)
+    for(int i = 0, j = vertex.size() - 1; i < (int)vertex.size(); j = i++)
     {
       if(((vertex[i].y > p.y) != (vertex[j].y > p.y)) &&
          (p.x < (vertex[j].x - vertex[i].x) * (p.y - vertex[i].y) / (vertex[j].y - vertex[i].y) + vertex[i].x))

@@ -6,11 +6,12 @@
 #include <ros/ros.h>
 #include <string>
 #include <visualization_msgs/Marker.h>
+#include <unordered_set>
 
 #include "overworld/BasicTypes/Shape.h"
-#include "overworld/Bullet/BulletClient.h"
 #include "overworld/Geometry/Pose.h"
 #include "overworld/Utils/CircularBuffer.h"
+#include "overworld/Engine/Common/WorldTypes.h"
 
 namespace owds {
 
@@ -57,10 +58,10 @@ namespace owds {
     int bulletLinkId() const { return bullet_link_id_; }
     bool isBulletLink() { return (bullet_link_id_ != -1); }
 
-    void setAabb(const struct aabb_t& aabb) { aabb_ = aabb; }
-    struct aabb_t getAabb() const { return aabb_; }
+    void setAabb(const struct AABB_t& aabb) { aabb_ = aabb; }
+    struct AABB_t getAabb() const { return aabb_; }
     double getAabbVolume() const;
-    bool isAabbValid() const { return aabb_.is_valid; }
+    bool isAabbValid() const { return aabb_.isValid(); }
 
     void setShape(const Shape_t& shape)
     {
@@ -98,7 +99,7 @@ namespace owds {
     int bullet_link_id_;
     Shape_t shape_;
     size_t nb_frame_unseen_;
-    struct aabb_t aabb_;
+    struct AABB_t aabb_;
 
     visualization_msgs::Marker marker_;
 
