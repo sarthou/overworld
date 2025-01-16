@@ -56,11 +56,13 @@ namespace owds {
     auto new_object = new Object(*percept);
     auto it = entities_.emplace(percept->id(), new_object).first;
     addToWorld(it->second);
+
     new_object->removeFromHand(); // We remove in case an entity is created from a percept already in hand
 
     getObjectBoundingBox(it->second);
     if(it->second->getMass() == 0)
       it->second->setDefaultMass();
+    world_client_->setMass(it->second->worldId(), -1, it->second->getMass());
 
     it->second->setTypes(onto_->individuals.getUp(it->first));
 
@@ -365,21 +367,11 @@ namespace owds {
   void ObjectsPerceptionManager::startSimulation(Object* object)
   {
     std::cout << "--start simulation for " << object->id() << " with a mass of " << object->getMass() << std::endl;
-    world_client_->setMass(object->bulletId(), -1, object->getMass());
-    world_client_->resetBaseVelocity(object->bulletId(), {0, 0, 0}, {0, 0, 0});
+    //world_client_->setMass(object->worldId(), -1, object->getMass());
+    world_client_->setBaseVelocity(object->worldId(), {0, 0, 0}, {0, 0, 0});
+    world_client_->setSimulation(object->worldId(), true);
 
     simulated_objects_.insert({object->id(), 0});
-
-    /*world_client_->performCollisionDetection();
-    auto contact_points = world_client_->getContactPoints(object->bulletId());
-    std::cout << "==> " << contact_points.m_numContactPoints << " CPs" << std::endl;
-    for(size_t i = 0; i < contact_points.m_numContactPoints; i++)
-    {
-      auto point = contact_points.m_contactPointData[i];
-      auto contact_entity = getEntityFromBulletId(point.m_bodyUniqueIdB);
-      if(contact_entity != nullptr)
-        std::cout << "====> contact with " << contact_entity->id() << " on dist " << point.m_contactDistance << std::endl;
-    }*/
   }
 
   void ObjectsPerceptionManager::stopSimulation(Object* object, bool erase)
@@ -388,7 +380,8 @@ namespace owds {
     if(it != simulated_objects_.end())
     {
       std::cout << "--stop simulation for " << object->id() << std::endl;
-      world_client_->setMass(object->bulletId(), -1, 0);
+      //world_client_->setMass(object->worldId(), -1, 0);
+      world_client_->setSimulation(object->worldId(), false);
       if(erase)
         simulated_objects_.erase(object->id());
     }
