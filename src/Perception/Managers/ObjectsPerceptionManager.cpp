@@ -472,7 +472,7 @@ namespace owds {
         Pose map_to_point = object->pose() * point;
         to_poses.push_back(map_to_point.arrays().first);
       }
-      auto ray_cast_info = world_client_->rayTestBatch(from_poses, to_poses, poi.getPoints().size(), true);
+      auto ray_cast_info = world_client_->raycasts(from_poses, to_poses, sensor->getFieldOfView().getClipFar());
 
       if(ray_cast_info.size() == 0)
         return true;
@@ -480,9 +480,7 @@ namespace owds {
       {
         for(auto& info : ray_cast_info)
         {
-          if(info.m_hitObjectUniqueId != object->bulletId())
-            return false;
-          else if(info.m_hitFraction < 0.95)
+          if(info.body_id != object->bulletId())
             return false;
         }
         return true;
