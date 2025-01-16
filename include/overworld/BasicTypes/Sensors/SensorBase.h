@@ -19,6 +19,8 @@ namespace owds {
                     bool is_static = false,
                     const FieldOfView& field_of_view = FieldOfView(60, 80, 0.1, 12));
 
+    virtual ~Sensor() = default;
+
     void clearPoses() { objects_seen_ids_.clear(); }
 
     void setPerceptseen(const std::string& percept_id) { objects_seen_ids_.insert(percept_id); };

@@ -36,13 +36,13 @@ namespace owds::physx {
 
     size_t createActor(const owds::Shape& collision_shape,
                        const std::vector<owds::Shape>& visual_shapes,
-                       const glm::vec3& position,
-                       const glm::quat& orientation) override;
+                       const std::array<float, 3>& position,
+                       const std::array<float, 4>& orientation) override;
 
     size_t createStaticActor(const owds::Shape& collision_shape,
                              const std::vector<owds::Shape>& visual_shapes,
-                             const glm::vec3& position,
-                             const glm::quat& orientation) override;
+                             const std::array<float, 3>& position,
+                             const std::array<float, 4>& orientation) override;
 
     owds::Urdf* loadUrdf(const urdf::Urdf_t& model) override;
     void insertUrdf(owds::Urdf* urdf) override;
