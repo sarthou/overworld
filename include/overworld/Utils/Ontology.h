@@ -11,7 +11,7 @@ namespace owds {
 
   namespace ontology {
 
-    std::array<double, 3> getEntityColor(onto::OntologyManipulator* onto, const std::string& indiv_name, const std::array<double, 3>& default_value = {0.8, 0.8, 0.8});
+    std::array<float, 3> getEntityColor(onto::OntologyManipulator* onto, const std::string& indiv_name, const std::array<float, 3>& default_value = {0.8, 0.8, 0.8});
 
     Shape_t getEntityShape(onto::OntologyManipulator* onto, const std::string& indiv_name);
 
