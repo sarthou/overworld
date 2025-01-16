@@ -38,7 +38,7 @@ namespace owds {
   {
     drawn_ = true;
     for(auto& area : areas_)
-      if(area.second->getWorldIds().size() == 0)
+      if(area.second->getWorldLineIds().size() == 0)
         addToWorld(area.second);
   }
 
@@ -46,7 +46,7 @@ namespace owds {
   {
     drawn_ = false;
     for(auto& area : areas_)
-      if(area.second->getWorldIds().size() != 0)
+      if(area.second->getWorldLineIds().size() != 0)
         removeFromBullet(area.second);
   }
 
@@ -90,9 +90,12 @@ namespace owds {
 
   void AreasPerceptionManager::removeFromBullet(Area* area)
   {
-    for(auto id : area->getWorldIds())
-      world_client_->removeUserDebugItem(id);
-    area->setWorldIds({});
+    for(auto id : area->getWorldLineIds())
+      world_client_->removeDebugLine(id);
+    for(auto id : area->getWorldTextIds())
+      world_client_->removeDebugText(id);
+    area->setWorldLineIds({});
+    area->setWorldTextIds({});
   }
 
   void AreasPerceptionManager::addToWorld(Area* area)
@@ -108,7 +111,7 @@ namespace owds {
 
   void AreasPerceptionManager::addPolygonToBullet(Area* area)
   {
-    std::array<double, 3> color = {1, 0, 0};
+    std::array<float, 3> color = {1, 0, 0};
     int owner_id = -1;
     int owner_link_id = -1;
     if(area->isStatic() == false)
@@ -120,39 +123,53 @@ namespace owds {
 
     std::unordered_set<int> engine_ids;
     auto polygon_points = area->getPolygon().getBasePoints();
-    double z_min = area->getZmin();
-    double z_max = area->getZmax();
-    double mean_x = 0;
-    double mean_y = 0;
-    for(size_t i = 0, j = 1; i < polygon_points.size(); i++, j++)
-    {
-      if(j >= polygon_points.size())
-        j = 0;
+    float z_min = area->getZmin();
+    float z_max = area->getZmax();
+    float mean_x = 0;
+    float mean_y = 0;
 
-      engine_ids.insert(world_client_->addUserDebugLine({polygon_points[i].x, polygon_points[i].y, z_min},
-                                                        {polygon_points[i].x, polygon_points[i].y, z_max},
-                                                        color, 2, 0, -1, owner_id, owner_link_id));
-      engine_ids.insert(world_client_->addUserDebugLine({polygon_points[i].x, polygon_points[i].y, z_min},
-                                                        {polygon_points[j].x, polygon_points[j].y, z_min},
-                                                        color, 2, 0, -1, owner_id, owner_link_id));
-      engine_ids.insert(world_client_->addUserDebugLine({polygon_points[i].x, polygon_points[i].y, z_max},
-                                                        {polygon_points[j].x, polygon_points[j].y, z_max},
-                                                        color, 2, 0, -1, owner_id, owner_link_id));
+    std::vector<std::array<float, 3>> positions;
+    std::vector<unsigned int> indices; // min pair, max impair
+    positions.reserve(polygon_points.size() * 2);
+    indices.reserve(polygon_points.size() * 6);
+
+    for(size_t i = 0; i < polygon_points.size(); i++)
+    {
+      positions.push_back({(float)polygon_points[i].x, (float)polygon_points[i].y, z_min});
+      positions.push_back({(float)polygon_points[i].x, (float)polygon_points[i].y, z_max});
+
+      indices.emplace_back(i * 2);
+      indices.emplace_back(i * 2 + 1);
+      indices.emplace_back(i * 2);
+      indices.emplace_back((i + 1) * 2);
+      indices.emplace_back(i * 2 + 1);
+      indices.emplace_back((i + 1) * 2 + 1);
+
       mean_x += polygon_points[i].x;
       mean_y += polygon_points[i].y;
     }
+
+    indices[indices.size() - 1] = 1;
+    indices[indices.size() - 3] = 0;
+
+    engine_ids.insert(world_client_->addDebugLine(positions, indices, color,
+                                                  0, -1, owner_id, owner_link_id));
+
     mean_x = mean_x / polygon_points.size();
     mean_y = mean_y / polygon_points.size();
-    engine_ids.insert(world_client_->addUserDebugText(area->id(),
-                                                      {mean_x, mean_y, z_max + 0.2},
-                                                      color, 1.5, 0, owner_id, owner_link_id));
 
-    area->setWorldIds(engine_ids);
+    std::unordered_set<int> engine_text_ids;
+    engine_text_ids.insert(world_client_->addDebugText(area->id(),
+                                                      {mean_x, mean_y, z_max + 0.2f}, 0.4,
+                                                      color, 0, -1, owner_id, owner_link_id));
+
+    area->setWorldLineIds(engine_ids);
+    area->setWorldTextIds(engine_text_ids);
   }
 
   void AreasPerceptionManager::addCircleToBullet(Area* area)
   {
-    std::array<double, 3> color = {1, 0, 0};
+    std::array<float, 3> color = {1, 0, 0};
     int owner_id = -1;
     int owner_link_id = -1;
     if(area->isStatic() == false)
@@ -164,35 +181,48 @@ namespace owds {
 
     std::unordered_set<int> engine_ids;
 
-    double angle_step = (2 * M_PI / CIRCLE_STEPS);
-    double radius = area->getRadius();
-    double z_min = area->getCenterPose().getZ() - area->getHalfHeight();
-    double z_max = area->getCenterPose().getZ() + area->getHalfHeight();
-    double x_center = area->getCenterPose().getX();
-    double y_center = area->getCenterPose().getY();
+    float angle_step = (2 * M_PI / CIRCLE_STEPS);
+    float radius = area->getRadius();
+    float z_min = area->getCenterPose().getZ() - area->getHalfHeight();
+    float z_max = area->getCenterPose().getZ() + area->getHalfHeight();
+    float x_center = area->getCenterPose().getX();
+    float y_center = area->getCenterPose().getY();
+
+    std::vector<std::array<float, 3>> positions;
+    std::vector<unsigned int> indices; // min pair, max impair
+    positions.reserve(CIRCLE_STEPS * 2);
+    indices.reserve(CIRCLE_STEPS * 6);
+
     for(size_t i = 0; i < CIRCLE_STEPS; i++)
     {
-      double angle = i * angle_step;
-      double x = x_center + radius * std::cos(angle);
-      double y = y_center + radius * std::sin(angle);
-      double angle_next = (i + 1) * angle_step;
-      double x_next = x_center + radius * std::cos(angle_next);
-      double y_next = y_center + radius * std::sin(angle_next);
-      engine_ids.insert(world_client_->addUserDebugLine({x, y, z_min},
-                                                        {x, y, z_max},
-                                                        color, 2, 0, -1, owner_id, owner_link_id));
-      engine_ids.insert(world_client_->addUserDebugLine({x, y, z_min},
-                                                        {x_next, y_next, z_min},
-                                                        color, 2, 0, -1, owner_id, owner_link_id));
-      engine_ids.insert(world_client_->addUserDebugLine({x, y, z_max},
-                                                        {x_next, y_next, z_max},
-                                                        color, 2, 0, -1, owner_id, owner_link_id));
-    }
-    engine_ids.insert(world_client_->addUserDebugText(area->id(),
-                                                      {x_center, y_center, z_max + 0.2},
-                                                      color, 1.5, 0, owner_id, owner_link_id));
+      float angle = i * angle_step;
+      float x = x_center + radius * std::cos(angle);
+      float y = y_center + radius * std::sin(angle);
 
-    area->setWorldIds(engine_ids);
+      positions.push_back({x, y, z_min});
+      positions.push_back({x, y, z_max});
+
+      indices.emplace_back(i * 2);
+      indices.emplace_back(i * 2 + 1);
+      indices.emplace_back(i * 2);
+      indices.emplace_back((i + 1) * 2);
+      indices.emplace_back(i * 2 + 1);
+      indices.emplace_back((i + 1) * 2 + 1);
+    }
+
+    indices[indices.size() - 1] = 1;
+    indices[indices.size() - 3] = 0;
+
+    engine_ids.insert(world_client_->addDebugLine(positions, indices, color,
+                                                  0, -1, owner_id, owner_link_id));
+
+    std::unordered_set<int> engine_text_ids;
+    engine_text_ids.insert(world_client_->addDebugText(area->id(),
+                                                      {x_center, y_center, z_max + 0.2f}, 0.4,
+                                                      color, 0, -1, owner_id, owner_link_id));
+
+    area->setWorldLineIds(engine_ids);
+    area->setWorldTextIds(engine_text_ids);;
   }
 
   Entity* AreasPerceptionManager::findAreaOwner(Area* area)
