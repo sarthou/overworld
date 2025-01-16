@@ -79,6 +79,8 @@ namespace owds {
         ShellDisplay::info("[AgentPerceptionManager] Base " + body_part->id() + " has been setted for " + it_agent->second->getId());
         break;
       }
+      default:
+        return nullptr;
       }
       return it_agent->second;
     }
