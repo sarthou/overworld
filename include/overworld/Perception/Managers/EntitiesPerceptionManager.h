@@ -256,13 +256,15 @@ namespace owds {
       visual_geom.material.diffuse_texture_ = entity->getShape().texture;
 
       auto entity_pose = entity->pose().arrays();
+      std::array<float, 3> position{entity_pose.first[0], entity_pose.first[1], entity_pose.first[2]};
+      std::array<float, 4> orientation{entity_pose.second[0], entity_pose.second[1], entity_pose.second[2], entity_pose.second[3]};
       int obj_id = -1;
       if(entity->isStatic())
-        obj_id = world_client_->createStaticActor(collision_geom,
-                                                  {visual_geom});
+        obj_id = world_client_->createStaticActor(collision_geom, {visual_geom},
+                                                  position, orientation);
       else
-        obj_id = world_client_->createActor(collision_geom,
-                                            {visual_geom});
+        obj_id = world_client_->createActor(collision_geom, {visual_geom},
+                                            position, orientation);
 
       world_client_->setMass(obj_id, -1, 0); // We force the mass to zero to not have gravity effect
       world_client_->setRestitution(obj_id, -1, 0.001);

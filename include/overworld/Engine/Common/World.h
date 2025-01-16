@@ -65,17 +65,17 @@ namespace owds {
 
     size_t createStaticActor(const owds::urdf::Geometry_t& collision_geometry,
                              const std::vector<owds::urdf::Geometry_t>& visual_geometries,
-                             const std::array<float, 3>& position = {0., 0., 0.},
-                             const glm::vec3& rotation = {0., 0., 0.});
+                             const std::array<float, 3>& position = {0.f, 0.f, 0.f},
+                             const std::array<float, 4>& rotation = {0., 0., 0., 1.});
 
     size_t createActor(const owds::urdf::Geometry_t& collision_geometry,
                        const std::vector<owds::urdf::Geometry_t>& visual_geometries,
-                       const std::array<float, 3>& position = {0., 0., 0.},
-                       const glm::vec3& rotation = {0., 0., 0.});
+                       const std::array<float, 3>& position = {0.f, 0.f, 0.f},
+                       const std::array<float, 4>& rotation = {0., 0., 0., 1.});
 
     size_t createVisualActor(const std::vector<owds::urdf::Geometry_t>& visual_geometries,
-                             const std::array<float, 3>& position = {0., 0., 0.},
-                             const glm::vec3& rotation = {0., 0., 0.});
+                             const std::array<float, 3>& position = {0.f, 0.f, 0.f},
+                             const std::array<float, 4>& rotation = {0., 0., 0., 1.});
 
     size_t loadUrdf(const std::string& path,
                     const std::array<float, 3>& position,
@@ -183,13 +183,13 @@ namespace owds {
 
     virtual size_t createActor(const owds::Shape& collision_shape,
                                const std::vector<owds::Shape>& visual_shapes,
-                               const glm::vec3& position,
-                               const glm::quat& orientation) = 0;
+                               const std::array<float, 3>& position,
+                               const std::array<float, 4>& orientation) = 0;
 
     virtual size_t createStaticActor(const owds::Shape& collision_shape,
                                      const std::vector<owds::Shape>& visual_shapes,
-                                     const glm::vec3& position,
-                                     const glm::quat& orientation) = 0;
+                                     const std::array<float, 3>& position,
+                                     const std::array<float, 4>& orientation) = 0;
 
     virtual owds::Urdf* loadUrdf(const urdf::Urdf_t& urdf) = 0;
     virtual void insertUrdf(owds::Urdf* urdf) = 0;

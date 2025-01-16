@@ -45,13 +45,12 @@ namespace owds::physx {
 
   size_t World::createActor(const owds::Shape& collision_shape,
                             const std::vector<owds::Shape>& visual_shapes,
-                            const glm::vec3& position,
-                            const glm::quat& orientation)
+                            const std::array<float, 3>& position,
+                            const std::array<float, 4>& orientation)
   {
     owds::physx::Actor* actor = new owds::physx::DynamicActor(*ctx_, collision_shape, visual_shapes);
 
-    actor->setup({position.x, position.y, position.z},
-                 {orientation.x, orientation.y, orientation.z, orientation.w});
+    actor->setup(position, orientation);
     actors_.emplace(actor->unique_id_, actor);
 
     return actor->unique_id_;
@@ -59,13 +58,12 @@ namespace owds::physx {
 
   size_t World::createStaticActor(const owds::Shape& collision_shape,
                                   const std::vector<owds::Shape>& visual_shapes,
-                                  const glm::vec3& position,
-                                  const glm::quat& orientation)
+                                  const std::array<float, 3>& position,
+                                  const std::array<float, 4>& orientation)
   {
     owds::physx::Actor* actor = new owds::physx::StaticActor(*ctx_, collision_shape, visual_shapes);
 
-    actor->setup({position.x, position.y, position.z},
-                 {orientation.x, orientation.y, orientation.z, orientation.w});
+    actor->setup(position, orientation);
     actors_.emplace(actor->unique_id_, actor);
 
     return actor->unique_id_;

@@ -56,7 +56,7 @@ namespace owds {
   size_t World::createStaticActor(const owds::urdf::Geometry_t& collision_geometry,
                                   const std::vector<owds::urdf::Geometry_t>& visual_geometries,
                                   const std::array<float, 3>& position,
-                                  const glm::vec3& rotation)
+                                  const std::array<float, 4>& rotation)
   {
     owds::Shape collision_shape = convertShape(collision_geometry);
     std::vector<owds::Shape> visual_shapes;
@@ -65,14 +65,13 @@ namespace owds {
       visual_shapes.emplace_back(convertShape(geometry));
 
     return createStaticActor(collision_shape, visual_shapes,
-                             {position.at(0), position.at(1), position.at(2)},
-                             glm::quat(rotation));
+                             position, rotation);
   }
 
   size_t World::createActor(const owds::urdf::Geometry_t& collision_geometry,
                             const std::vector<owds::urdf::Geometry_t>& visual_geometries,
                             const std::array<float, 3>& position,
-                            const glm::vec3& rotation)
+                            const std::array<float, 4>& rotation)
   {
     owds::Shape collision_shape = convertShape(collision_geometry);
     std::vector<owds::Shape> visual_shapes;
@@ -81,23 +80,20 @@ namespace owds {
       visual_shapes.emplace_back(convertShape(geometry));
 
     return createActor(collision_shape, visual_shapes,
-                       {position.at(0), position.at(1), position.at(2)},
-                       glm::quat(rotation));
+                       position, rotation);
   }
 
   size_t World::createVisualActor(const std::vector<owds::urdf::Geometry_t>& visual_geometries,
                                   const std::array<float, 3>& position,
-                                  const glm::vec3& rotation)
+                                  const std::array<float, 4>& rotation)
   {
     std::vector<owds::Shape> visual_shapes;
     visual_shapes.reserve(visual_geometries.size());
     for(const auto& geometry : visual_geometries)
       visual_shapes.emplace_back(convertShape(geometry));
-    glm::quat quat(rotation);
 
     Actor* actor = new VisualActor(visual_shapes);
-    actor->setup(position,
-                 {quat.x, quat.y, quat.z, quat.w});
+    actor->setup(position, rotation);
 
     actors_.emplace(actor->unique_id_, actor);
 
