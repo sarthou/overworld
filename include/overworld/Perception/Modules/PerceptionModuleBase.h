@@ -12,7 +12,7 @@
 
 #include "overworld/BasicTypes/Agent.h"
 #include "overworld/BasicTypes/Percept.h"
-#include "overworld/Bullet/PhysicsServers.h"
+#include "overworld/Engine/Engine.h"
 #include "overworld/Utils/Ontology.h"
 #include "overworld/Utils/ShellDisplay.h"
 
@@ -26,8 +26,8 @@ namespace owds {
                                                                                     updated_(true),
                                                                                     need_access_to_external_entities_(need_access_to_external_entities),
                                                                                     n_(nullptr),
-                                                                                    bullet_client_(nullptr),
-                                                                                    robot_bullet_id_(-1),
+                                                                                    world_client_(nullptr),
+                                                                                    robot_engine_id_(-1),
                                                                                     robot_agent_(nullptr)
 
     {}
@@ -35,14 +35,14 @@ namespace owds {
 
     virtual void initialize(const std::string& module_name,
                             ros::NodeHandle* n,
-                            BulletClient* bullet_client,
-                            int robot_bullet_id,
+                            WorldEngine* world_client,
+                            int robot_engine_id,
                             Agent* robot_agent)
     {
       module_name_ = module_name;
       n_ = n;
-      bullet_client_ = bullet_client;
-      robot_bullet_id_ = robot_bullet_id;
+      world_client_ = world_client;
+      robot_engine_id_ = robot_engine_id;
       robot_agent_ = robot_agent;
     }
 
@@ -85,8 +85,8 @@ namespace owds {
     bool need_access_to_external_entities_;
 
     ros::NodeHandle* n_;
-    BulletClient* bullet_client_;
-    int robot_bullet_id_;
+    WorldEngine* world_client_;
+    int robot_engine_id_;
     Agent* robot_agent_;
 
     void setAllPerceptsUnseen()
@@ -147,11 +147,11 @@ namespace owds {
 
     virtual void initialize(const std::string& module_name,
                             ros::NodeHandle* n,
-                            BulletClient* bullet_client,
-                            int robot_bullet_id,
+                            WorldEngine* world_client,
+                            int robot_engine_id,
                             Agent* robot_agent) override
     {
-      PerceptionModuleBase_<T>::initialize(module_name, n, bullet_client, robot_bullet_id, robot_agent);
+      PerceptionModuleBase_<T>::initialize(module_name, n, world_client, robot_engine_id, robot_agent);
       if(topic_name_ != "")
       {
         sub_ = this->n_->subscribe(topic_name_, 1, &PerceptionModuleRosBase::privatePerceptionCallback, this);
@@ -227,11 +227,11 @@ namespace owds {
 
     virtual void initialize(const std::string& module_name,
                             ros::NodeHandle* n,
-                            BulletClient* bullet_client,
-                            int robot_bullet_id,
+                            WorldEngine* world_client,
+                            int robot_engine_id,
                             Agent* robot_agent) override
     {
-      PerceptionModuleBase_<T>::initialize(module_name, n, bullet_client, robot_bullet_id, robot_agent);
+      PerceptionModuleBase_<T>::initialize(module_name, n, world_client, robot_engine_id, robot_agent);
       sub_0_.subscribe(*n, first_topic_name_, 1);
       sub_1_.subscribe(*n, second_topic_name_, 1);
       sync_.reset(new Sync(SyncPolicy(10), sub_0_, sub_1_));

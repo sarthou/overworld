@@ -81,7 +81,7 @@ namespace owds {
     double time_step_; // in second
     double simu_step_;
 
-    BulletClient* bullet_client_;
+    BulletClient* world_client_;
     PerceptionManagers perception_manager_;
 
     FactsCalculator facts_calculator_;

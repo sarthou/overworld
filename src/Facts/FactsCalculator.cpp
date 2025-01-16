@@ -247,9 +247,9 @@ namespace owds {
     return false;
   }
 
-  bool FactsCalculator::isLookingAt(Agent* agent, const std::unordered_set<int>& seen_bullet_ids, const Object* object)
+  bool FactsCalculator::isLookingAt(Agent* agent, const std::unordered_set<int>& seen_engine_ids, const Object* object)
   {
-    if(seen_bullet_ids.count(object->bulletId()))
+    if(seen_engine_ids.count(object->bulletId()))
     {
       facts_.emplace_back(agent->getId(), "isLookingAt", object->id());
       return true;

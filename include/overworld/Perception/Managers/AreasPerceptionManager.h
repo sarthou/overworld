@@ -17,10 +17,10 @@ namespace owds {
   class AreasPerceptionManager : public BasePerceptionManager<Area>
   {
   public:
-    explicit AreasPerceptionManager(ros::NodeHandle* nh) : bullet_client_(nullptr), drawn_(true) {}
+    explicit AreasPerceptionManager(ros::NodeHandle* nh) : world_client_(nullptr), drawn_(true) {}
     ~AreasPerceptionManager();
 
-    void setBulletClient(BulletClient* client) { bullet_client_ = client; }
+    void setWorldClient(BulletClient* client) { world_client_ = client; }
 
     void registerObjectsManager(EntitiesPerceptionManager<Object>* manager) { objects_managers_.insert(manager); }
     void registerBodyPartsManager(EntitiesPerceptionManager<BodyPart>* manager) { bodyparts_managers_.insert(manager); }
@@ -37,7 +37,7 @@ namespace owds {
   private:
     std::map<std::string, Area*> areas_;
     std::map<std::string, Area*> pending_percepts_;
-    BulletClient* bullet_client_;
+    BulletClient* world_client_;
     bool drawn_;
 
     std::set<EntitiesPerceptionManager<Object>*> objects_managers_;

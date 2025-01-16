@@ -12,7 +12,7 @@ namespace owds {
   class PerceptionManagers
   {
   public:
-    explicit PerceptionManagers(ros::NodeHandle* n, BulletClient* bullet_client = nullptr);
+    explicit PerceptionManagers(ros::NodeHandle* n, BulletClient* world_client = nullptr);
     ~PerceptionManagers();
 
     AreasPerceptionManager areas_manager_;
@@ -20,13 +20,13 @@ namespace owds {
     ObjectsPerceptionManager objects_manager_;
     HumansPerceptionManager humans_manager_;
 
-    void setBulletClient(BulletClient* bullet_client)
+    void setWorldClient(BulletClient* world_client)
     {
-      bullet_client_ = bullet_client;
-      areas_manager_.setBulletClient(bullet_client_);
-      robots_manager_.setBulletClient(bullet_client_);
-      objects_manager_.setBulletClient(bullet_client_);
-      humans_manager_.setBulletClient(bullet_client_);
+      world_client_ = world_client;
+      areas_manager_.setWorldClient(world_client_);
+      robots_manager_.setWorldClient(world_client_);
+      objects_manager_.setWorldClient(world_client_);
+      humans_manager_.setWorldClient(world_client_);
     }
 
     void setOwnerAgentName(const std::string& agent_name)
@@ -45,9 +45,9 @@ namespace owds {
 
   private:
     ros::NodeHandle* n_;
-    BulletClient* bullet_client_;
+    BulletClient* world_client_;
     std::string robot_name_;
-    int robot_bullet_id_;
+    int robot_engine_id_;
     Agent* robot_agent_;
 
     bool applyConfiguration(const std::string& config_path, YamlElement& modules_list, bool display = true);

@@ -18,8 +18,8 @@ namespace owds {
 
     const std::string& id() const { return id_; }
 
-    const std::unordered_set<int>& getBulletIds() const { return bullet_ids_; }
-    void setBulletIds(const std::unordered_set<int>& bullet_ids) { bullet_ids_ = bullet_ids; }
+    const std::unordered_set<int>& getWorldIds() const { return engine_ids_; }
+    void setWorldIds(const std::unordered_set<int>& engine_ids) { engine_ids_ = engine_ids; }
 
     void setHysteresis(double hysteresis);
     void setOwner(Entity* owner) { owner_ = owner; }
@@ -62,7 +62,7 @@ namespace owds {
     std::unordered_set<Entity*> inside_entities_;
     std::unordered_set<Entity*> leaving_entities_;
 
-    std::unordered_set<int> bullet_ids_;
+    std::unordered_set<int> engine_ids_;
 
     bool isInCircle(Entity* entity);
     bool isInPolygon(Entity* entity);

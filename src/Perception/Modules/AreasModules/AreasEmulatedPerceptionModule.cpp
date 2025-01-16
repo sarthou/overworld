@@ -19,7 +19,7 @@ namespace owds {
     Percept<Area> percept(*area);
     percept.setOwner(nullptr);
     percept.clearInsideEntities();
-    percept.setBulletIds({});
+    percept.setWorldIds({});
 
     return percepts_.insert(std::make_pair(percept.id(), percept)).first;
   }

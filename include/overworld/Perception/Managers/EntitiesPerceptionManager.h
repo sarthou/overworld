@@ -11,7 +11,7 @@
 #include "overworld/BasicTypes/Entity.h"
 #include "overworld/BasicTypes/Percept.h"
 #include "overworld/BasicTypes/Sensors/SensorBase.h"
-#include "overworld/Bullet/BulletClient.h"
+#include "overworld/Engine/Engine.h"
 #include "overworld/Perception/DataFusion/DataFusionBase.h"
 #include "overworld/Perception/Managers/BasePerceptionManager.h"
 #include "overworld/Utils/RosFiles.h"
@@ -26,11 +26,11 @@ namespace owds {
     static_assert(std::is_base_of<Entity, T>::value, "T must be derived from Entity");
 
   public:
-    explicit EntitiesPerceptionManager(ros::NodeHandle* nh) : bullet_client_(nullptr), onto_(nullptr) {}
+    explicit EntitiesPerceptionManager(ros::NodeHandle* nh) : world_client_(nullptr), onto_(nullptr) {}
     virtual ~EntitiesPerceptionManager();
 
     void setOwnerAgentName(const std::string& agent_name);
-    void setBulletClient(BulletClient* client) { bullet_client_ = client; }
+    void setWorldClient(WorldEngine* world_client) { world_client_ = world_client; }
 
     const std::map<std::string, T*>& getEntities() const { return entities_; }
     T* getEntity(const std::string& entity_id) const;
@@ -43,7 +43,7 @@ namespace owds {
     std::map<std::string, std::map<std::string, std::set<std::string>>> entities_percetion_register_;
     std::unordered_map<std::string, Percept<T>*> fusioned_percepts_;
     std::unordered_set<std::string> black_listed_entities_;
-    BulletClient* bullet_client_;
+    WorldEngine* world_client_;
 
     std::string myself_agent_name_;
     onto::OntologiesManipulator ontos_;
@@ -61,7 +61,7 @@ namespace owds {
     void addToBullet(T* entity, int bullet_parent_id);
     void updateToBullet(T* entity);
     void undoInBullet(T* entity);
-    T* getEntityFromBulletId(int bullet_id);
+    T* getEntityFromBulletId(int engine_id);
 
     void UpdateAabbs();
   };
@@ -201,43 +201,43 @@ namespace owds {
     {
     case SHAPE_CUBE:
     {
-      visual_id = bullet_client_->createVisualShapeBox({entity->getShape().scale[0] / 2.,
+      visual_id = world_client_->createVisualShapeBox({entity->getShape().scale[0] / 2.,
                                                         entity->getShape().scale[1] / 2.,
                                                         entity->getShape().scale[2] / 2.},
                                                        {entity->getShape().color[0],
                                                         entity->getShape().color[1],
                                                         entity->getShape().color[2],
                                                         1});
-      collision_id = bullet_client_->createCollisionShapeBox({entity->getShape().scale[0] / 2.,
+      collision_id = world_client_->createCollisionShapeBox({entity->getShape().scale[0] / 2.,
                                                               entity->getShape().scale[1] / 2.,
                                                               entity->getShape().scale[2] / 2.});
       break;
     }
     case SHAPE_SPEHERE:
     {
-      visual_id = bullet_client_->createVisualShapeSphere(entity->getShape().scale[0],
+      visual_id = world_client_->createVisualShapeSphere(entity->getShape().scale[0],
                                                           {entity->getShape().color[0],
                                                            entity->getShape().color[1],
                                                            entity->getShape().color[2],
                                                            1});
-      collision_id = bullet_client_->createCollisionShapeSphere(entity->getShape().scale[0]);
+      collision_id = world_client_->createCollisionShapeSphere(entity->getShape().scale[0]);
       break;
     }
     case SHAPE_CYLINDER:
     {
-      visual_id = bullet_client_->createVisualShapeCylinder(std::min(entity->getShape().scale[0], entity->getShape().scale[1]) / 2.,
+      visual_id = world_client_->createVisualShapeCylinder(std::min(entity->getShape().scale[0], entity->getShape().scale[1]) / 2.,
                                                             entity->getShape().scale[2],
                                                             {entity->getShape().color[0],
                                                              entity->getShape().color[1],
                                                              entity->getShape().color[2],
                                                              1});
-      collision_id = bullet_client_->createCollisionShapeCylinder(std::min(entity->getShape().scale[0], entity->getShape().scale[1]) / 2.,
+      collision_id = world_client_->createCollisionShapeCylinder(std::min(entity->getShape().scale[0], entity->getShape().scale[1]) / 2.,
                                                                   entity->getShape().scale[2]);
       break;
     }
     case SHAPE_MESH:
     {
-      visual_id = bullet_client_->createVisualShapeMesh(entity->getShape().visual_mesh_resource,
+      visual_id = world_client_->createVisualShapeMesh(entity->getShape().visual_mesh_resource,
                                                         entity->getShape().scale,
                                                         {entity->getShape().color[0],
                                                          entity->getShape().color[1],
@@ -246,7 +246,7 @@ namespace owds {
       std::string colision_mesh = entity->getShape().colision_mesh_resource;
       if(colision_mesh == "")
         colision_mesh = entity->getShape().visual_mesh_resource;
-      collision_id = bullet_client_->createCollisionShapeMesh(colision_mesh,
+      collision_id = world_client_->createCollisionShapeMesh(colision_mesh,
                                                               entity->getShape().scale);
       break;
     }
@@ -255,21 +255,21 @@ namespace owds {
     if((visual_id != -1) && (collision_id != -1))
     {
       auto entity_pose = entity->pose().arrays();
-      int obj_id = bullet_client_->createMultiBody(0, collision_id, visual_id, entity_pose.first, entity_pose.second);
+      int obj_id = world_client_->createMultiBody(0, collision_id, visual_id, entity_pose.first, entity_pose.second);
       if(entity->getShape().texture != "")
       {
-        int texture_id = bullet_client_->loadTexture(entity->getShape().texture);
-        bullet_client_->changeRgbaColor(obj_id, -1, {1, 1, 1, 1});
-        bullet_client_->changeTexture(obj_id, -1, texture_id);
+        int texture_id = world_client_->loadTexture(entity->getShape().texture);
+        world_client_->changeRgbaColor(obj_id, -1, {1, 1, 1, 1});
+        world_client_->changeTexture(obj_id, -1, texture_id);
       }
-      bullet_client_->setMass(obj_id, -1, 0); // We force the mass to zero to not have gravity effect
-      bullet_client_->setRestitution(obj_id, -1, 0.001);
-      bullet_client_->setFrictionAnchor(obj_id, -1, 0.5);
-      bullet_client_->setLateralFriction(obj_id, -1, 0.5);
-      bullet_client_->setSpinningFriction(obj_id, -1, 0.5);
-      bullet_client_->setRollingFriction(obj_id, -1, 0.5);
-      bullet_client_->setActivationState(obj_id, eActivationStateDisableSleeping);
-      entity->setBulletId(obj_id);
+      world_client_->setMass(obj_id, -1, 0); // We force the mass to zero to not have gravity effect
+      world_client_->setRestitution(obj_id, -1, 0.001);
+      world_client_->setFrictionAnchor(obj_id, -1, 0.5);
+      world_client_->setLateralFriction(obj_id, -1, 0.5);
+      world_client_->setSpinningFriction(obj_id, -1, 0.5);
+      world_client_->setRollingFriction(obj_id, -1, 0.5);
+      world_client_->setActivationState(obj_id, eActivationStateDisableSleeping);
+      entity->setWorldId(obj_id);
       return true;
     }
     else
@@ -283,14 +283,14 @@ namespace owds {
   template<typename T>
   void EntitiesPerceptionManager<T>::addToBullet(T* entity, int bullet_parent_id)
   {
-    auto p = bullet_client_->findJointAndLinkIndices(bullet_parent_id);
+    auto p = world_client_->findJointAndLinkIndices(bullet_parent_id);
     // std::unordered_map<std::string, int> joint_name_id = p.first;
     std::unordered_map<std::string, int> links_name_id = p.second;
 
     auto it = links_name_id.find(entity->id());
     if(it != links_name_id.end())
     {
-      entity->setBulletId(bullet_parent_id);
+      entity->setWorldId(bullet_parent_id);
       entity->setBulletLinkId(it->second);
     }
   }
@@ -303,12 +303,12 @@ namespace owds {
       if(entity->isLocated() == true)
       {
         auto entity_pose = entity->pose().arrays();
-        bullet_client_->resetBasePositionAndOrientation(entity->bulletId(),
+        world_client_->resetBasePositionAndOrientation(entity->bulletId(),
                                                         entity_pose.first,
                                                         entity_pose.second);
       }
       else
-        bullet_client_->resetBasePositionAndOrientation(entity->bulletId(),
+        world_client_->resetBasePositionAndOrientation(entity->bulletId(),
                                                         {0.0, 0.0, -100.0},
                                                         {0.0, 0.0, 0.0, 1.0});
     }
@@ -322,7 +322,7 @@ namespace owds {
       if(entity->isLocated() == true)
       {
         auto entity_pose = entity->pose(1).arrays();
-        bullet_client_->resetBasePositionAndOrientation(entity->bulletId(),
+        world_client_->resetBasePositionAndOrientation(entity->bulletId(),
                                                         entity_pose.first,
                                                         entity_pose.second);
       }
@@ -330,12 +330,12 @@ namespace owds {
   }
 
   template<typename T>
-  T* EntitiesPerceptionManager<T>::getEntityFromBulletId(int bullet_id)
+  T* EntitiesPerceptionManager<T>::getEntityFromBulletId(int engine_id)
   {
     for(auto entity : entities_)
     {
       if(entity.second->bulletLinkId() == -1)
-        if(entity.second->bulletId() == bullet_id)
+        if(entity.second->bulletId() == engine_id)
           return entity.second;
     }
     return nullptr;
@@ -346,7 +346,7 @@ namespace owds {
   {
     for(auto entity : entities_)
       if(entity.second->isLocated() && entity.second->hasShape()) // TODO test if entity has moved
-        entity.second->setAabb(bullet_client_->getAABB(entity.second->bulletId()));
+        entity.second->setAabb(world_client_->getAABB(entity.second->bulletId()));
   }
 
 } // namespace owds

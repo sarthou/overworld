@@ -14,7 +14,7 @@ namespace owds {
   {
     for(auto& simulated_object : simulated_objects_)
     {
-      auto pose = bullet_client_->getBasePositionAndOrientation(entities_[simulated_object.first]->bulletId());
+      auto pose = world_client_->getBasePositionAndOrientation(entities_[simulated_object.first]->bulletId());
       entities_[simulated_object.first]->updatePose(pose.first, pose.second);
     }
   }
@@ -199,7 +199,7 @@ namespace owds {
 
   void ObjectsPerceptionManager::geometricReasoning()
   {
-    bullet_client_->performCollisionDetection();
+    world_client_->performCollisionDetection();
     UpdateAabbs();
 
     std::map<std::string, std::set<Sensor*>> object__sensors_set; // map of the object and the sensors associated to module without poi
@@ -258,13 +258,13 @@ namespace owds {
             } // object with pois but none in the fov
             else // object with no pois in the fov should be put in no_data and erased if pois are in the fov of another module
             {
-              //object_is_consider_with_no_poi = true;
+              // object_is_consider_with_no_poi = true;
             }
           }
           else // object has no pois
             object_is_consider_with_no_poi = true;
         }
-        
+
         if(object_is_consider_with_no_poi)
         {
           no_data_objects.emplace(object.first, object.second);
@@ -366,13 +366,13 @@ namespace owds {
   void ObjectsPerceptionManager::startSimulation(Object* object)
   {
     std::cout << "--start simulation for " << object->id() << " with a mass of " << object->getMass() << std::endl;
-    bullet_client_->setMass(object->bulletId(), -1, object->getMass());
-    bullet_client_->resetBaseVelocity(object->bulletId(), {0, 0, 0}, {0, 0, 0});
+    world_client_->setMass(object->bulletId(), -1, object->getMass());
+    world_client_->resetBaseVelocity(object->bulletId(), {0, 0, 0}, {0, 0, 0});
 
     simulated_objects_.insert({object->id(), 0});
 
-    /*bullet_client_->performCollisionDetection();
-    auto contact_points = bullet_client_->getContactPoints(object->bulletId());
+    /*world_client_->performCollisionDetection();
+    auto contact_points = world_client_->getContactPoints(object->bulletId());
     std::cout << "==> " << contact_points.m_numContactPoints << " CPs" << std::endl;
     for(size_t i = 0; i < contact_points.m_numContactPoints; i++)
     {
@@ -389,7 +389,7 @@ namespace owds {
     if(it != simulated_objects_.end())
     {
       std::cout << "--stop simulation for " << object->id() << std::endl;
-      bullet_client_->setMass(object->bulletId(), -1, 0);
+      world_client_->setMass(object->bulletId(), -1, 0);
       if(erase)
         simulated_objects_.erase(object->id());
     }
@@ -473,7 +473,7 @@ namespace owds {
         Pose map_to_point = object->pose() * point;
         to_poses.push_back(map_to_point.arrays().first);
       }
-      auto ray_cast_info = bullet_client_->rayTestBatch(from_poses, to_poses, poi.getPoints().size(), true);
+      auto ray_cast_info = world_client_->rayTestBatch(from_poses, to_poses, poi.getPoints().size(), true);
 
       if(ray_cast_info.size() == 0)
         return true;
@@ -502,18 +502,18 @@ namespace owds {
     else if(sensor->isLocated() == false)
       return {};
 
-    auto proj_matrix = bullet_client_->computeProjectionMatrix(sensor->getFieldOfView().getHeight(),
-                                                               sensor->getFieldOfView().getRatioOpenGl(),
-                                                               sensor->getFieldOfView().getClipNear(),
-                                                               sensor->getFieldOfView().getClipFar());
+    auto proj_matrix = world_client_->computeProjectionMatrix(sensor->getFieldOfView().getHeight(),
+                                                              sensor->getFieldOfView().getRatioOpenGl(),
+                                                              sensor->getFieldOfView().getClipNear(),
+                                                              sensor->getFieldOfView().getClipFar());
     Pose target_pose = sensor->pose() * Pose({0, 0, 1}, {0, 0, 0, 1});
     auto sensor_pose_trans = sensor->pose().arrays().first;
     auto target_pose_trans = target_pose.arrays().first;
-    auto view_matrix = bullet_client_->computeViewMatrix({(float)sensor_pose_trans[0], (float)sensor_pose_trans[1], (float)sensor_pose_trans[2]},
-                                                         {(float)target_pose_trans[0], (float)target_pose_trans[1], (float)target_pose_trans[2]},
-                                                         {0., 0., 1.});
-    auto images = bullet_client_->getCameraImage(100 * sensor->getFieldOfView().getRatioOpenGl(), 100, view_matrix, proj_matrix, owds::BULLET_HARDWARE_OPENGL);
-    auto objects_in_sensor = bullet_client_->getSegmentationIds(images);
+    auto view_matrix = world_client_->computeViewMatrix({(float)sensor_pose_trans[0], (float)sensor_pose_trans[1], (float)sensor_pose_trans[2]},
+                                                        {(float)target_pose_trans[0], (float)target_pose_trans[1], (float)target_pose_trans[2]},
+                                                        {0., 0., 1.});
+    auto images = world_client_->getCameraImage(100 * sensor->getFieldOfView().getRatioOpenGl(), 100, view_matrix, proj_matrix, owds::BULLET_HARDWARE_OPENGL);
+    auto objects_in_sensor = world_client_->getSegmentationIds(images);
     if(objects_in_sensor.find(object->bulletId()) != objects_in_sensor.end())
       return true;
     else
@@ -606,8 +606,8 @@ namespace owds {
     },
                      ros::Time::now());
 
-    bullet_client_->performCollisionDetection();
-    auto bb = bullet_client_->getAABB(object->bulletId());
+    world_client_->performCollisionDetection();
+    auto bb = world_client_->getAABB(object->bulletId());
 
     updateEntityPose(object, tmp_pose, ros::Time::now());
 

@@ -83,7 +83,7 @@ namespace owds {
     }
     loadRobotModel();
 
-    auto p = bullet_client_->findJointAndLinkIndices(robot_bullet_id_);
+    auto p = world_client_->findJointAndLinkIndices(robot_engine_id_);
     joint_name_id_ = p.first;
     links_name_id_ = p.second;
     for(const auto& link_pair : links_to_entity_)
@@ -92,7 +92,7 @@ namespace owds {
       percepts_.at(link_pair.first).setAgentName(robot_name_);
       percepts_.at(link_pair.first).setType(link_pair.second);
       // we set the bullet id of the parent to inform the manager
-      percepts_.at(link_pair.first).setBulletId(robot_bullet_id_);
+      percepts_.at(link_pair.first).setWorldId(robot_engine_id_);
       if(links_name_id_.count(link_pair.first) == 0)
       {
         std::cout << "Error: link name '" << link_pair.first
@@ -104,7 +104,7 @@ namespace owds {
     percepts_.at(base_link_).setAgentName(robot_name_);
     percepts_.at(base_link_).setType(BODY_PART_BASE);
     // we set the bullet id of the parent to inform the manager
-    percepts_.at(base_link_).setBulletId(robot_bullet_id_);
+    percepts_.at(base_link_).setWorldId(robot_engine_id_);
 
     if(updateBasePose() == false)
       ShellDisplay::warning("[JointStatePerceptionModule] Pr2 base has no position in tf");
@@ -113,7 +113,7 @@ namespace owds {
 
     // We set the links mass to 0 to make them static and not be impacted by the gravity
     for(auto& link : links_name_id_)
-      bullet_client_->setMass(robot_bullet_id_, link.second, 0);
+      world_client_->setMass(robot_engine_id_, link.second, 0);
 
     return true;
   }
@@ -134,11 +134,11 @@ namespace owds {
         // std::cout << "Joint name not found in Bullet: " << name << std::endl;
         continue;
       }
-      bullet_client_->resetJointState(robot_bullet_id_, joint_name_id_[name], msg.position[i]);
+      world_client_->resetJointState(robot_engine_id_, joint_name_id_[name], msg.position[i]);
     }
     for(const auto& link_pair : links_to_entity_)
     {
-      b3LinkState link = bullet_client_->getLinkState(robot_bullet_id_, links_name_id_.at(link_pair.first));
+      b3LinkState link = world_client_->getLinkState(robot_engine_id_, links_name_id_.at(link_pair.first));
       double* pos = link.m_worldLinkFramePosition;
       double* rot = link.m_worldLinkFrameOrientation;
       percepts_.at(link_pair.first).updatePose({
@@ -167,8 +167,8 @@ namespace owds {
       return false;
     }
 
-    bullet_client_->resetBasePositionAndOrientation(
-      robot_bullet_id_, {robot_base.transform.translation.x, robot_base.transform.translation.y, robot_base.transform.translation.z},
+    world_client_->resetBasePositionAndOrientation(
+      robot_engine_id_, {robot_base.transform.translation.x, robot_base.transform.translation.y, robot_base.transform.translation.z},
       {robot_base.transform.rotation.x, robot_base.transform.rotation.y, robot_base.transform.rotation.z, robot_base.transform.rotation.w});
     percepts_.at(base_link_)
       .updatePose(
@@ -182,13 +182,13 @@ namespace owds {
   {
     std::string path_overworld = ros::package::getPath("overworld");
 
-    bullet_client_->setAdditionalSearchPath(path_overworld + "/models");
+    world_client_->setAdditionalSearchPath(path_overworld + "/models");
 
     std::string urdf = n_->param<std::string>("/robot_description", "");
     if(urdf == "")
-      robot_bullet_id_ = bullet_client_->loadURDF(robot_name_ + ".urdf", {0, 0, 0}, {0, 0, 0, 1}, true, URDF_USE_MATERIAL_COLORS_FROM_MTL);
+      robot_engine_id_ = world_client_->loadURDF(robot_name_ + ".urdf", {0, 0, 0}, {0, 0, 0, 1}, true, URDF_USE_MATERIAL_COLORS_FROM_MTL);
     else
-      robot_bullet_id_ = bullet_client_->loadURDFRaw(urdf, robot_name_ + "_tmp.urdf", {0, 0, 0}, {0, 0, 0, 1}, true, URDF_USE_MATERIAL_COLORS_FROM_MTL);
+      robot_engine_id_ = world_client_->loadURDFRaw(urdf, robot_name_ + "_tmp.urdf", {0, 0, 0}, {0, 0, 0, 1}, true, URDF_USE_MATERIAL_COLORS_FROM_MTL);
   }
 
 } // namespace owds

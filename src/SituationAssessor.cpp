@@ -37,23 +37,23 @@ namespace owds {
 
     if(is_robot_)
     {
-      bullet_client_ = PhysicsServers::connectPhysicsServer(owds::CONNECT_GUI);
-      bullet_client_->configureDebugVisualizer(COV_ENABLE_GUI, false);
-      bullet_client_->configureDebugVisualizer(COV_ENABLE_DEPTH_BUFFER_PREVIEW, false);
-      bullet_client_->configureDebugVisualizer(COV_ENABLE_SHADOWS, false);
-      bullet_client_->configureDebugVisualizer(COV_ENABLE_PLANAR_REFLECTION, false);
-      bullet_client_->configureDebugVisualizer(COV_ENABLE_RGB_BUFFER_PREVIEW, false);
-      bullet_client_->configureDebugVisualizer(COV_ENABLE_SEGMENTATION_MARK_PREVIEW, false);
-      bullet_client_->configureDebugVisualizer(COV_ENABLE_WIREFRAME, false);
-      bullet_client_->configureDebugVisualizer(COV_ENABLE_RENDERING, true);
+      world_client_ = PhysicsServers::connectPhysicsServer(owds::CONNECT_GUI);
+      world_client_->configureDebugVisualizer(COV_ENABLE_GUI, false);
+      world_client_->configureDebugVisualizer(COV_ENABLE_DEPTH_BUFFER_PREVIEW, false);
+      world_client_->configureDebugVisualizer(COV_ENABLE_SHADOWS, false);
+      world_client_->configureDebugVisualizer(COV_ENABLE_PLANAR_REFLECTION, false);
+      world_client_->configureDebugVisualizer(COV_ENABLE_RGB_BUFFER_PREVIEW, false);
+      world_client_->configureDebugVisualizer(COV_ENABLE_SEGMENTATION_MARK_PREVIEW, false);
+      world_client_->configureDebugVisualizer(COV_ENABLE_WIREFRAME, false);
+      world_client_->configureDebugVisualizer(COV_ENABLE_RENDERING, true);
     }
     else
-      bullet_client_ = PhysicsServers::connectPhysicsServer(owds::CONNECT_DIRECT);
+      world_client_ = PhysicsServers::connectPhysicsServer(owds::CONNECT_DIRECT);
 
-    bullet_client_->setGravity(0, 0, -9.81);
-    bullet_client_->setTimeStep(simu_step_);
+    world_client_->setGravity(0, 0, -9.81);
+    world_client_->setTimeStep(simu_step_);
 
-    perception_manager_.setBulletClient(bullet_client_);
+    perception_manager_.setWorldClient(world_client_);
 
     /***************************
      * Set perception modules  *
@@ -109,8 +109,8 @@ namespace owds {
       delete objetcs_pose_sender_;
     if(bernie_sender_ != nullptr)
       delete bernie_sender_;
-    if(bullet_client_ != nullptr)
-      delete bullet_client_;
+    if(world_client_ != nullptr)
+      delete world_client_;
   }
 
   void SituationAssessor::stop()
@@ -180,7 +180,7 @@ namespace owds {
       assess();
 
       if(is_robot_)
-        handleKeypress(bullet_client_, perception_manager_);
+        handleKeypress(world_client_, perception_manager_);
 
       if(ros::ok() && isRunning())
       {
@@ -197,7 +197,7 @@ namespace owds {
           unsigned int nb_step = time_interval_sec / simu_step_;
           for(int i = 0; i < nb_step; i++)
           {
-            bullet_client_->stepSimulation();
+            world_client_->stepSimulation();
             perception_manager_.objects_manager_.stepLerp((double)((i + 1) / (double)nb_step));
           }
 
@@ -261,7 +261,7 @@ namespace owds {
     auto facts = facts_calculator_.computeAreasFacts(areas, objects, body_parts, false);
     facts_publisher_.publish(facts);
   }
-  
+
   void SituationAssessor::processHumans(std::map<std::string, std::unordered_set<int>>& agents_segmentation_ids)
   {
     auto objects = perception_manager_.objects_manager_.getEntities();
@@ -273,25 +273,25 @@ namespace owds {
     {
       if(human.second->getSensors().empty())
         continue;
-      else if(human.second->getHead()->isLocated() == false) 
+      else if(human.second->getHead()->isLocated() == false)
         continue;
 
-      for(const auto& sensor: human.second->getSensors())
+      for(const auto& sensor : human.second->getSensors())
       {
-        auto proj_matrix = bullet_client_->computeProjectionMatrix(sensor.second->getFieldOfView().getHeight(),
+        auto proj_matrix = world_client_->computeProjectionMatrix(sensor.second->getFieldOfView().getHeight(),
                                                                   sensor.second->getFieldOfView().getRatioOpenGl(),
                                                                   sensor.second->getFieldOfView().getClipNear(),
                                                                   sensor.second->getFieldOfView().getClipFar());
         Pose target_pose = sensor.second->pose() * Pose({0, 0, 1}, {0, 0, 0, 1});
         auto head_pose_trans = sensor.second->pose().arrays().first;
         auto target_pose_trans = target_pose.arrays().first;
-        auto view_matrix = bullet_client_->computeViewMatrix({(float)head_pose_trans[0], (float)head_pose_trans[1], (float)head_pose_trans[2]},
+        auto view_matrix = world_client_->computeViewMatrix({(float)head_pose_trans[0], (float)head_pose_trans[1], (float)head_pose_trans[2]},
                                                             {(float)target_pose_trans[0], (float)target_pose_trans[1], (float)target_pose_trans[2]},
                                                             {0., 0., 1.});
-        auto images = bullet_client_->getCameraImage(300 * sensor.second->getFieldOfView().getRatioOpenGl(), 300, view_matrix, proj_matrix, owds::BULLET_HARDWARE_OPENGL);
+        auto images = world_client_->getCameraImage(300 * sensor.second->getFieldOfView().getRatioOpenGl(), 300, view_matrix, proj_matrix, owds::BULLET_HARDWARE_OPENGL);
 
         ros_sender_->sendImage(human.first + "/view", images);
-        agents_segmentation_ids[human.first] = bullet_client_->getSegmentationIds(images);
+        agents_segmentation_ids[human.first] = world_client_->getSegmentationIds(images);
         updateHumansPerspective(human.first, objects, body_parts, areas, agents_segmentation_ids[human.first]);
 
         break; // TODO consider only one sensor per human

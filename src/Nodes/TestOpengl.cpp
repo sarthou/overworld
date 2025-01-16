@@ -7,7 +7,7 @@
 
 #include "overworld/Engine/Engine.h"
 
-void offscreenThread(DefaultEngine* world, std::vector<int> camera_ids)
+void offscreenThread(owds::WorldEngine* world, std::vector<int> camera_ids)
 {
   usleep(1000000);
   world->requestCameraRender(camera_ids);

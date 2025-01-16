@@ -1,7 +1,7 @@
 #ifndef OWDS_ENGINE_H
 #define OWDS_ENGINE_H
 
-#include <overworld/Compat/ROS.h>
+#include "overworld/Compat/ROS.h"
 // should be first
 
 #include <string>
@@ -16,10 +16,14 @@
 #if !OWDS_USE_PHYSX
 #include <overworld/Physics/Bullet3/Actor.h>
 #include <overworld/Physics/Bullet3/World.h>
-using DefaultEngine = owds::bullet3::World;
+namespace owds {
+  using WorldEngine = owds::bullet3::World;
+}
 #else
 #include "overworld/Engine/Physics/PhysX/World.h"
-using DefaultEngine = owds::physx::World;
+namespace owds {
+  using WorldEngine = owds::physx::World;
+}
 #endif
 
 // Should be last
@@ -34,10 +38,9 @@ namespace owds {
   public:
     Engine(const std::string& name, Window* window) : world(compat::owds_ros::getShareDirectory("overworld")),
                                                       name_(name), window_(window)
-    {
-    }
+    {}
 
-    DefaultEngine world;
+    WorldEngine world;
 
     void initView(float screen_width = 640, float screen_height = 480)
     {
@@ -75,6 +78,8 @@ namespace owds {
     }
 
     void setKeyCallback(const std::function<void(Key_e, bool)>& callback) { window_->setKeyCallback(callback); }
+
+    WorldEngine* getWorld() { return &world; }
 
   private:
     Renderer renderer_;
