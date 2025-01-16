@@ -57,6 +57,7 @@ namespace owds {
     void updateEntityPose(T* entity, const Pose& pose, const ros::Time& stamp);
     void removeEntityPose(T* entity);
 
+    bool addToWorld(Sensor* sensor);
     bool addToWorld(T* entity);
     void addToWorld(T* entity, int bullet_parent_id);
     void updateToBullet(T* entity);
@@ -189,6 +190,18 @@ namespace owds {
   }
 
   template<typename T>
+  bool EntitiesPerceptionManager<T>::addToWorld(Sensor* sensor)
+  {
+    if(sensor->getWorldId() != -1)
+      return true;
+
+    auto fov = sensor->getFieldOfView();
+    int id = world_client_->addCamera(fov.getWidth(), fov.getHeight(), fov.getRatioOpenGl(), CameraView_e::segmented_view, fov.getClipNear(), fov.getClipFar());
+    sensor->setWorldId(id);
+    return id != -1;
+  }
+
+  template<typename T>
   bool EntitiesPerceptionManager<T>::addToWorld(T* entity)
   {
     if(black_listed_entities_.find(entity->id()) != black_listed_entities_.end())
@@ -247,6 +260,8 @@ namespace owds {
 
       break;
     }
+    default:
+      return false;
     }
 
     if(visual_geom.type != urdf::geometry_none)
@@ -284,15 +299,11 @@ namespace owds {
   template<typename T>
   void EntitiesPerceptionManager<T>::addToWorld(T* entity, int bullet_parent_id)
   {
-    auto p = world_client_->findJointAndLinkIndices(bullet_parent_id);
-    // std::unordered_map<std::string, int> joint_name_id = p.first;
-    std::unordered_map<std::string, int> links_name_id = p.second;
-
-    auto it = links_name_id.find(entity->id());
-    if(it != links_name_id.end())
+    int link_id = world_client_->getLinkId(entity->id());
+    if(link_id != -1)
     {
       entity->setWorldId(bullet_parent_id);
-      entity->setBulletLinkId(it->second);
+      entity->setBulletLinkId(link_id);
     }
   }
 

@@ -39,11 +39,16 @@ namespace owds {
     void setAgentName(const std::string& name) { agent_name_ = name; }
     bool isAgentKnown() const { return (agent_name_ != ""); }
 
+    void setWorldId(int id) { world_id_ = id; }
+    int getWorldId() { return world_id_; }
+
   protected:
     bool is_activated_;
     bool is_static_;
     std::string agent_name_;
     std::string frame_id_;
+
+    int world_id_;
 
     FieldOfView field_of_view_;
 
