@@ -199,8 +199,7 @@ namespace owds {
 
   void ObjectsPerceptionManager::geometricReasoning()
   {
-    world_client_->performCollisionDetection();
-    UpdateAabbs();
+    updateAabbs();
 
     std::map<std::string, std::set<Sensor*>> object__sensors_set; // map of the object and the sensors associated to module without poi
     std::map<std::string, Object*> no_data_objects;
@@ -599,17 +598,9 @@ namespace owds {
     if(object->isLocated() == false)
       return;
 
-    auto tmp_pose = object->pose();
-    updateEntityPose(object, {
-                               {0, 0, 0},
-                               {0, 0, 0, 1}
-    },
-                     ros::Time::now());
-
-    world_client_->performCollisionDetection();
-    auto bb = world_client_->getAABB(object->bulletId());
-
-    updateEntityPose(object, tmp_pose, ros::Time::now());
+    auto bb = world_client_->getLocalAABB(object->bulletId());
+    if(bb.isValid() == false)
+      return;
 
     object->setBoundingBox({bb.max[0] - bb.min[0], bb.max[1] - bb.min[1], bb.max[2] - bb.min[2]});
     object->setOriginOffset({(bb.max[0] - bb.min[0]) / 2. + bb.min[0],

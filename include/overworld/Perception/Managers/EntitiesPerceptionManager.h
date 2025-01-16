@@ -64,7 +64,7 @@ namespace owds {
     void undoInBullet(T* entity);
     T* getEntityFromBulletId(int engine_id);
 
-    void UpdateAabbs();
+    void updateAabbs();
   };
 
   template<typename T>
@@ -354,7 +354,7 @@ namespace owds {
   }
 
   template<typename T>
-  void EntitiesPerceptionManager<T>::UpdateAabbs()
+  void EntitiesPerceptionManager<T>::updateAabbs()
   {
     for(auto entity : entities_)
       if(entity.second->isLocated() && entity.second->hasShape()) // TODO test if entity has moved
