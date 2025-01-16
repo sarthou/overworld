@@ -245,6 +245,32 @@ namespace owds {
     }
   }
 
+  void World::setSimulation(int body_id, bool activate)
+  {
+    auto urdf_it = urdfs_.find(body_id);
+    if(urdf_it != urdfs_.end())
+      return;
+    else
+    {
+      auto actor_it = actors_.find(body_id);
+      if(actor_it != actors_.end())
+        actor_it->second->setSimulationEnabled(activate);
+    }
+  }
+
+  void World::setPhysics(int body_id, bool activate)
+  {
+    auto urdf_it = urdfs_.find(body_id);
+    if(urdf_it != urdfs_.end())
+      return;
+    else
+    {
+      auto actor_it = actors_.find(body_id);
+      if(actor_it != actors_.end())
+        actor_it->second->setPhysicsEnabled(activate);
+    }
+  }
+
   /* COLISIONS */
 
   std::vector<RaycastHitResult_t> World::raycasts(const std::vector<std::array<double, 3>>& origins,

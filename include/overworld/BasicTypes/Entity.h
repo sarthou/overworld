@@ -57,7 +57,7 @@ namespace owds {
 
     void setWorldId(int engine_id) { engine_id_ = engine_id; }
     void setBulletLinkId(int bullet_link_id) { bullet_link_id_ = bullet_link_id; }
-    int bulletId() const { return engine_id_; }
+    int worldId() const { return engine_id_; }
     int bulletLinkId() const { return bullet_link_id_; }
     bool isBulletLink() { return (bullet_link_id_ != -1); }
 

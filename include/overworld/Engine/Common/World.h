@@ -93,6 +93,9 @@ namespace owds {
     void setDynamicFriction(int body_id, int link_index, double friction);
     void setRestitution(int body_id, int link_index, double restitution);
 
+    void setSimulation(int body_id, bool activate);
+    void setPhysics(int body_id, bool activate);
+
     const std::unordered_map<std::size_t, Actor*>& getActors() const { return actors_; }
 
     /* COLISIONS */

@@ -44,8 +44,8 @@ namespace owds {
         it = entities_.emplace(std::pair<std::string, BodyPart*>(percept.second->id(), new_body_part)).first;
         if(addToWorld(it->second) == false)
         {
-          if(it->second->bulletId() != -1)
-            addToWorld(it->second, it->second->bulletId());
+          if(it->second->worldId() != -1)
+            addToWorld(it->second, it->second->worldId());
         }
         updateAgent(it->second, AgentType_e::HUMAN);
       }

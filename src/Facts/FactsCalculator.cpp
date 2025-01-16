@@ -249,7 +249,7 @@ namespace owds {
 
   bool FactsCalculator::isLookingAt(Agent* agent, const std::unordered_set<int>& seen_engine_ids, const Object* object)
   {
-    if(seen_engine_ids.count(object->bulletId()))
+    if(seen_engine_ids.count(object->worldId()))
     {
       facts_.emplace_back(agent->getId(), "isLookingAt", object->id());
       return true;

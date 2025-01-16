@@ -313,7 +313,7 @@ namespace owds {
     for(auto object : objects)
     {
       if(object.second->isStatic() == false)
-        if(segmented_ids.find(object.second->bulletId()) != segmented_ids.end())
+        if(segmented_ids.find(object.second->worldId()) != segmented_ids.end())
           seen_objects.push_back(object.second);
     }
 
@@ -322,7 +322,7 @@ namespace owds {
     {
       if(body_part.second->getAgentName() == human_name)
         seen_humans.push_back(body_part.second);
-      else if(segmented_ids.find(body_part.second->bulletId()) != segmented_ids.end())
+      else if(segmented_ids.find(body_part.second->worldId()) != segmented_ids.end())
         seen_humans.push_back(body_part.second);
     }
 

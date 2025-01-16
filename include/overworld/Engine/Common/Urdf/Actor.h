@@ -34,6 +34,7 @@ namespace owds {
 
     /**
      * @param enabled Determines whether the actor should be influenced by the world (ie: move when it collides with other actors) or not.
+     *                Set it as Kinematic (avoid teleportation).
      */
     virtual void setPhysicsEnabled(bool enabled) = 0;
 

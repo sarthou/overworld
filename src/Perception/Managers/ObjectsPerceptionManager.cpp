@@ -14,7 +14,7 @@ namespace owds {
   {
     for(auto& simulated_object : simulated_objects_)
     {
-      auto pose = world_client_->getBasePositionAndOrientation(entities_[simulated_object.first]->bulletId());
+      auto pose = world_client_->getBasePositionAndOrientation(entities_[simulated_object.first]->worldId());
       entities_[simulated_object.first]->updatePose(pose.first, pose.second);
     }
   }
@@ -473,7 +473,7 @@ namespace owds {
       {
         for(auto& info : ray_cast_info)
         {
-          if(info.body_id != object->bulletId())
+          if(info.body_id != object->worldId())
             return false;
         }
         return true;
@@ -486,11 +486,13 @@ namespace owds {
   bool ObjectsPerceptionManager::isObjectInCamera(Object* object, Sensor* sensor)
   {
     if(sensor == nullptr)
-      return {};
+      return false;
     else if(sensor->id().empty())
-      return {};
+      return false;
     else if(sensor->isLocated() == false)
-      return {};
+      return false;
+
+    addToWorld(sensor);
 
     auto proj_matrix = world_client_->computeProjectionMatrix(sensor->getFieldOfView().getHeight(),
                                                               sensor->getFieldOfView().getRatioOpenGl(),
@@ -504,10 +506,8 @@ namespace owds {
                                                         {0., 0., 1.});
     auto images = world_client_->getCameraImage(100 * sensor->getFieldOfView().getRatioOpenGl(), 100, view_matrix, proj_matrix, owds::BULLET_HARDWARE_OPENGL);
     auto objects_in_sensor = world_client_->getSegmentationIds(images);
-    if(objects_in_sensor.find(object->bulletId()) != objects_in_sensor.end())
-      return true;
-    else
-      return false;
+
+    return(objects_in_sensor.find(object->worldId()) != objects_in_sensor.end());
   }
 
   void ObjectsPerceptionManager::mergeFalseIdData()
@@ -589,7 +589,7 @@ namespace owds {
     if(object->isLocated() == false)
       return;
 
-    auto bb = world_client_->getLocalAABB(object->bulletId());
+    auto bb = world_client_->getLocalAABB(object->worldId());
     if(bb.isValid() == false)
       return;
 

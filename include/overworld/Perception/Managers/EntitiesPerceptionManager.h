@@ -310,17 +310,17 @@ namespace owds {
   template<typename T>
   void EntitiesPerceptionManager<T>::updateToBullet(T* entity)
   {
-    if((entity->bulletLinkId() == -1) && (entity->bulletId() != -1))
+    if((entity->bulletLinkId() == -1) && (entity->worldId() != -1))
     {
       if(entity->isLocated() == true)
       {
         auto entity_pose = entity->pose().arrays();
-        world_client_->setBasePositionAndOrientation(entity->bulletId(),
+        world_client_->setBasePositionAndOrientation(entity->worldId(),
                                                      entity_pose.first,
                                                      entity_pose.second);
       }
       else
-        world_client_->setBasePositionAndOrientation(entity->bulletId(),
+        world_client_->setBasePositionAndOrientation(entity->worldId(),
                                                      {0.0, 0.0, -100.0},
                                                      {0.0, 0.0, 0.0, 1.0});
     }
@@ -329,12 +329,12 @@ namespace owds {
   template<typename T>
   void EntitiesPerceptionManager<T>::undoInBullet(T* entity)
   {
-    if((entity->bulletLinkId() == -1) && (entity->bulletId() != -1))
+    if((entity->bulletLinkId() == -1) && (entity->worldId() != -1))
     {
       if(entity->isLocated() == true)
       {
         auto entity_pose = entity->pose(1).arrays();
-        world_client_->setBasePositionAndOrientation(entity->bulletId(),
+        world_client_->setBasePositionAndOrientation(entity->worldId(),
                                                      entity_pose.first,
                                                      entity_pose.second);
       }
@@ -347,7 +347,7 @@ namespace owds {
     for(auto entity : entities_)
     {
       if(entity.second->bulletLinkId() == -1)
-        if(entity.second->bulletId() == engine_id)
+        if(entity.second->worldId() == engine_id)
           return entity.second;
     }
     return nullptr;
@@ -358,7 +358,7 @@ namespace owds {
   {
     for(auto entity : entities_)
       if(entity.second->isLocated() && entity.second->hasShape()) // TODO test if entity has moved
-        entity.second->setAabb(world_client_->getAABB(entity.second->bulletId()));
+        entity.second->setAabb(world_client_->getAABB(entity.second->worldId()));
   }
 
 } // namespace owds
