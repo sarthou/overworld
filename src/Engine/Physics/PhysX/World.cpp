@@ -166,8 +166,8 @@ namespace owds::physx {
   }
 
   void performRaycast(::physx::PxScene* scene,
-                      const std::array<float, 3>& origin,
-                      const std::array<float, 3>& destination,
+                      const std::array<double, 3>& origin,
+                      const std::array<double, 3>& destination,
                       float max_distance,
                       size_t ray_index,
                       std::vector<RaycastHitResult_t>& results)
@@ -204,8 +204,8 @@ namespace owds::physx {
     results[ray_index] = result;
   }
 
-  void World::performRaycastsInParallel(const std::vector<std::array<float, 3>>& origins,
-                                        const std::vector<std::array<float, 3>>& destinations,
+  void World::performRaycastsInParallel(const std::vector<std::array<double, 3>>& origins,
+                                        const std::vector<std::array<double, 3>>& destinations,
                                         float max_distance,
                                         std::vector<RaycastHitResult_t>& results)
   {

@@ -97,8 +97,8 @@ namespace owds {
 
     /* COLISIONS */
 
-    std::vector<RaycastHitResult_t> raycasts(const std::vector<std::array<float, 3>>& origins,
-                                             const std::vector<std::array<float, 3>>& destinations,
+    std::vector<RaycastHitResult_t> raycasts(const std::vector<std::array<double, 3>>& origins,
+                                             const std::vector<std::array<double, 3>>& destinations,
                                              float max_distance);
 
     AABB_t getAABB(int body_id, int link_index = -1);
@@ -212,8 +212,8 @@ namespace owds {
     owds::Shape convertShape(const urdf::Geometry_t& geometry);
     owds::Shape convertShape(const urdf::Geometry_t& urdf_shape, glm::mat4& transform);
 
-    virtual void performRaycastsInParallel(const std::vector<std::array<float, 3>>& origins,
-                                           const std::vector<std::array<float, 3>>& destinations,
+    virtual void performRaycastsInParallel(const std::vector<std::array<double, 3>>& origins,
+                                           const std::vector<std::array<double, 3>>& destinations,
                                            float max_distance,
                                            std::vector<RaycastHitResult_t>& results) = 0;
   };

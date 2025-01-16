@@ -247,8 +247,8 @@ namespace owds {
 
   /* COLISIONS */
 
-  std::vector<RaycastHitResult_t> World::raycasts(const std::vector<std::array<float, 3>>& origins,
-                                                  const std::vector<std::array<float, 3>>& destinations,
+  std::vector<RaycastHitResult_t> World::raycasts(const std::vector<std::array<double, 3>>& origins,
+                                                  const std::vector<std::array<double, 3>>& destinations,
                                                   float max_distance)
   {
     std::vector<RaycastHitResult_t> results;
