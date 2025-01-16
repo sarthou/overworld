@@ -42,10 +42,10 @@ namespace owds {
         else
           new_body_part = new BodyPart(*percept.second);
         it = entities_.emplace(std::pair<std::string, BodyPart*>(percept.second->id(), new_body_part)).first;
-        if(addToBullet(it->second) == false)
+        if(addToWorld(it->second) == false)
         {
           if(it->second->bulletId() != -1)
-            addToBullet(it->second, it->second->bulletId());
+            addToWorld(it->second, it->second->bulletId());
         }
         updateAgent(it->second, AgentType_e::HUMAN);
       }

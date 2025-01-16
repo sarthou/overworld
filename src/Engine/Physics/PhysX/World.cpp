@@ -45,8 +45,8 @@ namespace owds::physx {
 
   size_t World::createActor(const owds::Shape& collision_shape,
                             const std::vector<owds::Shape>& visual_shapes,
-                            const std::array<float, 3>& position,
-                            const std::array<float, 4>& orientation)
+                            const std::array<double, 3>& position,
+                            const std::array<double, 4>& orientation)
   {
     owds::physx::Actor* actor = new owds::physx::DynamicActor(*ctx_, collision_shape, visual_shapes);
 
@@ -58,8 +58,8 @@ namespace owds::physx {
 
   size_t World::createStaticActor(const owds::Shape& collision_shape,
                                   const std::vector<owds::Shape>& visual_shapes,
-                                  const std::array<float, 3>& position,
-                                  const std::array<float, 4>& orientation)
+                                  const std::array<double, 3>& position,
+                                  const std::array<double, 4>& orientation)
   {
     owds::physx::Actor* actor = new owds::physx::StaticActor(*ctx_, collision_shape, visual_shapes);
 

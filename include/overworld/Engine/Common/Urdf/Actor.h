@@ -28,8 +28,8 @@ namespace owds {
 
   public:
     virtual ~Actor() noexcept;
-    virtual void setup(const std::array<float, 3>& position,
-                       const std::array<float, 4>& orientation) = 0;
+    virtual void setup(const std::array<double, 3>& position,
+                       const std::array<double, 4>& orientation) = 0;
     virtual void remove() = 0;
 
     /**
@@ -66,9 +66,9 @@ namespace owds {
      * @param position Absolute position.
      * @param orientation Absolute rotation, in radians.
      */
-    virtual void setPositionAndOrientation(const std::array<float, 3>& position, const std::array<float, 4>& orientation) = 0;
+    virtual void setPositionAndOrientation(const std::array<double, 3>& position, const std::array<double, 4>& orientation) = 0;
 
-    virtual void setVelocity(const std::array<float, 3>& linear_velocity, const std::array<float, 3>& angular_velocity) = 0;
+    virtual void setVelocity(const std::array<double, 3>& linear_velocity, const std::array<double, 3>& angular_velocity) = 0;
 
     virtual AABB_t getAABB() = 0;
     virtual AABB_t getLocalAABB() = 0;
@@ -82,7 +82,7 @@ namespace owds {
      *
      * @return todo: document this
      */
-    [[nodiscard]] virtual std::pair<std::array<float, 3>, std::array<float, 4>> getPositionAndOrientation() const = 0;
+    [[nodiscard]] virtual std::pair<std::array<double, 3>, std::array<double, 4>> getPositionAndOrientation() const = 0;
 
     // Each actor is associated with a non-zero, unique id.
     const std::size_t unique_id_{};

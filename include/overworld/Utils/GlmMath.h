@@ -19,6 +19,18 @@ namespace owds {
     return out;
   }
 
+  inline glm::vec3 ToV3(const std::array<double, 3>& in)
+  {
+    std::array<float, 3> array{(float)in.at(0), (float)in.at(1), (float)in.at(2)};
+    return ToV3(array);
+  }
+
+  inline glm::quat ToQT(const std::array<double, 4>& in)
+  {
+    std::array<float, 4> array{(float)in.at(0), (float)in.at(1), (float)in.at(2), (float)in.at(3)};
+    return ToQT(array);
+  }
+
   inline glm::mat4 ToM4(const std::array<float, 16>& in)
   {
     glm::mat4 out;

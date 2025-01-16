@@ -15,8 +15,8 @@ namespace owds {
   {
   }
 
-  void VisualActor::setup(const std::array<float, 3>& position,
-                          const std::array<float, 4>& orientation)
+  void VisualActor::setup(const std::array<double, 3>& position,
+                          const std::array<double, 4>& orientation)
   {
     position_ = position;
     orientation_ = orientation;
@@ -58,13 +58,13 @@ namespace owds {
     assert(false && "[VisualActor] Restitution cannot be set on visual actor.");
   }
 
-  void VisualActor::setPositionAndOrientation(const std::array<float, 3>& position, const std::array<float, 4>& orientation)
+  void VisualActor::setPositionAndOrientation(const std::array<double, 3>& position, const std::array<double, 4>& orientation)
   {
     position_ = position;
     orientation_ = orientation;
   }
 
-  void VisualActor::setVelocity(const std::array<float, 3>& linear_velocity, const std::array<float, 3>& angular_velocity)
+  void VisualActor::setVelocity(const std::array<double, 3>& linear_velocity, const std::array<double, 3>& angular_velocity)
   {
     (void)linear_velocity;
     (void)angular_velocity;
@@ -91,7 +91,7 @@ namespace owds {
     return FromM4(transform);
   }
 
-  std::pair<std::array<float, 3>, std::array<float, 4>> VisualActor::getPositionAndOrientation() const
+  std::pair<std::array<double, 3>, std::array<double, 4>> VisualActor::getPositionAndOrientation() const
   {
     return {position_, orientation_};
   }

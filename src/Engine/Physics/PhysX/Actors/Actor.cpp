@@ -101,7 +101,7 @@ namespace owds::physx {
     return owds::BitCast<std::array<float, 16>>(translation_mat * rotation_mat);
   }
 
-  std::pair<std::array<float, 3>, std::array<float, 4>> Actor::getPositionAndOrientation() const
+  std::pair<std::array<double, 3>, std::array<double, 4>> Actor::getPositionAndOrientation() const
   {
     const auto px_pose = px_base_->getGlobalPose();
     return {

@@ -57,8 +57,8 @@ namespace owds {
     void updateEntityPose(T* entity, const Pose& pose, const ros::Time& stamp);
     void removeEntityPose(T* entity);
 
-    bool addToBullet(T* entity);
-    void addToBullet(T* entity, int bullet_parent_id);
+    bool addToWorld(T* entity);
+    void addToWorld(T* entity, int bullet_parent_id);
     void updateToBullet(T* entity);
     void undoInBullet(T* entity);
     T* getEntityFromBulletId(int engine_id);
@@ -145,7 +145,7 @@ namespace owds {
       {
         T* new_entity = new T(percept.second);
         it = entities_.insert(std::pair<std::string, T*>(percept.second.id(), new_entity)).first;
-        addToBullet(it->second);
+        addToWorld(it->second);
       }
 
       updateEntityPose(it->second, percept.second.pose(), percept.second.lastStamp());
@@ -189,7 +189,7 @@ namespace owds {
   }
 
   template<typename T>
-  bool EntitiesPerceptionManager<T>::addToBullet(T* entity)
+  bool EntitiesPerceptionManager<T>::addToWorld(T* entity)
   {
     if(black_listed_entities_.find(entity->id()) != black_listed_entities_.end())
       return true;
@@ -256,15 +256,13 @@ namespace owds {
       visual_geom.material.diffuse_texture_ = entity->getShape().texture;
 
       auto entity_pose = entity->pose().arrays();
-      std::array<float, 3> position{entity_pose.first[0], entity_pose.first[1], entity_pose.first[2]};
-      std::array<float, 4> orientation{entity_pose.second[0], entity_pose.second[1], entity_pose.second[2], entity_pose.second[3]};
       int obj_id = -1;
       if(entity->isStatic())
         obj_id = world_client_->createStaticActor(collision_geom, {visual_geom},
-                                                  position, orientation);
+                                                  entity_pose.first, entity_pose.second);
       else
         obj_id = world_client_->createActor(collision_geom, {visual_geom},
-                                            position, orientation);
+                                            entity_pose.first, entity_pose.second);
 
       world_client_->setMass(obj_id, -1, 0); // We force the mass to zero to not have gravity effect
       world_client_->setRestitution(obj_id, -1, 0.001);
@@ -284,7 +282,7 @@ namespace owds {
   }
 
   template<typename T>
-  void EntitiesPerceptionManager<T>::addToBullet(T* entity, int bullet_parent_id)
+  void EntitiesPerceptionManager<T>::addToWorld(T* entity, int bullet_parent_id)
   {
     auto p = world_client_->findJointAndLinkIndices(bullet_parent_id);
     // std::unordered_map<std::string, int> joint_name_id = p.first;
@@ -306,14 +304,14 @@ namespace owds {
       if(entity->isLocated() == true)
       {
         auto entity_pose = entity->pose().arrays();
-        world_client_->resetBasePositionAndOrientation(entity->bulletId(),
-                                                        entity_pose.first,
-                                                        entity_pose.second);
+        world_client_->setBasePositionAndOrientation(entity->bulletId(),
+                                                     entity_pose.first,
+                                                     entity_pose.second);
       }
       else
-        world_client_->resetBasePositionAndOrientation(entity->bulletId(),
-                                                        {0.0, 0.0, -100.0},
-                                                        {0.0, 0.0, 0.0, 1.0});
+        world_client_->setBasePositionAndOrientation(entity->bulletId(),
+                                                     {0.0, 0.0, -100.0},
+                                                     {0.0, 0.0, 0.0, 1.0});
     }
   }
 
@@ -325,9 +323,9 @@ namespace owds {
       if(entity->isLocated() == true)
       {
         auto entity_pose = entity->pose(1).arrays();
-        world_client_->resetBasePositionAndOrientation(entity->bulletId(),
-                                                        entity_pose.first,
-                                                        entity_pose.second);
+        world_client_->setBasePositionAndOrientation(entity->bulletId(),
+                                                     entity_pose.first,
+                                                     entity_pose.second);
       }
     }
   }

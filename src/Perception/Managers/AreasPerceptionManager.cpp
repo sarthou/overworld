@@ -39,7 +39,7 @@ namespace owds {
     drawn_ = true;
     for(auto& area : areas_)
       if(area.second->getWorldIds().size() == 0)
-        addToBullet(area.second);
+        addToWorld(area.second);
   }
 
   void AreasPerceptionManager::undrawAreas()
@@ -61,7 +61,7 @@ namespace owds {
         if(percept.second.isStatic() == true)
         {
           it = areas_.insert(std::pair<std::string, Area*>(percept.second.id(), new_entity)).first;
-          addToBullet(it->second);
+          addToWorld(it->second);
         }
         else
           pending_percepts_.insert(std::pair<std::string, Area*>(percept.first, new_entity));
@@ -79,7 +79,7 @@ namespace owds {
       {
         percept.second->setOwner(owner);
         auto it = areas_.insert(std::pair<std::string, Area*>(percept.second->id(), percept.second)).first;
-        addToBullet(it->second);
+        addToWorld(it->second);
         solved.insert(it->first);
       }
     }
@@ -95,7 +95,7 @@ namespace owds {
     area->setWorldIds({});
   }
 
-  void AreasPerceptionManager::addToBullet(Area* area)
+  void AreasPerceptionManager::addToWorld(Area* area)
   {
     if(drawn_ == false)
       return;

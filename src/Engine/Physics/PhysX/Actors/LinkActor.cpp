@@ -27,8 +27,8 @@ namespace owds::physx {
   LinkActor::~LinkActor() noexcept
   {}
 
-  void LinkActor::setup(const std::array<float, 3>& position,
-                        const std::array<float, 4>& orientation)
+  void LinkActor::setup(const std::array<double, 3>& position,
+                        const std::array<double, 4>& orientation)
   {
     (void)position;
     (void)orientation;
@@ -76,14 +76,14 @@ namespace owds::physx {
     px_link_->setMass(static_cast<::physx::PxReal>(mass_kg));
   }
 
-  void LinkActor::setPositionAndOrientation(const std::array<float, 3>& position, const std::array<float, 4>& orientation)
+  void LinkActor::setPositionAndOrientation(const std::array<double, 3>& position, const std::array<double, 4>& orientation)
   {
     (void)position;
     (void)orientation;
     assert(false && "LinkActor can only be moved through their joint");
   }
 
-  void LinkActor::setVelocity(const std::array<float, 3>& linear_velocity, const std::array<float, 3>& angular_velocity)
+  void LinkActor::setVelocity(const std::array<double, 3>& linear_velocity, const std::array<double, 3>& angular_velocity)
   {
     (void)linear_velocity;
     (void)angular_velocity;

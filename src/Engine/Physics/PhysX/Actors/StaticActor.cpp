@@ -22,8 +22,8 @@ namespace owds::physx {
     remove();
   }
 
-  void StaticActor::setup(const std::array<float, 3>& position,
-                          const std::array<float, 4>& orientation)
+  void StaticActor::setup(const std::array<double, 3>& position,
+                          const std::array<double, 4>& orientation)
   {
     const auto& sdk = owds::physx::Context::createContext()->px_physics_;
 
@@ -86,14 +86,14 @@ namespace owds::physx {
     (void)mass_kg;
   }
 
-  void StaticActor::setPositionAndOrientation(const std::array<float, 3>& position, const std::array<float, 4>& orientation)
+  void StaticActor::setPositionAndOrientation(const std::array<double, 3>& position, const std::array<double, 4>& orientation)
   {
     (void)position;
     (void)orientation;
     assert(false && "Static actors cannot be moved.");
   }
 
-  void StaticActor::setVelocity(const std::array<float, 3>& linear_velocity, const std::array<float, 3>& angular_velocity)
+  void StaticActor::setVelocity(const std::array<double, 3>& linear_velocity, const std::array<double, 3>& angular_velocity)
   {
     (void)linear_velocity;
     (void)angular_velocity;

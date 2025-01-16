@@ -55,7 +55,7 @@ namespace owds {
   {
     auto new_object = new Object(*percept);
     auto it = entities_.emplace(percept->id(), new_object).first;
-    addToBullet(it->second);
+    addToWorld(it->second);
     new_object->removeFromHand(); // We remove in case an entity is created from a percept already in hand
 
     getObjectBoundingBox(it->second);

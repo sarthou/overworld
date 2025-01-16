@@ -118,7 +118,7 @@ namespace owds::bullet3 {
     bt_actor_->setRestitution(coefficient);
   }
 
-  void Actor::setPositionAndOrientation(const std::array<float, 3>& position, const std::array<float, 4>& orientation)
+  void Actor::setPositionAndOrientation(const std::array<double, 3>& position, const std::array<double, 4>& orientation)
   {
     assert(bt_actor_);
 
@@ -164,7 +164,7 @@ namespace owds::bullet3 {
     return owds::BitCast<std::array<float, 16>>(translation_mat * rotation_mat);
   }
 
-  std::pair<std::array<float, 3>, std::array<float, 4>> Actor::getPositionAndOrientation() const
+  std::pair<std::array<double, 3>, std::array<double, 4>> Actor::getPositionAndOrientation() const
   {
     assert(false && "not implemented");
   }

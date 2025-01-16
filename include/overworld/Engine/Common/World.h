@@ -65,26 +65,26 @@ namespace owds {
 
     size_t createStaticActor(const owds::urdf::Geometry_t& collision_geometry,
                              const std::vector<owds::urdf::Geometry_t>& visual_geometries,
-                             const std::array<float, 3>& position = {0.f, 0.f, 0.f},
-                             const std::array<float, 4>& rotation = {0., 0., 0., 1.});
+                             const std::array<double, 3>& position = {0.f, 0.f, 0.f},
+                             const std::array<double, 4>& rotation = {0., 0., 0., 1.});
 
     size_t createActor(const owds::urdf::Geometry_t& collision_geometry,
                        const std::vector<owds::urdf::Geometry_t>& visual_geometries,
-                       const std::array<float, 3>& position = {0.f, 0.f, 0.f},
-                       const std::array<float, 4>& rotation = {0., 0., 0., 1.});
+                       const std::array<double, 3>& position = {0.f, 0.f, 0.f},
+                       const std::array<double, 4>& rotation = {0., 0., 0., 1.});
 
     size_t createVisualActor(const std::vector<owds::urdf::Geometry_t>& visual_geometries,
-                             const std::array<float, 3>& position = {0.f, 0.f, 0.f},
-                             const std::array<float, 4>& rotation = {0., 0., 0., 1.});
+                             const std::array<double, 3>& position = {0.f, 0.f, 0.f},
+                             const std::array<double, 4>& rotation = {0., 0., 0., 1.});
 
     size_t loadUrdf(const std::string& path,
-                    const std::array<float, 3>& position,
-                    const std::array<float, 3>& orientation,
+                    const std::array<double, 3>& position,
+                    const std::array<double, 3>& orientation,
                     bool from_base_path = true);
     int getNumJoints(size_t urdf_id) const;
-    std::pair<std::array<float, 3>, std::array<float, 4>> getBasePositionAndOrientation(int body_id) const;
-    void setBasePositionAndOrientation(int body_id, const std::array<float, 3>& position, const std::array<float, 4>& orientation);
-    void setBaseVelocity(int body_id, const std::array<float, 3>& linear_velocity, const std::array<float, 3>& angular_velocity);
+    std::pair<std::array<double, 3>, std::array<double, 4>> getBasePositionAndOrientation(int body_id) const;
+    void setBasePositionAndOrientation(int body_id, const std::array<double, 3>& position, const std::array<double, 4>& orientation);
+    void setBaseVelocity(int body_id, const std::array<double, 3>& linear_velocity, const std::array<double, 3>& angular_velocity);
     bool setJointState(int body_id, const std::string& joint_name, double position, double velocity = 0);
     int getLinkId(int body_id, const std::string& link_name);
 
@@ -183,13 +183,13 @@ namespace owds {
 
     virtual size_t createActor(const owds::Shape& collision_shape,
                                const std::vector<owds::Shape>& visual_shapes,
-                               const std::array<float, 3>& position,
-                               const std::array<float, 4>& orientation) = 0;
+                               const std::array<double, 3>& position,
+                               const std::array<double, 4>& orientation) = 0;
 
     virtual size_t createStaticActor(const owds::Shape& collision_shape,
                                      const std::vector<owds::Shape>& visual_shapes,
-                                     const std::array<float, 3>& position,
-                                     const std::array<float, 4>& orientation) = 0;
+                                     const std::array<double, 3>& position,
+                                     const std::array<double, 4>& orientation) = 0;
 
     virtual owds::Urdf* loadUrdf(const urdf::Urdf_t& urdf) = 0;
     virtual void insertUrdf(owds::Urdf* urdf) = 0;
@@ -198,8 +198,8 @@ namespace owds {
     void loadUrdfLink(owds::Urdf* urdf, const urdf::Urdf_t& model,
                       const std::string& parent,
                       const std::string& link_name,
-                      const std::array<float, 3>& position,
-                      const std::array<float, 3>& orientation);
+                      const std::array<double, 3>& position,
+                      const std::array<double, 3>& orientation);
 
     virtual std::unordered_set<int> getOverlappingActors(Actor* actor) = 0;
 

@@ -32,8 +32,8 @@ namespace owds::physx {
     LinkActor(LinkActor&& other) noexcept = delete;
     LinkActor& operator=(LinkActor&& other) = delete;
 
-    void setup(const std::array<float, 3>& position,
-               const std::array<float, 4>& orientation) override;
+    void setup(const std::array<double, 3>& position,
+               const std::array<double, 4>& orientation) override;
     void remove() override;
 
     void setMass(float mass_kg) override;
@@ -41,8 +41,8 @@ namespace owds::physx {
     void setPhysicsEnabled(bool enabled) override;
     void setSimulationEnabled(bool enabled) override;
 
-    void setPositionAndOrientation(const std::array<float, 3>& position, const std::array<float, 4>& orientation) override;
-    void setVelocity(const std::array<float, 3>& linear_velocity, const std::array<float, 3>& angular_velocity) override;
+    void setPositionAndOrientation(const std::array<double, 3>& position, const std::array<double, 4>& orientation) override;
+    void setVelocity(const std::array<double, 3>& linear_velocity, const std::array<double, 3>& angular_velocity) override;
 
   private:
     PxPtr<::physx::PxArticulationLink> px_link_;

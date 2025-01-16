@@ -55,8 +55,8 @@ namespace owds {
 
   size_t World::createStaticActor(const owds::urdf::Geometry_t& collision_geometry,
                                   const std::vector<owds::urdf::Geometry_t>& visual_geometries,
-                                  const std::array<float, 3>& position,
-                                  const std::array<float, 4>& rotation)
+                                  const std::array<double, 3>& position,
+                                  const std::array<double, 4>& rotation)
   {
     owds::Shape collision_shape = convertShape(collision_geometry);
     std::vector<owds::Shape> visual_shapes;
@@ -70,8 +70,8 @@ namespace owds {
 
   size_t World::createActor(const owds::urdf::Geometry_t& collision_geometry,
                             const std::vector<owds::urdf::Geometry_t>& visual_geometries,
-                            const std::array<float, 3>& position,
-                            const std::array<float, 4>& rotation)
+                            const std::array<double, 3>& position,
+                            const std::array<double, 4>& rotation)
   {
     owds::Shape collision_shape = convertShape(collision_geometry);
     std::vector<owds::Shape> visual_shapes;
@@ -84,8 +84,8 @@ namespace owds {
   }
 
   size_t World::createVisualActor(const std::vector<owds::urdf::Geometry_t>& visual_geometries,
-                                  const std::array<float, 3>& position,
-                                  const std::array<float, 4>& rotation)
+                                  const std::array<double, 3>& position,
+                                  const std::array<double, 4>& rotation)
   {
     std::vector<owds::Shape> visual_shapes;
     visual_shapes.reserve(visual_geometries.size());
@@ -101,8 +101,8 @@ namespace owds {
   }
 
   size_t World::loadUrdf(const std::string& path,
-                         const std::array<float, 3>& position,
-                         const std::array<float, 3>& orientation,
+                         const std::array<double, 3>& position,
+                         const std::array<double, 3>& orientation,
                          bool from_base_path)
   {
     auto urdf_model = getUrdf(path, from_base_path);
@@ -131,7 +131,7 @@ namespace owds {
       return it->second->getNumJoints();
   }
 
-  std::pair<std::array<float, 3>, std::array<float, 4>> World::getBasePositionAndOrientation(int body_id) const
+  std::pair<std::array<double, 3>, std::array<double, 4>> World::getBasePositionAndOrientation(int body_id) const
   {
     auto urdf_it = urdfs_.find(body_id);
     if(urdf_it != urdfs_.end())
@@ -142,14 +142,14 @@ namespace owds {
       if(actor_it != actors_.end())
         return actor_it->second->getPositionAndOrientation();
       else
-        return std::pair<std::array<float, 3>, std::array<float, 4>>{
+        return std::pair<std::array<double, 3>, std::array<double, 4>>{
           {0., 0., 0.},
           {0., 0., 0., 0.}
         };
     }
   }
 
-  void World::setBasePositionAndOrientation(int body_id, const std::array<float, 3>& position, const std::array<float, 4>& orientation)
+  void World::setBasePositionAndOrientation(int body_id, const std::array<double, 3>& position, const std::array<double, 4>& orientation)
   {
     auto urdf_it = urdfs_.find(body_id);
     if(urdf_it != urdfs_.end())
@@ -162,7 +162,7 @@ namespace owds {
     }
   }
 
-  void World::setBaseVelocity(int body_id, const std::array<float, 3>& linear_velocity, const std::array<float, 3>& angular_velocity)
+  void World::setBaseVelocity(int body_id, const std::array<double, 3>& linear_velocity, const std::array<double, 3>& angular_velocity)
   {
     auto urdf_it = urdfs_.find(body_id);
     if(urdf_it != urdfs_.end())
@@ -628,8 +628,8 @@ namespace owds {
   void World::loadUrdfLink(owds::Urdf* urdf, const urdf::Urdf_t& model,
                            const std::string& parent,
                            const std::string& link_name,
-                           const std::array<float, 3>& position,
-                           const std::array<float, 3>& orientation)
+                           const std::array<double, 3>& position,
+                           const std::array<double, 3>& orientation)
   {
     const auto& link = model.links.at(link_name);
     owds::Shape visual_shape = convertShape(link.visual);

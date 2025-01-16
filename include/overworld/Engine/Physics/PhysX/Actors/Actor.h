@@ -28,8 +28,8 @@ namespace owds::physx {
     Actor(Actor&& other) noexcept = delete;
     Actor& operator=(Actor&& other) = delete;
 
-    void setup(const std::array<float, 3>& position,
-               const std::array<float, 4>& orientation) override = 0;
+    void setup(const std::array<double, 3>& position,
+               const std::array<double, 4>& orientation) override = 0;
     void remove() override = 0;
 
     void setPhysicsEnabled(bool enabled) override = 0;
@@ -40,14 +40,14 @@ namespace owds::physx {
     void setDynamicFriction(float coefficient) override;
     void setRestitution(float coefficient) override;
 
-    void setPositionAndOrientation(const std::array<float, 3>& position, const std::array<float, 4>& orientation) override = 0;
-    void setVelocity(const std::array<float, 3>& linear_velocity, const std::array<float, 3>& angular_velocity) override = 0;
+    void setPositionAndOrientation(const std::array<double, 3>& position, const std::array<double, 4>& orientation) override = 0;
+    void setVelocity(const std::array<double, 3>& linear_velocity, const std::array<double, 3>& angular_velocity) override = 0;
 
     owds::AABB_t getAABB() override;
     owds::AABB_t getLocalAABB() override;
 
     std::array<float, 16> getModelMatrix() const override;
-    std::pair<std::array<float, 3>, std::array<float, 4>> getPositionAndOrientation() const override;
+    std::pair<std::array<double, 3>, std::array<double, 4>> getPositionAndOrientation() const override;
 
     void setupPhysicsShape(const owds::ShapeBox& shape);
     void setupPhysicsShape(const owds::ShapeCapsule& shape);

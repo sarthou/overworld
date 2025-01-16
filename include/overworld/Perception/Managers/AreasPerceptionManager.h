@@ -48,7 +48,7 @@ namespace owds {
     void solvePendingAreas();
 
     void removeFromBullet(Area* area);
-    void addToBullet(Area* area);
+    void addToWorld(Area* area);
     void addPolygonToBullet(Area* area);
     void addCircleToBullet(Area* area);
 
