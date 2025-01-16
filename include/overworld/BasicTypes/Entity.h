@@ -41,6 +41,9 @@ namespace owds {
     bool hasMoved() const;
     bool hasMoved(const ros::Time& stamp) const;
 
+    void setStatic(bool is_static = true) { is_static_ = is_static; }
+    bool isStatic() const { return is_static_; }
+
     std::array<double, 3> computeTranslationSpeed() const;
     virtual std::array<double, 3> direction() const;
     double speed() const;
@@ -93,6 +96,7 @@ namespace owds {
     bool is_true_id_;
     std::unordered_set<std::string> false_ids_;
 
+    bool is_static_;
     CircularBuffer<PoseStamped_s, 30> last_poses_;
     bool is_located_;
     int engine_id_;

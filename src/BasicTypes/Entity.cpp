@@ -7,6 +7,7 @@ namespace owds {
 
   Entity::Entity(const std::string& id, bool is_true_id) : id_(id),
                                                            is_true_id_(is_true_id),
+                                                           is_static_(false),
                                                            is_located_(false),
                                                            engine_id_(-1),
                                                            bullet_link_id_(-1)

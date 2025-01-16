@@ -8,7 +8,6 @@
 namespace owds {
 
   Object::Object(const std::string& id, bool is_true_id) : Entity(id, is_true_id),
-                                                           is_static_(false),
                                                            hand_in_(nullptr),
                                                            mass_(0)
   {
