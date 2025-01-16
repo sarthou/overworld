@@ -194,82 +194,83 @@ namespace owds {
     if(black_listed_entities_.find(entity->id()) != black_listed_entities_.end())
       return true;
 
-    int visual_id = -1;
-    int collision_id = -1;
+    urdf::Geometry_t collision_geom;
+    urdf::Geometry_t visual_geom;
 
     switch(entity->getShape().type)
     {
     case SHAPE_CUBE:
     {
-      visual_id = world_client_->createVisualShapeBox({entity->getShape().scale[0] / 2.,
-                                                        entity->getShape().scale[1] / 2.,
-                                                        entity->getShape().scale[2] / 2.},
-                                                       {entity->getShape().color[0],
-                                                        entity->getShape().color[1],
-                                                        entity->getShape().color[2],
-                                                        1});
-      collision_id = world_client_->createCollisionShapeBox({entity->getShape().scale[0] / 2.,
-                                                              entity->getShape().scale[1] / 2.,
-                                                              entity->getShape().scale[2] / 2.});
+      collision_geom.type = urdf::geometry_box;
+      collision_geom.scale = {entity->getShape().scale[0] / 2.,
+                              entity->getShape().scale[1] / 2.,
+                              entity->getShape().scale[2] / 2.};
+
+      visual_geom = collision_geom;
+
       break;
     }
     case SHAPE_SPEHERE:
     {
-      visual_id = world_client_->createVisualShapeSphere(entity->getShape().scale[0],
-                                                          {entity->getShape().color[0],
-                                                           entity->getShape().color[1],
-                                                           entity->getShape().color[2],
-                                                           1});
-      collision_id = world_client_->createCollisionShapeSphere(entity->getShape().scale[0]);
+      collision_geom.type = urdf::geometry_sphere;
+      collision_geom.scale = {entity->getShape().scale[0],
+                              0.f, 0.f};
+
+      visual_geom = collision_geom;
+
       break;
     }
     case SHAPE_CYLINDER:
     {
-      visual_id = world_client_->createVisualShapeCylinder(std::min(entity->getShape().scale[0], entity->getShape().scale[1]) / 2.,
-                                                            entity->getShape().scale[2],
-                                                            {entity->getShape().color[0],
-                                                             entity->getShape().color[1],
-                                                             entity->getShape().color[2],
-                                                             1});
-      collision_id = world_client_->createCollisionShapeCylinder(std::min(entity->getShape().scale[0], entity->getShape().scale[1]) / 2.,
-                                                                  entity->getShape().scale[2]);
+      collision_geom.type = urdf::geometry_cylinder;
+      collision_geom.scale = {std::min(entity->getShape().scale[0], entity->getShape().scale[1]) / 2.,
+                              entity->getShape().scale[2],
+                              0.f};
+
+      visual_geom = collision_geom;
+
       break;
     }
     case SHAPE_MESH:
     {
-      visual_id = world_client_->createVisualShapeMesh(entity->getShape().visual_mesh_resource,
-                                                        entity->getShape().scale,
-                                                        {entity->getShape().color[0],
-                                                         entity->getShape().color[1],
-                                                         entity->getShape().color[2],
-                                                         1});
+      visual_geom.type = urdf::geometry_mesh;
+
+      visual_geom.file_name = entity->getShape().visual_mesh_resource;
+      visual_geom.scale = {entity->getShape().scale[0],
+                           entity->getShape().scale[1],
+                           entity->getShape().scale[2]};
+
+      collision_geom = visual_geom;
       std::string colision_mesh = entity->getShape().colision_mesh_resource;
-      if(colision_mesh == "")
-        colision_mesh = entity->getShape().visual_mesh_resource;
-      collision_id = world_client_->createCollisionShapeMesh(colision_mesh,
-                                                              entity->getShape().scale);
+      if(colision_mesh.empty() == false)
+        collision_geom.file_name = colision_mesh;
+
       break;
     }
     }
 
-    if((visual_id != -1) && (collision_id != -1))
+    if(visual_geom.type != urdf::geometry_none)
     {
+      visual_geom.material.diffuse_color_ = entity->getShape().color;
+      visual_geom.material.specular_color_ = entity->getShape().color;
+      visual_geom.material.diffuse_texture_ = entity->getShape().texture;
+
       auto entity_pose = entity->pose().arrays();
-      int obj_id = world_client_->createMultiBody(0, collision_id, visual_id, entity_pose.first, entity_pose.second);
-      if(entity->getShape().texture != "")
-      {
-        int texture_id = world_client_->loadTexture(entity->getShape().texture);
-        world_client_->changeRgbaColor(obj_id, -1, {1, 1, 1, 1});
-        world_client_->changeTexture(obj_id, -1, texture_id);
-      }
+      int obj_id = -1;
+      if(entity->isStatic())
+        obj_id = world_client_->createStaticActor(collision_geom,
+                                                  {visual_geom});
+      else
+        obj_id = world_client_->createActor(collision_geom,
+                                            {visual_geom});
+
       world_client_->setMass(obj_id, -1, 0); // We force the mass to zero to not have gravity effect
       world_client_->setRestitution(obj_id, -1, 0.001);
-      world_client_->setFrictionAnchor(obj_id, -1, 0.5);
-      world_client_->setLateralFriction(obj_id, -1, 0.5);
-      world_client_->setSpinningFriction(obj_id, -1, 0.5);
-      world_client_->setRollingFriction(obj_id, -1, 0.5);
-      world_client_->setActivationState(obj_id, eActivationStateDisableSleeping);
+      world_client_->setStaticFriction(obj_id, -1, 0.5);
+      world_client_->setDynamicFriction(obj_id, -1, 0.5);
+
       entity->setWorldId(obj_id);
+
       return true;
     }
     else
