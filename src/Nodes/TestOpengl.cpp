@@ -117,11 +117,14 @@ void worldThread(const std::string& world_name, owds::Window* window)
   for(auto& res : ray_res)
     std::cout << "- " << res.actor_id << "=" << res.body_id << " : " << res.distance << std::endl;
 
-  auto aabb = engine.world.getAABB(1, 3);
-  auto l_aabb = engine.world.getLocalAABB(1, 3);
+  auto aabb = engine.world.getAABB(pr2_id, 3);
+  auto l_aabb = engine.world.getLocalAABB(pr2_id, 3);
 
   std::cout << "AABB = " << aabb.min[0] << " : " << aabb.min[1] << " : " << aabb.min[2] << " == " << aabb.max[0] << " : " << aabb.max[1] << " : " << aabb.max[2] << std::endl;
   std::cout << "LAABB = " << l_aabb.min[0] << " : " << l_aabb.min[1] << " : " << l_aabb.min[2] << " == " << l_aabb.max[0] << " : " << l_aabb.max[1] << " : " << l_aabb.max[2] << std::endl;
+
+  (void)engine.world.createVisualActor({owds::urdf::Geometry_t(overworld_dir + "/models/trees/Tree1_.obj")},
+                                       {-4., 0., 0.}, {0., 0., 1.57});
 
   auto overlap = engine.world.getOverlappingObjects(1, 2);
   for(auto over : overlap)

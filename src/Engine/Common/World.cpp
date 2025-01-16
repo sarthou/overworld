@@ -31,6 +31,7 @@
 #include "overworld/Engine/Common/Urdf/Actor.h"
 #include "overworld/Engine/Common/Urdf/Urdf.h"
 #include "overworld/Engine/Common/Urdf/UrdfLoader.h"
+#include "overworld/Engine/Common/Urdf/VisualActor.h"
 #include "overworld/Utils/GlmMath.h"
 #include "overworld/Utils/ROS.h"
 
@@ -78,6 +79,25 @@ namespace owds {
       visual_shapes.emplace_back(convertShape(geometry));
 
     return createActor(collision_shape, visual_shapes, position, glm::quat(rotation));
+  }
+
+  size_t World::createVisualActor(const std::vector<owds::urdf::Geometry_t>& visual_geometries,
+                                  const glm::vec3& position,
+                                  const glm::vec3& rotation)
+  {
+    std::vector<owds::Shape> visual_shapes;
+    visual_shapes.reserve(visual_geometries.size());
+    for(const auto& geometry : visual_geometries)
+      visual_shapes.emplace_back(convertShape(geometry));
+    glm::quat quat(rotation);
+
+    Actor* actor = new VisualActor(visual_shapes);
+    actor->setup({position.x, position.y, position.z},
+                 {quat.x, quat.y, quat.z, quat.w});
+
+    actors_.emplace(actor->unique_id_, actor);
+
+    return actor->unique_id_;
   }
 
   size_t World::loadUrdf(const std::string& path,
