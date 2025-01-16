@@ -10,7 +10,7 @@ namespace owds {
 
   namespace ontology {
 
-    std::array<double, 3> getEntityColor(onto::OntologyManipulator* onto, const std::string& indiv_name, const std::array<double, 3>& default_value)
+    std::array<float, 3> getEntityColor(onto::OntologyManipulator* onto, const std::string& indiv_name, const std::array<float, 3>& default_value)
     {
       auto color = onto->individuals.getOn(indiv_name, "hasColor");
       if(color.size() != 0)

@@ -763,8 +763,8 @@ namespace owds {
   {
     Material material;
     float id = (float)(uid % 60) / 100.f + 0.2;
-    material.diffuse_color_ = {id, id, id, 1.f};
-    material.specular_color_ = {id, id, id, 1.f};
+    material.diffuse_color_ = Color({id, id, id, 1.f});
+    material.specular_color_ = Color({id, id, id, 1.f});
     material.shininess_ = 0;
 
     return material;

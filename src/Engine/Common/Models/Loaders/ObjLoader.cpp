@@ -91,14 +91,14 @@ namespace owds {
       if(tiny_mesh.material_id >= 0)
       {
         tinyobj::Material_t& material = materials[tiny_mesh.material_id];
-        owds_mesh->material_.diffuse_color_ = Color{(float)material.diffuse[0],
+        owds_mesh->material_.diffuse_color_ = Color({(float)material.diffuse[0],
                                                     (float)material.diffuse[1],
                                                     (float)material.diffuse[2],
-                                                    material.has_diffuse ? 1.f : 0.f};
-        owds_mesh->material_.specular_color_ = Color{(float)material.specular[0],
+                                                    material.has_diffuse ? 1.f : 0.f});
+        owds_mesh->material_.specular_color_ = Color({(float)material.specular[0],
                                                      (float)material.specular[1],
                                                      (float)material.specular[2],
-                                                     material.has_specular ? 1.f : 0.f};
+                                                     material.has_specular ? 1.f : 0.f});
         owds_mesh->material_.shininess_ = material.shininess;
         owds_mesh->material_.diffuse_texture_ = material.diffuse_texname;
         owds_mesh->material_.specular_texture_ = material.specular_texname;
