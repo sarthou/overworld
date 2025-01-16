@@ -42,10 +42,10 @@ namespace owds::bullet3 {
     void setStaticFriction(float coefficient) override;
     void setDynamicFriction(float coefficient) override;
     void setRestitution(float coefficient) override;
-    void setPositionAndOrientation(const std::array<double, 3>& position, const std::array<double, 4>& orientation) override;
+    void setPositionAndOrientation(const std::array<float, 3>& position, const std::array<float, 4>& orientation) override;
 
     [[nodiscard]] std::array<float, 16> getModelMatrix() const override;
-    [[nodiscard]] std::pair<std::array<double, 3>, std::array<double, 4>> getPositionAndOrientation() const override;
+    [[nodiscard]] std::pair<std::array<float, 3>, std::array<float, 4>> getPositionAndOrientation() const override;
 
     void setupPhysicsShape(const owds::ShapeBox& shape);
     void setupPhysicsShape(const owds::ShapeCapsule& shape);

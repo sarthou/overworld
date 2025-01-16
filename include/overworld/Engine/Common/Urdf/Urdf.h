@@ -39,9 +39,9 @@ namespace owds {
 
     virtual size_t getNumJoints() = 0;
 
-    virtual std::pair<std::array<double, 3>, std::array<double, 4>> getPositionAndOrientation() = 0;
-    virtual void setPositionAndOrientation(const std::array<double, 3>& position, const std::array<double, 4>& orientation) = 0;
-    virtual void setVelocity(const std::array<double, 3>& linear_velocity, const std::array<double, 3>& angular_velocity) = 0;
+    virtual std::pair<std::array<float, 3>, std::array<float, 4>> getPositionAndOrientation() = 0;
+    virtual void setPositionAndOrientation(const std::array<float, 3>& position, const std::array<float, 4>& orientation) = 0;
+    virtual void setVelocity(const std::array<float, 3>& linear_velocity, const std::array<float, 3>& angular_velocity) = 0;
     bool setJointState(const std::string& joint_name, double position, double velocity);
 
     int getLinkId(const std::string& link_name);

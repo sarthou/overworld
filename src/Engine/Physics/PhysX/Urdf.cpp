@@ -209,12 +209,12 @@ namespace owds::physx {
     return px_joints_.size();
   }
 
-  std::pair<std::array<double, 3>, std::array<double, 4>> Urdf::getPositionAndOrientation()
+  std::pair<std::array<float, 3>, std::array<float, 4>> Urdf::getPositionAndOrientation()
   {
     return root_actor_->getPositionAndOrientation();
   }
 
-  void Urdf::setPositionAndOrientation(const std::array<double, 3>& position, const std::array<double, 4>& orientation)
+  void Urdf::setPositionAndOrientation(const std::array<float, 3>& position, const std::array<float, 4>& orientation)
   {
     const auto px_transform =
       ::physx::PxTransform(
@@ -231,7 +231,7 @@ namespace owds::physx {
     px_articulation_->setRootGlobalPose(px_transform);
   }
 
-  void Urdf::setVelocity(const std::array<double, 3>& linear_velocity, const std::array<double, 3>& angular_velocity)
+  void Urdf::setVelocity(const std::array<float, 3>& linear_velocity, const std::array<float, 3>& angular_velocity)
   {
     px_articulation_->setRootLinearVelocity(::physx::PxVec3(
       static_cast<::physx::PxReal>(linear_velocity[0]),

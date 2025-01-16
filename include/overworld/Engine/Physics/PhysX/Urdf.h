@@ -45,10 +45,10 @@ namespace owds::physx {
 
     void setPhysicsEnabled(bool enabled) override;
 
-    void setPositionAndOrientation(const std::array<double, 3>& position, const std::array<double, 4>& orientation) override;
+    void setPositionAndOrientation(const std::array<float, 3>& position, const std::array<float, 4>& orientation) override;
     virtual size_t getNumJoints() override;
-    std::pair<std::array<double, 3>, std::array<double, 4>> getPositionAndOrientation() override;
-    void setVelocity(const std::array<double, 3>& linear_velocity, const std::array<double, 3>& angular_velocity) override;
+    std::pair<std::array<float, 3>, std::array<float, 4>> getPositionAndOrientation() override;
+    void setVelocity(const std::array<float, 3>& linear_velocity, const std::array<float, 3>& angular_velocity) override;
 
   protected:
     owds::physx::Context& ctx_;
