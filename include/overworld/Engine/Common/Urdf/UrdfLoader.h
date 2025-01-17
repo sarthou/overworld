@@ -103,9 +103,13 @@ namespace owds {
   {
   public:
     urdf::Urdf_t read(const std::string& path);
+    urdf::Urdf_t readRaw(const std::string& content);
 
   private:
+    urdf::Urdf_t read(TiXmlDocument& doc);
+
     bool getXmlDocument(const std::string& path, TiXmlDocument& doc);
+    bool getXmlDocumentRaw(const std::string& content, TiXmlDocument& doc);
     std::map<std::string, Material> getMaterialLibrary(TiXmlElement* root);
     std::pair<std::string, Material> getMaterial(TiXmlElement* element);
     std::map<std::string, urdf::Link_t> getLinks(TiXmlElement* root, const std::map<std::string, Material>& materials);

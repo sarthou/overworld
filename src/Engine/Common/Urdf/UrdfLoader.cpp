@@ -18,11 +18,25 @@ namespace owds {
 
   urdf::Urdf_t UrdfLoader::read(const std::string& path)
   {
-    urdf::Urdf_t urdf;
-
     TiXmlDocument doc;
     if(getXmlDocument(path, doc) == false)
-      return urdf;
+      return urdf::Urdf_t();
+    else
+      return read(doc);
+  }
+
+  urdf::Urdf_t UrdfLoader::readRaw(const std::string& content)
+  {
+    TiXmlDocument doc;
+    if(getXmlDocumentRaw(content, doc) == false)
+      return urdf::Urdf_t();
+    else
+      return read(doc);
+  }
+
+  urdf::Urdf_t UrdfLoader::read(TiXmlDocument& doc)
+  {
+    urdf::Urdf_t urdf;
 
     urdf.name = doc.RootElement()->Attribute("name");
 
@@ -33,11 +47,11 @@ namespace owds {
 
     auto roots = findRootLink(urdf.joints);
     if(roots.empty())
-      ShellDisplay::error("[UrdfLoader] No root found in: " + path);
+      ShellDisplay::error("[UrdfLoader] No root link found in urdf: " + urdf.name);
     else
     {
       if(roots.size() > 1)
-        ShellDisplay::error("[UrdfLoader] Multiple roots found in: " + path);
+        ShellDisplay::error("[UrdfLoader] Multiple root liinks found in urdf: " + urdf.name);
       urdf.root_link = *roots.begin();
     }
 
@@ -51,7 +65,7 @@ namespace owds {
 
     if(!f.is_open())
     {
-      ShellDisplay::error("Fail to open : " + path);
+      ShellDisplay::error("[UrdfLoader] Fail to open : " + path);
       return false;
     }
 
@@ -59,8 +73,11 @@ namespace owds {
     while(std::getline(f, tmp))
       content += tmp;
 
-    // removeDocType(response);
+    return getXmlDocumentRaw(content, doc);
+  }
 
+  bool UrdfLoader::getXmlDocumentRaw(const std::string& content, TiXmlDocument& doc)
+  {
     doc.Parse((const char*)content.c_str(), nullptr, TIXML_ENCODING_UTF8);
 
     TiXmlElement* root = doc.RootElement();
