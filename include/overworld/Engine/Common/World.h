@@ -81,6 +81,10 @@ namespace owds {
                     const std::array<double, 3>& position,
                     const std::array<double, 3>& orientation,
                     bool from_base_path = true);
+    size_t loadUrdfRaw(const std::string& content,
+                       const std::array<double, 3>& position,
+                       const std::array<double, 3>& orientation);
+
     int getNumJoints(size_t urdf_id) const;
     std::pair<std::array<double, 3>, std::array<double, 4>> getBasePositionAndOrientation(int body_id) const;
     void setBasePositionAndOrientation(int body_id, const std::array<double, 3>& position, const std::array<double, 4>& orientation);
@@ -198,7 +202,11 @@ namespace owds {
     virtual owds::Urdf* loadUrdf(const urdf::Urdf_t& urdf) = 0;
     virtual void insertUrdf(owds::Urdf* urdf) = 0;
 
+    size_t loadUrdf(urdf::Urdf_t& urdf_model,
+                    const std::array<double, 3>& position,
+                    const std::array<double, 3>& orientation);
     urdf::Urdf_t getUrdf(const std::string& path, bool from_base_path);
+    urdf::Urdf_t getUrdfRaw(const std::string& content);
     void loadUrdfLink(owds::Urdf* urdf, const urdf::Urdf_t& model,
                       const std::string& parent,
                       const std::string& link_name,

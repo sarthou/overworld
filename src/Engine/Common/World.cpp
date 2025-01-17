@@ -106,7 +106,21 @@ namespace owds {
                          bool from_base_path)
   {
     auto urdf_model = getUrdf(path, from_base_path);
+    return loadUrdf(urdf_model, position, orientation);
+  }
 
+  size_t World::loadUrdfRaw(const std::string& content,
+                            const std::array<double, 3>& position,
+                            const std::array<double, 3>& orientation)
+  {
+    auto urdf_model = getUrdfRaw(content);
+    return loadUrdf(urdf_model, position, orientation);
+  }
+
+  size_t World::loadUrdf(urdf::Urdf_t& urdf_model,
+                         const std::array<double, 3>& position,
+                         const std::array<double, 3>& orientation)
+  {
     auto* urdf = loadUrdf(urdf_model);
 
     loadUrdfLink(urdf, urdf_model, "", urdf_model.root_link, position, orientation);
@@ -660,6 +674,12 @@ namespace owds {
       urdf_model = loader.read(path);
 
     return urdf_model;
+  }
+
+  urdf::Urdf_t World::getUrdfRaw(const std::string& content)
+  {
+    UrdfLoader loader;
+    return loader.readRaw(content);;
   }
 
   void World::loadUrdfLink(owds::Urdf* urdf, const urdf::Urdf_t& model,
