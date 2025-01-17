@@ -52,7 +52,6 @@ namespace owds {
     bool isObjectInFovAabb(Object* object, Sensor* sensor);
 
     bool shouldBeSeen(Object* object, Sensor* sensor, const std::vector<PointOfInterest>& pois);
-    bool isObjectInCamera(Object* object, Sensor* sensors);
 
     void mergeFalseIdData();
 

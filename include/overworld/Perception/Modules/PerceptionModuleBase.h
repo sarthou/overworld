@@ -48,7 +48,12 @@ namespace owds {
 
     const std::string& getModuleName() { return module_name_; }
 
-    virtual void setParameter(const std::string& parameter_name, const std::string& parameter_value) {}
+    virtual void setParameter(const std::string& parameter_name, const std::string& parameter_value)
+    {
+      (void)parameter_name;
+      (void)parameter_value;
+    }
+
     virtual bool closeInitialization()
     {
       updated_ = false;

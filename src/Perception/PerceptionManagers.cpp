@@ -6,14 +6,13 @@
 
 namespace owds {
 
-  PerceptionManagers::PerceptionManagers(ros::NodeHandle* n, BulletClient* world_client) : areas_manager_(n),
-                                                                                            robots_manager_(n),
-                                                                                            objects_manager_(n),
-                                                                                            humans_manager_(n),
-                                                                                            n_(n),
-                                                                                            world_client_(world_client),
-                                                                                            robot_engine_id_(-1),
-                                                                                            robot_agent_(nullptr)
+  PerceptionManagers::PerceptionManagers(ros::NodeHandle* n, WorldEngine* world_client) : robots_manager_(n),
+                                                                                          objects_manager_(n),
+                                                                                          humans_manager_(n),
+                                                                                          n_(n),
+                                                                                          world_client_(world_client),
+                                                                                          robot_engine_id_(-1),
+                                                                                          robot_agent_(nullptr)
   {
     areas_manager_.registerObjectsManager(&objects_manager_);
     areas_manager_.registerBodyPartsManager(&robots_manager_);

@@ -277,14 +277,43 @@ namespace owds {
         }
       }
     }
+
     if(no_data_objects.size())
     {
+      std::unordered_set<Sensor*> used_sensors;
+      for(auto no_data_obj : no_data_objects)
+      {
+        auto sensor_set = object__sensors_set.find(no_data_obj.first);
+        for(auto sensor : sensor_set->second)
+          used_sensors.insert(sensor);
+      }
+
+      std::vector<int> sensor_world_ids;
+      sensor_world_ids.reserve(used_sensors.size());
+      for(auto sensor : used_sensors)
+      {
+        addToWorld(sensor);
+        sensor_world_ids.push_back(sensor->getWorldSegmentationId());
+        auto sensor_pose = sensor->pose().arrays();
+        world_client_->setCameraPositionAndOrientation(sensor->getWorldSegmentationId(),
+                                                       sensor_pose.first, sensor_pose.second);
+      }
+      world_client_->requestCameraRender(sensor_world_ids);
+      std::unordered_map<Sensor*, std::unordered_set<uint32_t>> segmentations;
+      for(auto sensor : used_sensors)
+      {
+        int sensor_id = sensor->getWorldSegmentationId();
+        segmentations.emplace(sensor, world_client_->getCameraSementation(sensor_id));
+      }
+
       for(auto no_data_obj : no_data_objects)
       {
         auto sensor_set = object__sensors_set.find(no_data_obj.first);
         for(auto sensor : sensor_set->second)
         {
-          if(isObjectInFovAabb(no_data_obj.second, sensor) && isObjectInCamera(no_data_obj.second, sensor)) // pb
+          if((sensor != nullptr) && (sensor->isLocated()) &&
+             isObjectInFovAabb(no_data_obj.second, sensor) && 
+             (segmentations[sensor].find(no_data_obj.second->worldId()) != segmentations[sensor].end()))
           {
             auto it_unseen = lost_objects_nb_frames_.find(no_data_obj.first);
             if(it_unseen == lost_objects_nb_frames_.end())
@@ -481,33 +510,6 @@ namespace owds {
     }
 
     return false;
-  }
-
-  bool ObjectsPerceptionManager::isObjectInCamera(Object* object, Sensor* sensor)
-  {
-    if(sensor == nullptr)
-      return false;
-    else if(sensor->id().empty())
-      return false;
-    else if(sensor->isLocated() == false)
-      return false;
-
-    addToWorld(sensor);
-
-    auto proj_matrix = world_client_->computeProjectionMatrix(sensor->getFieldOfView().getHeight(),
-                                                              sensor->getFieldOfView().getRatioOpenGl(),
-                                                              sensor->getFieldOfView().getClipNear(),
-                                                              sensor->getFieldOfView().getClipFar());
-    Pose target_pose = sensor->pose() * Pose({0, 0, 1}, {0, 0, 0, 1});
-    auto sensor_pose_trans = sensor->pose().arrays().first;
-    auto target_pose_trans = target_pose.arrays().first;
-    auto view_matrix = world_client_->computeViewMatrix({(float)sensor_pose_trans[0], (float)sensor_pose_trans[1], (float)sensor_pose_trans[2]},
-                                                        {(float)target_pose_trans[0], (float)target_pose_trans[1], (float)target_pose_trans[2]},
-                                                        {0., 0., 1.});
-    auto images = world_client_->getCameraImage(100 * sensor->getFieldOfView().getRatioOpenGl(), 100, view_matrix, proj_matrix, owds::BULLET_HARDWARE_OPENGL);
-    auto objects_in_sensor = world_client_->getSegmentationIds(images);
-
-    return(objects_in_sensor.find(object->worldId()) != objects_in_sensor.end());
   }
 
   void ObjectsPerceptionManager::mergeFalseIdData()

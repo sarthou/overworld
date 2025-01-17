@@ -17,7 +17,7 @@ namespace owds {
   class AreasPerceptionManager : public BasePerceptionManager<Area>
   {
   public:
-    explicit AreasPerceptionManager(ros::NodeHandle* nh) : world_client_(nullptr), drawn_(true) {}
+    AreasPerceptionManager() : world_client_(nullptr), drawn_(true) {}
     ~AreasPerceptionManager();
 
     void setWorldClient(WorldEngine* client) { world_client_ = client; }

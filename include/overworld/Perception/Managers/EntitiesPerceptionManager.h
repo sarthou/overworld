@@ -138,6 +138,7 @@ namespace owds {
   template<typename T>
   void EntitiesPerceptionManager<T>::getPercepts(const std::string& module_name, std::map<std::string, Percept<T>>& percepts)
   {
+    (void)module_name;
     // This implementation only has test purposes
     for(auto& percept : percepts)
     {
@@ -299,7 +300,7 @@ namespace owds {
   template<typename T>
   void EntitiesPerceptionManager<T>::addToWorld(T* entity, int bullet_parent_id)
   {
-    int link_id = world_client_->getLinkId(entity->id());
+    int link_id = world_client_->getLinkId(bullet_parent_id, entity->id());
     if(link_id != -1)
     {
       entity->setWorldId(bullet_parent_id);
