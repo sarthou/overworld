@@ -20,13 +20,12 @@ namespace owds {
     ShapeType_e type;
     std::string visual_mesh_resource;
     std::string colision_mesh_resource;
-    std::array<float, 3> color;
-    std::array<float, 3> scale;
+    std::array<double, 3> color;
+    std::array<double, 3> scale;
     std::string texture;
 
-    Shape_t()
+    Shape_t() : type(SHAPE_NONE)
     {
-      type = SHAPE_NONE;
       color.fill(0.);
       scale = {1., 1., 1.};
     }

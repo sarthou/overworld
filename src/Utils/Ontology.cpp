@@ -10,7 +10,7 @@ namespace owds {
 
   namespace ontology {
 
-    std::array<float, 3> getEntityColor(onto::OntologyManipulator* onto, const std::string& indiv_name, const std::array<float, 3>& default_value)
+    std::array<double, 3> getEntityColor(onto::OntologyManipulator* onto, const std::string& indiv_name, const std::array<double, 3>& default_value)
     {
       auto color = onto->individuals.getOn(indiv_name, "hasColor");
       if(color.size() != 0)
@@ -57,7 +57,7 @@ namespace owds {
             auto materials = wavefront::getMltMaterials(mlt);
             if(materials.size() == 1)
             {
-              if(wavefront::getMaterialTexture(mlt, materials.front()) != "")
+              if(wavefront::getMaterialTexture(mlt, materials.front()).empty() == false)
                 shape.color = {1, 1, 1};
               else
                 shape.color = getEntityColor(onto, indiv_name);
@@ -72,7 +72,7 @@ namespace owds {
           shape.color = getEntityColor(onto, indiv_name);
 
         if(is_wavefront && textures.size())
-          shape.texture = textures.front().substr(textures.front().find("#") + 1);
+          shape.texture = textures.front().substr(textures.front().find('#') + 1);
       }
       else
         shape.type = SHAPE_NONE;
@@ -86,7 +86,7 @@ namespace owds {
 
       if(masses.empty() == false)
       {
-        auto mass_str = masses.front().substr(masses.front().find("#") + 1);
+        auto mass_str = masses.front().substr(masses.front().find('#') + 1);
         return std::stod(mass_str);
       }
       else
