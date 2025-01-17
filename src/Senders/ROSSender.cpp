@@ -7,7 +7,7 @@ namespace owds {
 
   ROSSender::ROSSender(ros::NodeHandle* n) : n_(n), rviz_publishers_({}), image_publishers_({}) {}
 
-  void ROSSender::sendImage(const std::string& topic_name, const b3CameraImageData& image)
+  void ROSSender::sendImage(const std::string& topic_name, uint32_t* image, unsigned int width, unsigned int height)
   {
     if(image_publishers_.count(topic_name) == 0)
     {
@@ -17,11 +17,11 @@ namespace owds {
     sensor_msgs::Image im;
     im.encoding = sensor_msgs::image_encodings::RGBA8;
     im.header.stamp = ros::Time::now();
-    im.height = image.m_pixelHeight;
-    im.width = image.m_pixelWidth;
+    im.height = height;
+    im.width = width;
     im.step = im.width * 4;
     im.data.resize(im.height * im.width * 4);
-    memcpy(im.data.data(), image.m_rgbColorData, im.height * im.width * 4);
+    memcpy(im.data.data(), image, im.height * im.width * 4);
     pub.publish(im);
   }
 

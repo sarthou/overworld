@@ -6,7 +6,6 @@
 #include <unordered_map>
 #include <visualization_msgs/MarkerArray.h>
 
-#include "SharedMemory/PhysicsClientC_API.h"
 #include "overworld/BasicTypes/Entity.h"
 
 namespace owds {
@@ -27,7 +26,7 @@ namespace owds {
     void sendEntitiesToRViz(const std::string& topic_name, const std::map<std::string, T*>& entities);
     template<typename T>
     void sendEntitiesToTFAndRViz(const std::string& rviz_topic_name, const std::map<std::string, T*>& entities);
-    void sendImage(const std::string& topic_name, const b3CameraImageData& image);
+    void sendImage(const std::string& topic_name, uint32_t* image, unsigned int width, unsigned int height);
 
   protected:
     ros::NodeHandle* n_;

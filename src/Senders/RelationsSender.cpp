@@ -254,7 +254,7 @@ namespace owds {
   bool RelationsSender::InOverlappingOnZ(Object* object_a, Object* object_b)
   {
     double min_height = std::min(object_a->getAabb().max[2] - object_a->getAabb().min[2], object_b->getAabb().max[2] - object_b->getAabb().min[2]);
-    double overlapping_dist = std::max(0., std::min(object_a->getAabb().max[2], object_b->getAabb().max[2]) - std::max(object_a->getAabb().min[2], object_b->getAabb().min[2]));
+    double overlapping_dist = std::max(0.f, std::min(object_a->getAabb().max[2], object_b->getAabb().max[2]) - std::max(object_a->getAabb().min[2], object_b->getAabb().min[2]));
     return (overlapping_dist >= min_height / 3.);
   }
 
