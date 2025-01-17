@@ -99,10 +99,11 @@ namespace owds {
     void setOutputResolution(const std::array<float, 2>& resolution);
     void setPlanes(const std::array<float, 2>& near_far_planes);
 
-    void setPositionAndOrientation(const std::array<float, 3>& position, const std::array<float, 3>& orientation);
-    void setPositionAndLookAt(const std::array<float, 3>& eye_position, const std::array<float, 3>& dst_position);
-    void setPositionAndDirection(const std::array<float, 3>& eye_position, const std::array<float, 3>& eye_direction);
-    void setDirectionAndLookAt(const std::array<float, 3>& eye_direction, const std::array<float, 3>& dst_position);
+    void setPositionAnd2DOrientation(const std::array<double, 3>& position, const std::array<double, 3>& orientation);
+    void setPositionAndLookAt(const std::array<double, 3>& eye_position, const std::array<double, 3>& dst_position);
+    void setPositionAndDirection(const std::array<double, 3>& eye_position, const std::array<double, 3>& eye_direction);
+    void setDirectionAndLookAt(const std::array<double, 3>& eye_direction, const std::array<double, 3>& dst_position);
+    void setPositionAndOrientation(const std::array<double, 3>& eye_position, const std::array<double, 4>& orientation);
 
     void clearChanges() { camera_->has_changed_size_ = false; }
 

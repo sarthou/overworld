@@ -30,14 +30,19 @@ namespace owds {
     delete[] image_;
   }
 
-  void VirtualCamera::setPositionAndLookAt(const std::array<float, 3>& eye_position, const std::array<float, 3>& dst_position)
+  void VirtualCamera::setPositionAndLookAt(const std::array<double, 3>& eye_position, const std::array<double, 3>& dst_position)
   {
     camera_.setPositionAndLookAt(eye_position, dst_position);
   }
 
-  void VirtualCamera::setPositionAndDirection(const std::array<float, 3>& eye_position, const std::array<float, 3>& eye_direction)
+  void VirtualCamera::setPositionAndDirection(const std::array<double, 3>& eye_position, const std::array<double, 3>& eye_direction)
   {
     camera_.setPositionAndDirection(eye_position, eye_direction);
+  }
+
+  void VirtualCamera::setPositionAndOrientation(const std::array<double, 3>& eye_position, const std::array<double, 4>& orientation)
+  {
+    camera_.setPositionAndOrientation(eye_position, orientation);
   }
 
   std::unordered_set<uint32_t> VirtualCamera::getSegmentedIds() const

@@ -162,8 +162,9 @@ namespace owds {
     /* CAMERAS */
 
     int addCamera(unsigned int width, unsigned int height, float fov, owds::CameraView_e view_type, float near_plane, float far_plane);
-    bool setCameraPositionAndLookAt(int id, const std::array<float, 3>& eye_position, const std::array<float, 3>& dst_position);
-    bool setCameraPositionAndDirection(int id, const std::array<float, 3>& eye_position, const std::array<float, 3>& eye_direction);
+    bool setCameraPositionAndLookAt(int id, const std::array<double, 3>& eye_position, const std::array<double, 3>& dst_position);
+    bool setCameraPositionAndDirection(int id, const std::array<double, 3>& eye_position, const std::array<double, 3>& eye_direction);
+    bool setCameraPositionAndOrientation(int id, const std::array<double, 3>& eye_position, const std::array<double, 4>& orientation);
     // requestCameraRender blocks until the request has been treated. Do not cahnge the cameras during this time
     void requestCameraRender(const std::vector<int>& ids);
     void getCameraImage(int id, uint32_t** image, unsigned int& width, unsigned int& height);

@@ -559,7 +559,7 @@ namespace owds {
     return (int)cameras_.size() - 1;
   }
 
-  bool World::setCameraPositionAndLookAt(int id, const std::array<float, 3>& eye_position, const std::array<float, 3>& dst_position)
+  bool World::setCameraPositionAndLookAt(int id, const std::array<double, 3>& eye_position, const std::array<double, 3>& dst_position)
   {
     if(id < (int)cameras_.size())
     {
@@ -570,11 +570,22 @@ namespace owds {
       return false;
   }
 
-  bool World::setCameraPositionAndDirection(int id, const std::array<float, 3>& eye_position, const std::array<float, 3>& eye_direction)
+  bool World::setCameraPositionAndDirection(int id, const std::array<double, 3>& eye_position, const std::array<double, 3>& eye_direction)
   {
     if(id < (int)cameras_.size())
     {
       cameras_[id].setPositionAndDirection(eye_position, eye_direction);
+      return true;
+    }
+    else
+      return false;
+  }
+
+  bool World::setCameraPositionAndOrientation(int id, const std::array<double, 3>& eye_position, const std::array<double, 4>& orientation)
+  {
+    if(id < (int)cameras_.size())
+    {
+      cameras_[id].setPositionAndOrientation(eye_position, orientation);
       return true;
     }
     else

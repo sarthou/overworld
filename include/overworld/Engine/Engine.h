@@ -55,7 +55,7 @@ namespace owds {
       renderer_.initialize(*window_);
     }
 
-    void setVizualizerCamera(const std::array<float, 3>& position, const std::array<float, 3>& target)
+    void setVizualizerCamera(const std::array<double, 3>& position, const std::array<double, 3>& target)
     {
       window_->getCamera().setPositionAndLookAt(position, target);
     }
