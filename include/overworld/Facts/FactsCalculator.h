@@ -9,13 +9,14 @@
 #include "overworld/BasicTypes/Area.h"
 #include "overworld/BasicTypes/Object.h"
 #include "overworld/Facts/Fact.h"
+#include "overworld/Engine/Common/WorldTypes.h"
 
 namespace owds {
 
   class FactsCalculator
   {
   public:
-    explicit FactsCalculator(const std::string& agent_name);
+    FactsCalculator() = default;
 
     std::vector<Fact> computeObjectsFacts(const std::map<std::string, Object*>& objects,
                                           bool clear = true);
@@ -33,7 +34,7 @@ namespace owds {
 
     bool isOnTopfOf(Object* object_under, Object* object_on);
     bool isInContainer(Object* object_around, Object* object_in);
-    bool overlapXY(const struct aabb_t& aabb_1, const struct aabb_t& aabb_2);
+    bool overlapXY(const struct AABB_t& aabb_1, const struct AABB_t& aabb_2);
 
     bool isPerceiving(Agent* agent_perceiving, Agent* agent_perceived);
 

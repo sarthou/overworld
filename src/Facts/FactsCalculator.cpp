@@ -1,11 +1,10 @@
 #include "overworld/Facts/FactsCalculator.h"
 
+#include "overworld/Engine/Common/WorldTypes.h"
+
 #define IN_HAND_DIST 0.08
 
 namespace owds {
-
-  FactsCalculator::FactsCalculator(const std::string& agent_name)
-  {}
 
   std::vector<Fact> FactsCalculator::computeObjectsFacts(const std::map<std::string, Object*>& objects,
                                                          bool clear)
@@ -177,7 +176,7 @@ namespace owds {
     }
   }
 
-  bool FactsCalculator::overlapXY(const struct aabb_t& aabb_1, const struct aabb_t& aabb_2)
+  bool FactsCalculator::overlapXY(const struct AABB_t& aabb_1, const struct AABB_t& aabb_2)
   {
     if((aabb_1.min[0] == aabb_1.max[0]) || (aabb_1.min[1] == aabb_1.max[1]) ||
        (aabb_2.min[0] == aabb_2.max[0]) || (aabb_2.min[1] == aabb_2.max[1]))
