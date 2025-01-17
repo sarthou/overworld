@@ -267,8 +267,10 @@ namespace owds {
 
     if(visual_geom.type != urdf::geometry_none)
     {
-      visual_geom.material.diffuse_color_ = entity->getShape().color;
-      visual_geom.material.specular_color_ = entity->getShape().color;
+      auto shape_color = entity->getShape().color;
+      std::array<float, 3> color{(float)shape_color[0], (float)shape_color[1], (float)shape_color[2]};
+      visual_geom.material.diffuse_color_ = color;
+      visual_geom.material.specular_color_ = color;
       visual_geom.material.diffuse_texture_ = entity->getShape().texture;
 
       auto entity_pose = entity->pose().arrays();

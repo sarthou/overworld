@@ -6,7 +6,6 @@
 
 #include "ontologenius/OntologiesManipulator.h"
 #include "overworld/BasicTypes/BodyPart.h"
-#include "overworld/Bullet/PhysicsServers.h"
 #include "overworld/Perception/Modules/PerceptionModuleBase.h"
 
 namespace owds {
