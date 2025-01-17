@@ -39,8 +39,8 @@ namespace owds {
     void setAgentName(const std::string& name) { agent_name_ = name; }
     bool isAgentKnown() const { return (agent_name_ != ""); }
 
-    void setWorldId(int id) { world_id_ = id; }
-    int getWorldId() { return world_id_; }
+    void setWorldSegmentationId(int id) { world_id_ = id; }
+    int getWorldSegmentationId() const { return world_id_; }
 
   protected:
     bool is_activated_;

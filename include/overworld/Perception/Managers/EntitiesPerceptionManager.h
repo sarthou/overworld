@@ -192,12 +192,12 @@ namespace owds {
   template<typename T>
   bool EntitiesPerceptionManager<T>::addToWorld(Sensor* sensor)
   {
-    if(sensor->getWorldId() != -1)
+    if(sensor->getWorldSegmentationId() != -1)
       return true;
 
     auto fov = sensor->getFieldOfView();
     int id = world_client_->addCamera(fov.getWidth(), fov.getHeight(), fov.getRatioOpenGl(), CameraView_e::segmented_view, fov.getClipNear(), fov.getClipFar());
-    sensor->setWorldId(id);
+    sensor->setWorldSegmentationId(id);
     return id != -1;
   }
 
