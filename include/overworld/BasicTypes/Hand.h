@@ -16,6 +16,7 @@ namespace owds {
   public:
     explicit Hand(const std::string& id, bool is_true_id = true);
     explicit Hand(const BodyPart& body_part);
+    virtual ~Hand() = default;
 
     void putInHand(Object* object);
     void putPerceptInHand(Percept<Object>* percept);

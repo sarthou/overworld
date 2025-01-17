@@ -18,6 +18,7 @@ namespace owds {
   {
   public:
     explicit Object(const std::string& id, bool is_true_id = true);
+    virtual ~Object() = default;
 
     void setPointsOfInterest(const std::string& module_name, const std::vector<PointOfInterest>& points_of_interest);
     void addPointOfInterest(const std::string& module_name, const PointOfInterest& point_of_interest);

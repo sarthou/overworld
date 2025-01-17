@@ -20,6 +20,7 @@ namespace owds {
   {
   public:
     explicit BodyPart(const std::string& id, bool is_true_id = true);
+    virtual ~BodyPart() = default;
 
     const std::string& getFrameName() const { return frame_name_; }
     void setFrameName(const std::string& frame_name) { frame_name_ = frame_name; }
