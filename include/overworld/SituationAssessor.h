@@ -52,6 +52,10 @@ namespace owds {
     SituationAssessor(const SituationAssessor& other) = delete;
     ~SituationAssessor();
 
+    void initWorld(Window* window);
+    // World should be initialized before the assessor
+    void initAssessor();
+
     void run();
     void stop();
     bool isRunning() { return run_; }
@@ -93,6 +97,7 @@ namespace owds {
 
     std::map<std::string, HumanAssessor_t> humans_assessors_;
 
+    void rosLoop();
     void assessmentLoop();
     void assess();
 

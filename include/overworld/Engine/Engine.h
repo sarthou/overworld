@@ -66,12 +66,13 @@ namespace owds {
       world.setTimeStep(fps);
     }
 
-    void run()
+    void run(bool simulate = false)
     {
       while(!window_->isCloseRequested())
       {
         window_->doPollEvents(renderer_);
-        world.stepSimulation();
+        if(simulate)
+          world.stepSimulation();
         renderer_.commit();
         window_->swapBuffer();
       }

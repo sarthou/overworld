@@ -26,7 +26,28 @@ namespace owds {
                                                         perception_manager_(&n_)
   {
     n_.setCallbackQueue(&callback_queue_);
+  }
 
+  SituationAssessor::~SituationAssessor()
+  {
+    if(ros_sender_ != nullptr)
+      delete ros_sender_;
+    if(objetcs_pose_sender_ != nullptr)
+      delete objetcs_pose_sender_;
+    if(engine_ != nullptr)
+      delete engine_;
+  }
+
+  void SituationAssessor::initWorld(Window* window)
+  {
+    engine_ = new Engine(agent_name_, window);
+    engine_->initView();
+    // we could insert this in the world there if needed
+    engine_->finalise();
+  }
+
+  void SituationAssessor::initAssessor()
+  {
     if(is_robot_)
     {
       new_assessor_publisher_ = n_.advertise<std_msgs::String>("/overworld/new_assessor", 5);
@@ -43,20 +64,20 @@ namespace owds {
      * Set perception modules  *
      ***************************/
 
-    perception_manager_.setOwnerAgentName(agent_name);
+    perception_manager_.setOwnerAgentName(agent_name_);
 
     if(is_robot_)
     {
       if(perception_manager_.applyConfigurationRobot(config_path_) == false)
         throw std::runtime_error("The configuration of overworld has failed. Please look above for more information.");
-      if(perception_manager_.getRobotName() != agent_name)
+      if(perception_manager_.getRobotName() != agent_name_)
         throw std::runtime_error("The robot name provided in the launch file is different from the robot perception module.");
-      myself_agent_ = perception_manager_.robots_manager_.getAgent(agent_name);
+      myself_agent_ = perception_manager_.robots_manager_.getAgent(agent_name_);
     }
     else
     {
       perception_manager_.applyConfigurationHuman(config_path_);
-      myself_agent_ = perception_manager_.humans_manager_.getAgent(agent_name);
+      myself_agent_ = perception_manager_.humans_manager_.getAgent(agent_name_);
       perception_manager_.areas_manager_.undrawAreas();
     }
 
@@ -84,17 +105,6 @@ namespace owds {
 
     if(is_robot_)
       engine_->setKeyCallback([this](Key_e key, bool pressed){ handleKeypress(key, pressed, this->engine_, this->perception_manager_); });
-        //handleKeypress(world_client_, perception_manager_);
-  }
-
-  SituationAssessor::~SituationAssessor()
-  {
-    if(ros_sender_ != nullptr)
-      delete ros_sender_;
-    if(objetcs_pose_sender_ != nullptr)
-      delete objetcs_pose_sender_;
-    if(engine_ != nullptr)
-      delete engine_;
   }
 
   void SituationAssessor::stop()
@@ -110,15 +120,21 @@ namespace owds {
     perception_manager_.objects_manager_.setSimulation(simulate_);
   }
 
-  void SituationAssessor::run()
+  void SituationAssessor::rosLoop()
   {
-    std::thread assessment_thread(&SituationAssessor::assessmentLoop, this);
-    run_ = true;
-
     while(ros::ok() && isRunning())
     {
       callback_queue_.callAvailable(ros::WallDuration(0.1));
     }
+  }
+
+  void SituationAssessor::run()
+  {
+    std::thread render_thread(&SituationAssessor::rosLoop, this);
+    std::thread assessment_thread(&SituationAssessor::assessmentLoop, this);
+    run_ = true;
+
+    engine_->run();
 
     for(auto& human_assessor : humans_assessors_)
     {
@@ -127,7 +143,7 @@ namespace owds {
       delete human_assessor.second.assessor;
     }
 
-    assessment_thread.join();
+    //assessment_thread.join();
   }
 
   void SituationAssessor::addObjectPerceptionModule(const std::string& module_name, PerceptionModuleBase_<Object>* module)

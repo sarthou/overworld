@@ -7,6 +7,7 @@
 
 #include "overworld/Utils/Parameters.h"
 #include "overworld/Utils/ShellDisplay.h"
+#include "overworld/Engine/Engine.h"
 
 void handler(int sig)
 {
@@ -20,11 +21,21 @@ void handler(int sig)
   exit(1);
 }
 
+void assessorThread(owds::Window* window, owds::SituationAssessor& assessor)
+{
+  assessor.initWorld(window);
+  assessor.initAssessor();
+
+  assessor.run();
+}
+
 int main(int argc, char** argv)
 {
   signal(SIGSEGV, handler);
   signal(SIGABRT, handler);
   ros::init(argc, argv, "overworld");
+
+  owds::Renderer::init();
 
   owds::Parameters params;
   params.insert(owds::Parameter("config_path", {"-c", "--config"}));
@@ -47,8 +58,18 @@ int main(int argc, char** argv)
                                                    std::stod(params.at("simulation frequency").getFirst()),
                                                    params.at("simulate").getFirst() == "true",
                                                    true);
+  owds::Window robot_window(params.at("robot_name").getFirst());
+  std::thread tread(&assessorThread, &robot_window, std::ref(robot_situation_assessor));
 
-  robot_situation_assessor.run();
+  while(ros::ok())
+  {
+    owds::Window::pollEvent();
+    usleep(1000);
+  }
+
+  tread.join();
+
+  owds::Renderer::release();
 
   return 0;
 }

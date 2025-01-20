@@ -187,6 +187,7 @@ namespace owds {
     render_camera_ = *camera;
     if(render_camera_.sizeHasChanged())
     {
+      std::cout << "size has changed" << std::endl;
       screen_.setSize(render_camera_.getWidth(), render_camera_.getHeight());
       glViewport(0, 0, render_camera_.getWidth(), render_camera_.getHeight());
       screen_.reinitBuffers();

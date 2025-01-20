@@ -90,11 +90,11 @@ namespace owds {
       percepts_.at(link_pair.first).setType(link_pair.second);
       // we set the bullet id of the parent to inform the manager
       percepts_.at(link_pair.first).setWorldId(robot_engine_id_);
-      if(world_client_->getLinkId(robot_engine_id_, link_pair.first) != -1)
+      if(world_client_->getLinkId(robot_engine_id_, link_pair.first) == -1)
       {
         std::cout << "Error: link name '" << link_pair.first
-                  << "' passed as 'link_to_entity_names' of ctor of JointStatePerceptionModule does not exist in Bullet.";
-        throw std::runtime_error("Link name '" + link_pair.first + "' not found in Bullet.");
+                  << "' passed as 'link_to_entity_names' of ctor of JointStatePerceptionModule does not exist in World.";
+        throw std::runtime_error("Link name '" + link_pair.first + "' not found in World.");
       }
     }
     percepts_.emplace(base_link_, BodyPart(base_link_));
