@@ -92,6 +92,7 @@ namespace owds {
       case GLFW_KEY_SPACE: owds_key = Key_e::key_space; break;
       case GLFW_KEY_LEFT_SHIFT: owds_key = Key_e::key_left_shift; break;
       case GLFW_KEY_MINUS: owds_key = Key_e::key_minus; break;
+      case GLFW_KEY_ENTER: owds_key = Key_e::key_enter; break;
       case GLFW_KEY_A: owds_key = Key_e::key_a; break;
       case GLFW_KEY_B: owds_key = Key_e::key_b; break;
       case GLFW_KEY_C: owds_key = Key_e::key_c; break;

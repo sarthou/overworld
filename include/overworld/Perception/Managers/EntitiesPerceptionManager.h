@@ -197,7 +197,7 @@ namespace owds {
       return true;
 
     auto fov = sensor->getFieldOfView();
-    int id = world_client_->addCamera(fov.getWidth(), fov.getHeight(), fov.getRatioOpenGl(), CameraView_e::segmented_view, fov.getClipNear(), fov.getClipFar());
+    int id = world_client_->addCamera(300 * fov.getRatioOpenGl(), 300, fov.getRatioOpenGl(), CameraView_e::segmented_view, fov.getClipNear(), fov.getClipFar());
     sensor->setWorldSegmentationId(id);
     return id != -1;
   }

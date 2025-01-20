@@ -50,7 +50,7 @@ namespace owds {
 
   std::vector<Fact> FactsCalculator::computeAgentsFacts(const std::map<std::string, Object*>& objects,
                                                         const std::map<std::string, Agent*>& agents,
-                                                        const std::map<std::string, std::unordered_set<int>>& segmantation_ids,
+                                                        const std::map<std::string, std::unordered_set<uint32_t>>& segmantation_ids,
                                                         bool clear)
   {
     if(clear)
@@ -246,7 +246,7 @@ namespace owds {
     return false;
   }
 
-  bool FactsCalculator::isLookingAt(Agent* agent, const std::unordered_set<int>& seen_engine_ids, const Object* object)
+  bool FactsCalculator::isLookingAt(Agent* agent, const std::unordered_set<uint32_t>& seen_engine_ids, const Object* object)
   {
     if(seen_engine_ids.count(object->worldId()))
     {

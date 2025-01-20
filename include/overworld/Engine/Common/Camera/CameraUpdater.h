@@ -18,6 +18,7 @@ namespace owds {
   {
     key_unknown,
     key_esc,
+    key_enter,
     key_f1,
     key_f2,
     key_f3,

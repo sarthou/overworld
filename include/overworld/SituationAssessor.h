@@ -11,11 +11,12 @@
 #include <string>
 #include <thread>
 
-#include "overworld/Bullet/PhysicsServers.h"
+#include "overworld/Engine/Engine.h"
+// import first
+
 #include "overworld/Facts/FactsCalculator.h"
 #include "overworld/Facts/Publisher/OntologeniusFactsPublisher.h"
 #include "overworld/Perception/PerceptionManagers.h"
-#include "overworld/Senders/Bernie.h"
 #include "overworld/Senders/PoseSender.h"
 #include "overworld/Senders/ROSSender.h"
 
@@ -81,7 +82,7 @@ namespace owds {
     double time_step_; // in second
     double simu_step_;
 
-    BulletClient* world_client_;
+    Engine* engine_;
     PerceptionManagers perception_manager_;
 
     FactsCalculator facts_calculator_;
@@ -89,19 +90,18 @@ namespace owds {
 
     ROSSender* ros_sender_;
     PoseSender* objetcs_pose_sender_;
-    BernieSenders* bernie_sender_;
 
     std::map<std::string, HumanAssessor_t> humans_assessors_;
 
     void assessmentLoop();
     void assess();
 
-    void processHumans(std::map<std::string, std::unordered_set<int>>& agents_segmentation_ids);
+    void processHumans(std::map<std::string, std::unordered_set<uint32_t>>& agents_segmentation_ids);
     void updateHumansPerspective(const std::string& human_name,
                                  const std::map<std::string, Object*>& objects,
                                  const std::map<std::string, BodyPart*>& humans,
                                  const std::map<std::string, Area*>& areas,
-                                 const std::unordered_set<int>& segmented_ids);
+                                 const std::unordered_set<uint32_t>& segmented_ids);
     std::map<std::string, HumanAssessor_t>::iterator createHumanAssessor(const std::string& human_name);
 
     bool stopModules(overworld::StartStopModules::Request& req, overworld::StartStopModules::Response& res);

@@ -2,6 +2,9 @@
 #define OWDS_POSE_H
 
 #include <array>
+#ifdef Success
+  #undef Success
+#endif
 #include <eigen3/Eigen/Geometry>
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/TransformStamped.h>
@@ -14,7 +17,7 @@ namespace owds {
   public:
     Pose();
     Pose(const Pose& pose);
-    explicit Pose(const Eigen::Affine3d& pose) : t_(pose) {}
+    explicit Pose(const Eigen::Affine3d& pose);
 
     /**
      * @brief Construct a new Pose object
@@ -35,8 +38,8 @@ namespace owds {
     explicit Pose(const geometry_msgs::TransformStamped& transform);
     explicit Pose(const geometry_msgs::PoseStamped& pose);
 
-    bool operator==(const Pose& other) const { return t_.isApprox(other.t_); }
-    bool operator!=(const Pose& other) const { return !t_.isApprox(other.t_); }
+    bool operator==(const Pose& other) const;
+    bool operator!=(const Pose& other) const;
 
     double distanceSqTo(const Pose& pose) const;
     double distanceTo(const Pose& pose) const;

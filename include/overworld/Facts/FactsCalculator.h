@@ -22,7 +22,7 @@ namespace owds {
                                           bool clear = true);
     std::vector<Fact> computeAgentsFacts(const std::map<std::string, Object*>& objects,
                                          const std::map<std::string, Agent*>& agents,
-                                         const std::map<std::string, std::unordered_set<int>>& segmantation_ids,
+                                         const std::map<std::string, std::unordered_set<uint32_t>>& segmantation_ids,
                                          bool clear = true);
     std::vector<Fact> computeAreasFacts(const std::map<std::string, Area*>& areas,
                                         const std::map<std::string, Object*>& objects,
@@ -38,7 +38,7 @@ namespace owds {
 
     bool isPerceiving(Agent* agent_perceiving, Agent* agent_perceived);
 
-    bool isLookingAt(Agent* agent, const std::unordered_set<int>& seen_engine_ids, const Object* object);
+    bool isLookingAt(Agent* agent, const std::unordered_set<uint32_t>& seen_engine_ids, const Object* object);
     bool hasInHand(Agent* agent, Object* object);
     bool isHandMovingTowards(Agent* agent, Object* object);
 

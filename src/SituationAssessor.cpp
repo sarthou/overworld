@@ -6,7 +6,7 @@
 #include "overworld/Perception/Modules/AreasModules/AreasEmulatedPerceptionModule.h"
 #include "overworld/Perception/Modules/HumansModules/HumansEmulatedPerceptionModule.h"
 #include "overworld/Perception/Modules/ObjectsModules/ObjectsEmulatedPerceptionModule.h"
-#include "overworld/Utils/BulletKeypressHandler.h"
+#include "overworld/Utils/KeypressHandler.h"
 
 namespace owds {
 
@@ -34,25 +34,10 @@ namespace owds {
       set_simulation_service_ = n_.advertiseService("/overworld/setSimulation", &SituationAssessor::setSimulation, this);
     }
 
-    if(is_robot_)
-    {
-      world_client_ = PhysicsServers::connectPhysicsServer(owds::CONNECT_GUI);
-      world_client_->configureDebugVisualizer(COV_ENABLE_GUI, false);
-      world_client_->configureDebugVisualizer(COV_ENABLE_DEPTH_BUFFER_PREVIEW, false);
-      world_client_->configureDebugVisualizer(COV_ENABLE_SHADOWS, false);
-      world_client_->configureDebugVisualizer(COV_ENABLE_PLANAR_REFLECTION, false);
-      world_client_->configureDebugVisualizer(COV_ENABLE_RGB_BUFFER_PREVIEW, false);
-      world_client_->configureDebugVisualizer(COV_ENABLE_SEGMENTATION_MARK_PREVIEW, false);
-      world_client_->configureDebugVisualizer(COV_ENABLE_WIREFRAME, false);
-      world_client_->configureDebugVisualizer(COV_ENABLE_RENDERING, true);
-    }
-    else
-      world_client_ = PhysicsServers::connectPhysicsServer(owds::CONNECT_DIRECT);
+    engine_->world.setGravity({0, 0, -9.81});
+    engine_->world.setTimeStep(simu_step_);
 
-    world_client_->setGravity(0, 0, -9.81);
-    world_client_->setTimeStep(simu_step_);
-
-    perception_manager_.setWorldClient(world_client_);
+    perception_manager_.setWorldClient(&(engine_->world));
 
     /***************************
      * Set perception modules  *
@@ -82,12 +67,10 @@ namespace owds {
     if(is_robot_)
     {
       objetcs_pose_sender_ = new PoseSender(&n_, perception_manager_.objects_manager_);
-      bernie_sender_ = new BernieSenders(&n_);
     }
     else
     {
       objetcs_pose_sender_ = nullptr;
-      bernie_sender_ = nullptr;
     }
     start_modules_service_ = n_.advertiseService(agent_name_ + "/startPerceptionModules", &SituationAssessor::startModules, this);
     stop_modules_service_ = n_.advertiseService(agent_name_ + "/stopPerceptionModules", &SituationAssessor::stopModules, this);
@@ -98,6 +81,10 @@ namespace owds {
       msg.data = "ADD|" + agent_name_;
       new_assessor_publisher_.publish(msg);
     }
+
+    if(is_robot_)
+      engine_->setKeyCallback([this](Key_e key, bool pressed){ handleKeypress(key, pressed, this->engine_, this->perception_manager_); });
+        //handleKeypress(world_client_, perception_manager_);
   }
 
   SituationAssessor::~SituationAssessor()
@@ -106,10 +93,8 @@ namespace owds {
       delete ros_sender_;
     if(objetcs_pose_sender_ != nullptr)
       delete objetcs_pose_sender_;
-    if(bernie_sender_ != nullptr)
-      delete bernie_sender_;
-    if(world_client_ != nullptr)
-      delete world_client_;
+    if(engine_ != nullptr)
+      delete engine_;
   }
 
   void SituationAssessor::stop()
@@ -178,9 +163,6 @@ namespace owds {
 
       assess();
 
-      if(is_robot_)
-        handleKeypress(world_client_, perception_manager_);
-
       if(ros::ok() && isRunning())
       {
         next_start_time = start_time + interval;
@@ -196,7 +178,7 @@ namespace owds {
           unsigned int nb_step = time_interval_sec / simu_step_;
           for(int i = 0; i < nb_step; i++)
           {
-            world_client_->stepSimulation();
+            engine_->world.stepSimulation();
             perception_manager_.objects_manager_.stepLerp((double)((i + 1) / (double)nb_step));
           }
 
@@ -220,7 +202,7 @@ namespace owds {
 
   void SituationAssessor::assess()
   {
-    std::map<std::string, std::unordered_set<int>> agents_segmentation_ids;
+    std::map<std::string, std::unordered_set<uint32_t>> agents_segmentation_ids;
 
     perception_manager_.update();
     auto objects = perception_manager_.objects_manager_.getEntities();
@@ -244,7 +226,6 @@ namespace owds {
     {
       ros_sender_->sendEntitiesToTFAndRViz(myself_agent_->getId() + "/objects_markers", objects);
       ros_sender_->sendEntitiesToTFAndRViz(myself_agent_->getId() + "/humans_markers", body_parts);
-      // bernie_sender_->sendBernie();
     }
     else
     {
@@ -261,14 +242,18 @@ namespace owds {
     facts_publisher_.publish(facts);
   }
 
-  void SituationAssessor::processHumans(std::map<std::string, std::unordered_set<int>>& agents_segmentation_ids)
+  void SituationAssessor::processHumans(std::map<std::string, std::unordered_set<uint32_t>>& agents_segmentation_ids)
   {
     auto objects = perception_manager_.objects_manager_.getEntities();
     auto humans = perception_manager_.humans_manager_.getAgents();
     auto body_parts = perception_manager_.humans_manager_.getEntities();
     auto areas = perception_manager_.areas_manager_.getEntities();
 
-    for(auto human : humans)
+    std::vector<int> cameras;
+    std::unordered_map<Agent*, int> agent_to_segmentation;
+    std::unordered_map<Agent*, int> agent_to_rgba;
+
+    for(auto& human : humans)
     {
       if(human.second->getSensors().empty())
         continue;
@@ -277,23 +262,58 @@ namespace owds {
 
       for(const auto& sensor : human.second->getSensors())
       {
-        auto proj_matrix = world_client_->computeProjectionMatrix(sensor.second->getFieldOfView().getHeight(),
-                                                                  sensor.second->getFieldOfView().getRatioOpenGl(),
-                                                                  sensor.second->getFieldOfView().getClipNear(),
-                                                                  sensor.second->getFieldOfView().getClipFar());
-        Pose target_pose = sensor.second->pose() * Pose({0, 0, 1}, {0, 0, 0, 1});
-        auto head_pose_trans = sensor.second->pose().arrays().first;
-        auto target_pose_trans = target_pose.arrays().first;
-        auto view_matrix = world_client_->computeViewMatrix({(float)head_pose_trans[0], (float)head_pose_trans[1], (float)head_pose_trans[2]},
-                                                            {(float)target_pose_trans[0], (float)target_pose_trans[1], (float)target_pose_trans[2]},
-                                                            {0., 0., 1.});
-        auto images = world_client_->getCameraImage(300 * sensor.second->getFieldOfView().getRatioOpenGl(), 300, view_matrix, proj_matrix, owds::BULLET_HARDWARE_OPENGL);
+        if(sensor.second->isLocated() == false)
+          continue;
 
-        ros_sender_->sendImage(human.first + "/view", images);
-        agents_segmentation_ids[human.first] = world_client_->getSegmentationIds(images);
-        updateHumansPerspective(human.first, objects, body_parts, areas, agents_segmentation_ids[human.first]);
+        auto head_pose_array = sensor.second->pose().arrays();
+
+        if(sensor.second->getWorldSegmentationId() == -1)
+        {
+          auto fov = sensor.second->getFieldOfView();
+          int id = engine_->world.addCamera(300 * fov.getRatioOpenGl(), 300, fov.getRatioOpenGl(), CameraView_e::segmented_view, fov.getClipNear(), fov.getClipFar());
+          sensor.second->setWorldSegmentationId(id);
+        }
+        int cam_id = sensor.second->getWorldSegmentationId();
+        cameras.push_back(cam_id);
+        agent_to_segmentation.emplace(human.second, cam_id);
+        
+        engine_->world.setCameraPositionAndOrientation(cam_id, head_pose_array.first, head_pose_array.second);
+
+        if(sensor.second->getWorldRgbaId() == -1)
+        {
+          auto fov = sensor.second->getFieldOfView();
+          int id = engine_->world.addCamera(500 * fov.getRatioOpenGl(), 500, fov.getRatioOpenGl(), CameraView_e::segmented_view, fov.getClipNear(), fov.getClipFar());
+          sensor.second->setWorldRgbaId(id);
+        }
+        cam_id = sensor.second->getWorldRgbaId();
+        cameras.push_back(cam_id);
+        agent_to_rgba.emplace(human.second, cam_id);
+
+        engine_->world.setCameraPositionAndOrientation(cam_id, head_pose_array.first, head_pose_array.second);
 
         break; // TODO consider only one sensor per human
+      }
+    }
+
+    engine_->world.requestCameraRender(cameras);
+
+    for(auto& human : humans)
+    {
+      auto cam_it = agent_to_segmentation.find(human.second);
+      if(cam_it != agent_to_segmentation.end())
+      {
+        agents_segmentation_ids[human.first] = engine_->world.getCameraSementation(cam_it->second);
+        updateHumansPerspective(human.first, objects, body_parts, areas, agents_segmentation_ids[human.first]);
+      }
+
+      auto rgba_it = agent_to_rgba.find(human.second);
+      if(rgba_it != agent_to_rgba.end())
+      {
+        unsigned int w, h;
+        uint32_t* image_data = nullptr;
+        engine_->world.getCameraImage(rgba_it->second, &image_data, w, h);
+
+        ros_sender_->sendImage(human.first + "/view", image_data, w, h);
       }
     }
   }
@@ -302,7 +322,7 @@ namespace owds {
                                                   const std::map<std::string, Object*>& objects,
                                                   const std::map<std::string, BodyPart*>& humans,
                                                   const std::map<std::string, Area*>& areas,
-                                                  const std::unordered_set<int>& segmented_ids)
+                                                  const std::unordered_set<uint32_t>& segmented_ids)
   {
     auto assessor_it = humans_assessors_.find(human_name);
     if(assessor_it == humans_assessors_.end())

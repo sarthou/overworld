@@ -1,11 +1,19 @@
 #include "overworld/Geometry/Pose.h"
 
+#include <array>
+#include <eigen3/Eigen/Geometry>
+#include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/TransformStamped.h>
+#include <iostream>
+
 namespace owds {
 
   Pose::Pose() : t_(Eigen::Affine3d::Identity())
   {}
 
   Pose::Pose(const Pose& pose) : t_(pose.t_) {}
+
+  Pose::Pose(const Eigen::Affine3d& pose) : t_(pose) {}
 
   Pose::Pose(const std::array<double, 3>& translation, const std::array<double, 4>& rotation) : t_(Eigen::Translation3d(
                                                                                                      translation[0], translation[1], translation[2]) *
@@ -29,6 +37,16 @@ namespace owds {
     Eigen::Translation3d tra(pose.pose.position.x, pose.pose.position.y, pose.pose.position.z);
     Eigen::Quaternion<double> qua(pose.pose.orientation.w, pose.pose.orientation.x, pose.pose.orientation.y, pose.pose.orientation.z);
     t_ = Eigen::Affine3d(tra * qua);
+  }
+
+  bool Pose::operator==(const Pose& other) const
+  {
+    return t_.isApprox(other.t_);
+  }
+
+  bool Pose::operator!=(const Pose& other) const
+  {
+    return !t_.isApprox(other.t_);
   }
 
   double Pose::distanceSqTo(const Pose& pose) const
