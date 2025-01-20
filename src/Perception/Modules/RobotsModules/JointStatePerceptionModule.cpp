@@ -120,15 +120,8 @@ namespace owds {
       return false;
 
     for(size_t i = 0; i < msg.name.size(); i++)
-    {
-      std::string name = msg.name[i];
-      if(joint_name_id_.count(name) != 1)
-      {
-        // std::cout << "Joint name not found in Bullet: " << name << std::endl;
-        continue;
-      }
-      world_client_->setJointState(robot_engine_id_, name, msg.position[i]);
-    }
+      world_client_->setJointState(robot_engine_id_, msg.name[i], msg.position[i]);
+    
     for(const auto& link_pair : links_to_entity_)
     {
       int link_id = world_client_->getLinkId(robot_engine_id_, link_pair.first);
