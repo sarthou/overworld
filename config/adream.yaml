@@ -2,7 +2,11 @@ adream_walls:
   orientation:
     z: 1.57
 
-adream_floor:
+adream_hall_floor:
+  orientation:
+    z: 1.57
+
+adream_expe_floor:
   orientation:
     z: 1.57
 

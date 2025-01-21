@@ -83,19 +83,30 @@
         <rdf:type rdf:resource="cg_building#Wall"/>
         <cg_entities:hasVisualMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/adream/walls.obj</cg_entities:hasVisualMesh>
         <cg_entities:hasCollisionMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/adream/walls_vhacd.obj</cg_entities:hasCollisionMesh>
-        <cg_entities:hasTexture rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/textures/adream_wall_texture.png</cg_entities:hasTexture>
+        <cg_entities:hasTexture rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/adream/wall_color.png</cg_entities:hasTexture>
         <cg_entities:hasColor rdf:resource="cg_entities#grey"/>
     </owl:NamedIndividual>
 
 
 
-    <!-- adream_building#adream_floor -->
+    <!-- adream_building#adream_hall_floor -->
 
-    <owl:NamedIndividual rdf:about="adream_building#adream_floor">
+    <owl:NamedIndividual rdf:about="adream_building#adream_hall_floor">
         <rdf:type rdf:resource="cg_building#Floor"/>
-        <cg_entities:hasVisualMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/adream/floor.obj</cg_entities:hasVisualMesh>
-        <cg_entities:hasCollisionMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/adream/floor_collisions.obj</cg_entities:hasCollisionMesh>
-        <cg_entities:hasTexture rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/textures/adream_floor_texture.png</cg_entities:hasTexture>
+        <cg_entities:hasVisualMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/adream/floor_hall.obj</cg_entities:hasVisualMesh>
+        <cg_entities:hasCollisionMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/adream/floor_hall_collision.obj</cg_entities:hasCollisionMesh>
+        <cg_entities:hasTexture rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/adream/hall_color.png</cg_entities:hasTexture>
+        <cg_entities:hasColor rdf:resource="cg_entities#grey"/>
+    </owl:NamedIndividual>
+
+
+
+    <!-- adream_building#adream_expe_floor -->
+
+    <owl:NamedIndividual rdf:about="adream_building#adream_expe_floor">
+        <rdf:type rdf:resource="cg_building#Floor"/>
+        <cg_entities:hasVisualMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/adream/floor_expe.obj</cg_entities:hasVisualMesh>
+        <cg_entities:hasCollisionMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/adream/floor_expe_collision.obj</cg_entities:hasCollisionMesh>
         <cg_entities:hasColor rdf:resource="cg_entities#grey"/>
     </owl:NamedIndividual>
 
