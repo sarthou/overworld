@@ -37,7 +37,7 @@ namespace owds {
   {
   public:
     Engine(const std::string& name, Window* window) : world(compat::owds_ros::getShareDirectory("overworld")),
-                                                      name_(name), window_(window)
+                                                      name_(name), window_(window), run_(true)
     {}
 
     WorldEngine world;
@@ -66,9 +66,14 @@ namespace owds {
       world.setTimeStep(fps);
     }
 
+    void stop()
+    {
+      run_ = false;
+    }
+
     void run(bool simulate = false)
     {
-      while(!window_->isCloseRequested())
+      while(!window_->isCloseRequested() && run_)
       {
         window_->doPollEvents(renderer_);
         if(simulate)
@@ -86,6 +91,7 @@ namespace owds {
     Renderer renderer_;
     std::string name_;
     Window* window_;
+    std::atomic<bool> run_;
   };
 
 } // namespace owds

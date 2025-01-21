@@ -126,6 +126,7 @@ namespace owds {
     {
       callback_queue_.callAvailable(ros::WallDuration(0.1));
     }
+    engine_->stop();
   }
 
   void SituationAssessor::run()
