@@ -3,7 +3,7 @@
 #include <array>
 #include <string>
 
-#include "overworld/Utils/RosFiles.h"
+#include "overworld/Utils/RosPackage.h"
 #include "overworld/Utils/Wavefront.h"
 
 namespace owds {
@@ -47,32 +47,12 @@ namespace owds {
         else
           shape.colision_mesh_resource = meshes.front().substr(meshes.front().find('#') + 1);
 
-        bool is_wavefront = wavefront::isWavefront(shape.visual_mesh_resource);
-        if(is_wavefront)
-        {
-          auto full_path = getFullPath(shape.visual_mesh_resource);
-          auto mlt = wavefront::getMltFile(full_path);
-          if(mlt != "")
-          {
-            auto materials = wavefront::getMltMaterials(mlt);
-            if(materials.size() == 1)
-            {
-              if(wavefront::getMaterialTexture(mlt, materials.front()).empty() == false)
-                shape.color = {1, 1, 1};
-              else
-                shape.color = getEntityColor(onto, indiv_name);
-            }
-            else
-              shape.color = getEntityColor(onto, indiv_name);
-          }
-          else
-            shape.color = getEntityColor(onto, indiv_name);
-        }
-        else
-          shape.color = getEntityColor(onto, indiv_name);
+        shape.color = getEntityColor(onto, indiv_name);
 
-        if(is_wavefront && textures.size())
-          shape.texture = textures.front().substr(textures.front().find('#') + 1);
+        if(textures.empty() == false)
+        {
+          shape.texture = getFullPath(textures.front().substr(textures.front().find('#') + 1));
+        }
       }
       else
         shape.type = SHAPE_NONE;

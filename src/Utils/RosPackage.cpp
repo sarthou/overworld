@@ -1,4 +1,4 @@
-#include "overworld/Utils/Commands.h"
+#include "overworld/Utils/RosPackage.h"
 
 #include <array>
 #include <cstdio>
@@ -98,6 +98,26 @@ namespace owds {
     if(res.empty())
       res = listPackagesRos2();
     return res;
+  }
+
+  std::string getFullPath(const std::string& file_name)
+  {
+    std::string package_pattern = "package://";
+
+    if(file_name.find(package_pattern) != std::string::npos)
+    {
+      size_t pose = file_name.find(package_pattern);
+      size_t pose_end_of_name = file_name.find("/", pose + package_pattern.size());
+      std::string full_package = file_name.substr(pose, pose_end_of_name - pose);
+      std::string package_name = file_name.substr(pose + package_pattern.size(), pose_end_of_name - pose - package_pattern.size());
+      std::string package_path = findPackage(package_name);
+
+      std::string full_file_name = file_name;
+      full_file_name.replace(pose, full_package.size(), package_path);
+      return full_file_name;
+    }
+    else
+      return file_name;
   }
 
 } // namespace owds

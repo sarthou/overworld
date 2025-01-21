@@ -1,5 +1,5 @@
-#ifndef OWDS_COMMANDS_H
-#define OWDS_COMMANDS_H
+#ifndef OWDS_ROSPACKAGE_H
+#define OWDS_ROSPACKAGE_H
 
 #include <array>
 #include <string>
@@ -21,6 +21,8 @@ namespace owds {
 
   std::vector<std::string> listPackages();
 
+  std::string getFullPath(const std::string& file_name);
+
 } // namespace owds
 
-#endif // OWDS_COMMANDS_H
+#endif // OWDS_ROSPACKAGE_H

@@ -34,11 +34,10 @@ owds_add_ros_library(owds_compat
 
 owds_add_ros_library(overworld_utility_lib
     src/Utils/YamlReader.cpp
-    src/Utils/Commands.cpp
+    src/Utils/RosPackage.cpp
     src/Utils/Ontology.cpp
     src/Utils/XmlTokenize.cpp
     src/Utils/SolarAzEl.cpp
-    src/Utils/RosFiles.cpp
     src/Utils/Wavefront.cpp)
 target_link_libraries(overworld_utility_lib PUBLIC ontologenius_lib)
 

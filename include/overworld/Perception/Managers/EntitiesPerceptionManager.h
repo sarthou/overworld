@@ -14,7 +14,7 @@
 #include "overworld/Engine/Engine.h"
 #include "overworld/Perception/DataFusion/DataFusionBase.h"
 #include "overworld/Perception/Managers/BasePerceptionManager.h"
-#include "overworld/Utils/RosFiles.h"
+#include "overworld/Utils/RosPackage.h"
 #include "overworld/Utils/ShellDisplay.h"
 #include "overworld/Utils/Wavefront.h"
 
