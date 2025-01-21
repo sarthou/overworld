@@ -62,7 +62,7 @@ if(OWDS_USE_PHYSX)
     FetchContent_Declare(
         PhysX
         GIT_REPOSITORY "https://github.com/NVIDIA-Omniverse/PhysX.git"
-        GIT_TAG "106.0-physx-5.4.0"
+        GIT_TAG "106.4-physx-5.5.0"
     )
     FetchContent_GetProperties(PhysX)
 
@@ -95,6 +95,7 @@ if(OWDS_USE_PHYSX)
         set(PX_GENERATE_STATIC_LIBRARIES 1)
         set(PX_BUILDPVDRUNTIME 1)
         set(PX_BUILDSNIPPETS 0) # No we don't want any fancy demos :c
+        set(PX_SUPPORT_GPU_PHYSX ON)
 
         set(PX_OUTPUT_LIB_DIR ${CMAKE_CURRENT_BINARY_DIR})
         set(PX_OUTPUT_BIN_DIR ${CMAKE_CURRENT_BINARY_DIR})
@@ -102,7 +103,7 @@ if(OWDS_USE_PHYSX)
         add_subdirectory(${physx_SOURCE_DIR}/physx/compiler/public/ ${physx_BINARY_DIR}/physx/)
     endif()
 
-    link_directories(${physx_SOURCE_DIR}/physx/bin/linux.clang/release)
+    link_directories(${physx_SOURCE_DIR}/physx/bin/linux.x86_64/release)
 endif()
 
 if($ENV{ROS_VERSION} STREQUAL "1")
