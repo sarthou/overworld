@@ -33,7 +33,7 @@
 #include "overworld/Engine/Common/Urdf/UrdfLoader.h"
 #include "overworld/Engine/Common/Urdf/VisualActor.h"
 #include "overworld/Utils/GlmMath.h"
-#include "overworld/Utils/ROS.h"
+#include "overworld/Utils/RosPackage.h"
 
 namespace owds {
   World::World(const std::filesystem::path& base_assets_path) : base_assets_path_(base_assets_path),
@@ -801,7 +801,7 @@ namespace owds {
     case urdf::GeometryType_e::geometry_mesh:
     {
       return createShapeFromModel(urdf_shape.material,
-                                  owds::rosPkgPathToPath(urdf_shape.file_name),
+                                  owds::getFullPath(urdf_shape.file_name),
                                   {static_cast<float>(urdf_shape.scale.x),
                                    static_cast<float>(urdf_shape.scale.y),
                                    static_cast<float>(urdf_shape.scale.z)},

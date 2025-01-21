@@ -10,7 +10,7 @@
 #include <vector>
 
 #include "overworld/Engine/Common/Models/Material.h"
-#include "overworld/Utils/ROS.h"
+#include "overworld/Utils/RosPackage.h"
 #include "overworld/Utils/ShellDisplay.h"
 #include "overworld/Utils/XmlTokenize.h"
 
@@ -117,7 +117,7 @@ namespace owds {
     if(texture != nullptr)
     {
       std::string filename = std::string(texture->Attribute("filename"));
-      instance.diffuse_texture_ = rosPkgPathToPath(filename);
+      instance.diffuse_texture_ = getFullPath(filename);
     }
 
     return {id, instance};
