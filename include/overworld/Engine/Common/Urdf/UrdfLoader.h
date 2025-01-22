@@ -49,8 +49,8 @@ namespace owds {
       Material material;
       GeometryType_e type = geometry_none;
       std::string file_name;
-      glm::vec3 origin_translation;
-      glm::vec3 origin_rotation;
+      glm::vec3 origin_translation = {0., 0., 0.};
+      glm::vec3 origin_rotation = {0., 0., 0.};
       glm::vec3 scale = {1., 1., 1.}; // x = radius y = length for cylinder and sphere
 
       Geometry_t() = default;
