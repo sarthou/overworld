@@ -161,7 +161,7 @@ namespace owds {
     std::unordered_set<int> engine_text_ids;
     engine_text_ids.insert(world_client_->addDebugText(area->id(),
                                                       {mean_x, mean_y, z_max + 0.2f}, 0.4,
-                                                      color, 0, -1, owner_id, owner_link_id));
+                                                      color, true, 0, -1, owner_id, owner_link_id));
 
     area->setWorldLineIds(engine_ids);
     area->setWorldTextIds(engine_text_ids);
@@ -219,7 +219,7 @@ namespace owds {
     std::unordered_set<int> engine_text_ids;
     engine_text_ids.insert(world_client_->addDebugText(area->id(),
                                                       {x_center, y_center, z_max + 0.2f}, 0.4,
-                                                      color, 0, -1, owner_id, owner_link_id));
+                                                      color, true, 0, -1, owner_id, owner_link_id));
 
     area->setWorldLineIds(engine_ids);
     area->setWorldTextIds(engine_text_ids);;
