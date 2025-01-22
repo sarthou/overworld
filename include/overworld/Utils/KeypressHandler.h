@@ -21,9 +21,10 @@ namespace owds {
       auto head_pose = agent->getHead()->pose();
       auto head_pose_arrays = head_pose.arrays();
 
-      Pose cam_pose_in_head({0., 1., -3.}, {0., 0., 0., 1.});
+      Pose cam_pose_in_head({2., 2., 0.}, {0., 0., 0., 1.});
       Pose cam_in_world = head_pose * cam_pose_in_head;
       auto cam_pose_arrays = cam_in_world.arrays();
+      cam_pose_arrays.first[2] = head_pose_arrays.first[2] + 1.;
 
       engine->setVizualizerCamera(cam_pose_arrays.first, head_pose_arrays.first);
     }
