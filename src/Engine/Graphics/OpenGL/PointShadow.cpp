@@ -14,13 +14,55 @@
 
 namespace owds {
 
+  PointShadow::PointShadow()
+  {
+    is_init_.fill(false);
+  }
+
+  void PointShadow::init()
+  {
+    for(int id = 0; id < MAX_POINTS; id++)
+    {
+      glGenFramebuffers(1, &depth_framebuffer_[id]);
+
+      glGenTextures(1, &depth_cubemap_[id]);
+      glBindTexture(GL_TEXTURE_CUBE_MAP, depth_cubemap_[id]);
+      for(unsigned int i = 0; i < 6; ++i)
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT,
+                    resolution_, resolution_, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+
+      glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+      glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+      glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+      glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+      glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+      constexpr float bordercolor[] = {1.0f, 1.0f, 1.0f, 1.0f};
+      glTexParameterfv(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BORDER_COLOR, bordercolor);
+
+      glBindFramebuffer(GL_FRAMEBUFFER, depth_framebuffer_[id]);
+      glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depth_cubemap_[id], 0);
+      glDrawBuffer(GL_NONE);
+      glReadBuffer(GL_NONE);
+
+      int status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+      if(status != GL_FRAMEBUFFER_COMPLETE)
+      {
+        std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!";
+        throw 0;
+      }
+
+      glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+  }
+
   void PointShadow::init(size_t id, float far_plane)
   {
     far_plane *= 2.5;
     far_plane_[id] = far_plane;
     projection_matrix_[id] = glm::perspective(glm::radians(90.0f), 1.0f, 0.02f, far_plane);
 
-    glGenFramebuffers(1, &depth_framebuffer_[id]);
+    /*glGenFramebuffers(1, &depth_framebuffer_[id]);
 
     glGenTextures(1, &depth_cubemap_[id]);
     glBindTexture(GL_TEXTURE_CUBE_MAP, depth_cubemap_[id]);
@@ -49,7 +91,7 @@ namespace owds {
       throw 0;
     }
 
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);*/
     is_init_[id] = true;
   }
 

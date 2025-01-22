@@ -131,6 +131,7 @@ namespace owds {
     sky_.init(owds_path + "/models/textures/skybox/Footballfield/");
 
     shadow_.init(render_camera_.getNearPlane(), render_camera_.getFarPlane());
+    point_shadows_.init();
     text_renderer_.init();
     text_renderer_.load("/usr/share/fonts/truetype/open-sans/OpenSans-Regular.ttf", 48);
 
@@ -582,17 +583,17 @@ namespace owds {
     renderModels(shadow_shader, 2);
 
     // Points shadows
+    shadow_point_shader.use();
     for(size_t i = 0; i < PointLights::MAX_POINT_LIGHTS; i++)
     {
+      point_shadows_.bindFrameBuffer(i);
       if(world_->point_lights_.isUsed(i))
       {
         if(point_shadows_.isInit(i) == false)
           point_shadows_.init(i, world_->point_lights_.getAttenuationDistance(i));
 
         point_shadows_.computeLightTransforms(i, glm::vec3(world_->point_lights_.getPosition(i)));
-
-        shadow_point_shader.use();
-        point_shadows_.bindFrameBuffer(i);
+        
         point_shadows_.setUniforms(i, shadow_point_shader);
 
         renderModels(shadow_point_shader, 2);
