@@ -656,7 +656,7 @@ namespace owds {
 
     text_shader.use();
     text_shader.setMat4("projection", render_camera_.getProjectionMatrix());
-    for(auto& debug : world_->debug_texts_)
+    for(auto debug : world_->debug_texts_)
     {
       glm::vec4 actor_pose(0., 0., 0., 0.);
       if(debug.linked_actor != nullptr)
