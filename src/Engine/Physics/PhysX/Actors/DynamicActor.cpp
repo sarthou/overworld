@@ -49,10 +49,6 @@ namespace owds::physx {
 
     px_actor_->setRigidBodyFlag(::physx::PxRigidBodyFlag::eENABLE_GYROSCOPIC_FORCES, true);
 
-    setPositionAndOrientation(position, orientation);
-
-    setPhysicsEnabled(false);
-
     ActorData_t* data = new ActorData_t();
     data->actor_id = unique_id_;
     data->body_id = -1;
@@ -60,6 +56,10 @@ namespace owds::physx {
 
     ctx_.px_scene_->addActor(*px_actor_);
     ctx_.physx_mutex_.unlock();
+
+    setPositionAndOrientation(position, orientation);
+
+    setPhysicsEnabled(false);
   }
 
   void DynamicActor::setPhysicsEnabled(bool enabled)
