@@ -53,7 +53,7 @@ namespace owds {
         case Key_e::key_enter:
           onEnterPressed(engine, managers.robots_manager_);
           break;
-        case key_a:
+        case key_v:
           onAPressed(managers.areas_manager_);
           break;
         default:
