@@ -27,6 +27,7 @@ namespace owds::physx {
   void DynamicActor::setup(const std::array<double, 3>& position,
                            const std::array<double, 4>& orientation)
   {
+    ctx_.physx_mutex_.lock();
     const auto& sdk = owds::physx::Context::createContext()->px_physics_;
 
     px_material_ = sdk->createMaterial(0.5f, 0.5f, 0.5f);
@@ -58,27 +59,36 @@ namespace owds::physx {
     px_actor_->userData = data;
 
     ctx_.px_scene_->addActor(*px_actor_);
+    ctx_.physx_mutex_.unlock();
   }
 
   void DynamicActor::setPhysicsEnabled(bool enabled)
   {
+    ctx_.physx_mutex_.lock();
     px_actor_->setRigidBodyFlag(::physx::PxRigidBodyFlag::eKINEMATIC, !enabled);
     is_kinematic_ = !enabled;
+    ctx_.physx_mutex_.unlock();
   }
 
   void DynamicActor::setSimulationEnabled(bool enabled)
   {
+    ctx_.physx_mutex_.lock();
     px_actor_->setActorFlag(::physx::PxActorFlag::eDISABLE_SIMULATION, !enabled);
+    ctx_.physx_mutex_.unlock();
   }
 
   void DynamicActor::remove()
   {
+    ctx_.physx_mutex_.lock();
     ctx_.px_scene_->removeActor(*px_actor_);
+    ctx_.physx_mutex_.unlock();
   }
 
   void DynamicActor::setMass(const float mass_kg)
   {
+    ctx_.physx_mutex_.lock();
     px_actor_->setMass(static_cast<::physx::PxReal>(mass_kg));
+    ctx_.physx_mutex_.unlock();
   }
 
   void DynamicActor::setPositionAndOrientation(const std::array<double, 3>& position, const std::array<double, 4>& orientation)
@@ -95,14 +105,17 @@ namespace owds::physx {
           static_cast<::physx::PxReal>(orientation[2]),
           static_cast<::physx::PxReal>(orientation[3])));
 
+    ctx_.physx_mutex_.lock();
     if(is_kinematic_)
       px_actor_->setKinematicTarget(px_transform);
     else
       px_actor_->setGlobalPose(px_transform);
+    ctx_.physx_mutex_.unlock();
   }
 
   void DynamicActor::setVelocity(const std::array<double, 3>& linear_velocity, const std::array<double, 3>& angular_velocity)
   {
+    ctx_.physx_mutex_.lock();
     px_actor_->setLinearVelocity(::physx::PxVec3(
       static_cast<::physx::PxReal>(linear_velocity[0]),
       static_cast<::physx::PxReal>(linear_velocity[1]),
@@ -112,6 +125,7 @@ namespace owds::physx {
       static_cast<::physx::PxReal>(angular_velocity[0]),
       static_cast<::physx::PxReal>(angular_velocity[1]),
       static_cast<::physx::PxReal>(angular_velocity[2])));
+    ctx_.physx_mutex_.unlock();
   }
 
 } // namespace owds::physx

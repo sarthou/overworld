@@ -149,20 +149,24 @@ namespace owds::physx {
 
   void World::setGravity(const std::array<float, 3>& gravity)
   {
+    ctx_->physx_mutex_.lock();
     ctx_->px_scene_->setGravity(::physx::PxVec3(
       static_cast<::physx::PxReal>(gravity[0]),
       static_cast<::physx::PxReal>(gravity[1]),
       static_cast<::physx::PxReal>(gravity[2])));
+    ctx_->physx_mutex_.unlock();
   }
 
   void World::stepSimulation(const float delta)
   {
+    ctx_->physx_mutex_.lock();
     ctx_->px_scene_->simulate(delta != 0 ? delta : time_step_);
 
     if(ctx_->px_scene_->checkResults(true))
       ctx_->px_scene_->fetchResults(true);
     else
       std::cout << "error " << std::endl;
+    ctx_->physx_mutex_.unlock();
   }
 
   void performRaycast(::physx::PxScene* scene,

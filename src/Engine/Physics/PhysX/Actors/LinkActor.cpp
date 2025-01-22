@@ -33,6 +33,7 @@ namespace owds::physx {
     (void)position;
     (void)orientation;
 
+    ctx_.physx_mutex_.lock();
     const auto& sdk = owds::physx::Context::createContext()->px_physics_;
 
     px_material_ = sdk->createMaterial(0.5f, 0.5f, 0.5f);
@@ -53,6 +54,7 @@ namespace owds::physx {
     data->actor_id = unique_id_;
     data->body_id = body_id_;
     px_link_->userData = data;
+    ctx_.physx_mutex_.unlock();
   }
 
   void LinkActor::setPhysicsEnabled(bool enabled)
@@ -63,7 +65,9 @@ namespace owds::physx {
 
   void LinkActor::setSimulationEnabled(bool enabled)
   {
+    ctx_.physx_mutex_.lock();
     px_link_->setActorFlag(::physx::PxActorFlag::eDISABLE_SIMULATION, !enabled);
+    ctx_.physx_mutex_.unlock();
   }
 
   void LinkActor::remove()
@@ -73,7 +77,9 @@ namespace owds::physx {
 
   void LinkActor::setMass(const float mass_kg)
   {
+    ctx_.physx_mutex_.lock();
     px_link_->setMass(static_cast<::physx::PxReal>(mass_kg));
+    ctx_.physx_mutex_.unlock();
   }
 
   void LinkActor::setPositionAndOrientation(const std::array<double, 3>& position, const std::array<double, 4>& orientation)

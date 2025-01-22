@@ -41,8 +41,10 @@ namespace owds::physx {
 
   void Urdf::finish()
   {
+    ctx_.physx_mutex_.lock();
     ctx_.px_scene_->addArticulation(*px_articulation_);
     px_articulation_->setArticulationFlag(::physx::PxArticulationFlag::eDISABLE_SELF_COLLISION, true);
+    ctx_.physx_mutex_.unlock();
 
     setPhysicsEnabled(false);
   }
@@ -85,6 +87,7 @@ namespace owds::physx {
 
   void Urdf::addJoint(const urdf::Joint_t& joint)
   {
+    ctx_.physx_mutex_.lock();
     auto* px_link = px_links_[joint.child_link];
     ::physx::PxArticulationJointReducedCoordinate* px_joint = static_cast<::physx::PxArticulationJointReducedCoordinate*>(px_link->getInboundJoint());
     px_joints_[joint.name] = px_joint;
@@ -191,17 +194,22 @@ namespace owds::physx {
 
       joints_[joint.name] = new ::owds::physx::Joint(ctx_, px_joint, joint.type, int_axis);
     }
+    ctx_.physx_mutex_.unlock();
   }
 
   void Urdf::remove()
   {
+    ctx_.physx_mutex_.lock();
     ctx_.px_scene_->removeArticulation(*px_articulation_);
+    ctx_.physx_mutex_.unlock();
   }
 
   void Urdf::setPhysicsEnabled(bool enabled)
   {
+    ctx_.physx_mutex_.lock();
     for(const auto& link : px_links_)
       link.second->setActorFlag(::physx::PxActorFlag::eDISABLE_GRAVITY, !enabled);
+    ctx_.physx_mutex_.unlock();
   }
 
   size_t Urdf::getNumJoints()
@@ -228,11 +236,14 @@ namespace owds::physx {
           static_cast<::physx::PxReal>(orientation[2]),
           static_cast<::physx::PxReal>(orientation[3])));
 
+    ctx_.physx_mutex_.lock();
     px_articulation_->setRootGlobalPose(px_transform);
+    ctx_.physx_mutex_.unlock();
   }
 
   void Urdf::setVelocity(const std::array<double, 3>& linear_velocity, const std::array<double, 3>& angular_velocity)
   {
+    ctx_.physx_mutex_.lock();
     px_articulation_->setRootLinearVelocity(::physx::PxVec3(
       static_cast<::physx::PxReal>(linear_velocity[0]),
       static_cast<::physx::PxReal>(linear_velocity[1]),
@@ -242,6 +253,7 @@ namespace owds::physx {
       static_cast<::physx::PxReal>(angular_velocity[0]),
       static_cast<::physx::PxReal>(angular_velocity[1]),
       static_cast<::physx::PxReal>(angular_velocity[2])));
+    ctx_.physx_mutex_.unlock();
   }
 
 } // namespace owds::physx

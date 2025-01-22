@@ -57,7 +57,7 @@ namespace owds::physx {
     void setupPhysicsShape(const owds::ShapeSphere& shape);
 
     const std::vector<PxPtr<::physx::PxShape>>& getShapes() { return px_shapes_; }
-    ::physx::PxTransform getGlobalPose() { return px_base_->getGlobalPose(); }
+    ::physx::PxTransform getGlobalPose();
 
     static bool use_cache_input;
     static bool use_cache_output;

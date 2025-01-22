@@ -5,6 +5,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <mutex>
 
 #include "overworld/Engine/Physics/PhysX/API.h"
 
@@ -28,6 +29,7 @@ namespace owds::physx {
     Context& operator=(Context&& other) = delete;
 
     PxPtr<::physx::PxScene> px_scene_;
+    std::mutex physx_mutex_;
 
     bool minimize_memory_footprint_;
 

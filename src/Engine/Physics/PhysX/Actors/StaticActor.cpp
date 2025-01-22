@@ -25,6 +25,7 @@ namespace owds::physx {
   void StaticActor::setup(const std::array<double, 3>& position,
                           const std::array<double, 4>& orientation)
   {
+    ctx_.physx_mutex_.lock();
     const auto& sdk = owds::physx::Context::createContext()->px_physics_;
 
     px_material_ = sdk->createMaterial(0.5f, 0.5f, 0.5f);
@@ -62,6 +63,7 @@ namespace owds::physx {
     px_actor_->userData = data;
 
     ctx_.px_scene_->addActor(*px_actor_);
+    ctx_.physx_mutex_.unlock();
   }
 
   void StaticActor::setPhysicsEnabled(bool enabled)
@@ -78,7 +80,9 @@ namespace owds::physx {
 
   void StaticActor::remove()
   {
+    ctx_.physx_mutex_.lock();
     ctx_.px_scene_->removeActor(*px_actor_);
+    ctx_.physx_mutex_.unlock();
   }
 
   void StaticActor::setMass(const float mass_kg)

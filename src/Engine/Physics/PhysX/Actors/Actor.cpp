@@ -65,7 +65,9 @@ namespace owds::physx {
 
   owds::AABB_t Actor::getAABB()
   {
+    ctx_.physx_mutex_.lock();
     ::physx::PxBounds3 px_aabb = px_base_->getWorldBounds();
+    ctx_.physx_mutex_.unlock();
     AABB_t aabb({px_aabb.minimum.x, px_aabb.minimum.y, px_aabb.minimum.z},
                 {px_aabb.maximum.x, px_aabb.maximum.y, px_aabb.maximum.z});
     return aabb;
@@ -94,7 +96,9 @@ namespace owds::physx {
 
   std::array<float, 16> Actor::getModelMatrix() const
   {
+    ctx_.physx_mutex_.lock();
     const auto px_pose = px_base_->getGlobalPose();
+    ctx_.physx_mutex_.unlock();
     const auto translation_mat = glm::translate(glm::mat4(1), glm::vec3(px_pose.p.x, px_pose.p.y, px_pose.p.z));
     const auto rotation_mat = glm::mat4_cast(glm::quat(px_pose.q.w, px_pose.q.x, px_pose.q.y, px_pose.q.z));
 
@@ -103,11 +107,21 @@ namespace owds::physx {
 
   std::pair<std::array<double, 3>, std::array<double, 4>> Actor::getPositionAndOrientation() const
   {
+    ctx_.physx_mutex_.lock();
     const auto px_pose = px_base_->getGlobalPose();
+    ctx_.physx_mutex_.unlock();
     return {
       {px_pose.p.x, px_pose.p.y, px_pose.p.z},
       {px_pose.q.x, px_pose.q.y, px_pose.q.z, px_pose.q.w}
     };
+  }
+
+  ::physx::PxTransform Actor::getGlobalPose()
+  {
+    ctx_.physx_mutex_.lock();
+    auto pose = px_base_->getGlobalPose();
+    ctx_.physx_mutex_.unlock();
+    return pose;
   }
 
   void Actor::setupPhysicsShape(const owds::ShapeBox& shape)

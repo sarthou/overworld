@@ -44,20 +44,24 @@ namespace owds::physx {
 
   void Joint::setPosition(double position)
   {
+    ctx_.physx_mutex_.lock();
     assert(type_ != urdf::JointType_e::joint_fixed && "[Joint] fixed joint cannot be moved");
     if(px_axis_ != ::physx::PxArticulationAxis::eCOUNT)
       px_base_->setJointPosition(px_axis_, position);
     else
       assert(false && "[Joint floating and planar joints are not yet supported]");
+    ctx_.physx_mutex_.unlock();
   }
 
   void Joint::setVelocity(double velocity)
   {
+    ctx_.physx_mutex_.lock();
     assert(type_ != urdf::JointType_e::joint_fixed && "[Joint] fixed joint cannot be moved");
     if(px_axis_ != ::physx::PxArticulationAxis::eCOUNT)
       px_base_->setJointVelocity(px_axis_, velocity);
     else
       assert(false && "[Joint floating and planar joints are not yet supported]");
+    ctx_.physx_mutex_.unlock();
   }
 
 } // namespace owds::physx

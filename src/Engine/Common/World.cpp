@@ -36,6 +36,7 @@
 #include "overworld/Utils/RosPackage.h"
 
 namespace owds {
+
   World::World(const std::filesystem::path& base_assets_path) : base_assets_path_(base_assets_path),
                                                                 preloaded_box_model_(owds::ModelManager::get().load(
                                                                   base_assets_path / "models/basic_shapes/cube.obj")),
