@@ -13,18 +13,10 @@
 // should be after glad
 #include "overworld/Engine/Graphics/GLFW/Window.h"
 
-#if !OWDS_USE_PHYSX
-#include <overworld/Physics/Bullet3/Actor.h>
-#include <overworld/Physics/Bullet3/World.h>
-namespace owds {
-  using WorldEngine = owds::bullet3::World;
-}
-#else
 #include "overworld/Engine/Physics/PhysX/World.h"
 namespace owds {
   using WorldEngine = owds::physx::World;
 }
-#endif
 
 // Should be last
 #define GLFW_EXPOSE_NATIVE_X11

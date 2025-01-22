@@ -9,13 +9,6 @@ set(CMAKE_POLICY_DEFAULT_CMP0153 OLD)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED on)
 
-option(OWDS_USE_PHYSX "Use PhysX instead of Bullet3" ON)
-
-if(DEFINED ENV{OWDS_USE_PHYSX})
-    set(OWDS_USE_PHYSX $ENV{OWDS_USE_PHYSX})
-else()
-    message(WARNING "The environment variable 'OWDS_USE_PHYSX' is not set, assuming value = 1")
-endif()
 
 if(NOT DEFINED ENV{ROS_VERSION})
     message(FATAL_ERROR "Please source your ROS1 / ROS2 environment before running cmake")
@@ -58,53 +51,53 @@ include(CheckLanguage)
 # # PhysX may be used as an alternative engine for better simulation ##
 # # performance and GPU hardware acceleration if cuda is available.  ##
 # #####################################################################
-if(OWDS_USE_PHYSX)
-    FetchContent_Declare(
-        PhysX
-        GIT_REPOSITORY "https://github.com/NVIDIA-Omniverse/PhysX.git"
-        GIT_TAG "106.4-physx-5.5.0"
-    )
-    FetchContent_GetProperties(PhysX)
 
-    if(NOT physx_POPULATED)
-        FetchContent_Populate(PhysX)
-        message(WARNING "PhysX source dir: ${physx_SOURCE_DIR}")
-        message(WARNING "PhysX binary dir: ${physx_BINARY_DIR}")
+FetchContent_Declare(
+    PhysX
+    GIT_REPOSITORY "https://github.com/NVIDIA-Omniverse/PhysX.git"
+    GIT_TAG "106.4-physx-5.5.0"
+)
+FetchContent_GetProperties(PhysX)
 
-        # todo: figure out this doesn't work
-        # We need to call this script so that packman can download NVidia's proprietary PhysXgpu shared binary
-        execute_process(
-            WORKING_DIRECTORY "${physx_SOURCE_DIR}/physx/"
-            COMMAND "yes 1 | generate_projects.sh"
-            COMMAND_ECHO STDOUT)
+if(NOT physx_POPULATED)
+    FetchContent_Populate(PhysX)
+    message(WARNING "PhysX source dir: ${physx_SOURCE_DIR}")
+    message(WARNING "PhysX binary dir: ${physx_BINARY_DIR}")
 
-        # Hardcoded for now..
-        set(PHYSX_ROOT_DIR ${physx_SOURCE_DIR}/physx/)
-        set(TARGET_BUILD_PLATFORM "linux")
+    # todo: figure out this doesn't work
+    # We need to call this script so that packman can download NVidia's proprietary PhysXgpu shared binary
+    execute_process(
+        WORKING_DIRECTORY "${physx_SOURCE_DIR}/physx/"
+        COMMAND "yes 1 | generate_projects.sh"
+        COMMAND_ECHO STDOUT)
 
-        # Dirty hack, please look away just for this one
-        macro(physx_workaround VAR access value current_list_file stack)
-            if("${access}" STREQUAL "MODIFIED_ACCESS")
-                set(${VAR} 0)
-            endif()
-        endmacro()
+    # Hardcoded for now..
+    set(PHYSX_ROOT_DIR ${physx_SOURCE_DIR}/physx/)
+    set(TARGET_BUILD_PLATFORM "linux")
 
-        variable_watch(PUBLIC_RELEASE physx_workaround)
+    # Dirty hack, please look away just for this one
+    macro(physx_workaround VAR access value current_list_file stack)
+        if("${access}" STREQUAL "MODIFIED_ACCESS")
+            set(${VAR} 0)
+        endif()
+    endmacro()
 
-        set(PX_GENERATE_SOURCE_DISTRO 1)
-        set(PX_GENERATE_STATIC_LIBRARIES 1)
-        set(PX_BUILDPVDRUNTIME 1)
-        set(PX_BUILDSNIPPETS 0) # No we don't want any fancy demos :c
-        set(PX_SUPPORT_GPU_PHYSX ON)
+    variable_watch(PUBLIC_RELEASE physx_workaround)
 
-        set(PX_OUTPUT_LIB_DIR ${CMAKE_CURRENT_BINARY_DIR})
-        set(PX_OUTPUT_BIN_DIR ${CMAKE_CURRENT_BINARY_DIR})
+    set(PX_GENERATE_SOURCE_DISTRO 1)
+    set(PX_GENERATE_STATIC_LIBRARIES 1)
+    set(PX_BUILDPVDRUNTIME 1)
+    set(PX_BUILDSNIPPETS 0) # No we don't want any fancy demos :c
+    set(PX_SUPPORT_GPU_PHYSX ON)
 
-        add_subdirectory(${physx_SOURCE_DIR}/physx/compiler/public/ ${physx_BINARY_DIR}/physx/)
-    endif()
+    set(PX_OUTPUT_LIB_DIR ${CMAKE_CURRENT_BINARY_DIR})
+    set(PX_OUTPUT_BIN_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
-    link_directories(${physx_SOURCE_DIR}/physx/bin/linux.x86_64/release)
+    add_subdirectory(${physx_SOURCE_DIR}/physx/compiler/public/ ${physx_BINARY_DIR}/physx/)
 endif()
+
+link_directories(${physx_SOURCE_DIR}/physx/bin/linux.x86_64/release)
+
 
 if($ENV{ROS_VERSION} STREQUAL "1")
     include(cmake/BuildROS1.cmake)

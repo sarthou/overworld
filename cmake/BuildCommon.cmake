@@ -85,7 +85,6 @@ target_include_directories(overworld_graphics PRIVATE ${FREETYPE_INCLUDE_DIRS})
 target_compile_options(overworld_graphics PRIVATE $<$<CXX_COMPILER_ID:Clang>:-Wno-unused-function>)
 
 # ##################################
-if(OWDS_USE_PHYSX)
     set(OWDS_PHYSICS_SRC
         src/Engine/Physics/PhysX/Actors/Actor.cpp
         src/Engine/Physics/PhysX/Actors/DynamicActor.cpp
@@ -96,14 +95,6 @@ if(OWDS_USE_PHYSX)
         src/Engine/Physics/PhysX/Context.cpp
         src/Engine/Physics/PhysX/SharedContext.cpp
         src/Engine/Physics/PhysX/World.cpp)
-else()
-    set(OWDS_PHYSICS_SRC
-        src/Physics/Bullet3/Joints/JointFixed.cpp
-        src/Physics/Bullet3/Joints/JointPrismatic.cpp
-        src/Physics/Bullet3/Actor.cpp
-        src/Physics/Bullet3/Context.cpp
-        src/Physics/Bullet3/World.cpp)
-endif()
 
 owds_add_ros_library(overworld_physics
     ${OWDS_PHYSICS_SRC})
@@ -111,24 +102,19 @@ owds_add_ros_library(overworld_physics
 target_compile_definitions(overworld_physics
     PUBLIC
     _DEBUG
-    PX_ENABLE_ASSERTS
-    $<$<BOOL:${OWDS_USE_PHYSX}>:OWDS_USE_PHYSX>)
+    PX_ENABLE_ASSERTS)
 target_link_libraries(overworld_physics PUBLIC overworld_engine_common)
 
-if(OWDS_USE_PHYSX)
-    target_link_libraries(overworld_physics
-        PUBLIC
-        PhysX
-        PhysXCommon
-        PhysXCooking
-        PhysXExtensions
-        PhysXFoundation
-        PhysXPvdSDK
-        cuda)
-else()
-    target_include_directories(overworld_physics PUBLIC ${BULLET_INCLUDE_DIR})
-    target_link_libraries(overworld_physics PUBLIC ${BULLET_LIBRARIES})
-endif()
+
+target_link_libraries(overworld_physics
+    PUBLIC
+    PhysX
+    PhysXCommon
+    PhysXCooking
+    PhysXExtensions
+    PhysXFoundation
+    PhysXPvdSDK
+    cuda)
 
 owds_add_ros_library(overworld_types_lib
     src/Geometry/Pose.cpp
