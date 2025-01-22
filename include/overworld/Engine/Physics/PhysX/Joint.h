@@ -14,7 +14,7 @@ namespace owds::physx {
   public:
     Joint(owds::physx::Context& ctx,
           ::physx::PxArticulationJointReducedCoordinate* px_joint,
-          urdf::JointType_e type, int axis);
+          urdf::JointType_e type, int axis, int direction = 1);
 
     ~Joint() noexcept override = default;
 

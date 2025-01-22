@@ -10,7 +10,7 @@ namespace owds {
   class Joint
   {
   protected:
-    Joint(urdf::JointType_e type, int axis);
+    Joint(urdf::JointType_e type, int axis, int direction = 1);
 
   public:
     virtual ~Joint() noexcept = default;
@@ -25,6 +25,7 @@ namespace owds {
     const std::size_t unique_id_{};
     urdf::JointType_e type_;
     int axis_; // 0 = x, 1 = y, 2 = z
+    int direction_; // 1 or -1
     bool has_limits_;
     double limit_low_;
     double limit_high_;

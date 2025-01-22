@@ -93,6 +93,7 @@ namespace owds::physx {
     px_joints_[joint.name] = px_joint;
 
     ::physx::PxArticulationAxis::Enum axis(::physx::PxArticulationAxis::eCOUNT);
+    int direction = joint.axis[0] + joint.axis[1] + joint.axis[2];
     switch(joint.type)
     {
     case urdf::JointType_e::joint_revolute:
@@ -123,13 +124,14 @@ namespace owds::physx {
     case urdf::JointType_e::joint_continuous:
       px_joint->setJointType(::physx::PxArticulationJointType::eREVOLUTE);
       if(joint.axis[0] != 0.)
-        px_joint->setMotion(::physx::PxArticulationAxis::eTWIST, ::physx::PxArticulationMotion::eFREE); // Unbounded rotation around twist axis
+        axis = ::physx::PxArticulationAxis::eTWIST;
       else if(joint.axis[1] != 0.)
-        px_joint->setMotion(::physx::PxArticulationAxis::eSWING1, ::physx::PxArticulationMotion::eFREE); // Unbounded rotation around swing1 axis
+        axis = ::physx::PxArticulationAxis::eSWING1;
       else if(joint.axis[2] != 0.)
-        px_joint->setMotion(::physx::PxArticulationAxis::eSWING2, ::physx::PxArticulationMotion::eFREE); // Unbounded rotation around swing2 axis
-      else
-        std::cout << "-----------> no axis set" << std::endl;
+        axis = ::physx::PxArticulationAxis::eSWING2;
+
+      if(axis != ::physx::PxArticulationAxis::eCOUNT)
+        px_joint->setMotion(axis, ::physx::PxArticulationMotion::eFREE); // Unbounded rotation
       break;
 
     case urdf::JointType_e::joint_prismatic:
@@ -192,7 +194,7 @@ namespace owds::physx {
       else if((axis == ::physx::PxArticulationAxis::eZ) || (axis == ::physx::PxArticulationAxis::eSWING2))
         int_axis = 2;
 
-      joints_[joint.name] = new ::owds::physx::Joint(ctx_, px_joint, joint.type, int_axis);
+      joints_[joint.name] = new ::owds::physx::Joint(ctx_, px_joint, joint.type, int_axis, direction);
     }
     ctx_.physx_mutex_.unlock();
   }

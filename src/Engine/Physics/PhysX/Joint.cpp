@@ -12,10 +12,11 @@ namespace owds::physx {
 
   Joint::Joint(owds::physx::Context& ctx,
                ::physx::PxArticulationJointReducedCoordinate* px_joint,
-               urdf::JointType_e type, int axis) : owds::Joint(type, axis),
-                                                   ctx_(ctx),
-                                                   px_axis_(::physx::PxArticulationAxis::eCOUNT),
-                                                   px_base_(px_joint)
+               urdf::JointType_e type, int axis,
+               int direction) : owds::Joint(type, axis, direction),
+                                ctx_(ctx),
+                                px_axis_(::physx::PxArticulationAxis::eCOUNT),
+                                px_base_(px_joint)
   {
     switch(type_)
     {
@@ -47,7 +48,7 @@ namespace owds::physx {
     ctx_.physx_mutex_.lock();
     assert(type_ != urdf::JointType_e::joint_fixed && "[Joint] fixed joint cannot be moved");
     if(px_axis_ != ::physx::PxArticulationAxis::eCOUNT)
-      px_base_->setJointPosition(px_axis_, position);
+      px_base_->setJointPosition(px_axis_, std::fmod(direction_ * position, M_PI * 2));
     else
       assert(false && "[Joint floating and planar joints are not yet supported]");
     ctx_.physx_mutex_.unlock();
