@@ -79,14 +79,14 @@ namespace owds {
       {
         onto->feeder.addInheritage(color_name, "Color");
         if(rgb_value.empty() == false)
-          onto->feeder.addProperty(color_name, "hexRgbValue", "hexrbg", rgb_value);
+          onto->feeder.addRelation(color_name, "hexRgbValue", "hexrbg", rgb_value);
         onto->feeder.waitUpdate(1000);
       }
     }
 
     void addColorToEntity(onto::OntologyManipulator* onto, const std::string& indiv_name, const std::string& color_name)
     {
-      onto->feeder.addProperty(indiv_name, "hasColor", color_name);
+      onto->feeder.addRelation(indiv_name, "hasColor", color_name);
       onto->feeder.waitUpdate(1000);
     }
 
