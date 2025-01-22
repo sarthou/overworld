@@ -4,6 +4,11 @@
 #include "overworld/BasicTypes/Entity.h"
 #include "overworld/BasicTypes/PointOfInterest.h"
 
+#include <unordered_map>
+#include <array>
+#include <string>
+#include <vector>
+
 namespace owds {
 
   class Hand;
