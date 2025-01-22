@@ -61,19 +61,20 @@ namespace owds {
     void setElevationAndAzimuth(float elevation, float azimuth)
     {
       float x = std::cos(elevation) * std::sin(azimuth);
-      float y = std::cos(elevation) * std::cos(azimuth);
+      float y = -(std::cos(elevation) * std::cos(azimuth));
       float z = std::sin(elevation);
-      setDirection(glm::vec3(y, -x, -z));
+      setDirection(glm::vec3(-y, -x, -z));
 
-      if(z < 0)
+      auto night_color = glm::vec4(0.11, 0.15f, 0.31f, 1.f);
+      if(z < -1)
       {
         diffuse_strength_ = 0.;
         specular_strength_ = 0.;
-        color_ = glm::vec4(0.11, 0.15f, 0.31f, 1.f);
+        color_ = night_color;
       }
-      else if(z < 1.)
+      else if(z < 0.)
       {
-        auto night_color = glm::vec4(0.11, 0.15f, 0.31f, 1.f);
+        z = z+1;
         color_ = z * color_ + night_color * (1.f - z);
         diffuse_strength_ = z;
         specular_strength_ = z;

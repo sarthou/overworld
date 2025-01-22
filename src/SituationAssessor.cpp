@@ -42,6 +42,11 @@ namespace owds {
   {
     engine_ = new Engine(agent_name_, window);
     engine_->initView();
+
+    engine_->world.setAmbientLight({43.6f, 1.43f, 115.f},
+                                    {1.0f, 0.976f, 0.898f},
+                                    0.25, 0.4, 0.8);
+
     // we could insert this in the world there if needed
     engine_->finalise();
   }

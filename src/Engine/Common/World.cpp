@@ -341,13 +341,13 @@ namespace owds {
 
   /* LIGHTS */
 
-  void World::setAmbientLight(const std::array<float, 3>& direction,
+  void World::setAmbientLight(const std::array<float, 3>& lat_long_alt,
                               const std::array<float, 3>& color,
                               float ambient_strength,
                               float diffuse_strength,
                               float specular_strength)
   {
-    ambient_light_ = AmbientLight(direction,
+    ambient_light_ = AmbientLight(lat_long_alt,
                                   glm::vec3(color[0], color[1], color[2]),
                                   ambient_strength, diffuse_strength, specular_strength);
   }

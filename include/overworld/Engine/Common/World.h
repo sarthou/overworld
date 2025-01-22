@@ -115,7 +115,7 @@ namespace owds {
 
     /* LIGHTS */
 
-    void setAmbientLight(const std::array<float, 3>& direction,
+    void setAmbientLight(const std::array<float, 3>& lat_long_alt,
                          const std::array<float, 3>& color = {1.0, 1.0, 1.0},
                          float ambient_strength = 1.0f,
                          float diffuse_strength = 1.0f,
