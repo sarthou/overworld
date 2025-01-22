@@ -136,9 +136,9 @@ endfunction(owds_install_executables)
 include(cmake/BuildCommon.cmake)
 
 catkin_package(
-    INCLUDE_DIRS include
+    INCLUDE_DIRS include External/include
 
-    # LIBRARIES mementar_lib
+    LIBRARIES overworld_perception_lib overworld_graphics overworld_sender_lib overworld_facts_lib
     CATKIN_DEPENDS roscpp std_msgs ontologenius
     DEPENDS TinyXML OpenCV
 )
