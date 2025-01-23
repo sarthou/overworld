@@ -10,17 +10,17 @@ namespace owds {
 
   namespace ontology {
 
-    std::array<double, 3> getEntityColor(onto::OntologyManipulator* onto, const std::string& indiv_name, const std::array<double, 3>& default_value)
+    std::array<double, 4> getEntityColor(onto::OntologyManipulator* onto, const std::string& indiv_name, const std::array<double, 4>& default_value)
     {
       auto color = onto->individuals.getOn(indiv_name, "hasColor");
-      if(color.size() != 0)
+      if(color.empty() == false)
       {
         auto hex_value = onto->individuals.getOn(color.front(), "hexRgbValue");
-        if(hex_value.size())
+        if(hex_value.empty() == false)
         {
           unsigned int hex = 0;
-          sscanf(hex_value[0].substr(hex_value[0].find("#") + 1).c_str(), "%x", &hex);
-          return {((hex >> 16) & 0xff) / 255., ((hex >> 8) & 0xff) / 255., (hex & 0xff) / 255.};
+          sscanf(hex_value[0].substr(hex_value[0].find('#') + 1).c_str(), "%x", &hex);
+          return {((hex >> 16) & 0xff) / 255., ((hex >> 8) & 0xff) / 255., (hex & 0xff) / 255., 1.0};
         }
       }
 

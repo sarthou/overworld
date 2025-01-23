@@ -3,6 +3,7 @@
 #include <pluginlib/class_list_macros.h>
 #include <ros/package.h>
 #include <string>
+#include <array>
 
 #include "overworld/Utils/YamlReader.h"
 
@@ -44,7 +45,7 @@ namespace owds {
                                                 const std::string& colision_mesh,
                                                 const std::array<double, 3>& translation,
                                                 const std::array<double, 3>& rotation,
-                                                const std::array<double, 3>& color,
+                                                const std::array<double, 4>& color,
                                                 const std::string& texture)
   {
     Percept<Object> obj(name);
