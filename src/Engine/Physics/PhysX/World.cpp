@@ -49,7 +49,6 @@ namespace owds::physx {
                             const std::array<double, 4>& orientation)
   {
     owds::physx::Actor* actor = new owds::physx::DynamicActor(*ctx_, collision_shape, visual_shapes);
-
     actor->setup(position, orientation);
     actors_.emplace(actor->unique_id_, actor);
 

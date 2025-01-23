@@ -6,6 +6,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <array>
 
 #include "overworld/BasicTypes/Agent.h"
 #include "overworld/BasicTypes/Entity.h"
@@ -268,7 +269,7 @@ namespace owds {
     if(visual_geom.type != urdf::geometry_none)
     {
       auto shape_color = entity->getShape().color;
-      std::array<float, 3> color{(float)shape_color[0], (float)shape_color[1], (float)shape_color[2]};
+      std::array<float, 4> color{(float)shape_color[0], (float)shape_color[1], (float)shape_color[2], (float)shape_color[3]};
       visual_geom.material.diffuse_color_ = color;
       visual_geom.material.specular_color_ = color;
       visual_geom.material.diffuse_texture_ = entity->getShape().texture;
