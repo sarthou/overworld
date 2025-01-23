@@ -2,6 +2,7 @@
 
 #include <array>
 #include <cassert>
+#include <cstddef>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/euler_angles.hpp>
 #include <iostream>
@@ -60,14 +61,13 @@ namespace owds::physx {
   void LinkActor::setPhysicsEnabled(bool enabled)
   {
     (void)enabled;
-    assert(false && "LinkActor cannot enabled the physics. Use setSimulationEnabled instead.");
+    assert(false && "LinkActor cannot enabled the physics.");
   }
 
   void LinkActor::setSimulationEnabled(bool enabled)
   {
-    ctx_.physx_mutex_.lock();
-    px_link_->setActorFlag(::physx::PxActorFlag::eDISABLE_SIMULATION, !enabled);
-    ctx_.physx_mutex_.unlock();
+    (void)enabled;
+    assert(false && "LinkActor cannot enabled simulation.");
   }
 
   void LinkActor::remove()
