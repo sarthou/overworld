@@ -44,6 +44,7 @@ namespace owds::physx {
     ctx_.physx_mutex_.lock();
     ctx_.px_scene_->addArticulation(*px_articulation_);
     px_articulation_->setArticulationFlag(::physx::PxArticulationFlag::eDISABLE_SELF_COLLISION, true);
+    px_articulation_->setArticulationFlag(::physx::PxArticulationFlag::eFIX_BASE, true);
     ctx_.physx_mutex_.unlock();
 
     setPhysicsEnabled(false);
@@ -111,8 +112,16 @@ namespace owds::physx {
         {
           px_joint->setMotion(axis, ::physx::PxArticulationMotion::eLIMITED);
           ::physx::PxArticulationLimit limit;
-          limit.low = joint.limit.first;
-          limit.high = joint.limit.second;
+          if(direction > 0)
+          {
+            limit.low = joint.limit.first;
+            limit.high = joint.limit.second;
+          }
+          else
+          {
+            limit.high = -joint.limit.first;
+            limit.low = -joint.limit.second;
+          }
           px_joint->setLimitParams(axis, limit);
         }
         else
@@ -149,8 +158,16 @@ namespace owds::physx {
         {
           px_joint->setMotion(axis, ::physx::PxArticulationMotion::eLIMITED);
           ::physx::PxArticulationLimit limit;
-          limit.low = joint.limit.first;
-          limit.high = joint.limit.second;
+          if(direction > 0)
+          {
+            limit.low = joint.limit.first;
+            limit.high = joint.limit.second;
+          }
+          else
+          {
+            limit.high = -joint.limit.first;
+            limit.low = -joint.limit.second;
+          }
           px_joint->setLimitParams(axis, limit);
         }
         else
