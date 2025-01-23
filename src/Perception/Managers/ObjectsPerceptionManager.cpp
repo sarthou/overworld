@@ -191,7 +191,8 @@ namespace owds {
         if(percept.second->hasBeenSeen())
         {
           stopSimulation(it->second);
-          updateEntityPose(it->second, percept.second->pose(), percept.second->lastStamp());
+          if(percept.second->isLocated())
+            updateEntityPose(it->second, percept.second->pose(), percept.second->lastStamp());
         }
         else if(it->second->isLocated())
           it->second->updatePose(it->second->pose(), ros::Time::now());

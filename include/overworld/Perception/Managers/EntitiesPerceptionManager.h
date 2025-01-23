@@ -75,8 +75,7 @@ namespace owds {
       delete entity.second;
     entities_.clear();
 
-    if(onto_ != nullptr)
-      delete onto_;
+    delete onto_;
   }
 
   template<typename T>

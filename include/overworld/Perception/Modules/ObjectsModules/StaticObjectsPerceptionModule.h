@@ -12,8 +12,8 @@ namespace owds {
   public:
     StaticObjectsPerceptionModule();
 
-    virtual void setParameter(const std::string& parameter_name, const std::string& parameter_value) override;
-    virtual bool closeInitialization() override;
+    void setParameter(const std::string& parameter_name, const std::string& parameter_value) override;
+    bool closeInitialization() override;
 
   private:
     onto::OntologiesManipulator* ontologies_manipulator_;

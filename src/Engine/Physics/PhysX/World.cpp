@@ -175,8 +175,8 @@ namespace owds::physx {
                       size_t ray_index,
                       std::vector<RaycastHitResult_t>& results)
   {
-    ::physx::PxVec3 origin_vec(origin[0], origin[1], origin[2]);
-    ::physx::PxVec3 destination_vec(destination[0], destination[1], destination[2]);
+    ::physx::PxVec3 origin_vec((float)origin[0], (float)origin[1], (float)origin[2]);
+    ::physx::PxVec3 destination_vec((float)destination[0], (float)destination[1], (float)destination[2]);
 
     ::physx::PxVec3 direction = destination_vec - origin_vec;
     ::physx::PxVec3 unit_dir = direction.getNormalized();
