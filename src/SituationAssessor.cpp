@@ -206,6 +206,8 @@ namespace owds {
 
           perception_manager_.objects_manager_.updateSimulatedPoses();
         }
+        else
+          engine_->world.stepSimulation(time_step_); // TODO handle that correctly (in case of overtime)
 
         if(next_start_time < std::chrono::high_resolution_clock::now())
         {
