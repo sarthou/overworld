@@ -44,7 +44,9 @@ namespace owds {
     void geometricReasoning();
     void reasoningOnUpdate() override;
 
-    std::map<std::string, Object*> simulatePhysics(const std::map<std::string, Object*>& objects, const std::map<std::string, Object*>& to_simulate_objetcs);
+    std::map<std::string, Object*> simulatePhysics(const std::map<std::string, Object*>& objects,
+                                                   const std::map<std::string, Object*>& objects_to_simulate_lost,
+                                                   const std::map<std::string, Object*>& objects_to_simulate_oclusion);
     void startSimulation(Object* object);
     void stopSimulation(Object* object, bool erase = true);
 

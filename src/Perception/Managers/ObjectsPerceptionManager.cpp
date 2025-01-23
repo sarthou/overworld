@@ -1,5 +1,11 @@
 #include "overworld/Perception/Managers/ObjectsPerceptionManager.h"
 
+#include <array>
+#include <string>
+#include <vector>
+#include <map>
+#include <cstddef>
+
 #include "overworld/BasicTypes/Hand.h"
 
 #define TO_HALF_RAD M_PI / 180. / 2.
@@ -149,7 +155,7 @@ namespace owds {
     }
     else if(entity->isInHand())
     {
-      auto hand = entity->getHandIn();
+      auto* hand = entity->getHandIn();
       if(percept->hasBeenSeen() && hand->pose().distanceTo(percept->pose()) >= IN_HAND_DISTANCE)
       {
         hand->removeFromHand(entity->id());
@@ -204,10 +210,11 @@ namespace owds {
   {
     updateAabbs();
 
-    std::map<std::string, std::set<Sensor*>> object__sensors_set; // map of the object and the sensors associated to module without poi
+    std::map<std::string, std::set<Sensor*>> object_sensors_set; // map of the object and the sensors associated to module without poi
     std::map<std::string, Object*> no_data_objects;
     std::map<std::string, Object*> objects_to_remove;
-    std::map<std::string, Object*> objects_to_simulate;
+    std::map<std::string, Object*> objects_to_simulate_lost;
+    std::map<std::string, Object*> objects_to_simulate_oclusion;
 
     for(auto& object : entities_)
     {
@@ -219,24 +226,25 @@ namespace owds {
           lost_objects_nb_frames_.erase(object.first);
         continue;
       }
+
       auto it = entities_percetion_register_.find(object.first);
       if(it == entities_percetion_register_.end())
         continue;
-      for(auto& pair_sensor__set_modules : it->second)
+      for(auto& pair_sensor_set_modules : it->second)
       {
         object_is_consider_with_no_poi = false;
 
         if(can_pass_to_the_next_object)
           break;
 
-        for(auto& module_name : pair_sensor__set_modules.second)
+        for(auto& module_name : pair_sensor_set_modules.second)
         {
           if(object.second->getPointsOfInterest(module_name).size() != 0)
           {
-            auto pois_in_fov = getPoisInFov(object.second, myself_agent_->getSensor(pair_sensor__set_modules.first), module_name);
-            if(pois_in_fov.size() != 0)
+            auto pois_in_fov = getPoisInFov(object.second, myself_agent_->getSensor(pair_sensor_set_modules.first), module_name);
+            if(pois_in_fov.empty() == false)
             {
-              if(shouldBeSeen(object.second, myself_agent_->getSensor(pair_sensor__set_modules.first), pois_in_fov))
+              if(shouldBeSeen(object.second, myself_agent_->getSensor(pair_sensor_set_modules.first), pois_in_fov))
               {
                 auto it_unseen = lost_objects_nb_frames_.find(object.first);
                 if(it_unseen == lost_objects_nb_frames_.end())
@@ -246,7 +254,7 @@ namespace owds {
                 if(it_unseen->second > MAX_UNSEEN)
                 {
                   objects_to_remove.emplace(object.first, object.second);
-                  objects_to_simulate.erase(object.first);
+                  objects_to_simulate_lost.erase(object.first);
                   no_data_objects.erase(object.first);
                   can_pass_to_the_next_object = true;
                   break;
@@ -254,7 +262,7 @@ namespace owds {
               }
               else
               {
-                objects_to_simulate.emplace(object.first, object.second);
+                objects_to_simulate_oclusion.emplace(object.first, object.second);
                 no_data_objects.erase(object.first);
               }
             } // object with pois but none in the fov
@@ -270,11 +278,11 @@ namespace owds {
         if(object_is_consider_with_no_poi)
         {
           no_data_objects.emplace(object.first, object.second);
-          auto it = object__sensors_set.find(object.first);
-          if(it == object__sensors_set.end())
-            object__sensors_set.emplace(object.first, std::set<Sensor*>{myself_agent_->getSensor(pair_sensor__set_modules.first)});
+          auto it = object_sensors_set.find(object.first);
+          if(it == object_sensors_set.end())
+            object_sensors_set.emplace(object.first, std::set<Sensor*>{myself_agent_->getSensor(pair_sensor_set_modules.first)});
           else
-            it->second.emplace(myself_agent_->getSensor(pair_sensor__set_modules.first));
+            it->second.emplace(myself_agent_->getSensor(pair_sensor_set_modules.first));
         }
       }
     }
@@ -284,7 +292,7 @@ namespace owds {
       std::unordered_set<Sensor*> used_sensors;
       for(auto no_data_obj : no_data_objects)
       {
-        auto sensor_set = object__sensors_set.find(no_data_obj.first);
+        auto sensor_set = object_sensors_set.find(no_data_obj.first);
         for(auto sensor : sensor_set->second)
           used_sensors.insert(sensor);
       }
@@ -309,7 +317,7 @@ namespace owds {
 
       for(auto no_data_obj : no_data_objects)
       {
-        auto sensor_set = object__sensors_set.find(no_data_obj.first);
+        auto sensor_set = object_sensors_set.find(no_data_obj.first);
         for(auto sensor : sensor_set->second)
         {
           if((sensor != nullptr) && (sensor->isLocated()) &&
@@ -324,25 +332,27 @@ namespace owds {
             if(it_unseen->second > MAX_UNSEEN)
             {
               objects_to_remove.emplace(no_data_obj.first, no_data_obj.second);
-              objects_to_simulate.erase(no_data_obj.first);
+              objects_to_simulate_lost.erase(no_data_obj.first);
               break;
             }
           }
           else // there is the case where one told to simulate and the next one says to remove, we wait the end of the loop to be sure
-            objects_to_simulate.emplace(no_data_obj.first, no_data_obj.second);
+            objects_to_simulate_lost.emplace(no_data_obj.first, no_data_obj.second);
         }
       }
     }
 
     // From there, objects to be removed are in the agent Fov but we don't have
     // any information about them neither any explanation
-    objects_to_remove = simulatePhysics(objects_to_remove, objects_to_simulate);
+    objects_to_remove = simulatePhysics(objects_to_remove, objects_to_simulate_lost, objects_to_simulate_oclusion);
 
     for(auto obj : objects_to_remove)
       removeEntityPose(obj.second);
   }
 
-  std::map<std::string, Object*> ObjectsPerceptionManager::simulatePhysics(const std::map<std::string, Object*>& lost_objects, const std::map<std::string, Object*>& to_simulate_objetcs)
+  std::map<std::string, Object*> ObjectsPerceptionManager::simulatePhysics(const std::map<std::string, Object*>& lost_objects,
+                                                                           const std::map<std::string, Object*>& objects_to_simulate_lost,
+                                                                           const std::map<std::string, Object*>& objects_to_simulate_oclusion)
   {
     if(simulate_)
     {
@@ -356,7 +366,14 @@ namespace owds {
           startSimulation(object.second);
       }
 
-      for(auto& object : to_simulate_objetcs)
+      for(auto& object : objects_to_simulate_lost)
+      {
+        auto it = simulated_objects_.find(object.first);
+        if(it == simulated_objects_.end())
+          startSimulation(object.second);
+      }
+
+      for(auto& object : objects_to_simulate_oclusion)
       {
         auto it = simulated_objects_.find(object.first);
         if(it == simulated_objects_.end())
@@ -389,7 +406,7 @@ namespace owds {
     else
     {
       std::map<std::string, Object*> objects_to_remove = lost_objects;
-      objects_to_remove.insert(to_simulate_objetcs.begin(), to_simulate_objetcs.end());
+      objects_to_remove.insert(objects_to_simulate_lost.begin(), objects_to_simulate_lost.end());
       return objects_to_remove;
     }
   }
@@ -497,13 +514,13 @@ namespace owds {
       }
       auto ray_cast_info = world_client_->raycasts(from_poses, to_poses, sensor->getFieldOfView().getClipFar());
 
-      if(ray_cast_info.size() == 0)
+      if(ray_cast_info.empty())
         return true;
       else
       {
         for(auto& info : ray_cast_info)
         {
-          if(info.body_id != object->worldId())
+          if(info.actor_id != object->worldId())
             return false;
         }
         return true;
