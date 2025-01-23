@@ -1,5 +1,8 @@
 #include "overworld/Perception/Managers/AreasPerceptionManager.h"
 
+#include <string>
+#include <array>
+
 #define CIRCLE_STEPS 10
 
 namespace owds {
@@ -111,7 +114,7 @@ namespace owds {
 
   void AreasPerceptionManager::addPolygonToBullet(Area* area)
   {
-    std::array<float, 3> color = {1, 0, 0};
+    std::array<double, 3> color = {1, 0, 0};
     int owner_id = -1;
     int owner_link_id = -1;
     if(area->isStatic() == false)
@@ -128,15 +131,15 @@ namespace owds {
     float mean_x = 0;
     float mean_y = 0;
 
-    std::vector<std::array<float, 3>> positions;
+    std::vector<std::array<double, 3>> positions;
     std::vector<unsigned int> indices; // min pair, max impair
     positions.reserve(polygon_points.size() * 2);
     indices.reserve(polygon_points.size() * 6);
 
     for(size_t i = 0; i < polygon_points.size(); i++)
     {
-      positions.push_back({(float)polygon_points[i].x, (float)polygon_points[i].y, z_min});
-      positions.push_back({(float)polygon_points[i].x, (float)polygon_points[i].y, z_max});
+      positions.push_back({polygon_points[i].x, polygon_points[i].y, (double)z_min});
+      positions.push_back({polygon_points[i].x, polygon_points[i].y, (double)z_max});
 
       indices.emplace_back(i * 2);
       indices.emplace_back(i * 2 + 1);
@@ -169,7 +172,7 @@ namespace owds {
 
   void AreasPerceptionManager::addCircleToBullet(Area* area)
   {
-    std::array<float, 3> color = {1, 0, 0};
+    std::array<double, 3> color = {1, 0, 0};
     int owner_id = -1;
     int owner_link_id = -1;
     if(area->isStatic() == false)
@@ -188,7 +191,7 @@ namespace owds {
     float x_center = area->getCenterPose().getX();
     float y_center = area->getCenterPose().getY();
 
-    std::vector<std::array<float, 3>> positions;
+    std::vector<std::array<double, 3>> positions;
     std::vector<unsigned int> indices; // min pair, max impair
     positions.reserve(CIRCLE_STEPS * 2);
     indices.reserve(CIRCLE_STEPS * 6);
@@ -196,11 +199,11 @@ namespace owds {
     for(size_t i = 0; i < CIRCLE_STEPS; i++)
     {
       float angle = i * angle_step;
-      float x = x_center + radius * std::cos(angle);
-      float y = y_center + radius * std::sin(angle);
+      double x = x_center + radius * std::cos(angle);
+      double y = y_center + radius * std::sin(angle);
 
-      positions.push_back({x, y, z_min});
-      positions.push_back({x, y, z_max});
+      positions.push_back({x, y, (double)z_min});
+      positions.push_back({x, y, (double)z_max});
 
       indices.emplace_back(i * 2);
       indices.emplace_back(i * 2 + 1);

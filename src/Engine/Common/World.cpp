@@ -407,7 +407,7 @@ namespace owds {
   int World::addDebugText(const std::string& text,
                           const std::array<float, 3>& position,
                           float height,
-                          const std::array<float, 3>& color,
+                          const std::array<double, 3>& color,
                           bool centered,
                           double life_time,
                           int replace_id,
@@ -462,9 +462,9 @@ namespace owds {
       debug_texts_[id].text = "";
   }
 
-  int World::addDebugLine(const std::array<float, 3>& position_from,
-                          const std::array<float, 3>& position_to,
-                          const std::array<float, 3>& color,
+  int World::addDebugLine(const std::array<double, 3>& position_from,
+                          const std::array<double, 3>& position_to,
+                          const std::array<double, 3>& color,
                           double life_time,
                           int replace_id,
                           int body_id,
@@ -476,9 +476,9 @@ namespace owds {
                         body_id, link_index);
   }
 
-  int World::addDebugLine(const std::vector<std::array<float, 3>>& vertices,
+  int World::addDebugLine(const std::vector<std::array<double, 3>>& vertices,
                           const std::vector<unsigned int>& indices,
-                          const std::array<float, 3>& color,
+                          const std::array<double, 3>& color,
                           double life_time,
                           int replace_id,
                           int body_id,
