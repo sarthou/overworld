@@ -65,8 +65,9 @@ namespace owds::physx {
   void DynamicActor::setPhysicsEnabled(bool enabled)
   {
     ctx_.physx_mutex_.lock();
-    px_actor_->setRigidBodyFlag(::physx::PxRigidBodyFlag::eKINEMATIC, !enabled);
-    is_kinematic_ = !enabled;
+    px_actor_->setRigidBodyFlag(::physx::PxRigidBodyFlag::eKINEMATIC, enabled);
+    px_actor_->setActorFlag(::physx::PxActorFlag::eDISABLE_SIMULATION, !enabled);
+    is_kinematic_ = enabled;
     ctx_.physx_mutex_.unlock();
   }
 
