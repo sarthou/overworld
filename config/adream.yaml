@@ -1,3 +1,6 @@
+include:
+  - package://overworld/config/adream_visual.yaml
+
 adream_walls:
   orientation:
     z: 1.57

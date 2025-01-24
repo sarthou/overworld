@@ -32,7 +32,13 @@ namespace owds {
     void addObject(const std::string& name,
                    const std::array<double, 3>& translation,
                    const std::array<double, 3>& rotation,
-                  const std::array<double,3>& scale);
+                   const std::array<double,3>& scale);
+
+    void addVisual(const std::string& name,
+                   const std::string& mesh,
+                   const std::array<double, 3>& translation,
+                   const std::array<double, 3>& rotation,
+                   const std::array<double,3>& scale);
 
     bool readConfiguration(std::string path);
   };
