@@ -213,7 +213,6 @@ namespace owds {
     std::map<std::string, std::set<Sensor*>> object_sensors_set; // map of the object and the sensors associated to module without poi
     std::map<std::string, Object*> no_data_objects;
     std::map<std::string, Object*> objects_to_remove;
-    std::map<std::string, Object*> objects_to_simulate_lost;
     std::map<std::string, Object*> objects_to_simulate_oclusion;
 
     for(auto& object : entities_)
@@ -254,7 +253,7 @@ namespace owds {
                 if(it_unseen->second > MAX_UNSEEN)
                 {
                   objects_to_remove.emplace(object.first, object.second);
-                  objects_to_simulate_lost.erase(object.first);
+                  objects_to_simulate_oclusion.erase(object.first);
                   no_data_objects.erase(object.first);
                   can_pass_to_the_next_object = true;
                   break;
@@ -332,26 +331,25 @@ namespace owds {
             if(it_unseen->second > MAX_UNSEEN)
             {
               objects_to_remove.emplace(no_data_obj.first, no_data_obj.second);
-              objects_to_simulate_lost.erase(no_data_obj.first);
+              objects_to_simulate_oclusion.erase(no_data_obj.first);
               break;
             }
           }
           else // there is the case where one told to simulate and the next one says to remove, we wait the end of the loop to be sure
-            objects_to_simulate_lost.emplace(no_data_obj.first, no_data_obj.second);
+            objects_to_simulate_oclusion.emplace(no_data_obj.first, no_data_obj.second);
         }
       }
     }
 
     // From there, objects to be removed are in the agent Fov but we don't have
     // any information about them neither any explanation
-    objects_to_remove = simulatePhysics(objects_to_remove, objects_to_simulate_lost, objects_to_simulate_oclusion);
+    objects_to_remove = simulatePhysics(objects_to_remove, objects_to_simulate_oclusion);
 
     for(auto obj : objects_to_remove)
       removeEntityPose(obj.second);
   }
 
   std::map<std::string, Object*> ObjectsPerceptionManager::simulatePhysics(const std::map<std::string, Object*>& lost_objects,
-                                                                           const std::map<std::string, Object*>& objects_to_simulate_lost,
                                                                            const std::map<std::string, Object*>& objects_to_simulate_oclusion)
   {
     if(simulate_)
@@ -361,13 +359,6 @@ namespace owds {
       for(auto& object : lost_objects)
       {
         lost_ids.insert(object.first);
-        auto it = simulated_objects_.find(object.first);
-        if(it == simulated_objects_.end())
-          startSimulation(object.second);
-      }
-
-      for(auto& object : objects_to_simulate_lost)
-      {
         auto it = simulated_objects_.find(object.first);
         if(it == simulated_objects_.end())
           startSimulation(object.second);
@@ -404,11 +395,7 @@ namespace owds {
       return objects_to_remove;
     }
     else
-    {
-      std::map<std::string, Object*> objects_to_remove = lost_objects;
-      objects_to_remove.insert(objects_to_simulate_lost.begin(), objects_to_simulate_lost.end());
-      return objects_to_remove;
-    }
+      return lost_objects;
   }
 
   void ObjectsPerceptionManager::startSimulation(Object* object)
