@@ -136,9 +136,9 @@ namespace owds {
 
   void SituationAssessor::run()
   {
+    run_ = true;
     std::thread render_thread(&SituationAssessor::rosLoop, this);
     std::thread assessment_thread(&SituationAssessor::assessmentLoop, this);
-    run_ = true;
 
     engine_->run();
 
