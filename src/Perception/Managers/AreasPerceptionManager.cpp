@@ -55,6 +55,7 @@ namespace owds {
 
   void AreasPerceptionManager::getPercepts(const std::string& module_name, std::map<std::string, Percept<Area>>& percepts)
   {
+    (void)module_name;
     for(auto& percept : percepts)
     {
       auto it = areas_.find(percept.second.id());

@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <thread>
+#include <string>
 
 #include "overworld/Perception/Modules/AreasModules/AreasEmulatedPerceptionModule.h"
 #include "overworld/Perception/Modules/HumansModules/HumansEmulatedPerceptionModule.h"
@@ -22,20 +23,18 @@ namespace owds {
                                                         simulate_(simulate),
                                                         time_step_(1.0 / assessment_frequency),
                                                         simu_step_(1.0 / simulation_frequency),
-                                                        facts_publisher_(agent_name),
-                                                        perception_manager_(&n_)
+                                                        perception_manager_(&n_),
+                                                        facts_publisher_(agent_name)
+                                                        
   {
     n_.setCallbackQueue(&callback_queue_);
   }
 
   SituationAssessor::~SituationAssessor()
   {
-    if(ros_sender_ != nullptr)
-      delete ros_sender_;
-    if(objetcs_pose_sender_ != nullptr)
-      delete objetcs_pose_sender_;
-    if(engine_ != nullptr)
-      delete engine_;
+    delete ros_sender_;
+    delete objetcs_pose_sender_;
+    delete engine_;
   }
 
   void SituationAssessor::initWorld(Window* window)

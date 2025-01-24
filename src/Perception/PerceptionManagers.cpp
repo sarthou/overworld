@@ -3,13 +3,11 @@
 #include <pluginlib/class_loader.h>
 
 #include "overworld/Utils/ShellDisplay.h"
+#include "overworld/Engine/Engine.h"
 
 namespace owds {
 
-  PerceptionManagers::PerceptionManagers(ros::NodeHandle* n, WorldEngine* world_client) : robots_manager_(n),
-                                                                                          objects_manager_(n),
-                                                                                          humans_manager_(n),
-                                                                                          n_(n),
+  PerceptionManagers::PerceptionManagers(ros::NodeHandle* n, WorldEngine* world_client) : n_(n),
                                                                                           world_client_(world_client),
                                                                                           robot_engine_id_(-1),
                                                                                           robot_agent_(nullptr)

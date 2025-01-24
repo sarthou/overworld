@@ -502,10 +502,6 @@ namespace owds {
 
   void ObjectsPerceptionManager::mergeFalseIdData()
   {
-    double direction_similarity_threshold = 0;
-    double speed_difference_threshold = 5;
-    int times_seen_difference_threshold = 20;
-
     std::unordered_set<std::string> merged;
 
     for(auto& false_id : false_ids_to_be_merged_)

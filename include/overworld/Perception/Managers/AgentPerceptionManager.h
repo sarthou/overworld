@@ -10,7 +10,7 @@ namespace owds {
   class AgentPerceptionManager : public EntitiesPerceptionManager<BodyPart>
   {
   public:
-    explicit AgentPerceptionManager(ros::NodeHandle* nh) : EntitiesPerceptionManager(nh) {}
+    AgentPerceptionManager() = default;
     ~AgentPerceptionManager();
 
     std::map<std::string, Agent*> getAgents() const { return agents_; }

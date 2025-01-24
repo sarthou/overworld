@@ -27,7 +27,7 @@ namespace owds {
     static_assert(std::is_base_of<Entity, T>::value, "T must be derived from Entity");
 
   public:
-    explicit EntitiesPerceptionManager(ros::NodeHandle* nh) : world_client_(nullptr), onto_(nullptr) {}
+    explicit EntitiesPerceptionManager() : world_client_(nullptr), onto_(nullptr) {}
     virtual ~EntitiesPerceptionManager();
 
     void setOwnerAgentName(const std::string& agent_name);

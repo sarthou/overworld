@@ -10,7 +10,7 @@ namespace owds {
   class ObjectsPerceptionManager : public EntitiesPerceptionManager<Object>
   {
   public:
-    explicit ObjectsPerceptionManager(ros::NodeHandle* nh) : EntitiesPerceptionManager(nh), simulate_(false), myself_agent_(nullptr) {}
+    explicit ObjectsPerceptionManager() : simulate_(false), myself_agent_(nullptr) {}
 
     std::map<std::string, Object*> getEntities() const { return entities_; };
 
