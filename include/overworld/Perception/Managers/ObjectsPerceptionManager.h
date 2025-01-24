@@ -18,9 +18,6 @@ namespace owds {
     bool needSimulation() const { return simulated_objects_.size() != 0; }
     void updateSimulatedPoses();
 
-    void initLerp();
-    void stepLerp(double alpha);
-
     void setOwnerAgent(Agent* agent) { myself_agent_ = agent; }
 
   private:

@@ -22,7 +22,9 @@ namespace owds::physx {
     scene_desc.cpuDispatcher = shared_ctx_->px_dispatcher_.get();
     scene_desc.filterShader = ::physx::PxDefaultSimulationFilterShader;
     scene_desc.cudaContextManager = shared_ctx_->px_cuda_context_manager_.get();
-    scene_desc.flags |= ::physx::PxSceneFlag::eENABLE_GPU_DYNAMICS;
+    scene_desc.flags |= ::physx::PxSceneFlag::eENABLE_GPU_DYNAMICS |
+                        ::physx::PxSceneFlag::eENABLE_STABILIZATION |
+                        ::physx::PxSceneFlag::eENABLE_CCD;
     scene_desc.broadPhaseType = ::physx::PxBroadPhaseType::eGPU;
 
     px_scene_ = shared_ctx_->px_physics_->createScene(scene_desc);

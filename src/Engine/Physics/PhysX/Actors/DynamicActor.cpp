@@ -44,10 +44,14 @@ namespace owds::physx {
         *px_material_,
         false,
         ::physx::PxShapeFlag::eSCENE_QUERY_SHAPE | ::physx::PxShapeFlag::eSIMULATION_SHAPE));
+      px_shapes_.back()->setContactOffset(0.05); // default is 0.02
+      px_shapes_.back()->setRestOffset(0.0);    // default is 0.0
       px_actor_->attachShape(*px_shapes_.back());
     }
 
     px_actor_->setRigidBodyFlag(::physx::PxRigidBodyFlag::eENABLE_GYROSCOPIC_FORCES, true);
+    //px_actor_->setRigidBodyFlag(::physx::PxRigidBodyFlag::eENABLE_CCD, true);
+    px_actor_->setSolverIterationCounts(8, 4);
 
     ActorData_t* data = new ActorData_t();
     data->actor_id = unique_id_;
@@ -65,16 +69,18 @@ namespace owds::physx {
   void DynamicActor::setPhysicsEnabled(bool enabled)
   {
     ctx_.physx_mutex_.lock();
-    px_actor_->setRigidBodyFlag(::physx::PxRigidBodyFlag::eKINEMATIC, enabled);
-    px_actor_->setActorFlag(::physx::PxActorFlag::eDISABLE_SIMULATION, !enabled);
-    is_kinematic_ = enabled;
+    px_actor_->setRigidBodyFlag(::physx::PxRigidBodyFlag::eKINEMATIC, !enabled);
+    px_actor_->setActorFlag(::physx::PxActorFlag::eDISABLE_GRAVITY, !enabled);
+    is_kinematic_ = !enabled;
+    if(is_kinematic_ == false)
+      was_kinematic_ = false;
     ctx_.physx_mutex_.unlock();
   }
 
   void DynamicActor::setSimulationEnabled(bool enabled)
   {
     ctx_.physx_mutex_.lock();
-    px_actor_->setActorFlag(::physx::PxActorFlag::eDISABLE_SIMULATION, !enabled);
+    px_actor_->setActorFlag(::physx::PxActorFlag::eDISABLE_GRAVITY, !enabled);
     ctx_.physx_mutex_.unlock();
   }
 
@@ -107,10 +113,13 @@ namespace owds::physx {
           static_cast<::physx::PxReal>(orientation[3])));
 
     ctx_.physx_mutex_.lock();
-    if(is_kinematic_)
+    if(is_kinematic_ && was_kinematic_)
       px_actor_->setKinematicTarget(px_transform);
     else
+    {
       px_actor_->setGlobalPose(px_transform);
+      was_kinematic_ = is_kinematic_;
+    }
     ctx_.physx_mutex_.unlock();
   }
 

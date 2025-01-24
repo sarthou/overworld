@@ -25,38 +25,6 @@ namespace owds {
     }
   }
 
-  void ObjectsPerceptionManager::initLerp()
-  {
-    goal_poses_.clear();
-    for(auto& object : entities_)
-    {
-      if(object.second->isStatic() == false)
-      {
-        if(object.second->isLocated() && (object.second->isInHand() == false))
-        {
-          if(simulated_objects_.find(object.second->id()) == simulated_objects_.end())
-          {
-            if(object.second->pose() != object.second->pose(1))
-            {
-              goal_poses_.insert({object.second, object.second->poseRaw()});
-              undoInEngine(object.second); // set to the previous pose
-            }
-          }
-        }
-      }
-    }
-  }
-
-  void ObjectsPerceptionManager::stepLerp(double alpha)
-  {
-    for(auto& goal_it : goal_poses_)
-    {
-      Pose new_pose = goal_it.first->pose(1).lerpTo(goal_it.second, alpha);
-      goal_it.first->replacePose(new_pose);
-      updateToEngine(goal_it.first);
-    }
-  }
-
   std::map<std::string, Object*>::iterator ObjectsPerceptionManager::createFromFusedPercept(Percept<Object>* percept)
   {
     auto new_object = new Object(*percept);
@@ -400,10 +368,9 @@ namespace owds {
 
   void ObjectsPerceptionManager::startSimulation(Object* object)
   {
-    std::cout << "--start simulation for " << object->id() << " with a mass of " << object->getMass() << std::endl;
-    //world_client_->setMass(object->worldId(), -1, object->getMass());
+    world_client_->setMass(object->worldId(), -1, object->getMass());
+    world_client_->setPhysics(object->worldId(), true);
     world_client_->setBaseVelocity(object->worldId(), {0, 0, 0}, {0, 0, 0});
-    world_client_->setSimulation(object->worldId(), true);
 
     simulated_objects_.insert({object->id(), 0});
   }
@@ -413,9 +380,8 @@ namespace owds {
     auto it = simulated_objects_.find(object->id());
     if(it != simulated_objects_.end())
     {
-      std::cout << "--stop simulation for " << object->id() << std::endl;
-      //world_client_->setMass(object->worldId(), -1, 0);
-      world_client_->setSimulation(object->worldId(), false);
+      world_client_->setMass(object->worldId(), -1, 0);
+      world_client_->setPhysics(object->worldId(), false);
       if(erase)
         simulated_objects_.erase(object->id());
     }

@@ -42,6 +42,7 @@ namespace owds::physx {
     PxPtr<::physx::PxRigidDynamic> px_actor_;
 
     bool is_kinematic_ = false;
+    bool was_kinematic_ = false;
   };
 
 } // namespace owds::physx

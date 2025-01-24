@@ -191,19 +191,7 @@ namespace owds {
 
         if(simulate_ && perception_manager_.objects_manager_.needSimulation())
         {
-          perception_manager_.objects_manager_.initLerp();
-
-          double time_interval_sec = time_step_;
-          if(next_start_time < std::chrono::high_resolution_clock::now())
-            time_interval_sec = (std::chrono::high_resolution_clock::now() - start_time).count() / 1000000000.;
-
-          unsigned int nb_step = time_interval_sec / simu_step_;
-          for(int i = 0; i < nb_step; i++)
-          {
-            engine_->world.stepSimulation();
-            perception_manager_.objects_manager_.stepLerp((double)((i + 1) / (double)nb_step));
-          }
-
+          engine_->world.stepSimulation(time_step_);
           perception_manager_.objects_manager_.updateSimulatedPoses();
         }
         else
