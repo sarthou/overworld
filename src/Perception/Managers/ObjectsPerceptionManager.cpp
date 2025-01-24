@@ -39,7 +39,7 @@ namespace owds {
             if(object.second->pose() != object.second->pose(1))
             {
               goal_poses_.insert({object.second, object.second->poseRaw()});
-              undoInBullet(object.second); // set to the previous pose
+              undoInEngine(object.second); // set to the previous pose
             }
           }
         }
@@ -53,7 +53,7 @@ namespace owds {
     {
       Pose new_pose = goal_it.first->pose(1).lerpTo(goal_it.second, alpha);
       goal_it.first->replacePose(new_pose);
-      updateToBullet(goal_it.first);
+      updateToEngine(goal_it.first);
     }
   }
 

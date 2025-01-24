@@ -61,9 +61,9 @@ namespace owds {
     bool addToWorld(Sensor* sensor);
     bool addToWorld(T* entity);
     void addToWorld(T* entity, int bullet_parent_id);
-    void updateToBullet(T* entity);
-    void undoInBullet(T* entity);
-    T* getEntityFromBulletId(int engine_id);
+    void updateToEngine(T* entity);
+    void undoInEngine(T* entity);
+    T* getEntityFromWorldId(int engine_id);
 
     void updateAabbs();
   };
@@ -176,7 +176,7 @@ namespace owds {
   void EntitiesPerceptionManager<T>::updateEntityPose(T* entity, const Pose& pose, const ros::Time& stamp)
   {
     entity->updatePose(pose, stamp);
-    updateToBullet(entity);
+    updateToEngine(entity);
     entity->setSeen();
   }
 
@@ -187,7 +187,7 @@ namespace owds {
     if(percept != fusioned_percepts_.end())
       percept->second->unsetPose();
     entity->unsetPose();
-    updateToBullet(entity);
+    updateToEngine(entity);
   }
 
   template<typename T>
@@ -311,7 +311,7 @@ namespace owds {
   }
 
   template<typename T>
-  void EntitiesPerceptionManager<T>::updateToBullet(T* entity)
+  void EntitiesPerceptionManager<T>::updateToEngine(T* entity)
   {
     if((entity->bulletLinkId() == -1) && (entity->worldId() != -1))
     {
@@ -330,7 +330,7 @@ namespace owds {
   }
 
   template<typename T>
-  void EntitiesPerceptionManager<T>::undoInBullet(T* entity)
+  void EntitiesPerceptionManager<T>::undoInEngine(T* entity)
   {
     if((entity->bulletLinkId() == -1) && (entity->worldId() != -1))
     {
@@ -345,7 +345,7 @@ namespace owds {
   }
 
   template<typename T>
-  T* EntitiesPerceptionManager<T>::getEntityFromBulletId(int engine_id)
+  T* EntitiesPerceptionManager<T>::getEntityFromWorldId(int engine_id)
   {
     for(auto entity : entities_)
     {
