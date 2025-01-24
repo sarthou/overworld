@@ -5,6 +5,8 @@
 
 #include "overworld/Utils/RosPackage.h"
 #include "overworld/Utils/Wavefront.h"
+#include "overworld/Utils/ShellDisplay.h"
+#include "overworld/BasicTypes/Shape.h"
 
 namespace owds {
 
@@ -32,7 +34,13 @@ namespace owds {
       auto visual_meshes = onto->individuals.getOn(indiv_name, "hasVisualMesh");
       auto collision_meshes = onto->individuals.getOn(indiv_name, "hasCollisionMesh");
       auto meshes = onto->individuals.getOn(indiv_name, "hasMesh");
+      auto diffuse_textures = onto->individuals.getOn(indiv_name, "hasDiffuseTexture");
+      auto specular_textures = onto->individuals.getOn(indiv_name, "hasSpecularTexture");
+      auto normal_maps = onto->individuals.getOn(indiv_name, "hasNormalTexture");
       auto textures = onto->individuals.getOn(indiv_name, "hasTexture");
+
+      if((textures.size() != 0) && ((normal_maps.size() + diffuse_textures.size() + specular_textures.size()) == 0))
+        ShellDisplay::warning("Textures for entity " + indiv_name + " seems to be defined with property hasTexture instead of hasDiffuseTexture or hasNormalTexture.");
 
       Shape_t shape;
       if(meshes.empty() == false)
@@ -49,10 +57,14 @@ namespace owds {
 
         shape.color = getEntityColor(onto, indiv_name);
 
-        if(textures.empty() == false)
-        {
-          shape.texture = getFullPath(textures.front().substr(textures.front().find('#') + 1));
-        }
+        if(diffuse_textures.empty() == false)
+          shape.texture = getFullPath(diffuse_textures.front().substr(diffuse_textures.front().find('#') + 1));
+        
+        if(normal_maps.empty() == false)
+          shape.normal_map = getFullPath(normal_maps.front().substr(normal_maps.front().find('#') + 1));
+        
+        if(specular_textures.empty() == false)
+          shape.specular_texture = getFullPath(specular_textures.front().substr(specular_textures.front().find('#') + 1));
       }
       else
         shape.type = SHAPE_NONE;

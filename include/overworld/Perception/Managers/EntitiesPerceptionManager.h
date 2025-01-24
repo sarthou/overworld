@@ -272,6 +272,8 @@ namespace owds {
       visual_geom.material.diffuse_color_ = color;
       visual_geom.material.specular_color_ = color;
       visual_geom.material.diffuse_texture_ = entity->getShape().texture;
+      visual_geom.material.normal_texture_ = entity->getShape().normal_map;
+      visual_geom.material.specular_texture_ = entity->getShape().specular_texture;
 
       auto entity_pose = entity->pose().arrays();
       int obj_id = -1;

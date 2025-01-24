@@ -23,6 +23,8 @@ namespace owds {
     std::array<double, 4> color;
     std::array<double, 3> scale;
     std::string texture;
+    std::string normal_map;
+    std::string specular_texture;
 
     Shape_t() : type(SHAPE_NONE)
     {

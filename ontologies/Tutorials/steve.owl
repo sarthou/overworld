@@ -62,7 +62,7 @@
     <owl:NamedIndividual rdf:about="agents#steve_base">
         <rdf:type rdf:resource="cg_agents#Base"/>
         <cg_entities:hasMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/tutorials/Steve/steve_body.obj</cg_entities:hasMesh>
-        <cg_entities:hasTexture rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/tutorials/Steve/steve.png</cg_entities:hasTexture>
+        <cg_entities:hasDiffuseTexture rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/tutorials/Steve/steve.png</cg_entities:hasDiffuseTexture>
     </owl:NamedIndividual>
     
 
@@ -73,7 +73,7 @@
         <rdf:type rdf:resource="cg_agents#Head"/>
         <cg_sensors:hasSensor rdf:resource="agents#steve_eye"/>
         <cg_entities:hasMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/tutorials/Steve/steve_head.obj</cg_entities:hasMesh>
-        <cg_entities:hasTexture rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/tutorials/Steve/steve.png</cg_entities:hasTexture>
+        <cg_entities:hasDiffuseTexture rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/tutorials/Steve/steve.png</cg_entities:hasDiffuseTexture>
     </owl:NamedIndividual>
     
 
