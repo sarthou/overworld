@@ -1,5 +1,8 @@
 #include "overworld/BasicTypes/Area.h"
 
+#include <string>
+#include <cstddef>
+
 namespace owds {
 
   Area::Area(const std::string& id, const Pose& center, double radius, double half_height) : id_(id),
@@ -9,6 +12,8 @@ namespace owds {
                                                                                              polygon_({}),
                                                                                              radius_(radius),
                                                                                              half_height_(half_height),
+                                                                                             z_min_(center.getZ() - half_height_),
+                                                                                             z_max_(center.getZ() + half_height_),
                                                                                              hysteresis_distance_(0.0001)
 
   {}

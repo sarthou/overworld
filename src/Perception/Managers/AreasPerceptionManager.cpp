@@ -187,8 +187,8 @@ namespace owds {
 
     float angle_step = (2 * M_PI / CIRCLE_STEPS);
     float radius = area->getRadius();
-    float z_min = area->getCenterPose().getZ() - area->getHalfHeight();
-    float z_max = area->getCenterPose().getZ() + area->getHalfHeight();
+    float z_min = area->getZmin();
+    float z_max = area->getZmax();
     float x_center = area->getCenterPose().getX();
     float y_center = area->getCenterPose().getY();
 
