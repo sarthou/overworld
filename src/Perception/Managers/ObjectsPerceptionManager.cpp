@@ -489,17 +489,31 @@ namespace owds {
     if(sensor->id().empty() || sensor == nullptr)
       return false;
 
-    for(const auto& poi : pois)
+    for(const auto& poi : pois) // TODO not all poi are considered
     {
       std::vector<std::array<double, 3>> from_poses(poi.getPoints().size(), sensor->pose().arrays().first);
       std::vector<std::array<double, 3>> to_poses;
+      //std::vector<std::array<double, 3>> debug_vertices;
+      //std::vector<unsigned int> debug_index_;
+      double max_dist = 0;
 
       for(const auto& point : poi.getPoints())
       {
         Pose map_to_point = object->pose() * point;
+        double poi_dist = map_to_point.distanceTo(sensor->pose()) + 0.01;
+        if(poi_dist > max_dist)
+          max_dist = poi_dist;
+
         to_poses.push_back(map_to_point.arrays().first);
+        //debug_vertices.push_back(map_to_point.arrays().first);
+        //debug_vertices.push_back(sensor->pose().arrays().first);
+        //debug_index_.push_back(debug_index_.size());
+        //debug_index_.push_back(debug_index_.size());
       }
-      auto ray_cast_info = world_client_->raycasts(from_poses, to_poses, sensor->getFieldOfView().getClipFar());
+      //world_client_->addDebugLine(debug_vertices, debug_index_, {0., 1., 0.}, 0.5);
+      if(max_dist > sensor->getFieldOfView().getClipFar())
+        max_dist = sensor->getFieldOfView().getClipFar();
+      auto ray_cast_info = world_client_->raycasts(from_poses, to_poses, max_dist);
 
       if(ray_cast_info.empty())
         return true;
@@ -508,7 +522,10 @@ namespace owds {
         for(auto& info : ray_cast_info)
         {
           if(info.actor_id != object->worldId())
+          {
+            //world_client_->addDebugLine(sensor->pose().arrays().first, info.position, {1., 0., 0.}, 0.5);
             return false;
+          }
         }
         return true;
       }
