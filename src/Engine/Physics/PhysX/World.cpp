@@ -181,7 +181,8 @@ namespace owds::physx {
     ::physx::PxVec3 direction = destination_vec - origin_vec;
     ::physx::PxVec3 unit_dir = direction.getNormalized();
 
-    ::physx::PxRaycastBuffer hit_buffer;
+    ::physx::PxRaycastHit raycast_hits[2];
+    ::physx::PxRaycastBuffer hit_buffer(raycast_hits, 2);
 
     bool hit = scene->raycast(origin_vec, unit_dir, max_distance, hit_buffer);
 
@@ -190,17 +191,31 @@ namespace owds::physx {
 
     if(hit)
     {
-      const ::physx::PxRaycastHit& closest_hit = hit_buffer.block;
-      result.position = {closest_hit.position.x, closest_hit.position.y, closest_hit.position.z};
-      result.normal = {closest_hit.normal.x, closest_hit.normal.y, closest_hit.normal.z};
-      result.distance = closest_hit.distance;
-      // result.actor_name = (closest_hit.actor != nullptr) ? closest_hit.actor->getName() : "Unnamed Actor";
+      result.distance = max_distance;
+      size_t hit_count = hit_buffer.nbTouches;
 
-      ActorData_t* data = static_cast<ActorData_t*>(closest_hit.actor->userData);
-      if(data != nullptr)
+      for(size_t i = 0; i < hit_count; i++)
       {
-        result.actor_id = (closest_hit.actor != nullptr) ? data->actor_id : -1;
-        result.body_id = (closest_hit.actor != nullptr) ? data->body_id : -1;
+        if((hit_buffer.touches[i].distance < result.distance) &&
+           (hit_buffer.touches[i].distance > 0.1))
+        {
+          const ::physx::PxRaycastHit& closest_hit = hit_buffer.touches[i];
+          result.position = {closest_hit.position.x, closest_hit.position.y, closest_hit.position.z};
+          result.normal = {closest_hit.normal.x, closest_hit.normal.y, closest_hit.normal.z};
+          result.distance = closest_hit.distance;
+
+          ActorData_t* data = static_cast<ActorData_t*>(closest_hit.actor->userData);
+          if(data != nullptr)
+          {
+            result.actor_id = (closest_hit.actor != nullptr) ? data->actor_id : -1;
+            result.body_id = (closest_hit.actor != nullptr) ? data->body_id : -1;
+          }
+          else
+          {
+            result.actor_id = -1;
+            result.body_id = -1;
+          }
+        }
       }
     }
 
@@ -215,12 +230,14 @@ namespace owds::physx {
     size_t num_rays = origins.size();
     results.resize(num_rays);
 
+    ctx_->physx_mutex_.lock();
     std::vector<std::thread> threads;
     for(size_t i = 0; i < num_rays; ++i)
       threads.emplace_back(performRaycast, ctx_->px_scene_.get(), origins[i], destinations[i], max_distance, i, std::ref(results));
 
     for(auto& thread : threads)
       thread.join();
+    ctx_->physx_mutex_.unlock();
   }
 
 } // namespace owds::physx

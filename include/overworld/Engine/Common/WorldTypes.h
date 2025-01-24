@@ -9,9 +9,9 @@ namespace owds {
 struct RaycastHitResult_t
   {
     bool hit;                      // Whether the ray hit something
-    std::array<float, 3> position; // Hit position (x, y, z)
-    std::array<float, 3> normal;   // Hit normal (x, y, z)
-    float distance;                // Distance to the hit
+    std::array<double, 3> position; // Hit position (x, y, z)
+    std::array<double, 3> normal;   // Hit normal (x, y, z)
+    double distance;                // Distance to the hit
     // std::string actor_name;
     size_t actor_id;
     size_t body_id;
