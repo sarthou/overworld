@@ -116,6 +116,9 @@ namespace owds::physx {
 
   void DynamicActor::setVelocity(const std::array<double, 3>& linear_velocity, const std::array<double, 3>& angular_velocity)
   {
+    if(is_kinematic_)
+      return;
+    
     ctx_.physx_mutex_.lock();
     px_actor_->setLinearVelocity(::physx::PxVec3(
       static_cast<::physx::PxReal>(linear_velocity[0]),
