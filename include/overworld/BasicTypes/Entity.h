@@ -56,10 +56,10 @@ namespace owds {
     std::unordered_set<std::string> getFalseIds() const { return false_ids_; }
 
     void setWorldId(int engine_id) { engine_id_ = engine_id; }
-    void setBulletLinkId(int bullet_link_id) { bullet_link_id_ = bullet_link_id; }
+    void setBulletLinkId(int engine_link_id) { engine_link_id_ = engine_link_id; }
     int worldId() const { return engine_id_; }
-    int bulletLinkId() const { return bullet_link_id_; }
-    bool isBulletLink() { return (bullet_link_id_ != -1); }
+    int engineLinkId() const { return engine_link_id_; }
+    bool isEngineLink() { return (engine_link_id_ != -1); }
 
     void setAabb(const struct AABB_t& aabb) { aabb_ = aabb; }
     struct AABB_t getAabb() const { return aabb_; }
@@ -100,7 +100,7 @@ namespace owds {
     CircularBuffer<PoseStamped_s, 30> last_poses_;
     bool is_located_;
     int engine_id_;
-    int bullet_link_id_;
+    int engine_link_id_;
     Shape_t shape_;
     size_t nb_frame_unseen_;
     struct AABB_t aabb_;
