@@ -32,7 +32,6 @@
   <depend condition="$ROS_VERSION == 1">tf2_ros</depend>
   <depend condition="$ROS_VERSION == 1">tf2_geometry_msgs</depend>
   <depend condition="$ROS_VERSION == 1">tf2_eigen</depend>
-  <depend condition="$ROS_VERSION == 1">bullet</depend>
   <depend condition="$ROS_VERSION == 1">roslib</depend>
   <depend condition="$ROS_VERSION == 1">eigen</depend>
   <depend condition="$ROS_VERSION == 1">message_filters</depend>
