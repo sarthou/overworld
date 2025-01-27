@@ -10,7 +10,7 @@ namespace owds {
                                                            is_static_(false),
                                                            is_located_(false),
                                                            engine_id_(-1),
-                                                           bullet_link_id_(-1)
+                                                           engine_link_id_(-1)
   {}
 
   void Entity::updatePose(const Pose& pose, ros::Time stamp)

@@ -88,7 +88,7 @@ namespace owds {
       percepts_.emplace(link_pair.first, link_pair.first);
       percepts_.at(link_pair.first).setAgentName(robot_name_);
       percepts_.at(link_pair.first).setType(link_pair.second);
-      // we set the bullet id of the parent to inform the manager
+      // we set the world id of the parent to inform the manager
       percepts_.at(link_pair.first).setWorldId(robot_engine_id_);
       if(world_client_->getLinkId(robot_engine_id_, link_pair.first) == -1)
       {
@@ -100,7 +100,7 @@ namespace owds {
     percepts_.emplace(base_link_, BodyPart(base_link_));
     percepts_.at(base_link_).setAgentName(robot_name_);
     percepts_.at(base_link_).setType(BODY_PART_BASE);
-    // we set the bullet id of the parent to inform the manager
+    // we set the world id of the parent to inform the manager
     percepts_.at(base_link_).setWorldId(robot_engine_id_);
 
     if(updateBasePose() == false)

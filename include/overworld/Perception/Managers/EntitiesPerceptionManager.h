@@ -60,7 +60,7 @@ namespace owds {
 
     bool addToWorld(Sensor* sensor);
     bool addToWorld(T* entity);
-    void addToWorld(T* entity, int bullet_parent_id);
+    void addToWorld(T* entity, int engine_parent_id);
     void updateToEngine(T* entity);
     void undoInEngine(T* entity);
     T* getEntityFromWorldId(int engine_id);
@@ -302,12 +302,12 @@ namespace owds {
   }
 
   template<typename T>
-  void EntitiesPerceptionManager<T>::addToWorld(T* entity, int bullet_parent_id)
+  void EntitiesPerceptionManager<T>::addToWorld(T* entity, int engine_parent_id)
   {
-    int link_id = world_client_->getLinkId(bullet_parent_id, entity->id());
+    int link_id = world_client_->getLinkId(engine_parent_id, entity->id());
     if(link_id != -1)
     {
-      entity->setWorldId(bullet_parent_id);
+      entity->setWorldId(engine_parent_id);
       entity->setBulletLinkId(link_id);
     }
   }
@@ -315,7 +315,7 @@ namespace owds {
   template<typename T>
   void EntitiesPerceptionManager<T>::updateToEngine(T* entity)
   {
-    if((entity->bulletLinkId() == -1) && (entity->worldId() != -1))
+    if((entity->engineLinkId() == -1) && (entity->worldId() != -1))
     {
       if(entity->isLocated() == true)
       {
@@ -334,7 +334,7 @@ namespace owds {
   template<typename T>
   void EntitiesPerceptionManager<T>::undoInEngine(T* entity)
   {
-    if((entity->bulletLinkId() == -1) && (entity->worldId() != -1))
+    if((entity->engineLinkId() == -1) && (entity->worldId() != -1))
     {
       if(entity->isLocated() == true)
       {
@@ -351,7 +351,7 @@ namespace owds {
   {
     for(auto entity : entities_)
     {
-      if(entity.second->bulletLinkId() == -1)
+      if(entity.second->engineLinkId() == -1)
         if(entity.second->worldId() == engine_id)
           return entity.second;
     }

@@ -121,7 +121,7 @@ namespace owds {
     if(area->isStatic() == false)
     {
       owner_id = area->getOwner()->worldId();
-      owner_link_id = area->getOwner()->bulletLinkId();
+      owner_link_id = area->getOwner()->engineLinkId();
       color = {0, 0, 1};
     }
 
@@ -179,7 +179,7 @@ namespace owds {
     if(area->isStatic() == false)
     {
       owner_id = area->getOwner()->worldId();
-      owner_link_id = area->getOwner()->bulletLinkId();
+      owner_link_id = area->getOwner()->engineLinkId();
       color = {0, 0, 1};
     }
 

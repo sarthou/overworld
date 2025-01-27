@@ -28,7 +28,7 @@ namespace owds {
       Pose pose_in_hand;
       Pose pose_in_map;
       bool located_in_map = false;
-      int nb_frame_unseen = 1000;
+      size_t nb_frame_unseen = 1000;
       float best_confidence = 0.;
       Percept<Object>* percept_to_merge = nullptr;
 
