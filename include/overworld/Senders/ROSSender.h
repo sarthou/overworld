@@ -82,8 +82,8 @@ namespace owds {
     {
       if(entity->isLocated())
       {
-        markers.markers.emplace_back(entity->toMarker(id++, 0.2, "marker"));
         transforms.emplace_back(entity->toTfTransform());
+        markers.markers.emplace_back(entity->toMarker(transforms.back(), id++, 0.2, "marker"));
       }
     }
     pub_it->second.publish(markers);
@@ -136,8 +136,8 @@ namespace owds {
     {
       if(entity.second->isLocated())
       {
-        markers.markers.emplace_back(entity.second->toMarker(id++, 0.2, "marker"));
         transforms.emplace_back(entity.second->toTfTransform());
+        markers.markers.emplace_back(entity.second->toMarker(transforms.back(), id++, 0.2, "marker"));
       }
     }
     pub_it->second.publish(markers);
