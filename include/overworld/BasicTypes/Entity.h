@@ -87,6 +87,7 @@ namespace owds {
     void merge(const Entity* other, bool update_pose = true);
 
     geometry_msgs::TransformStamped toTfTransform() const;
+    const visualization_msgs::Marker& toMarker(const geometry_msgs::TransformStamped& transform, int id, double lifetime, const std::string& ns);
     const visualization_msgs::Marker& toMarker(int id, double lifetime, const std::string& ns);
 
     void computeFeature();
