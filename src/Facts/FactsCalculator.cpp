@@ -2,6 +2,8 @@
 
 #include "overworld/Engine/Common/WorldTypes.h"
 
+#include <array>
+
 #define IN_HAND_DIST 0.08
 
 namespace owds {
@@ -82,6 +84,12 @@ namespace owds {
     }
 
     return facts_;
+  }
+
+  void FactsCalculator::initAreas(const std::map<std::string, Area*>& areas)
+  {
+    for(auto& area : areas)
+      area.second->updatePose();
   }
 
   std::vector<Fact> FactsCalculator::computeAreasFacts(const std::map<std::string, Area*>& areas,
@@ -197,7 +205,7 @@ namespace owds {
 
     for(const auto& agent_perceiving_sensor : agent_perceiving_sensors)
     {
-      Pose sensor_pose = agent_perceiving_sensor.second->pose();
+      const Pose& sensor_pose = agent_perceiving_sensor.second->pose();
       if(agent_perceived->getHead() != nullptr && agent_perceived->getHead()->isLocated())
       {
         if(agent_perceiving_sensor.second->getFieldOfView().hasIn(agent_perceived->getHead()->pose().transformIn(sensor_pose)))

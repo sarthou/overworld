@@ -45,6 +45,7 @@ namespace owds {
     if(area == nullptr)
       return false;
 
+    area->updatePose();
     return area->isInside(pose);
   }
 

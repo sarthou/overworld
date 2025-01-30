@@ -29,6 +29,7 @@ namespace owds {
                                         const std::map<std::string, BodyPart*>& body_parts,
                                         bool clear = true);
 
+    void initAreas(const std::map<std::string, Area*>& areas);
   private:
     std::vector<Fact> facts_;
 
