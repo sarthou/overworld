@@ -73,6 +73,8 @@ namespace owds {
     geometry_msgs::Transform toTransformMsg() const;
     geometry_msgs::Pose toPoseMsg() const;
 
+    bool isTranslationZero() const;
+
     double getX() const;
     double getY() const;
     double getZ() const;
