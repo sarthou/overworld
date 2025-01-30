@@ -90,7 +90,7 @@ namespace owds {
         if(percept->isInHand())
         {
           Hand* hand = percept->getHandIn();
-          auto pose_tmp = percept->pose();
+          const Pose& pose_tmp = percept->pose();
           hand->removePerceptFromHand(percept->id());
           for(auto& false_id : percept->getFalseIds())
             hand->removePerceptFromHand(false_id);

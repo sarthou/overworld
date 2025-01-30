@@ -1,6 +1,8 @@
 #include "overworld/BasicTypes/Object.h"
 
 #include <limits>
+#include <string>
+#include <array>
 
 #include "overworld/BasicTypes/Hand.h"
 #include "overworld/Utils/ShellDisplay.h"
@@ -105,7 +107,7 @@ namespace owds {
       return Entity::pose();
     else
     {
-      Pose hand_pose = hand_in_->pose();
+      const Pose& hand_pose = hand_in_->pose();
       Pose object_pose = hand_pose * Entity::pose();
       return object_pose;
     }

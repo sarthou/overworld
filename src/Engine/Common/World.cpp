@@ -609,6 +609,9 @@ namespace owds {
 
   void World::requestCameraRender(const std::vector<int>& ids)
   {
+    if(ids.empty())
+      return;
+      
     for(auto id : ids)
     {
       if(id < (int)cameras_.size())
