@@ -182,31 +182,30 @@ namespace owds {
     {
       start_time = std::chrono::high_resolution_clock::now();
 
-      assess();
+      perception_manager_.update();
 
-      if(ros::ok() && isRunning())
+      next_start_time = start_time + interval;
+
+      if(simulate_ && perception_manager_.objects_manager_.needSimulation())
       {
-        next_start_time = start_time + interval;
+        engine_->world.stepSimulation(time_step_);
+        perception_manager_.objects_manager_.updateSimulatedPoses();
+      }
+      else
+        engine_->world.stepSimulation(time_step_); // TODO handle that correctly (in case of overtime)
 
-        if(simulate_ && perception_manager_.objects_manager_.needSimulation())
-        {
-          engine_->world.stepSimulation(time_step_);
-          perception_manager_.objects_manager_.updateSimulatedPoses();
-        }
-        else
-          engine_->world.stepSimulation(time_step_); // TODO handle that correctly (in case of overtime)
+      assess(); // TODO split it, we could do stuff while the simulation is runing or while sleeping
 
-        if(next_start_time < std::chrono::high_resolution_clock::now())
-        {
-          auto delta = std::chrono::high_resolution_clock::now() - (start_time + interval);
-          ShellDisplay::warning("[SituationAssessor] [" + agent_name_ + "] The main loop is late of " + std::to_string(delta.count() / 1000000.) + " ms");
-        }
-        else
-        {
-          // auto delta = next_start_time - std::chrono::high_resolution_clock::now();
-          // ShellDisplay::info("sleep for " + std::to_string(delta.count() / 1000000.) + " ms");
-          std::this_thread::sleep_until(next_start_time);
-        }
+      if(next_start_time < std::chrono::high_resolution_clock::now())
+      {
+        auto delta = std::chrono::high_resolution_clock::now() - (start_time + interval);
+        ShellDisplay::warning("[SituationAssessor] [" + agent_name_ + "] The main loop is late of " + std::to_string(delta.count() / 1000000.) + " ms");
+      }
+      else
+      {
+        // auto delta = next_start_time - std::chrono::high_resolution_clock::now();
+        // ShellDisplay::info("sleep for " + std::to_string(delta.count() / 1000000.) + " ms");
+        std::this_thread::sleep_until(next_start_time);
       }
     }
   }
@@ -215,7 +214,7 @@ namespace owds {
   {
     std::map<std::string, std::unordered_set<uint32_t>> agents_segmentation_ids;
 
-    perception_manager_.update();
+    //perception_manager_.update();
     auto objects = perception_manager_.objects_manager_.getEntities();
     auto robots = perception_manager_.robots_manager_.getAgents();
     auto robot_parts = perception_manager_.robots_manager_.getEntities();
@@ -248,6 +247,7 @@ namespace owds {
       humans_process.join();
 
     facts_calculator_.computeAgentsFacts(objects, agents, agents_segmentation_ids, false);
+    facts_calculator_.initAreas(areas);
     facts_calculator_.computeAreasFacts(areas, {}, robot_parts, false);
     auto facts = facts_calculator_.computeAreasFacts(areas, objects, body_parts, false);
     facts_publisher_.publish(facts);
@@ -255,8 +255,11 @@ namespace owds {
 
   void SituationAssessor::processHumans(std::map<std::string, std::unordered_set<uint32_t>>& agents_segmentation_ids)
   {
-    auto objects = perception_manager_.objects_manager_.getEntities();
     auto humans = perception_manager_.humans_manager_.getAgents();
+    if(humans.empty())
+      return;
+
+    auto objects = perception_manager_.objects_manager_.getEntities();
     auto body_parts = perception_manager_.humans_manager_.getEntities();
     auto areas = perception_manager_.areas_manager_.getEntities();
 
