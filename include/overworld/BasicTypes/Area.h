@@ -27,6 +27,8 @@ namespace owds {
     void setOwner(Entity* owner) { owner_ = owner; }
     void setOwnerStr(const std::string& owner_str) { owner_str_ = owner_str; }
 
+    void updatePose();
+
     bool isStatic() const { return (owner_str_ == ""); }
     bool isEmpty() const;
     bool isCircle() const { return is_circle_; }
@@ -48,6 +50,7 @@ namespace owds {
   private:
     std::string id_;
     Pose center_;
+    Pose pose_;
     Entity* owner_;
     std::string owner_str_;
     bool is_circle_;
