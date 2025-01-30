@@ -63,15 +63,16 @@ namespace owds::physx {
 
     setPositionAndOrientation(position, orientation);
 
-    setPhysicsEnabled(false);
+    setPhysicsEnabled(true);
   }
 
   void DynamicActor::setPhysicsEnabled(bool enabled)
   {
     ctx_.physx_mutex_.lock();
-    px_actor_->setRigidBodyFlag(::physx::PxRigidBodyFlag::eKINEMATIC, !enabled);
-    px_actor_->setActorFlag(::physx::PxActorFlag::eDISABLE_GRAVITY, !enabled);
-    is_kinematic_ = !enabled;
+    px_actor_->setRigidBodyFlag(::physx::PxRigidBodyFlag::eKINEMATIC, enabled);
+    if(enabled)
+      px_actor_->setActorFlag(::physx::PxActorFlag::eDISABLE_GRAVITY, enabled);
+    is_kinematic_ = enabled;
     if(is_kinematic_ == false)
       was_kinematic_ = false;
     ctx_.physx_mutex_.unlock();
