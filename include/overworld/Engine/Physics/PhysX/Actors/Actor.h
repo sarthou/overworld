@@ -56,7 +56,7 @@ namespace owds::physx {
     void setupPhysicsShape(const owds::ShapeDummy& shape);
     void setupPhysicsShape(const owds::ShapeSphere& shape);
 
-    const std::vector<PxPtr<::physx::PxShape>>& getShapes() { return px_shapes_; }
+    const std::vector<PxPtr<::physx::PxShape>>& getShapes();
     ::physx::PxTransform getGlobalPose();
 
     static bool use_cache_input;

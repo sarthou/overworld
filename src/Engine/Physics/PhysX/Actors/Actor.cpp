@@ -189,7 +189,8 @@ namespace owds::physx {
 
     ::physx::PxTriangleMeshCookingResult::Enum result;
 
-    assert(PxCookTriangleMesh(cooking_params, mesh_desc, buffer, &result));
+    //assert(::physx::PxCookTriangleMesh(cooking_params, mesh_desc, buffer, &result));
+    PxCookTriangleMesh(cooking_params, mesh_desc, buffer, &result);
 
     using ResultTy = decltype(result);
 
@@ -376,6 +377,11 @@ namespace owds::physx {
   {
     px_geometries_.emplace_back(std::make_unique<::physx::PxSphereGeometry>(
       static_cast<::physx::PxReal>(shape.radius_)));
+  }
+
+  const std::vector<PxPtr<::physx::PxShape>>& Actor::getShapes()
+  {
+    return px_shapes_;
   }
 
 } // namespace owds::physx
