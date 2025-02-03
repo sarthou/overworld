@@ -36,6 +36,7 @@ namespace owds {
     glm::vec2 planes_{0.1, 100.};
 
     bool render_debug_ = true;
+    bool render_all_debug_ = false;
     bool render_collision_models_ = false;
     bool render_shadows_ = true;
 
@@ -62,6 +63,7 @@ namespace owds {
     bool sizeHasChanged() const { return has_changed_size_; }
 
     bool shouldRenderDebug() const { return render_debug_; }
+    bool shouldRenderAllDebug() const { return render_all_debug_; }
     bool shouldRendercollisionModels() const { return render_collision_models_; }
     bool shouldShadows() const { return render_shadows_; }
 

@@ -210,6 +210,26 @@ namespace owds {
         }
       }
     }
+
+    for(size_t i = 0; i < PointLights::MAX_POINT_LIGHTS; i++)
+    {
+      if(world_->point_lights_.isUsed(i))
+      {
+        double dist = world_->point_lights_.getAttenuationDistance(i);
+        auto pose = world_->point_lights_.getPosition(i);
+        auto color = world_->point_lights_.getDiffuse(i);
+        if(debug_lights_.find(i) == debug_lights_.end())
+        {
+          debug_lights_.emplace(i,
+                                DebugLine({glm::vec3(pose.x, pose.y, pose.z),
+                                           glm::vec3(pose.x, pose.y, pose.z - dist)},
+                                           {0, 1},
+                                           glm::vec3(color.x, color.y, color.z)));
+        }
+      }
+      else
+        debug_lights_.erase(i);
+    }
   }
 
   void Renderer::loadActor(Actor* actor, const ShapeBox& shape, bool default_material)
@@ -623,6 +643,14 @@ namespace owds {
         lines_shader.setMat4("model", glm::translate(glm::mat4(1), glm::vec3(pose[0], pose[1], pose[2])));
       }
       line_handle.second.draw(lines_shader);
+    }
+
+    if(render_camera_.shouldRenderAllDebug())
+    {
+      glLineWidth(6);
+      for(auto& debug_light : debug_lights_)
+        debug_light.second.draw(lines_shader);
+      glLineWidth(1);
     }
 
     // Draw debug axis

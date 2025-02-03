@@ -35,6 +35,7 @@ namespace owds {
     switch(key)
     {
     case Key_e::key_f2: camera_->render_collision_models_ = is_down; break;
+    case Key_e::key_f5: camera_->render_all_debug_ = is_down; break;
     case Key_e::key_f3:
     {
       if(is_down == false && key_state_debug_)
