@@ -104,17 +104,15 @@ target_compile_definitions(overworld_physics
     _DEBUG
     PX_ENABLE_ASSERTS)
 target_link_libraries(overworld_physics PUBLIC overworld_engine_common)
-
-
 target_link_libraries(overworld_physics
-    PUBLIC
+    PRIVATE
     PhysX
     PhysXCommon
     PhysXCooking
     PhysXExtensions
     PhysXFoundation
-    PhysXPvdSDK
-    cuda)
+    PhysXPvdSDK)
+    #cuda)
 
 owds_add_ros_library(overworld_types_lib
     src/Geometry/Pose.cpp
@@ -192,6 +190,7 @@ target_link_libraries(overworld_node PRIVATE
                       overworld_graphics
                       overworld_sender_lib
                       overworld_facts_lib
+                      overworld_physics
                       #${ontologenius_LIBRARIES}
 )
 
