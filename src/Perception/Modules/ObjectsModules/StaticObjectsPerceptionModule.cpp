@@ -4,9 +4,11 @@
 #include <ros/package.h>
 #include <string>
 #include <array>
+#include <cstddef>
 
 #include "overworld/Utils/YamlReader.h"
 #include "overworld/Utils/RosPackage.h"
+#include "overworld/Utils/ShellDisplay.h"
 #include "overworld/Engine/Common/Urdf/UrdfLoader.h"
 
 namespace owds {
@@ -72,7 +74,7 @@ namespace owds {
   void StaticObjectsPerceptionModule::addObject(const std::string& name,
                                                 const std::array<double, 3>& translation,
                                                 const std::array<double, 3>& rotation,
-                                                const std::array<double,3>& scale)
+                                                const std::array<double, 3>& scale)
   {
     if(onto_ == nullptr)
     {
@@ -103,7 +105,7 @@ namespace owds {
                                                 const std::string& mesh,
                                                 const std::array<double, 3>& translation,
                                                 const std::array<double, 3>& rotation,
-                                                const std::array<double,3>& scale)
+                                                const std::array<double, 3>& scale)
   {
     if(onto_ == nullptr)
     {
