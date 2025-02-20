@@ -17,7 +17,7 @@ namespace owds {
   {
     camera_.setCameraView(view_type);
     camera_.setProjection(CameraProjection_e::perspective);
-    camera_.setFieldOfView(fov);
+    camera_.setFieldOfViewRad(fov);
     camera_.setOutputResolution({(float)width, (float)height});
     camera_.setPlanes({near_plane, far_plane});
     camera_.finalize();
@@ -47,7 +47,6 @@ namespace owds {
 
   std::unordered_set<uint32_t> VirtualCamera::getSegmentedIds() const
   {
-    std::cout << "[VirtualCamera] getSegmentedIds" << std::endl;
     uint32_t n = width_ * height_;
     std::unordered_set<uint32_t> res(image_, image_ + n);
     res.erase(std::numeric_limits<uint32_t>::max());

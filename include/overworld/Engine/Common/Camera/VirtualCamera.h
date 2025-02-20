@@ -13,12 +13,16 @@ namespace owds {
   class VirtualCamera
   {
   public:
-    VirtualCamera(unsigned int width, unsigned int height, float fov, owds::CameraView_e view_type, float near_plane, float far_plane);
+    VirtualCamera(unsigned int width, unsigned int height, float fov /*Rad*/, owds::CameraView_e view_type, float near_plane, float far_plane);
     ~VirtualCamera();
     VirtualCamera(const VirtualCamera& other) = delete;
     VirtualCamera& operator = (const VirtualCamera&) = delete;
 
-    VirtualCamera(VirtualCamera&& other)
+    VirtualCamera(VirtualCamera&& other) : camera_(std::move(other.camera_)),
+                                           width_(other.width_),
+                                           height_(other.height_),
+                                           need_update_(other.need_update_),
+                                           updated_(other.updated_)
     {
       image_ = std::move(other.image_);
       other.image_ = nullptr;

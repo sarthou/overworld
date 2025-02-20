@@ -102,6 +102,7 @@ namespace owds {
     void setCameraView(owds::CameraView_e view_type);
     void setProjection(owds::CameraProjection_e proj);
     void setFieldOfView(float fov);
+    void setFieldOfViewRad(float fov);
     void setOutputAA(owds::ViewAntiAliasing_e aa_setting);
     void setOutputFPS(std::uint64_t desired_target_fps);
     void setOutputResolution(const std::array<float, 2>& resolution);
