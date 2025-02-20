@@ -1,5 +1,7 @@
 #include "overworld/Senders/ROSSender.h"
 
+#include <string>
+
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/image_encodings.h>
 
@@ -21,7 +23,20 @@ namespace owds {
     im.width = width;
     im.step = im.width * 4;
     im.data.resize(im.height * im.width * 4);
-    memcpy(im.data.data(), image, im.height * im.width * 4);
+
+    uint8_t* dst = im.data.data();
+    uint8_t* src = reinterpret_cast<uint8_t*>(image) + (height - 1) * im.step;
+
+    for (unsigned int row = 0; row < height; ++row, dst += im.step, src -= im.step)
+    {
+        for (unsigned int col = 0; col < width * 4; col += 4)
+        {
+            std::swap(src[col + 0], src[col + 3]);  // Swap R and B
+            std::swap(src[col + 1], src[col + 2]);  // Swap R and B
+            std::memcpy(dst + col, src + col, 4);   // Copy pixel
+        }
+    }
+
     pub.publish(im);
   }
 
