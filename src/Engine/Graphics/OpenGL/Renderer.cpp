@@ -515,9 +515,12 @@ namespace owds {
       {
         auto& virtual_camera = world_->cameras_[i];
         if(i >= off_screens_.size())
-          off_screens_.emplace_back(virtual_camera.getWidth(), virtual_camera.getHeight());
+        {
+          off_screens_.emplace_back();
+          off_screens_.back().init(virtual_camera.getWidth(), virtual_camera.getHeight());
+        }
 
-        off_screens_[i].bindFrameBuffer();
+        off_screens_.at(i).bindFrameBuffer();
 
         Camera* camera = virtual_camera.getCamera();
         if(camera->getViewType() == CameraView_e::regular_view)

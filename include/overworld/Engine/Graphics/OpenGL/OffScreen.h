@@ -8,9 +8,10 @@ namespace owds {
   class OffScreen
   {
   public:
-    OffScreen(unsigned int width, unsigned int height);
+    OffScreen() = default;
     ~OffScreen();
 
+    void init(unsigned int width, unsigned int height);
     void bindFrameBuffer() const;
 
     void getImage(uint32_t** data);

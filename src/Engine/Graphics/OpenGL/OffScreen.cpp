@@ -7,7 +7,7 @@
 
 namespace owds {
 
-  OffScreen::OffScreen(unsigned int width, unsigned int height)
+  void OffScreen::init(unsigned int width, unsigned int height)
   {
     width_ = width;
     height_ = height;
@@ -32,7 +32,10 @@ namespace owds {
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthbuffer_, 0);
 
     if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+    {
       std::cout << "ERROR::FRAMEBUFFER:: OffScreen framebuffer is not complete!" << std::endl;
+      exit(-2);
+    }
   }
 
   OffScreen::~OffScreen()
