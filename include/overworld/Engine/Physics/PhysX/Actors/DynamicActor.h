@@ -35,7 +35,9 @@ namespace owds::physx {
     void setPhysicsEnabled(bool enabled) override;
     void setSimulationEnabled(bool enabled) override;
 
+    void setPositionAndOrientation() override;
     void setPositionAndOrientation(const std::array<double, 3>& position, const std::array<double, 4>& orientation) override;
+    void stepPose() override;
     void setVelocity(const std::array<double, 3>& linear_velocity, const std::array<double, 3>& angular_velocity) override;
 
   private:
@@ -43,6 +45,9 @@ namespace owds::physx {
 
     bool is_kinematic_ = false;
     bool was_kinematic_ = false;
+    size_t pending_steps_ = 0;
+    bool has_first_pose_ = false;
+    ::physx::PxTransform goal_pose_;
   };
 
 } // namespace owds::physx

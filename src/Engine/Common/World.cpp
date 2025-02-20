@@ -164,6 +164,13 @@ namespace owds {
     }
   }
 
+  void World::setBasePositionAndOrientation(int body_id)
+  {
+    auto actor_it = actors_.find(body_id);
+    if(actor_it != actors_.end())
+      actor_it->second->setPositionAndOrientation();
+  }
+
   void World::setBasePositionAndOrientation(int body_id, const std::array<double, 3>& position, const std::array<double, 4>& orientation)
   {
     auto urdf_it = urdfs_.find(body_id);

@@ -175,7 +175,10 @@ namespace owds {
             updateEntityPose(it->second, percept.second->pose(), percept.second->lastStamp());
         }
         else if(it->second->isLocated())
+        {
           it->second->updatePose(it->second->pose(), ros::Time::now());
+          world_client_->setBasePositionAndOrientation(it->second->worldId());
+        }
       }
     }
   }

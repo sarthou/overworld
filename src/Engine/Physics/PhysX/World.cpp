@@ -43,6 +43,11 @@ namespace owds::physx {
            "." + std::to_string(PX_PHYSICS_VERSION_BUGFIX);
   }
 
+  void World::setSubsteping(size_t sub_step)
+  {
+    ctx_->sub_step_ = sub_step;
+  }
+
   size_t World::createActor(const owds::Shape& collision_shape,
                             const std::vector<owds::Shape>& visual_shapes,
                             const std::array<double, 3>& position,
@@ -159,12 +164,24 @@ namespace owds::physx {
   void World::stepSimulation(const float delta)
   {
     ctx_->physx_mutex_.lock();
-    ctx_->px_scene_->simulate(delta != 0 ? delta : time_step_);
-
-    //if(ctx_->px_scene_->checkResults(true))
+    if(ctx_->sub_step_ <= 1)
+    {
+      ctx_->px_scene_->simulate(delta != 0 ? delta : time_step_);
       ctx_->px_scene_->fetchResults(true);
-    //else
-    //  std::cout << "error " << std::endl;
+    }
+    else
+    {
+      for(size_t i = 0; i <  ctx_->sub_step_; i++)
+      {
+        if(i != 0)
+        {
+          for(auto& actor : actors_)
+            actor.second->stepPose();
+        }
+        ctx_->px_scene_->simulate((delta != 0 ? delta : time_step_) / (float)ctx_->sub_step_);
+        ctx_->px_scene_->fetchResults(true);
+      }
+    }
     ctx_->physx_mutex_.unlock();
   }
 

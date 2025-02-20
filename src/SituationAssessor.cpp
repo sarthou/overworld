@@ -46,6 +46,8 @@ namespace owds {
                                     {1.0f, 0.976f, 0.898f},
                                     0.25, 0.4, 0.8);
 
+    engine_->world.setSubsteping(3); // TODO make it configurable
+
     // we could insert this in the world there if needed
     engine_->finalise();
   }

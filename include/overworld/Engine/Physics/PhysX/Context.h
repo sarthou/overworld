@@ -30,6 +30,7 @@ namespace owds::physx {
 
     PxPtr<::physx::PxScene> px_scene_;
     std::mutex physx_mutex_;
+    size_t sub_step_ = 1;
 
     bool minimize_memory_footprint_;
 

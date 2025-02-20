@@ -99,6 +99,19 @@ namespace owds::physx {
     ctx_.physx_mutex_.unlock();
   }
 
+  // Interpolation function for PxTransform
+  ::physx::PxTransform interpolateTransform(const ::physx::PxTransform& start, const ::physx::PxTransform& end, float t) {
+    return ::physx::PxTransform(
+      start.p * (1.0f - t) + end.p * t,   // Interpolate position
+      ::physx::PxSlerp(t, start.q, end.q)// Interpolate rotation
+    );
+  }
+
+  void DynamicActor::setPositionAndOrientation()
+  {
+    pending_steps_ += ctx_.sub_step_;
+  }
+
   void DynamicActor::setPositionAndOrientation(const std::array<double, 3>& position, const std::array<double, 4>& orientation)
   {
     const auto px_transform =
@@ -113,15 +126,50 @@ namespace owds::physx {
           static_cast<::physx::PxReal>(orientation[2]),
           static_cast<::physx::PxReal>(orientation[3])));
 
+    goal_pose_ = px_transform;
+
     ctx_.physx_mutex_.lock();
     if(is_kinematic_ && was_kinematic_)
-      px_actor_->setKinematicTarget(px_transform);
+    {
+      pending_steps_ += ctx_.sub_step_;
+      if((pending_steps_ == 1) || (has_first_pose_ == false))
+      {
+        pending_steps_ = 0;
+        px_actor_->setKinematicTarget(px_transform);
+        has_first_pose_ = true;
+      }
+      else if(pending_steps_ != 0)
+      {
+        ::physx::PxTransform smoothed_pose = interpolateTransform(px_base_->getGlobalPose(), goal_pose_, 1. / (float)pending_steps_);
+        px_actor_->setKinematicTarget(smoothed_pose);
+        pending_steps_--;
+      }
+    }
     else
     {
+      pending_steps_ = 0;
       px_actor_->setGlobalPose(px_transform);
       was_kinematic_ = is_kinematic_;
     }
     ctx_.physx_mutex_.unlock();
+  }
+
+  void DynamicActor::stepPose()
+  {
+    if(is_kinematic_ && was_kinematic_)
+    {
+      if(pending_steps_ == 1)
+      {
+        pending_steps_ = 0;
+        px_actor_->setKinematicTarget(goal_pose_);
+      }
+      else if(pending_steps_ != 0)
+      {
+        ::physx::PxTransform smoothed_pose = interpolateTransform(px_base_->getGlobalPose(), goal_pose_, 1. / (float)pending_steps_);
+        px_actor_->setKinematicTarget(smoothed_pose);
+        pending_steps_--;
+      }
+    }
   }
 
   void DynamicActor::setVelocity(const std::array<double, 3>& linear_velocity, const std::array<double, 3>& angular_velocity)

@@ -63,11 +63,14 @@ namespace owds {
      */
     virtual void setRestitution(float coefficient) = 0;
 
+    // State that no new position has been found. Will impact the lerp with the function stepPose
+    virtual void setPositionAndOrientation() {};
     /**
      * @param position Absolute position.
      * @param orientation Absolute rotation, in radians.
      */
     virtual void setPositionAndOrientation(const std::array<double, 3>& position, const std::array<double, 4>& orientation) = 0;
+    virtual void stepPose() {};
 
     virtual void setVelocity(const std::array<double, 3>& linear_velocity, const std::array<double, 3>& angular_velocity) = 0;
 
