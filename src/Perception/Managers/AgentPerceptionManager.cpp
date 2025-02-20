@@ -1,5 +1,8 @@
 #include "overworld/Perception/Managers/AgentPerceptionManager.h"
 
+#include <string>
+#include <cstddef>
+
 #include "overworld/BasicTypes/Hand.h"
 #include "overworld/Utils/ShellDisplay.h"
 
@@ -28,7 +31,7 @@ namespace owds {
   std::map<std::string, Agent*>::iterator AgentPerceptionManager::createAgent(const std::string& name, AgentType_e type)
   {
     std::map<std::string, Agent*>::iterator it;
-    auto agent = new Agent(name, type);
+    auto* agent = new Agent(name, type);
     it = agents_.emplace(name, agent).first;
 
     if(type == AgentType_e::ROBOT)

@@ -1,13 +1,16 @@
-#include <shared_mutex>
 #include "overworld/SituationAssessor.h"
 
 #include <chrono>
-#include <thread>
+#include <cstddef>
+#include <shared_mutex>
+#include <stdexcept>
 #include <string>
+#include <thread>
 
 #include "overworld/Perception/Modules/AreasModules/AreasEmulatedPerceptionModule.h"
 #include "overworld/Perception/Modules/HumansModules/HumansEmulatedPerceptionModule.h"
 #include "overworld/Perception/Modules/ObjectsModules/ObjectsEmulatedPerceptionModule.h"
+#include "overworld/Perception/Modules/PerceptionModuleBase.h"
 #include "overworld/Utils/KeypressHandler.h"
 
 namespace owds {
