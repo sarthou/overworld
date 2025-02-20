@@ -1,3 +1,4 @@
+#include <shared_mutex>
 #include "overworld/SituationAssessor.h"
 
 #include <chrono>
@@ -286,7 +287,7 @@ namespace owds {
         if(sensor.second->getWorldSegmentationId() == -1)
         {
           auto fov = sensor.second->getFieldOfView();
-          int id = engine_->world.addCamera(300 * fov.getRatioOpenGl(), 300, fov.getRatioOpenGl(), CameraView_e::segmented_view, fov.getClipNear(), fov.getClipFar());
+          int id = engine_->world.addCamera(300 * fov.getRatioOpenGl(), 300, fov.getRatio(), CameraView_e::segmented_view, fov.getClipNear(), fov.getClipFar());
           sensor.second->setWorldSegmentationId(id);
         }
         int cam_id = sensor.second->getWorldSegmentationId();
@@ -298,7 +299,7 @@ namespace owds {
         if(sensor.second->getWorldRgbaId() == -1)
         {
           auto fov = sensor.second->getFieldOfView();
-          int id = engine_->world.addCamera(500 * fov.getRatioOpenGl(), 500, fov.getRatioOpenGl(), CameraView_e::segmented_view, fov.getClipNear(), fov.getClipFar());
+          int id = engine_->world.addCamera(500 * fov.getRatioOpenGl(), 500, fov.getRatio(), CameraView_e::regular_view, fov.getClipNear(), fov.getClipFar());
           sensor.second->setWorldRgbaId(id);
         }
         cam_id = sensor.second->getWorldRgbaId();
@@ -340,9 +341,13 @@ namespace owds {
                                                   const std::map<std::string, Area*>& areas,
                                                   const std::unordered_set<uint32_t>& segmented_ids)
   {
+    std::shared_lock<std::shared_timed_mutex> lock(humans_assessors_mutex_);
     auto assessor_it = humans_assessors_.find(human_name);
     if(assessor_it == humans_assessors_.end())
-      assessor_it = createHumanAssessor(human_name);
+    {
+      creation_request_(human_name);
+      return;
+    }
 
     std::vector<Object*> seen_objects;
     for(auto object : objects)
@@ -370,24 +375,31 @@ namespace owds {
     assessor_it->second.areas_module->sendPerception(seen_areas);
   }
 
-  std::map<std::string, HumanAssessor_t>::iterator SituationAssessor::createHumanAssessor(const std::string& human_name)
+  void SituationAssessor::humanAssessorThread(owds::Window* window)
   {
-    auto assessor = humans_assessors_.insert(std::make_pair(human_name, HumanAssessor_t())).first;
+    initWorld(window);
+    initAssessor();
 
-    assessor->second.assessor = new SituationAssessor(human_name, config_path_, 1.0 / time_step_, 1.0 / simu_step_, simulate_);
-    assessor->second.objects_module = new ObjectsEmulatedPerceptionModule();
-    assessor->second.humans_module = new HumansEmulatedPerceptionModule();
-    assessor->second.areas_module = new AreasEmulatedPerceptionModule();
-    assessor->second.assessor->addObjectPerceptionModule("emulated_objects", assessor->second.objects_module);
-    assessor->second.assessor->addHumanPerceptionModule("emulated_humans", assessor->second.humans_module);
-    assessor->second.assessor->addAreaPerceptionModule("emulated_areas", assessor->second.areas_module);
-    std::thread th(&SituationAssessor::run, assessor->second.assessor);
-    assessor->second.thread = std::move(th);
+    run();
+  }
+
+  void SituationAssessor::createHumanAssessor(const std::string& human_name, Window* window)
+  {
+    std::lock_guard<std::shared_timed_mutex> lock(humans_assessors_mutex_);
+    auto h_assessor = humans_assessors_.insert(std::make_pair(human_name, HumanAssessor_t())).first;
+
+    h_assessor->second.assessor = new SituationAssessor(human_name, config_path_, 1.0 / time_step_, 1.0 / simu_step_, simulate_);;
+    h_assessor->second.objects_module = new ObjectsEmulatedPerceptionModule();
+    h_assessor->second.humans_module = new HumansEmulatedPerceptionModule();
+    h_assessor->second.areas_module = new AreasEmulatedPerceptionModule();
+    h_assessor->second.assessor->addObjectPerceptionModule("emulated_objects", h_assessor->second.objects_module);
+    h_assessor->second.assessor->addHumanPerceptionModule("emulated_humans", h_assessor->second.humans_module);
+    h_assessor->second.assessor->addAreaPerceptionModule("emulated_areas", h_assessor->second.areas_module);
+    std::thread th(&SituationAssessor::humanAssessorThread, h_assessor->second.assessor, window);
+    h_assessor->second.thread = std::move(th);
     auto msg = std_msgs::String();
     msg.data = "ADD|" + human_name;
     new_assessor_publisher_.publish(msg);
-
-    return assessor;
   }
 
   bool SituationAssessor::startModules(overworld::StartStopModules::Request& req, overworld::StartStopModules::Response& res)

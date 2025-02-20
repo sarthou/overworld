@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string>
 
 #include "overworld/Utils/Parameters.h"
 #include "overworld/Utils/ShellDisplay.h"
@@ -21,12 +22,24 @@ void handler(int sig)
   exit(1);
 }
 
-void assessorThread(owds::Window* window, owds::SituationAssessor& assessor)
-{
-  assessor.initWorld(window);
-  assessor.initAssessor();
+std::unordered_map<std::string, owds::Window*> windows;
+std::unordered_map<std::string, owds::SituationAssessor*> human_assessors;
+owds::SituationAssessor* robot_assessor;
 
-  assessor.run();
+std::unordered_set<std::string> requests; // TODO should be protected
+
+void requestAssessorCreation(const std::string& human_name)
+{
+  requests.insert(human_name);
+}
+
+void robotAssessorThread(owds::Window* window, owds::SituationAssessor* assessor)
+{
+  assessor->initWorld(window);
+  assessor->initAssessor();
+  assessor->setCreationCallback(requestAssessorCreation);
+
+  assessor->run();
 }
 
 int main(int argc, char** argv)
@@ -52,19 +65,37 @@ int main(int argc, char** argv)
     return -1;
   }
 
-  owds::SituationAssessor robot_situation_assessor(params.at("robot_name").getFirst(),
-                                                   params.at("config_path").getFirst(),
-                                                   std::stod(params.at("assessment frequency").getFirst()),
-                                                   std::stod(params.at("simulation frequency").getFirst()),
-                                                   params.at("simulate").getFirst() == "true",
-                                                   true);
-  owds::Window robot_window(params.at("robot_name").getFirst());
-  std::thread tread(&assessorThread, &robot_window, std::ref(robot_situation_assessor));
+  std::string robot_name = params.at("robot_name").getFirst();
+
+  robot_assessor = new owds::SituationAssessor (robot_name,
+                                                params.at("config_path").getFirst(),
+                                                std::stod(params.at("assessment frequency").getFirst()),
+                                                std::stod(params.at("simulation frequency").getFirst()),
+                                                params.at("simulate").getFirst() == "true",
+                                                true);
+
+  windows.emplace(robot_name, new owds::Window(robot_name));
+  std::thread tread(&robotAssessorThread, windows.at(robot_name), robot_assessor);
 
   while(ros::ok())
   {
     owds::Window::pollEvent();
     usleep(1000);
+
+    if(requests.empty() == false)
+    {
+      std::unordered_set<std::string> rqts = requests;
+      requests.clear();
+
+      for(const auto& human_name : rqts)
+      {
+        if(windows.find(human_name) != windows.end())
+          continue;
+
+        windows.emplace(human_name, new owds::Window(human_name));
+        robot_assessor->createHumanAssessor(human_name, windows.at(human_name));
+      }
+    }
   }
 
   tread.join();

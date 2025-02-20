@@ -9,6 +9,7 @@
 #include <ros/ros.h>
 #include <std_srvs/SetBool.h>
 #include <string>
+#include <shared_mutex>
 #include <thread>
 
 #include "overworld/Engine/Engine.h"
@@ -33,14 +34,12 @@ namespace owds {
     PerceptionModuleBase<BodyPart, std::vector<BodyPart*>>* robots_module;
     PerceptionModuleBase<Area, std::vector<Area*>>* areas_module;
 
-    HumanAssessor_t()
-    {
-      assessor = nullptr;
-      objects_module = nullptr;
-      humans_module = nullptr;
-      robots_module = nullptr;
-      areas_module = nullptr;
-    }
+    HumanAssessor_t() : assessor(nullptr),
+                        objects_module(nullptr),
+                        humans_module(nullptr),
+                        robots_module(nullptr),
+                        areas_module(nullptr)
+    {}
   };
 
   class SituationAssessor
@@ -65,6 +64,9 @@ namespace owds {
     void addHumanPerceptionModule(const std::string& module_name, PerceptionModuleBase_<BodyPart>* module);
     void addRobotPerceptionModule(const std::string& module_name, PerceptionModuleBase_<BodyPart>* module);
     void addAreaPerceptionModule(const std::string& module_name, PerceptionModuleBase_<Area>* module);
+
+    void setCreationCallback(const std::function<void(const std::string&)>& callback) { creation_request_ = callback; }
+    void createHumanAssessor(const std::string& human_name, Window* window);
 
   private:
     std::string agent_name_;
@@ -95,7 +97,9 @@ namespace owds {
     ROSSender* ros_sender_;
     PoseSender* objetcs_pose_sender_;
 
+    mutable std::shared_timed_mutex humans_assessors_mutex_;
     std::map<std::string, HumanAssessor_t> humans_assessors_;
+    std::function<void(const std::string&)> creation_request_;
 
     void rosLoop();
     void assessmentLoop();
@@ -107,7 +111,7 @@ namespace owds {
                                  const std::map<std::string, BodyPart*>& humans,
                                  const std::map<std::string, Area*>& areas,
                                  const std::unordered_set<uint32_t>& segmented_ids);
-    std::map<std::string, HumanAssessor_t>::iterator createHumanAssessor(const std::string& human_name);
+    void humanAssessorThread(owds::Window* window);
 
     bool stopModules(overworld::StartStopModules::Request& req, overworld::StartStopModules::Response& res);
     bool startModules(overworld::StartStopModules::Request& req, overworld::StartStopModules::Response& res);
