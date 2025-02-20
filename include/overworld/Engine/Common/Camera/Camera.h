@@ -45,6 +45,7 @@ namespace owds {
 
   public:
     Camera() = default;
+    Camera(const Camera& other) = default;
 
     glm::vec3 getPosition() const { return world_eye_position_; }
     glm::vec3 getFrontPose() const { return world_eye_position_ + world_eye_front_; }

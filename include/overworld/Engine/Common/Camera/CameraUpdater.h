@@ -82,8 +82,15 @@ namespace owds {
   public:
     CameraUpdater(Camera* camera = nullptr);
     ~CameraUpdater() { delete camera_; }
+    CameraUpdater(const CameraUpdater& other) = delete;
+    CameraUpdater& operator = (const CameraUpdater&) = delete;
 
-    void initCamera(Camera* camera);
+    CameraUpdater(CameraUpdater&& other)
+    {
+      camera_ = std::move(other.camera_);
+      other.camera_ = nullptr;
+    }
+
     Camera* getCamera() const { return camera_; }
 
     void processUserKeyboardInput(float delta_time, Key_e key, bool is_down);

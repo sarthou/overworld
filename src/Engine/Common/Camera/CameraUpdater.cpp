@@ -21,12 +21,6 @@ namespace owds {
       camera_ = new Camera(*camera);
   }
 
-  void CameraUpdater::initCamera(Camera* camera)
-  {
-    delete camera_;
-    camera_ = new Camera(*camera);
-  }
-
   void CameraUpdater::processUserKeyboardInput(const float delta_time, Key_e key, bool is_down)
   {
     if(camera_ == nullptr)
