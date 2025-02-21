@@ -226,8 +226,6 @@ namespace owds {
 
   void SituationAssessor::assess()
   {
-    std::map<std::string, std::unordered_set<uint32_t>> agents_segmentation_ids;
-
     //perception_manager_.update();
     auto objects = perception_manager_.objects_manager_.getEntities();
     auto robots = perception_manager_.robots_manager_.getAgents();
@@ -239,7 +237,7 @@ namespace owds {
     std::thread humans_process;
 
     if(is_robot_)
-      humans_process = std::thread(&SituationAssessor::processHumans, this, std::ref(agents_segmentation_ids));
+      humans_process = std::thread(&SituationAssessor::processHumans, this);
 
     auto agents = humans;
     agents.insert(robots.begin(), robots.end());
@@ -260,14 +258,14 @@ namespace owds {
     if(is_robot_)
       humans_process.join();
 
-    facts_calculator_.computeAgentsFacts(objects, agents, agents_segmentation_ids, false);
+    facts_calculator_.computeAgentsFacts(objects, agents, agents_segmentation_ids_, false);
     facts_calculator_.initAreas(areas);
     facts_calculator_.computeAreasFacts(areas, {}, robot_parts, false);
     auto facts = facts_calculator_.computeAreasFacts(areas, objects, body_parts, false);
     facts_publisher_.publish(facts);
   }
 
-  void SituationAssessor::processHumans(std::map<std::string, std::unordered_set<uint32_t>>& agents_segmentation_ids)
+  void SituationAssessor::processHumans()
   {
     auto humans = perception_manager_.humans_manager_.getAgents();
     if(humans.empty())
@@ -310,7 +308,7 @@ namespace owds {
         if(sensor.second->getWorldRgbaId() == -1)
         {
           auto fov = sensor.second->getFieldOfView();
-          int id = engine_->world.addCamera(500 * fov.getRatioOpenGl(), 500, fov.getRatio(), CameraView_e::regular_view, fov.getClipNear(), fov.getClipFar());
+          int id = engine_->world.addCamera(300 * fov.getRatioOpenGl(), 300, fov.getRatio(), CameraView_e::regular_view, fov.getClipNear(), fov.getClipFar());
           sensor.second->setWorldRgbaId(id);
         }
         cam_id = sensor.second->getWorldRgbaId();
@@ -330,8 +328,8 @@ namespace owds {
       auto cam_it = agent_to_segmentation.find(human.second);
       if(cam_it != agent_to_segmentation.end())
       {
-        agents_segmentation_ids[human.first] = engine_->world.getCameraSementation(cam_it->second);
-        updateHumansPerspective(human.first, objects, body_parts, areas, agents_segmentation_ids[human.first]);
+        agents_segmentation_ids_[human.first] = engine_->world.getCameraSementation(cam_it->second);
+        updateHumansPerspective(human.first, objects, body_parts, areas, agents_segmentation_ids_[human.first]);
       }
 
       auto rgba_it = agent_to_rgba.find(human.second);
@@ -469,6 +467,7 @@ namespace owds {
   {
     (void)req;
     res.agents.push_back(agent_name_);
+    std::lock_guard<std::shared_timed_mutex> lock(humans_assessors_mutex_);
     for(auto& assessor : humans_assessors_)
       res.agents.push_back(assessor.first);
     return true;
@@ -478,6 +477,7 @@ namespace owds {
   {
     std::cout << "[SituationAssessor] set simulation to " << (int)(req.data) << std::endl;
     setSimulation(req.data);
+    std::lock_guard<std::shared_timed_mutex> lock(humans_assessors_mutex_);
     for(auto& assessor : humans_assessors_)
       assessor.second.assessor->setSimulation(req.data);
     res.success = true;

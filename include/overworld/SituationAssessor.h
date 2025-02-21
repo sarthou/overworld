@@ -101,11 +101,13 @@ namespace owds {
     std::map<std::string, HumanAssessor_t> humans_assessors_;
     std::function<void(const std::string&)> creation_request_;
 
+    std::map<std::string, std::unordered_set<uint32_t>> agents_segmentation_ids_;
+
     void rosLoop();
     void assessmentLoop();
     void assess();
 
-    void processHumans(std::map<std::string, std::unordered_set<uint32_t>>& agents_segmentation_ids);
+    void processHumans();
     void updateHumansPerspective(const std::string& human_name,
                                  const std::map<std::string, Object*>& objects,
                                  const std::map<std::string, BodyPart*>& humans,
