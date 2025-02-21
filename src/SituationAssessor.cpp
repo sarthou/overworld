@@ -186,11 +186,10 @@ namespace owds {
 
     while(ros::ok() && isRunning())
     {
-      start_time = std::chrono::high_resolution_clock::now();
+      start_time += interval; //= std::chrono::high_resolution_clock::now();
+      next_start_time = start_time + interval;
 
       perception_manager_.update();
-
-      next_start_time = start_time + interval;
 
       if(simulate_ && perception_manager_.objects_manager_.needSimulation())
       {
@@ -205,12 +204,21 @@ namespace owds {
       if(next_start_time < std::chrono::high_resolution_clock::now())
       {
         auto delta = std::chrono::high_resolution_clock::now() - (start_time + interval);
+        if(delta > interval)
+        {
+          int mod = (delta.count()/ 1000000) % interval.count();
+          start_time += interval * mod;
+          next_start_time  += interval * mod;
+        }
         ShellDisplay::warning("[SituationAssessor] [" + agent_name_ + "] The main loop is late of " + std::to_string(delta.count() / 1000000.) + " ms");
       }
       else
       {
-        // auto delta = next_start_time - std::chrono::high_resolution_clock::now();
-        // ShellDisplay::info("sleep for " + std::to_string(delta.count() / 1000000.) + " ms");
+        if(is_robot_)
+        {
+          auto delta = next_start_time - std::chrono::high_resolution_clock::now();
+          ShellDisplay::info("sleep for " + std::to_string(delta.count() / 1000000.) + " ms");
+        }
         std::this_thread::sleep_until(next_start_time);
       }
     }
