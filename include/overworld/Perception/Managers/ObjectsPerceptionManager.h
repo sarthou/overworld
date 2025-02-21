@@ -12,7 +12,7 @@ namespace owds {
   public:
     explicit ObjectsPerceptionManager() : simulate_(false), myself_agent_(nullptr) {}
 
-    std::map<std::string, Object*> getEntities() const { return entities_; };
+    const std::map<std::string, Object*>& getEntities() const { return entities_; };
 
     void setSimulation(bool simulate) { simulate_ = simulate; }
     bool needSimulation() const { return simulated_objects_.size() != 0; }
