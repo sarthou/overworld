@@ -154,6 +154,12 @@ namespace owds {
     shaders_.at("screen").use();
     shaders_.at("screen").setInt("screenTexture", 0);
 
+    render_steps_.emplace_back([this](){ loadWorld(); });
+    render_steps_.emplace_back([this](){ renderPointShadowDepth(); });
+    render_steps_.emplace_back([this](){ loadDebugLines(); });
+    render_steps_.emplace_back([this](){ renderAmbientShadowDepth(); });
+    render_steps_.emplace_back([this](){ renderMainScreen(); });
+
     return true;
   }
 
@@ -178,9 +184,14 @@ namespace owds {
       for(auto& mesh : model.second)
         mesh.second.clear();
 
-    loadWorld();
-    loadDebugLines();
-    render();
+    render_collision_models_ = render_camera_.shouldRendercollisionModels();
+    render_shadows_ = render_camera_.shouldShadows();
+
+    for(const auto& step : render_steps_)
+    {
+      step();
+      renderOffScreens();
+    }
   }
 
   void Renderer::setRenderCamera(Camera* camera)
@@ -429,22 +440,7 @@ namespace owds {
       cached_lines_.erase(id);
   }
 
-  void Renderer::render()
-  {
-    render_collision_models_ = render_camera_.shouldRendercollisionModels();
-    bool render_shadows = render_camera_.shouldShadows();
-
-    // 0. draw scene as normal in depth buffers
-
-    if(render_shadows)
-      renderShadowDepth();
-
-    renderMainScreen(render_shadows);
-
-    renderOffScreens(render_shadows);
-  }
-
-  void Renderer::renderMainScreen(bool render_shadows)
+  void Renderer::renderMainScreen()
   {
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -465,7 +461,7 @@ namespace owds {
     // glStencilMask(0x00);
 
     light_shader.use();
-    setLightsUniforms(light_shader, render_shadows, render_shadows);
+    setLightsUniforms(light_shader, render_shadows_, render_shadows_);
     light_shader.setVec3("view_pose", render_camera_.getPosition());
     light_shader.setMat4("view", render_camera_.getViewMatrix());
     light_shader.setMat4("projection", render_camera_.getProjectionMatrix());
@@ -507,7 +503,7 @@ namespace owds {
     screen_.draw();
   }
 
-  void Renderer::renderOffScreens(bool render_shadows)
+  void Renderer::renderOffScreens()
   {
     if(world_->has_render_request_)
     {
@@ -524,18 +520,18 @@ namespace owds {
 
         Camera* camera = virtual_camera.getCamera();
         if(camera->getViewType() == CameraView_e::regular_view)
-          renderOffscreenRgb(camera, render_shadows);
+          renderOffscreenRgb(camera);
         else
           renderOffscreenSegmented(camera);
 
-        glFlush();
+        //glFlush();
         off_screens_[i].getImage(virtual_camera.getImageData());
       }
       world_->has_render_request_ = false;
     }
   }
 
-  void Renderer::renderOffscreenRgb(Camera* camera, bool render_shadows)
+  void Renderer::renderOffscreenRgb(Camera* camera)
   {
     auto& light_shader = shaders_.at("default");
     auto& sky_shader = shaders_.at("sky");
@@ -548,7 +544,7 @@ namespace owds {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
     light_shader.use();
-    setLightsUniforms(light_shader, false, render_shadows); // We never use the ambient shadows for offscreen
+    setLightsUniforms(light_shader, false, render_shadows_); // We never use the ambient shadows for offscreen
     light_shader.setVec3("view_pose", camera->getPosition());
     light_shader.setMat4("view", camera->getViewMatrix());
     light_shader.setMat4("projection", camera->getProjectionMatrix());
@@ -589,12 +585,13 @@ namespace owds {
     renderModelsSegmented(shader);
   }
 
-  void Renderer::renderShadowDepth()
+  void Renderer::renderAmbientShadowDepth()
   {
-    auto& shadow_shader = shaders_.at("depth");
-    auto& shadow_point_shader = shaders_.at("depthcube");
+    if(render_shadows_ == false)
+      return;
 
-    // Ambient shadows
+    auto& shadow_shader = shaders_.at("depth");
+
     auto ambient_dir = -glm::normalize(world_->ambient_light_.getDirection());
     shadow_.computeLightSpaceMatrices(render_camera_, ambient_dir);
 
@@ -605,8 +602,16 @@ namespace owds {
     glEnable(GL_DEPTH_TEST);
 
     renderModels(shadow_shader, 2);
+  }
 
-    // Points shadows
+  void Renderer::renderPointShadowDepth()
+  {
+    if(render_shadows_ == false)
+      return;
+
+    auto& shadow_point_shader = shaders_.at("depthcube");
+    glEnable(GL_DEPTH_TEST);
+
     shadow_point_shader.use();
     for(size_t i = 0; i < PointLights::MAX_POINT_LIGHTS; i++)
     {

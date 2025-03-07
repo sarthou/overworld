@@ -57,6 +57,9 @@ namespace owds {
     float last_frame_ = 0;
 
     bool render_collision_models_ = false;
+    bool render_shadows_ = false;
+
+    std::vector<std::function<void()>> render_steps_;
 
     std::unordered_map<std::string, Texture2D> loaded_textures_;
     std::unordered_map<Model::Id, std::unordered_map<Mesh::Id, MeshHandle>> cached_models_;
@@ -77,16 +80,16 @@ namespace owds {
     std::vector<Texture2D> loadTextures(Material& material);
     void loadModel(const Model& model, const Material& material);
     void loadDebugLines();
-    void render();
 
     void renderModels(const Shader& shader, unsigned int texture_offset = 0);
     void renderModelsSegmented(const Shader& shader);
 
-    void renderMainScreen(bool render_shadows);
-    void renderOffScreens(bool render_shadows);
-    void renderOffscreenRgb(Camera* camera, bool render_shadows);
+    void renderMainScreen();
+    void renderOffScreens();
+    void renderOffscreenRgb(Camera* camera);
     void renderOffscreenSegmented(Camera* camera);
-    void renderShadowDepth();
+    void renderAmbientShadowDepth();
+    void renderPointShadowDepth();
     void renderDebug();
 
     void setLightsUniforms(const Shader& shader, bool use_ambient_shadows = true, bool use_points_shadows = true);
