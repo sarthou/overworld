@@ -192,6 +192,7 @@ namespace owds {
       step();
       renderOffScreens();
     }
+    glFinish();
   }
 
   void Renderer::setRenderCamera(Camera* camera)
