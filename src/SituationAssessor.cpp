@@ -113,8 +113,7 @@ namespace owds {
       new_assessor_publisher_.publish(msg);
     }
 
-    if(is_robot_)
-      engine_->setKeyCallback([this](Key_e key, bool pressed){ handleKeypress(key, pressed, this->engine_, this->perception_manager_); });
+    engine_->setKeyCallback([this](Key_e key, bool pressed){ handleKeypress(key, pressed, this->engine_, this->perception_manager_); });
   }
 
   void SituationAssessor::stop()
