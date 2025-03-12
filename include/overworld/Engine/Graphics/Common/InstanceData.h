@@ -11,6 +11,7 @@ namespace owds {
   public:
     glm::mat4 mvp_;
     owds::Color rgba_;
+    uint32_t object_id_;
   };
 } // namespace owds
 
