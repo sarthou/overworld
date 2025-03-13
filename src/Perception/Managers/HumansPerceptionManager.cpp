@@ -14,7 +14,7 @@ namespace owds {
       {
         auto* sensor = getAgent(percept.second.getAgentName())->getSensor(percept.second.getSensorId());
         if(sensor != nullptr)
-          sensor->setPerceptseen(percept.first);
+          sensor->setPerceptSeen(percept.first);
       }
 
       std::string part_id = percept.first;
@@ -88,10 +88,10 @@ namespace owds {
 
   void HumansPerceptionManager::reasoningOnUpdate()
   {
-    fusioner_.fuseData(fusioned_percepts_, aggregated_);
+    fusioner_.fuseData(fusioned_percepts_, entities_aggregated_percepts_);
     fromfusedToEntities();
 
-    for(auto& percept : aggregated_)
+    for(auto& percept : entities_aggregated_percepts_)
       percept.second.clear();
   }
 

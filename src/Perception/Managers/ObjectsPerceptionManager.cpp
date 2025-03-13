@@ -6,6 +6,7 @@
 #include <map>
 #include <cstddef>
 
+#include "overworld/Utils/ShellDisplay.h"
 #include "overworld/BasicTypes/Hand.h"
 
 #define TO_HALF_RAD M_PI / 180. / 2.
@@ -53,7 +54,7 @@ namespace owds {
       {
         auto* sensor = myself_agent_->getSensor(percept.second.getSensorId());
         if(sensor != nullptr)
-          sensor->setPerceptseen(percept.first);
+          sensor->setPerceptSeen(percept.first);
       }
       else if(myself_agent_->getType() == AgentType_e::HUMAN)
       {
@@ -62,7 +63,7 @@ namespace owds {
         {
           auto sensor = human_sensors.begin()->second; // we assume a single sensor by human
           percept.second.setSensorId(sensor->id());
-          sensor->setPerceptseen(percept.first);
+          sensor->setPerceptSeen(percept.first);
         }
       }
 
@@ -99,7 +100,7 @@ namespace owds {
 
   void ObjectsPerceptionManager::reasoningOnUpdate()
   {
-    fusioner_.fuseData(fusioned_percepts_, aggregated_);
+    fusioner_.fuseData(fusioned_percepts_, entities_aggregated_percepts_);
 
     if(false_ids_to_be_merged_.size())
       mergeFalseIdData();
@@ -187,140 +188,158 @@ namespace owds {
   {
     updateAabbs();
 
-    std::map<std::string, std::set<Sensor*>> object_sensors_set; // map of the object and the sensors associated to module without poi
-    std::map<std::string, Object*> no_data_objects;
     std::map<std::string, Object*> objects_to_remove;
-    std::map<std::string, Object*> objects_to_simulate_oclusion;
+    std::map<std::string, Object*> objects_to_simulate;
+    std::unordered_map<Object*, std::set<Sensor*>> object_to_reason_no_poi;
 
     for(auto& object : entities_)
     {
-      bool object_is_consider_with_no_poi = false;
-      bool can_pass_to_the_next_object = false;
       if(shouldBeReasonedOn(object.second) == false)
       {
         if(object.second->isStatic() == false)
           lost_objects_nb_frames_.erase(object.first);
         continue;
       }
+      // From there we only work on not perceived for a while (MAX_UNSEEN) objects
 
-      auto it = entities_percetion_register_.find(object.first);
-      if(it == entities_percetion_register_.end())
-        continue;
-      for(auto& pair_sensor_set_modules : it->second)
+      auto used_sensors_modules = entities_to_sensors_modules_.find(object.first);
+      if(used_sensors_modules == entities_to_sensors_modules_.end())
+        continue; // We do not have any information about the used sensor so we do not consider this entity
+
+      bool occlusion_detected = false;
+      bool should_be_remove = false;
+      std::set<Sensor*> no_poi_sensors;
+
+      for(auto& sensor_modules : used_sensors_modules->second)
       {
-        object_is_consider_with_no_poi = false;
-
-        if(can_pass_to_the_next_object)
+        if(should_be_remove)
           break;
 
-        for(auto& module_name : pair_sensor_set_modules.second)
+        const std::string& sensor_name = sensor_modules.first;
+        for(auto& module_name : sensor_modules.second)
         {
-          if(object.second->getPointsOfInterest(module_name).size() != 0)
-          {
-            auto pois_in_fov = getPoisInFov(object.second, myself_agent_->getSensor(pair_sensor_set_modules.first), module_name);
+          if(object.second->getPointsOfInterest(module_name).empty() == false)
+          { // this object used Poi to localize the object
+            auto pois_in_fov = getPoisInFov(object.second, myself_agent_->getSensor(sensor_name), module_name);
             if(pois_in_fov.empty() == false)
             {
-              if(shouldBeSeen(object.second, myself_agent_->getSensor(pair_sensor_set_modules.first), pois_in_fov))
+              if(shouldBeSeen(object.second, myself_agent_->getSensor(sensor_name), pois_in_fov))
               {
+                // Some of the used Poi for this module are in the Fov
                 auto it_unseen = lost_objects_nb_frames_.find(object.first);
                 if(it_unseen == lost_objects_nb_frames_.end())
                   it_unseen = lost_objects_nb_frames_.insert({object.second->id(), 0}).first;
-
                 it_unseen->second++;
+                // We have the count of from how many time this object has not been seen (MAX_UNSEEN + N)
+
                 if(it_unseen->second > MAX_UNSEEN)
                 {
-                  objects_to_remove.emplace(object.first, object.second);
-                  objects_to_simulate_oclusion.erase(object.first);
-                  no_data_objects.erase(object.first);
-                  can_pass_to_the_next_object = true;
+                  should_be_remove = true;
                   break;
                 }
               }
               else
-              {
-                objects_to_simulate_oclusion.emplace(object.first, object.second);
-                no_data_objects.erase(object.first);
-              }
-            } // object with pois but none in the fov
-            else // object with no pois in the fov should be put in no_data and erased if pois are in the fov of another module
-            {
-              // object_is_consider_with_no_poi = true;
+                occlusion_detected = true;
             }
+            //else
+              // If Pois are not in Fov we do not care, it is normal to not perceive
           }
-          else // object has no pois
-            object_is_consider_with_no_poi = true;
-        }
-
-        if(object_is_consider_with_no_poi)
-        {
-          no_data_objects.emplace(object.first, object.second);
-          auto it = object_sensors_set.find(object.first);
-          if(it == object_sensors_set.end())
-            object_sensors_set.emplace(object.first, std::set<Sensor*>{myself_agent_->getSensor(pair_sensor_set_modules.first)});
           else
-            it->second.emplace(myself_agent_->getSensor(pair_sensor_set_modules.first));
+            no_poi_sensors.insert(myself_agent_->getSensor(sensor_name));
         }
       }
+
+      if(should_be_remove)
+        objects_to_remove.emplace(object);
+      else if(occlusion_detected) // TODO: if it exist a no poi sensor for this object, should we reason further?
+        objects_to_simulate.emplace(object);
+      else if(no_poi_sensors.empty() == false)
+        object_to_reason_no_poi.emplace(object.second, std::move(no_poi_sensors));
     }
 
-    if(no_data_objects.size())
+    if(object_to_reason_no_poi.empty() == false)
     {
+      std::unordered_map<Object*, std::set<Sensor*>> object_to_reason_segmentation_needed;
       std::unordered_set<Sensor*> used_sensors;
-      for(auto no_data_obj : no_data_objects)
-      {
-        auto sensor_set = object_sensors_set.find(no_data_obj.first);
-        for(auto sensor : sensor_set->second)
-          used_sensors.insert(sensor);
-      }
 
-      std::vector<int> sensor_world_ids;
-      sensor_world_ids.reserve(used_sensors.size());
-      for(auto sensor : used_sensors)
+      // We first test simpliest conditions:
+      // - does a sensor exist and is located?
+      // - does the objects AABB in the Fov ?
+      // these conditions are filled, more complex tests will be performed in a second step
+      for(auto& object : object_to_reason_no_poi)
       {
-        addToWorld(sensor);
-        sensor_world_ids.push_back(sensor->getWorldSegmentationId());
-        auto sensor_pose = sensor->pose().arrays();
-        world_client_->setCameraPositionAndOrientation(sensor->getWorldSegmentationId(),
-                                                       sensor_pose.first, sensor_pose.second);
-      }
-      world_client_->requestCameraRender(sensor_world_ids);
-      std::unordered_map<Sensor*, std::unordered_set<uint32_t>> segmentations;
-      for(auto sensor : used_sensors)
-      {
-        int sensor_id = sensor->getWorldSegmentationId();
-        segmentations.emplace(sensor, world_client_->getCameraSementation(sensor_id));
-      }
-
-      for(auto no_data_obj : no_data_objects)
-      {
-        auto sensor_set = object_sensors_set.find(no_data_obj.first);
-        for(auto sensor : sensor_set->second)
+        std::set<Sensor*> sensors_to_segment;
+        const auto& sensor_set = object.second;
+        for(auto sensor : sensor_set)
         {
-          if((sensor != nullptr) && (sensor->isLocated()) &&
-             isObjectInFovAabb(no_data_obj.second, sensor) && 
-             (segmentations[sensor].find(no_data_obj.second->worldId()) != segmentations[sensor].end()))
+          if((sensor != nullptr) && (sensor->isLocated()) && isObjectInFovAabb(object.first, sensor))
           {
-            auto it_unseen = lost_objects_nb_frames_.find(no_data_obj.first);
-            if(it_unseen == lost_objects_nb_frames_.end())
-              it_unseen = lost_objects_nb_frames_.insert({no_data_obj.first, 0}).first;
-
-            it_unseen->second++;
-            if(it_unseen->second > MAX_UNSEEN)
-            {
-              objects_to_remove.emplace(no_data_obj.first, no_data_obj.second);
-              objects_to_simulate_oclusion.erase(no_data_obj.first);
-              break;
-            }
+            sensors_to_segment.insert(sensor);
+            used_sensors.insert(sensor);
           }
-          else // there is the case where one told to simulate and the next one says to remove, we wait the end of the loop to be sure
-            objects_to_simulate_oclusion.emplace(no_data_obj.first, no_data_obj.second);
+        }
+
+        if(sensors_to_segment.empty() == false)
+          object_to_reason_segmentation_needed.emplace(object.first, std::move(sensors_to_segment));
+      }
+
+      if(object_to_reason_segmentation_needed.empty() == false)
+      {
+        std::vector<int> sensor_world_ids;
+        sensor_world_ids.reserve(used_sensors.size());
+        for(auto sensor : used_sensors)
+        {
+          addToWorld(sensor);
+          sensor_world_ids.push_back(sensor->getWorldSegmentationId());
+          auto sensor_pose = sensor->pose().arrays();
+          world_client_->setCameraPositionAndOrientation(sensor->getWorldSegmentationId(),
+                                                        sensor_pose.first, sensor_pose.second);
+        }
+        world_client_->requestCameraRender(sensor_world_ids);
+        std::unordered_map<Sensor*, std::unordered_set<uint32_t>> segmentations;
+        for(auto sensor : used_sensors)
+        {
+          int sensor_id = sensor->getWorldSegmentationId();
+          segmentations.emplace(sensor, world_client_->getCameraSementation(sensor_id));
+        }
+
+        bool occlusion_detected = false;
+        bool should_be_remove = false;
+        for(auto& object : object_to_reason_segmentation_needed)
+        {
+          const auto& sensor_set = object.second;
+
+          for(auto sensor : sensor_set)
+          {
+            if(segmentations[sensor].find(object.first->worldId()) != segmentations[sensor].end()) // Other conditions have already been tested
+            { // This object should have been seen by this sensor
+              auto it_unseen = lost_objects_nb_frames_.find(object.first->id());
+              if(it_unseen == lost_objects_nb_frames_.end())
+                it_unseen = lost_objects_nb_frames_.insert({object.first->id(), 0}).first;
+              it_unseen->second++;
+              // We have the count of from how many time this object has not been seen (MAX_UNSEEN + N)
+
+              if(it_unseen->second > MAX_UNSEEN)
+              {
+                should_be_remove = true;
+                break;
+              }
+            }
+            else
+              occlusion_detected = true;
+          }
+
+          if(should_be_remove)
+            objects_to_remove.emplace(object.first->id(), object.first);
+          else if(occlusion_detected)
+            objects_to_simulate.emplace(object.first->id(), object.first);
         }
       }
     }
 
     // From there, objects to be removed are in the agent Fov but we don't have
     // any information about them neither any explanation
-    objects_to_remove = simulatePhysics(objects_to_remove, objects_to_simulate_oclusion);
+    objects_to_remove = simulatePhysics(objects_to_remove, objects_to_simulate);
 
     for(auto obj : objects_to_remove)
       removeEntityPose(obj.second);
@@ -563,9 +582,9 @@ namespace owds {
     // then we erase it from all maps
     for(auto& false_id : merged)
     {
-      entities_percetion_register_.erase(false_id);
+      entities_to_sensors_modules_.erase(false_id);
       false_ids_to_be_merged_.erase(false_id);
-      aggregated_.erase(false_id);
+      entities_aggregated_percepts_.erase(false_id);
 
       auto to_be_removed = fusioned_percepts_.at(false_id);
 

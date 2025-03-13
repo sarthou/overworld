@@ -115,7 +115,7 @@ namespace owds {
 
   std::map<std::string, Sensor*>::iterator AgentPerceptionManager::createSensor(const std::string& id, const std::string& agent_name)
   {
-    std::string sensor_id = id;
+    const std::string& sensor_id = id;
     std::vector<std::string> onto_res;
     onto_res = onto_->individuals.getOn(sensor_id, "hasFrameId");
     std::string frame_id = getOntoValue(onto_res, std::string(""));

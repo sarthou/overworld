@@ -1,5 +1,11 @@
 #include "overworld/Perception/Modules/ObjectsModules/ObjectsEmulatedPerceptionModule.h"
 
+#include <string>
+#include <map>
+
+#include "overworld/BasicTypes/Object.h"
+#include "overworld/BasicTypes/Percept.h"
+
 namespace owds {
 
   bool ObjectsEmulatedPerceptionModule::perceptionCallback(const std::vector<Object*>& msg)

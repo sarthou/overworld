@@ -2,8 +2,10 @@
 #define OWDS_OBJECTSEMULATEDPERCEPTIONMODULE_H
 
 #include <vector>
+#include <map>
 
 #include "overworld/BasicTypes/Object.h"
+#include "overworld/BasicTypes/Percept.h"
 #include "overworld/Perception/Modules/PerceptionModuleBase.h"
 
 namespace owds {
@@ -14,7 +16,7 @@ namespace owds {
     ObjectsEmulatedPerceptionModule() = default;
 
   private:
-    virtual bool perceptionCallback(const std::vector<Object*>& msg) override;
+    bool perceptionCallback(const std::vector<Object*>& msg) override;
 
     std::map<std::string, Percept<Object>>::iterator createNewPercept(Object* object);
   };

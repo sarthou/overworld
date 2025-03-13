@@ -23,7 +23,7 @@ namespace owds {
 
     void clearPoses() { objects_seen_ids_.clear(); }
 
-    void setPerceptseen(const std::string& percept_id) { objects_seen_ids_.insert(percept_id); };
+    void setPerceptSeen(const std::string& percept_id) { objects_seen_ids_.insert(percept_id); };
     void resetPerceptseen(const std::string& percept_id) { objects_seen_ids_.erase(percept_id); };
 
     bool isActivated() const { return is_activated_; }

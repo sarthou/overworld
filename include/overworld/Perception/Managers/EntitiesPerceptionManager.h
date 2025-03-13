@@ -40,8 +40,8 @@ namespace owds {
 
   protected:
     std::map<std::string, T*> entities_;
-    std::map<std::string, std::map<std::string, Percept<T>>> aggregated_;
-    std::map<std::string, std::map<std::string, std::set<std::string>>> entities_percetion_register_;
+    std::map<std::string, std::map<std::string, Percept<T>>> entities_aggregated_percepts_;
+    std::map<std::string, std::map<std::string, std::set<std::string>>> entities_to_sensors_modules_;
     std::unordered_map<std::string, Percept<T>*> fusioned_percepts_;
     std::unordered_set<std::string> black_listed_entities_;
     WorldEngine* world_client_;
@@ -103,9 +103,9 @@ namespace owds {
   {
     if(sensor_id.empty() == false) // we avoid problems with static object
     {
-      auto it = entities_percetion_register_.find(entity_id);
-      if(it == entities_percetion_register_.end())
-        entities_percetion_register_.emplace(entity_id, std::map<std::string, std::set<std::string>>{{sensor_id, {module_name}}});
+      auto it = entities_to_sensors_modules_.find(entity_id);
+      if(it == entities_to_sensors_modules_.end())
+        entities_to_sensors_modules_.emplace(entity_id, std::map<std::string, std::set<std::string>>{{sensor_id, {module_name}}});
       else
       {
         auto inner_it = it->second.find(sensor_id);
@@ -120,10 +120,10 @@ namespace owds {
   template<typename T>
   void EntitiesPerceptionManager<T>::fusionAggregated(const std::string& entity_id, const std::string& module_name, const Percept<T>& percept)
   {
-    auto it = aggregated_.find(entity_id);
-    if(it == aggregated_.end())
+    auto it = entities_aggregated_percepts_.find(entity_id);
+    if(it == entities_aggregated_percepts_.end())
     {
-      aggregated_.emplace(entity_id, std::map<std::string, Percept<T>>{{module_name, percept}});
+      entities_aggregated_percepts_.emplace(entity_id, std::map<std::string, Percept<T>>{{module_name, percept}});
     }
     else
     {
