@@ -25,7 +25,7 @@ namespace owds {
   private:
     std::string sensor_id_;
     std::string module_name_;
-    float confidence_;
+    float confidence_ = 1.0;
   };
 
 } // namespace owds
