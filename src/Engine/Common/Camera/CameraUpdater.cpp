@@ -279,7 +279,7 @@ namespace owds {
 
     glm::quat quat = ToQT(orientation);
     glm::vec3 world_up(0.0f, 0.0f, 1.0f); // Fixed world up vector
-    glm::vec3 front = glm::normalize(quat * glm::vec3(1.0f, 0.0f, 0.0f)); // Forward direction
+    glm::vec3 front = glm::normalize(quat * glm::vec3(0.0f, 0.0f, 1.0f)); // Forward direction
     glm::vec3 right = glm::normalize(glm::cross(front, world_up)); // Right direction
     glm::vec3 up = glm::cross(right, front); // Actual up direction based on orientation
 
