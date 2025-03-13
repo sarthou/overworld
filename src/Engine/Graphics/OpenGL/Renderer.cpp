@@ -163,22 +163,27 @@ namespace owds {
     return true;
   }
 
+  bool Renderer::shouldRender()
+  {
+    float current_frame = glfwGetTime();
+    if(last_frame_ <= 0)
+      last_frame_ = current_frame;
+    delta_time_ = current_frame - last_frame_;
+    
+    if(world_->has_render_request_)
+      return true;
+    else
+      return (1.0f / max_fps_ - delta_time_ <= 0);
+  }
+
   void Renderer::commit()
   {
     if(world_ == nullptr)
       return;
 
-    float current_frame = glfwGetTime();
-    if(last_frame_ <= 0)
-      last_frame_ = current_frame;
-    delta_time_ = current_frame - last_frame_;
-    last_frame_ = current_frame;
+    last_frame_ = glfwGetTime();
 
     world_->processDebugLifeTime((double)delta_time_);
-
-    float sleep_time = 1.0f / max_fps_ - delta_time_;
-    if(sleep_time > 0.0)
-      sleep(sleep_time);
 
     for(auto& model : current_mesh_batches_)
       for(auto& mesh : model.second)

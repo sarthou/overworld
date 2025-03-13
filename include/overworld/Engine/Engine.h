@@ -70,6 +70,8 @@ namespace owds {
         window_->doPollEvents(renderer_);
         if(simulate)
           world.stepSimulation();
+        while(renderer_.shouldRender() == false)
+          usleep(500);
         renderer_.commit();
         window_->swapBuffer();
       }

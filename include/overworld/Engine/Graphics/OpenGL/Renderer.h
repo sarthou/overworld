@@ -38,6 +38,7 @@ namespace owds {
     bool initialize(Window& window);
     void attachWorld(World* world) { world_ = world; }
 
+    bool shouldRender();
     void commit();
 
     void setRenderCamera(Camera* camera);
@@ -52,7 +53,7 @@ namespace owds {
     AmbientShadow shadow_;
     PointShadow point_shadows_;
     TextRenderer text_renderer_;
-    float max_fps_ = 120;
+    float max_fps_ = 30;
     float delta_time_;
     float last_frame_ = 0;
 
