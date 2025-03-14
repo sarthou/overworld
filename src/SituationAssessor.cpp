@@ -20,11 +20,13 @@ namespace owds {
                                        double assessment_frequency,
                                        size_t simulation_substepping,
                                        bool simulate,
+                                       bool publish_debug,
                                        bool is_robot) : agent_name_(agent_name),
                                                         myself_agent_(nullptr),
                                                         is_robot_(is_robot),
                                                         config_path_(config_path),
                                                         simulate_(simulate),
+                                                        debug_(publish_debug),
                                                         time_step_(1.0 / assessment_frequency),
                                                         simulation_substepping_(simulation_substepping),
                                                         perception_manager_(&n_),
@@ -245,10 +247,18 @@ namespace owds {
 
     if(is_robot_)
     {
-      ros_sender_->sendEntitiesToTFAndRViz(myself_agent_->getId() + "/objects_markers", objects);
-      ros_sender_->sendEntitiesToTFAndRViz(myself_agent_->getId() + "/humans_markers", body_parts);
+      if(debug_)
+      {
+        ros_sender_->sendEntitiesToTFAndRViz(myself_agent_->getId() + "/objects_markers", objects);
+        ros_sender_->sendEntitiesToTFAndRViz(myself_agent_->getId() + "/humans_markers", body_parts);
+      }
+      else
+      {
+        ros_sender_->sendEntitiesToTF(objects);
+        ros_sender_->sendEntitiesToTF(body_parts);
+      }
     }
-    else
+    else if(debug_)
     {
       ros_sender_->sendEntitiesToRViz(myself_agent_->getId() + "/objects_markers", objects);
       ros_sender_->sendEntitiesToRViz(myself_agent_->getId() + "/humans_markers", body_parts);

@@ -47,7 +47,9 @@ namespace owds {
   public:
     SituationAssessor(const std::string& agent_name, const std::string& config_path,
                       double assessment_frequency, size_t simulation_substepping,
-                      bool simulate = true, bool is_robot = false);
+                      bool simulate = true,
+                      bool publish_debug = false,
+                      bool is_robot = false);
     SituationAssessor(const SituationAssessor& other) = delete;
     ~SituationAssessor();
 
@@ -75,6 +77,7 @@ namespace owds {
 
     std::string config_path_;
     bool simulate_;
+    bool debug_;
 
     ros::NodeHandle n_;
     ros::CallbackQueue callback_queue_;
