@@ -1,11 +1,12 @@
 #include "overworld/Facts/FactsCalculator.h"
 
+#include "overworld/Engine/Common/WorldTypes.h"
+
+#include <array>
+
 #define IN_HAND_DIST 0.08
 
 namespace owds {
-
-  FactsCalculator::FactsCalculator(const std::string& agent_name)
-  {}
 
   std::vector<Fact> FactsCalculator::computeObjectsFacts(const std::map<std::string, Object*>& objects,
                                                          bool clear)
@@ -51,7 +52,7 @@ namespace owds {
 
   std::vector<Fact> FactsCalculator::computeAgentsFacts(const std::map<std::string, Object*>& objects,
                                                         const std::map<std::string, Agent*>& agents,
-                                                        const std::map<std::string, std::unordered_set<int>>& segmantation_ids,
+                                                        const std::map<std::string, std::unordered_set<uint32_t>>& segmantation_ids,
                                                         bool clear)
   {
     if(clear)
@@ -83,6 +84,12 @@ namespace owds {
     }
 
     return facts_;
+  }
+
+  void FactsCalculator::initAreas(const std::map<std::string, Area*>& areas)
+  {
+    for(auto& area : areas)
+      area.second->updatePose();
   }
 
   std::vector<Fact> FactsCalculator::computeAreasFacts(const std::map<std::string, Area*>& areas,
@@ -177,7 +184,7 @@ namespace owds {
     }
   }
 
-  bool FactsCalculator::overlapXY(const struct aabb_t& aabb_1, const struct aabb_t& aabb_2)
+  bool FactsCalculator::overlapXY(const struct AABB_t& aabb_1, const struct AABB_t& aabb_2)
   {
     if((aabb_1.min[0] == aabb_1.max[0]) || (aabb_1.min[1] == aabb_1.max[1]) ||
        (aabb_2.min[0] == aabb_2.max[0]) || (aabb_2.min[1] == aabb_2.max[1]))
@@ -198,7 +205,7 @@ namespace owds {
 
     for(const auto& agent_perceiving_sensor : agent_perceiving_sensors)
     {
-      Pose sensor_pose = agent_perceiving_sensor.second->pose();
+      const Pose& sensor_pose = agent_perceiving_sensor.second->pose();
       if(agent_perceived->getHead() != nullptr && agent_perceived->getHead()->isLocated())
       {
         if(agent_perceiving_sensor.second->getFieldOfView().hasIn(agent_perceived->getHead()->pose().transformIn(sensor_pose)))
@@ -247,9 +254,9 @@ namespace owds {
     return false;
   }
 
-  bool FactsCalculator::isLookingAt(Agent* agent, const std::unordered_set<int>& seen_bullet_ids, const Object* object)
+  bool FactsCalculator::isLookingAt(Agent* agent, const std::unordered_set<uint32_t>& seen_engine_ids, const Object* object)
   {
-    if(seen_bullet_ids.count(object->bulletId()))
+    if(seen_engine_ids.count(object->worldId()))
     {
       facts_.emplace_back(agent->getId(), "isLookingAt", object->id());
       return true;

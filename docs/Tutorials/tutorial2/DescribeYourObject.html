@@ -7,22 +7,26 @@
   <link href="../../images/favicon.ico" rel="shortcut icon">
   <link href="../../images/favicon-32x32.png" rel="icon" type="image/png">
   <link href="../../images/favicon-16x16.png" rel="icon" type="image/png">
-  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css"
+    integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
 </head>
 
 <body>
   <div class="header" id="header">
     <header class="fixed" id="navbar">
       <div class="container">
-          <div class="navbar-header">
-            <div id="header-buttons">
-                <ul id="header-ul" data-event="hover_intent" data-effect="fade" data-effect-speed="500">
-                    <li class="header-item"><a class="header-link" href="https://github.com/sarthou/overworld" tabindex="0"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Octicons-mark-github.svg/1200px-Octicons-mark-github.svg.png" alt="github" width="40px" height="40px"/></a></li>
-                </ul>
-            </div>
-            <a class="navbar-icon" href="../../index.html">
-              <img src="../../images/overworld.png " alt="overworld" width="53px" height="65px"/>
-            </a>
+        <div class="navbar-header">
+          <div id="header-buttons">
+            <ul id="header-ul" data-event="hover_intent" data-effect="fade" data-effect-speed="500">
+              <li class="header-item"><a class="header-link" href="https://github.com/sarthou/overworld"
+                  tabindex="0"><img
+                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Octicons-mark-github.svg/1200px-Octicons-mark-github.svg.png"
+                    alt="github" width="40px" height="40px" /></a></li>
+            </ul>
+          </div>
+          <a class="navbar-icon" href="../../index.html">
+            <img src="../../images/overworld_light.png" alt="overworld" height="65px" />
+          </a>
         </div>
       </div>
     </header>
@@ -32,9 +36,12 @@
 
     <div class="navigationbar">
       <ul class="sub-navigation">
-        <li><a href="https://www.youtube.com/watch?v=LUkjts8UacI" target="_blank" rel="noopener noreferrer">Demo video</a></li>
-        <li><a href="https://sarthou.github.io/ontologenius/index.html" target="_blank" rel="noopener noreferrer">Ontologenius</a></li>
-        <li><a href="https://github.com/sarthou/overworld/actions" target="_blank" rel="noopener noreferrer">Pipelines</a></li>
+        <li><a href="https://www.youtube.com/watch?v=LUkjts8UacI" target="_blank" rel="noopener noreferrer">Demo
+            video</a></li>
+        <li><a href="https://sarthou.github.io/ontologenius/index.html" target="_blank"
+            rel="noopener noreferrer">Ontologenius</a></li>
+        <li><a href="https://github.com/sarthou/overworld/actions" target="_blank"
+            rel="noopener noreferrer">Pipelines</a></li>
       </ul>
       <h1>Overworld Cpp Documentation</h1>
     </div>
@@ -92,150 +99,220 @@
 
         <h1 class="title">Describe your object</h1>
 
-        <p>Now that we have a CAD model, we have to make all the information about it available to all our components, and especially to Overworld.
-           In the same way we did for the robot, we will describe the object using the ontology.
+        <p>Now that we have a CAD model, we have to make all the information about it available to all our components,
+          and especially to Overworld.
+          In the same way we did for the robot, we will describe the object using the ontology.
         </p>
 
         <h2>Create the ontology</h2>
 
-        <p>Here we will not describe an entire environment which will be too long but we will just create four frames using the meshes we created before.
-           The idea here is to see how to link the meshes to instantiated entities and how to apply colors on.
+        <p>Here we will not describe an entire environment which will be too long but we will just create four frames
+          using the meshes we created before.
+          The idea here is to see how to link the meshes to instantiated entities and how to apply colors on.
         </p>
 
         <p>Let's create a new ontology file called "env.owl" in the "ontologies" folder.
-           Then paste the following in.
+          Then paste the following in.
         </p>
 
         <div class="code_block xml_code" style="counter-reset:code_line 0;">
-          <div class="code_line">&lt;?<span class="xml_tag">xml</span> <span class="xml_param">version</span>=<span class="xml_string">&quot;1.0&quot;</span>?&gt;</div>
-          <div class="code_line">&lt;<span class="xml_tag">rdf:RDF</span> <span class="xml_param">xmlns</span>=<span class="xml_string">&quot;https://gitlab.laas.fr/discuter/overworld_tutorials/-/blob/master/ontologies/env#&quot;</span></div>
-          <div class="code_line">     <span class="xml_param">xmlns:env</span>=<span class="xml_string">&quot;https://gitlab.laas.fr/discuter/overworld_tutorials/-/blob/master/ontologies/env#&quot;</span></div>
-          <div class="code_line">     <span class="xml_param">xmlns:cg_objects</span>=<span class="xml_string">&quot;https://github.com/RIS-WITH/common_ground_ontology/blob/master/CG_objects#&quot;</span></div>
-          <div class="code_line">     <span class="xml_param">xmlns:cg_entities</span>=<span class="xml_string">&quot;https://github.com/RIS-WITH/common_ground_ontology/blob/master/CG_entities#&quot;</span></div>
-          <div class="code_line">     <span class="xml_param">xmlns:rdf</span>=<span class="xml_string">&quot;http://www.w3.org/1999/02/22-rdf-syntax-ns#&quot;</span></div>
-          <div class="code_line">     <span class="xml_param">xmlns:owl</span>=<span class="xml_string">&quot;http://www.w3.org/2002/07/owl#&quot;</span></div>
-          <div class="code_line">     <span class="xml_param">xmlns:xml</span>=<span class="xml_string">&quot;http://www.w3.org/XML/1998/namespace&quot;</span></div>
-          <div class="code_line">     <span class="xml_param">xmlns:xsd</span>=<span class="xml_string">&quot;http://www.w3.org/2001/XMLSchema#&quot;</span></div>
-          <div class="code_line">     <span class="xml_param">xmlns:rdfs</span>=<span class="xml_string">&quot;http://www.w3.org/2000/01/rdf-schema#&quot;</span>&gt;</div>
-          <div class="code_line">    &lt;<span class="xml_tag">owl:Ontology</span> <span class="xml_param">rdf:about</span>=<span class="xml_string">&quot;https://gitlab.laas.fr/discuter/overworld_tutorials/-/blob/master/ontologies/env&quot;</span>&gt;</div>
-          <div class="code_line">      &lt;<span class="xml_tag">owl:imports</span> <span class="xml_param">rdf:resource</span>=<span class="xml_string">&quot;https://github.com/RIS-WITH/common_ground_ontology/blob/master/CG_objects&quot;</span>/&gt;</div>
-          <div class="code_line">    &lt;/<span class="xml_tag">owl:Ontology</span>&gt;</div>
-          <div class="code_line">    </div>
-          <div class="code_line">    </div>
-          <div class="code_line">    </div>
-          <div class="code_line">    <span class="xml_comment">&lt;!-- </span></div>
-          <div class="code_line">    <span class="xml_comment">///////////////////////////////////////////////////////////////////////////////////////</span></div>
-          <div class="code_line">    <span class="xml_comment">//</span></div>
-          <div class="code_line">    <span class="xml_comment">// Classes</span></div>
-          <div class="code_line">    <span class="xml_comment">//</span></div>
-          <div class="code_line">    <span class="xml_comment">///////////////////////////////////////////////////////////////////////////////////////</span></div>
-          <div class="code_line">    <span class="xml_comment"> --&gt;</span></div>
-          <div class="code_line">    </div>
-          <div class="code_line">    </div>
-          <div class="code_line">    </div>
-          <div class="code_line">    <span class="xml_comment">&lt;!-- env#Frame --&gt;</span></div>
-          <div class="code_line">    </div>
-          <div class="code_line">    &lt;<span class="xml_tag">owl:Class</span> <span class="xml_param">rdf:about</span>=<span class="xml_string">&quot;env#Frame&quot;</span>&gt;</div>
-          <div class="code_line">        &lt;<span class="xml_tag">rdfs:subClassOf</span> <span class="xml_param">rdf:resource</span>=<span class="xml_string">&quot;cg_objects#Object&quot;</span>/&gt;</div>
-          <div class="code_line">        &lt;<span class="xml_tag">cg_entities:hasMesh</span> <span class="xml_param">rdf:datatype</span>=<span class="xml_string">&quot;http://www.w3.org/2001/XMLSchema#string&quot;</span>&gt;package://overworld_tutorials/models/frame.obj&lt;/<span class="xml_tag">cg_entities:hasMesh</span>&gt;</div>
-          <div class="code_line">    &lt;/<span class="xml_tag">owl:Class</span>&gt;</div>
-          <div class="code_line">    </div>
-          <div class="code_line">    </div>
-          <div class="code_line">    </div>
-          <div class="code_line">    <span class="xml_comment">&lt;!-- </span></div>
-          <div class="code_line">    <span class="xml_comment">///////////////////////////////////////////////////////////////////////////////////////</span></div>
-          <div class="code_line">    <span class="xml_comment">//</span></div>
-          <div class="code_line">    <span class="xml_comment">// Individuals</span></div>
-          <div class="code_line">    <span class="xml_comment">//</span></div>
-          <div class="code_line">    <span class="xml_comment">///////////////////////////////////////////////////////////////////////////////////////</span></div>
-          <div class="code_line">    <span class="xml_comment"> --&gt;</span></div>
-          <div class="code_line">    </div>
-          <div class="code_line">    </div>
-          <div class="code_line">    </div>
-          <div class="code_line">    <span class="xml_comment">&lt;!-- env#frame_obj --&gt;</span></div>
-          <div class="code_line">    </div>
-          <div class="code_line">    &lt;<span class="xml_tag">owl:NamedIndividual</span> <span class="xml_param">rdf:about</span>=<span class="xml_string">&quot;env#frame_obj&quot;</span>&gt;</div>
-          <div class="code_line">        &lt;<span class="xml_tag">rdf:type</span> <span class="xml_param">rdf:resource</span>=<span class="xml_string">&quot;env#Frame&quot;</span>/&gt;</div>
-          <div class="code_line">    &lt;/<span class="xml_tag">owl:NamedIndividual</span>&gt;</div>
-          <div class="code_line">    </div>
-          <div class="code_line">    </div>
-          <div class="code_line">    </div>
-          <div class="code_line">    <span class="xml_comment">&lt;!-- env#frame_stl --&gt;</span></div>
-          <div class="code_line">    </div>
-          <div class="code_line">    &lt;<span class="xml_tag">owl:NamedIndividual</span> <span class="xml_param">rdf:about</span>=<span class="xml_string">&quot;env#frame_stl&quot;</span>&gt;</div>
-          <div class="code_line">        &lt;<span class="xml_tag">rdf:type</span> <span class="xml_param">rdf:resource</span>=<span class="xml_string">&quot;env#Frame&quot;</span>/&gt;</div>
-          <div class="code_line">        &lt;<span class="xml_tag">cg_entities:hasMesh</span> <span class="xml_param">rdf:datatype</span>=<span class="xml_string">&quot;http://www.w3.org/2001/XMLSchema#string&quot;</span>&gt;package://overworld_tutorials/models/frame.stl&lt;/<span class="xml_tag">cg_entities:hasMesh</span>&gt;</div>
-          <div class="code_line">    &lt;/<span class="xml_tag">owl:NamedIndividual</span>&gt;</div>
-          <div class="code_line">    </div>
-          <div class="code_line">    </div>
-          <div class="code_line">    </div>
-          <div class="code_line">    <span class="xml_comment">&lt;!-- env#frame_green --&gt;</span></div>
-          <div class="code_line">    </div>
-          <div class="code_line">    &lt;<span class="xml_tag">owl:NamedIndividual</span> <span class="xml_param">rdf:about</span>=<span class="xml_string">&quot;env#frame_green&quot;</span>&gt;</div>
-          <div class="code_line">        &lt;<span class="xml_tag">rdf:type</span> <span class="xml_param">rdf:resource</span>=<span class="xml_string">&quot;env#Frame&quot;</span>/&gt;</div>
-          <div class="code_line">        &lt;<span class="xml_tag">cg_entities:hasColor</span> <span class="xml_param">rdf:resource</span>=<span class="xml_string">&quot;cg_entities#green&quot;</span>/&gt;</div>
-          <div class="code_line">    &lt;/<span class="xml_tag">owl:NamedIndividual</span>&gt;</div>
-          <div class="code_line">    </div>
-          <div class="code_line">    </div>
-          <div class="code_line">    </div>
-          <div class="code_line">    <span class="xml_comment">&lt;!-- env#frame_red --&gt;</span></div>
-          <div class="code_line">    </div>
-          <div class="code_line">    &lt;<span class="xml_tag">owl:NamedIndividual</span> <span class="xml_param">rdf:about</span>=<span class="xml_string">&quot;env#frame_red&quot;</span>&gt;</div>
-          <div class="code_line">        &lt;<span class="xml_tag">rdf:type</span> <span class="xml_param">rdf:resource</span>=<span class="xml_string">&quot;env#Frame&quot;</span>/&gt;</div>
-          <div class="code_line">        &lt;<span class="xml_tag">cg_entities:hasMesh</span> <span class="xml_param">rdf:datatype</span>=<span class="xml_string">&quot;http://www.w3.org/2001/XMLSchema#string&quot;</span>&gt;package://overworld_tutorials/models/frame.stl&lt;/<span class="xml_tag">cg_entities:hasMesh</span>&gt;</div>
-          <div class="code_line">        &lt;<span class="xml_tag">cg_entities:hasColor</span> <span class="xml_param">rdf:resource</span>=<span class="xml_string">&quot;cg_entities#red&quot;</span>/&gt;</div>
-          <div class="code_line">    &lt;/<span class="xml_tag">owl:NamedIndividual</span>&gt;</div>
-          <div class="code_line">    </div>
+          <div class="code_line">&lt;?<span class="xml_tag">xml</span> <span class="xml_param">version</span>=<span
+              class="xml_string">&quot;1.0&quot;</span>?&gt;</div>
+          <div class="code_line">&lt;<span class="xml_tag">rdf:RDF</span> <span class="xml_param">xmlns</span>=<span
+              class="xml_string">&quot;https://gitlab.laas.fr/discuter/overworld_tutorials/-/blob/master/ontologies/env#&quot;</span>
+          </div>
+          <div class="code_line"> <span class="xml_param">xmlns:env</span>=<span
+              class="xml_string">&quot;https://gitlab.laas.fr/discuter/overworld_tutorials/-/blob/master/ontologies/env#&quot;</span>
+          </div>
+          <div class="code_line"> <span class="xml_param">xmlns:cg_objects</span>=<span
+              class="xml_string">&quot;https://github.com/RIS-WITH/common_ground_ontology/blob/master/CG_objects#&quot;</span>
+          </div>
+          <div class="code_line"> <span class="xml_param">xmlns:cg_entities</span>=<span
+              class="xml_string">&quot;https://github.com/RIS-WITH/common_ground_ontology/blob/master/CG_entities#&quot;</span>
+          </div>
+          <div class="code_line"> <span class="xml_param">xmlns:rdf</span>=<span
+              class="xml_string">&quot;http://www.w3.org/1999/02/22-rdf-syntax-ns#&quot;</span></div>
+          <div class="code_line"> <span class="xml_param">xmlns:owl</span>=<span
+              class="xml_string">&quot;http://www.w3.org/2002/07/owl#&quot;</span></div>
+          <div class="code_line"> <span class="xml_param">xmlns:xml</span>=<span
+              class="xml_string">&quot;http://www.w3.org/XML/1998/namespace&quot;</span></div>
+          <div class="code_line"> <span class="xml_param">xmlns:xsd</span>=<span
+              class="xml_string">&quot;http://www.w3.org/2001/XMLSchema#&quot;</span></div>
+          <div class="code_line"> <span class="xml_param">xmlns:rdfs</span>=<span
+              class="xml_string">&quot;http://www.w3.org/2000/01/rdf-schema#&quot;</span>&gt;</div>
+          <div class="code_line"> &lt;<span class="xml_tag">owl:Ontology</span> <span
+              class="xml_param">rdf:about</span>=<span
+              class="xml_string">&quot;https://gitlab.laas.fr/discuter/overworld_tutorials/-/blob/master/ontologies/env&quot;</span>&gt;
+          </div>
+          <div class="code_line"> &lt;<span class="xml_tag">owl:imports</span> <span
+              class="xml_param">rdf:resource</span>=<span
+              class="xml_string">&quot;https://github.com/RIS-WITH/common_ground_ontology/blob/master/CG_objects&quot;</span>/&gt;
+          </div>
+          <div class="code_line"> &lt;/<span class="xml_tag">owl:Ontology</span>&gt;</div>
+          <div class="code_line"> </div>
+          <div class="code_line"> </div>
+          <div class="code_line"> </div>
+          <div class="code_line"> <span class="xml_comment">&lt;!-- </span></div>
+          <div class="code_line"> <span
+              class="xml_comment">///////////////////////////////////////////////////////////////////////////////////////</span>
+          </div>
+          <div class="code_line"> <span class="xml_comment">//</span></div>
+          <div class="code_line"> <span class="xml_comment">// Classes</span></div>
+          <div class="code_line"> <span class="xml_comment">//</span></div>
+          <div class="code_line"> <span
+              class="xml_comment">///////////////////////////////////////////////////////////////////////////////////////</span>
+          </div>
+          <div class="code_line"> <span class="xml_comment"> --&gt;</span></div>
+          <div class="code_line"> </div>
+          <div class="code_line"> </div>
+          <div class="code_line"> </div>
+          <div class="code_line"> <span class="xml_comment">&lt;!-- env#Frame --&gt;</span></div>
+          <div class="code_line"> </div>
+          <div class="code_line"> &lt;<span class="xml_tag">owl:Class</span> <span
+              class="xml_param">rdf:about</span>=<span class="xml_string">&quot;env#Frame&quot;</span>&gt;</div>
+          <div class="code_line"> &lt;<span class="xml_tag">rdfs:subClassOf</span> <span
+              class="xml_param">rdf:resource</span>=<span class="xml_string">&quot;cg_objects#Object&quot;</span>/&gt;
+          </div>
+          <div class="code_line"> &lt;<span class="xml_tag">cg_entities:hasMesh</span> <span
+              class="xml_param">rdf:datatype</span>=<span
+              class="xml_string">&quot;http://www.w3.org/2001/XMLSchema#string&quot;</span>&gt;package://overworld_tutorials/models/frame.obj&lt;/<span
+              class="xml_tag">cg_entities:hasMesh</span>&gt;</div>
+          <div class="code_line"> &lt;/<span class="xml_tag">owl:Class</span>&gt;</div>
+          <div class="code_line"> </div>
+          <div class="code_line"> </div>
+          <div class="code_line"> </div>
+          <div class="code_line"> <span class="xml_comment">&lt;!-- </span></div>
+          <div class="code_line"> <span
+              class="xml_comment">///////////////////////////////////////////////////////////////////////////////////////</span>
+          </div>
+          <div class="code_line"> <span class="xml_comment">//</span></div>
+          <div class="code_line"> <span class="xml_comment">// Individuals</span></div>
+          <div class="code_line"> <span class="xml_comment">//</span></div>
+          <div class="code_line"> <span
+              class="xml_comment">///////////////////////////////////////////////////////////////////////////////////////</span>
+          </div>
+          <div class="code_line"> <span class="xml_comment"> --&gt;</span></div>
+          <div class="code_line"> </div>
+          <div class="code_line"> </div>
+          <div class="code_line"> </div>
+          <div class="code_line"> <span class="xml_comment">&lt;!-- env#frame_obj --&gt;</span></div>
+          <div class="code_line"> </div>
+          <div class="code_line"> &lt;<span class="xml_tag">owl:NamedIndividual</span> <span
+              class="xml_param">rdf:about</span>=<span class="xml_string">&quot;env#frame_obj&quot;</span>&gt;</div>
+          <div class="code_line"> &lt;<span class="xml_tag">rdf:type</span> <span
+              class="xml_param">rdf:resource</span>=<span class="xml_string">&quot;env#Frame&quot;</span>/&gt;</div>
+          <div class="code_line"> &lt;/<span class="xml_tag">owl:NamedIndividual</span>&gt;</div>
+          <div class="code_line"> </div>
+          <div class="code_line"> </div>
+          <div class="code_line"> </div>
+          <div class="code_line"> <span class="xml_comment">&lt;!-- env#frame_stl --&gt;</span></div>
+          <div class="code_line"> </div>
+          <div class="code_line"> &lt;<span class="xml_tag">owl:NamedIndividual</span> <span
+              class="xml_param">rdf:about</span>=<span class="xml_string">&quot;env#frame_stl&quot;</span>&gt;</div>
+          <div class="code_line"> &lt;<span class="xml_tag">rdf:type</span> <span
+              class="xml_param">rdf:resource</span>=<span class="xml_string">&quot;env#Frame&quot;</span>/&gt;</div>
+          <div class="code_line"> &lt;<span class="xml_tag">cg_entities:hasMesh</span> <span
+              class="xml_param">rdf:datatype</span>=<span
+              class="xml_string">&quot;http://www.w3.org/2001/XMLSchema#string&quot;</span>&gt;package://overworld_tutorials/models/frame.stl&lt;/<span
+              class="xml_tag">cg_entities:hasMesh</span>&gt;</div>
+          <div class="code_line"> &lt;/<span class="xml_tag">owl:NamedIndividual</span>&gt;</div>
+          <div class="code_line"> </div>
+          <div class="code_line"> </div>
+          <div class="code_line"> </div>
+          <div class="code_line"> <span class="xml_comment">&lt;!-- env#frame_green --&gt;</span></div>
+          <div class="code_line"> </div>
+          <div class="code_line"> &lt;<span class="xml_tag">owl:NamedIndividual</span> <span
+              class="xml_param">rdf:about</span>=<span class="xml_string">&quot;env#frame_green&quot;</span>&gt;</div>
+          <div class="code_line"> &lt;<span class="xml_tag">rdf:type</span> <span
+              class="xml_param">rdf:resource</span>=<span class="xml_string">&quot;env#Frame&quot;</span>/&gt;</div>
+          <div class="code_line"> &lt;<span class="xml_tag">cg_entities:hasColor</span> <span
+              class="xml_param">rdf:resource</span>=<span class="xml_string">&quot;cg_entities#green&quot;</span>/&gt;
+          </div>
+          <div class="code_line"> &lt;/<span class="xml_tag">owl:NamedIndividual</span>&gt;</div>
+          <div class="code_line"> </div>
+          <div class="code_line"> </div>
+          <div class="code_line"> </div>
+          <div class="code_line"> <span class="xml_comment">&lt;!-- env#frame_red --&gt;</span></div>
+          <div class="code_line"> </div>
+          <div class="code_line"> &lt;<span class="xml_tag">owl:NamedIndividual</span> <span
+              class="xml_param">rdf:about</span>=<span class="xml_string">&quot;env#frame_red&quot;</span>&gt;</div>
+          <div class="code_line"> &lt;<span class="xml_tag">rdf:type</span> <span
+              class="xml_param">rdf:resource</span>=<span class="xml_string">&quot;env#Frame&quot;</span>/&gt;</div>
+          <div class="code_line"> &lt;<span class="xml_tag">cg_entities:hasMesh</span> <span
+              class="xml_param">rdf:datatype</span>=<span
+              class="xml_string">&quot;http://www.w3.org/2001/XMLSchema#string&quot;</span>&gt;package://overworld_tutorials/models/frame.stl&lt;/<span
+              class="xml_tag">cg_entities:hasMesh</span>&gt;</div>
+          <div class="code_line"> &lt;<span class="xml_tag">cg_entities:hasColor</span> <span
+              class="xml_param">rdf:resource</span>=<span class="xml_string">&quot;cg_entities#red&quot;</span>/&gt;
+          </div>
+          <div class="code_line"> &lt;/<span class="xml_tag">owl:NamedIndividual</span>&gt;</div>
+          <div class="code_line"> </div>
           <div class="code_line">&lt;/<span class="xml_tag">rdf:RDF</span>&gt;</div>
         </div>
 
-        <p>Once again, the file begins with some namespaces declaration and some imports. 
-           The only difference with the agents one is that we will use the "CG_objects" which is the subpart of the common ground ontology dedicated to objects' description.
+        <p>Once again, the file begins with some namespaces declaration and some imports.
+          The only difference with the agents one is that we will use the "CG_objects" which is the subpart of the
+          common ground ontology dedicated to objects' description.
         </p>
 
         <p>The following is the description of the classes of our ontology.
-           The common ground ontology already provides several objects like tables, boxes, and mugs.
-           Looking at the CG_building part, you can also find some descriptions of building parts like floor, door, or window.
-           Nevertheless, here we do not use one of these and we create a new class named "Frame" inheriting directly from the "Object" class.
+          The common ground ontology already provides several objects like tables, boxes, and mugs.
+          Looking at the CG_building part, you can also find some descriptions of building parts like floor, door, or
+          window.
+          Nevertheless, here we do not use one of these and we create a new class named "Frame" inheriting directly from
+          the "Object" class.
         </p>
 
         <p>The important thing to be noticed with our "Frame" class is the relation applied to it.
-           We use the data property <b>hasMesh</b> to attach our OBJ mesh directly to the class.
-           This means that any frame entity will have a default mesh being this one.
+          We use the data property <b>hasMesh</b> to attach our OBJ mesh directly to the class.
+          This means that any frame entity will have a default mesh being this one.
         </p>
 
         <p>In the following, we describe our individuals with four frame instances.
-           The frame_obj is just declared as a Frame and will thus use the mesh defined by the class.
-           The frame_stl overwrites the hasMesh relation by using the STL mesh.
-           When it will be loaded, this will thus be the STL mesh which will be used instead of the OBJ one.
+          The frame_obj is just declared as a Frame and will thus use the mesh defined by the class.
+          The frame_stl overwrites the hasMesh relation by using the STL mesh.
+          When it will be loaded, this will thus be the STL mesh which will be used instead of the OBJ one.
         </p>
 
-        <p>With the frame_green and frame_redindividuals, we do the same as the previous ones but we add to them a new relation using the object property <b>hasColor</b>.
-           If a color is defined, Overworld will use it to apply it to the mesh.
-           If needed you can define several color to an object but Overworld will only apply one of them.
+        <p>With the frame_green and frame_redindividuals, we do the same as the previous ones but we add to them a new
+          relation using the object property <b>hasColor</b>.
+          If a color is defined, Overworld will use it to apply it to the mesh.
+          If needed you can define several color to an object but Overworld will only apply one of them.
         </p>
 
         <h2>Creating new colors</h2>
 
         <p>
-           The common ground ontology already defines several colors in the "CG_entities" part but you can use new ones if needed.
-           Here bellow you can find a color description example.
+          The common ground ontology already defines several colors in the "CG_entities" part but you can use new ones
+          if needed.
+          Here bellow you can find a color description example.
         </p>
 
         <div class="code_block xml_code" style="counter-reset:code_line 0;">
-          <div class="code_line">    <span class="xml_comment">&lt;!-- cg_entities#red --&gt;</span></div>
+          <div class="code_line"> <span class="xml_comment">&lt;!-- cg_entities#red --&gt;</span></div>
           <div class="code_line"></div>
-          <div class="code_line">    &lt;<span class="xml_tag">owl:NamedIndividual</span> <span class="xml_param">rdf:about</span>=<span class="xml_string">cg_entities#red</span>&gt;</div>
-          <div class="code_line">        &lt;<span class="xml_tag">rdf:type</span> <span class="xml_param">rdf:resource</span>=<span class="xml_string">cg_entities#Color</span>/&gt;</div>
-          <div class="code_line">        &lt;<span class="xml_tag">rdfs:label</span> <span class="xml_param">xml:lang</span>=<span class="xml_string">en</span>&gt;red&lt;/<span class="xml_tag">rdfs:label</span>&gt;</div>
-          <div class="code_line">        &lt;<span class="xml_tag">rdfs:label</span> <span class="xml_param">xml:lang</span>=<span class="xml_string">fr</span>&gt;rouge&lt;/<span class="xml_tag">rdfs:label</span>&gt;</div>
-          <div class="code_line">        &lt;<span class="xml_tag">cg_entities:hexRgbValue</span> <span class="xml_param">rdf:datatype</span>=<span class="xml_string">cg_entities#hexrbg</span>&gt;0xDC143C&lt;/<span class="xml_tag">cg_entities:hexRgbValue</span>&gt;</div>
-          <div class="code_line">    &lt;/<span class="xml_tag">owl:NamedIndividual</span>&gt;</div>
+          <div class="code_line"> &lt;<span class="xml_tag">owl:NamedIndividual</span> <span
+              class="xml_param">rdf:about</span>=<span class="xml_string">cg_entities#red</span>&gt;</div>
+          <div class="code_line"> &lt;<span class="xml_tag">rdf:type</span> <span
+              class="xml_param">rdf:resource</span>=<span class="xml_string">cg_entities#Color</span>/&gt;</div>
+          <div class="code_line"> &lt;<span class="xml_tag">rdfs:label</span> <span
+              class="xml_param">xml:lang</span>=<span class="xml_string">en</span>&gt;red&lt;/<span
+              class="xml_tag">rdfs:label</span>&gt;</div>
+          <div class="code_line"> &lt;<span class="xml_tag">rdfs:label</span> <span
+              class="xml_param">xml:lang</span>=<span class="xml_string">fr</span>&gt;rouge&lt;/<span
+              class="xml_tag">rdfs:label</span>&gt;</div>
+          <div class="code_line"> &lt;<span class="xml_tag">cg_entities:hexRgbValue</span> <span
+              class="xml_param">rdf:datatype</span>=<span
+              class="xml_string">cg_entities#hexrbg</span>&gt;0xDC143C&lt;/<span
+              class="xml_tag">cg_entities:hexRgbValue</span>&gt;</div>
+          <div class="code_line"> &lt;/<span class="xml_tag">owl:NamedIndividual</span>&gt;</div>
         </div>
 
-        <p>The only important thing to notice if you want to define additional colors, is the use of the <b>hexRgbValue</b> data property.
-           Overworld does not have any hard-coded information about color and thus uses the ontology.
-           With the hexRgbValue, we thus provide the RGB color code of each color allowing Overworld to apply this color code when we apply a semantic color to an object.
+        <p>The only important thing to notice if you want to define additional colors, is the use of the
+          <b>hexRgbValue</b> data property.
+          Overworld does not have any hard-coded information about color and thus uses the ontology.
+          With the hexRgbValue, we thus provide the RGB color code of each color allowing Overworld to apply this color
+          code when we apply a semantic color to an object.
         </p>
 
         <nav class="course-pagination">
@@ -261,7 +338,7 @@
     <p>
       Brought to you by:
       <a class="laas_logo" href="https://www.laas.fr/public/">
-        <img src="../../images/LogoLAAS-2016_BW.png " alt="LAAS-CNRS" height="60px"/>
+        <img src="../../images/LogoLAAS-2016_BW.png " alt="LAAS-CNRS" height="60px" />
       </a>
     </p>
   </div>

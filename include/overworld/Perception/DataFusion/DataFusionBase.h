@@ -25,12 +25,12 @@ namespace owds {
     }
 
     void fuseData(std::unordered_map<std::string, Percept<Object>*>& fusioned_percepts,
-                  std::map<std::string, std::map<std::string, Percept<Object>>>& aggregated_);
+                  std::map<std::string, std::map<std::string, Percept<Object>>>& entities_aggregated_percepts_);
 
     // Todo: const can't be used because of the reasoning on the hand
     template<typename T>
     void fuseData(std::unordered_map<std::string, Percept<T>*>& fusioned_percepts,
-                  std::map<std::string, std::map<std::string, Percept<T>>>& aggregated_);
+                  std::map<std::string, std::map<std::string, Percept<T>>>& entities_aggregated_percepts_);
 
   protected:
     std::string method_name_;
@@ -41,9 +41,9 @@ namespace owds {
   // Todo: const can't be used because of the reasoning on the hand
   template<typename T>
   void DataFusionBase::fuseData(std::unordered_map<std::string, Percept<T>*>& fusioned_percepts,
-                                std::map<std::string, std::map<std::string, Percept<T>>>& aggregated_)
+                                std::map<std::string, std::map<std::string, Percept<T>>>& entities_aggregated_percepts_)
   {
-    for(auto& it : aggregated_)
+    for(auto& it : entities_aggregated_percepts_)
     {
       if(it.second.size() == 0)
         continue;

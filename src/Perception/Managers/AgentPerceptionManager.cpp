@@ -1,7 +1,10 @@
 #include "overworld/Perception/Managers/AgentPerceptionManager.h"
 
+#include <string>
+#include <cstddef>
+
 #include "overworld/BasicTypes/Hand.h"
-#include "overworld/Utility/ShellDisplay.h"
+#include "overworld/Utils/ShellDisplay.h"
 
 namespace owds {
 
@@ -28,7 +31,7 @@ namespace owds {
   std::map<std::string, Agent*>::iterator AgentPerceptionManager::createAgent(const std::string& name, AgentType_e type)
   {
     std::map<std::string, Agent*>::iterator it;
-    auto agent = new Agent(name, type);
+    auto* agent = new Agent(name, type);
     it = agents_.emplace(name, agent).first;
 
     if(type == AgentType_e::ROBOT)
@@ -79,6 +82,8 @@ namespace owds {
         ShellDisplay::info("[AgentPerceptionManager] Base " + body_part->id() + " has been setted for " + it_agent->second->getId());
         break;
       }
+      default:
+        return nullptr;
       }
       return it_agent->second;
     }
@@ -110,7 +115,7 @@ namespace owds {
 
   std::map<std::string, Sensor*>::iterator AgentPerceptionManager::createSensor(const std::string& id, const std::string& agent_name)
   {
-    std::string sensor_id = id;
+    const std::string& sensor_id = id;
     std::vector<std::string> onto_res;
     onto_res = onto_->individuals.getOn(sensor_id, "hasFrameId");
     std::string frame_id = getOntoValue(onto_res, std::string(""));

@@ -2,18 +2,15 @@
 
 #include <pluginlib/class_loader.h>
 
-#include "overworld/Utility/ShellDisplay.h"
+#include "overworld/Utils/ShellDisplay.h"
+#include "overworld/Engine/Engine.h"
 
 namespace owds {
 
-  PerceptionManagers::PerceptionManagers(ros::NodeHandle* n, BulletClient* bullet_client) : areas_manager_(n),
-                                                                                            robots_manager_(n),
-                                                                                            objects_manager_(n),
-                                                                                            humans_manager_(n),
-                                                                                            n_(n),
-                                                                                            bullet_client_(bullet_client),
-                                                                                            robot_bullet_id_(-1),
-                                                                                            robot_agent_(nullptr)
+  PerceptionManagers::PerceptionManagers(ros::NodeHandle* n, WorldEngine* world_client) : n_(n),
+                                                                                          world_client_(world_client),
+                                                                                          robot_engine_id_(-1),
+                                                                                          robot_agent_(nullptr)
   {
     areas_manager_.registerObjectsManager(&objects_manager_);
     areas_manager_.registerBodyPartsManager(&robots_manager_);
@@ -56,7 +53,7 @@ namespace owds {
       {
         auto human_perception_module = agents_loader.createUnmanagedInstance("owds::" + human_module);
         YamlElement module_config = configuration_[human_module_name];
-        human_perception_module->initialize(human_module_name, n_, bullet_client_, robot_bullet_id_, robot_agent_);
+        human_perception_module->initialize(human_module_name, n_, world_client_, robot_engine_id_, robot_agent_);
         for(auto& param_name : module_config.getElementsKeys())
           human_perception_module->setParameter(param_name, module_config[param_name].value().front());
 
@@ -77,7 +74,7 @@ namespace owds {
       {
         auto object_perception_module = objects_loader.createUnmanagedInstance("owds::" + object_module);
         YamlElement module_config = configuration_[object_module_name];
-        object_perception_module->initialize(object_module_name, n_, bullet_client_, robot_bullet_id_, robot_agent_);
+        object_perception_module->initialize(object_module_name, n_, world_client_, robot_engine_id_, robot_agent_);
         for(auto& param_name : module_config.getElementsKeys())
           object_perception_module->setParameter(param_name, module_config[param_name].value().front());
 
@@ -98,7 +95,7 @@ namespace owds {
       {
         auto area_perception_module = areas_loader.createUnmanagedInstance("owds::" + area_module);
         YamlElement module_config = configuration_[area_module_name];
-        area_perception_module->initialize(area_module_name, n_, bullet_client_, robot_bullet_id_, robot_agent_);
+        area_perception_module->initialize(area_module_name, n_, world_client_, robot_engine_id_, robot_agent_);
         for(auto& param_name : module_config.getElementsKeys())
           area_perception_module->setParameter(param_name, module_config[param_name].value().front());
 
@@ -130,7 +127,7 @@ namespace owds {
       {
         auto object_perception_module = objects_loader.createUnmanagedInstance("owds::" + object_module);
         YamlElement module_config = configuration_[object_module_name];
-        object_perception_module->initialize(object_module_name, n_, bullet_client_, robot_bullet_id_, robot_agent_);
+        object_perception_module->initialize(object_module_name, n_, world_client_, robot_engine_id_, robot_agent_);
         for(auto& param_name : module_config.getElementsKeys())
           object_perception_module->setParameter(param_name, module_config[param_name].value().front());
 
@@ -175,7 +172,7 @@ namespace owds {
     auto robot_perception_module = agents_loader.createUnmanagedInstance("owds::" + robot_modules[0]);
     std::string module_name = modules_list["robot"][robot_modules.front()].value().front();
     YamlElement module_config = configuration_[module_name];
-    robot_perception_module->initialize(module_name, n_, bullet_client_, -1, nullptr);
+    robot_perception_module->initialize(module_name, n_, world_client_, -1, nullptr);
     for(auto& param_name : module_config.getElementsKeys())
       robot_perception_module->setParameter(param_name, module_config[param_name].value().front());
 
@@ -183,7 +180,7 @@ namespace owds {
       return false;
 
     robot_name_ = robot_perception_module->getAgentName();
-    robot_bullet_id_ = robot_perception_module->getAgentBulletId();
+    robot_engine_id_ = robot_perception_module->getAgentBulletId();
 
     robots_manager_.addPerceptionModule(module_name, robot_perception_module);
 

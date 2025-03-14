@@ -9,35 +9,37 @@
 #include "overworld/BasicTypes/Area.h"
 #include "overworld/BasicTypes/Object.h"
 #include "overworld/Facts/Fact.h"
+#include "overworld/Engine/Common/WorldTypes.h"
 
 namespace owds {
 
   class FactsCalculator
   {
   public:
-    explicit FactsCalculator(const std::string& agent_name);
+    FactsCalculator() = default;
 
     std::vector<Fact> computeObjectsFacts(const std::map<std::string, Object*>& objects,
                                           bool clear = true);
     std::vector<Fact> computeAgentsFacts(const std::map<std::string, Object*>& objects,
                                          const std::map<std::string, Agent*>& agents,
-                                         const std::map<std::string, std::unordered_set<int>>& segmantation_ids,
+                                         const std::map<std::string, std::unordered_set<uint32_t>>& segmantation_ids,
                                          bool clear = true);
     std::vector<Fact> computeAreasFacts(const std::map<std::string, Area*>& areas,
                                         const std::map<std::string, Object*>& objects,
                                         const std::map<std::string, BodyPart*>& body_parts,
                                         bool clear = true);
 
+    void initAreas(const std::map<std::string, Area*>& areas);
   private:
     std::vector<Fact> facts_;
 
     bool isOnTopfOf(Object* object_under, Object* object_on);
     bool isInContainer(Object* object_around, Object* object_in);
-    bool overlapXY(const struct aabb_t& aabb_1, const struct aabb_t& aabb_2);
+    bool overlapXY(const struct AABB_t& aabb_1, const struct AABB_t& aabb_2);
 
     bool isPerceiving(Agent* agent_perceiving, Agent* agent_perceived);
 
-    bool isLookingAt(Agent* agent, const std::unordered_set<int>& seen_bullet_ids, const Object* object);
+    bool isLookingAt(Agent* agent, const std::unordered_set<uint32_t>& seen_engine_ids, const Object* object);
     bool hasInHand(Agent* agent, Object* object);
     bool isHandMovingTowards(Agent* agent, Object* object);
 

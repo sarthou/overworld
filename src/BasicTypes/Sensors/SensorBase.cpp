@@ -9,6 +9,8 @@ namespace owds {
                                                      is_activated_(true),
                                                      is_static_(is_static),
                                                      frame_id_(frame_id),
+                                                     segmentation_id_(-1),
+                                                     rgba_id_(-1),
                                                      field_of_view_(field_of_view)
   {}
 

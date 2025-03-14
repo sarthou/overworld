@@ -15,17 +15,17 @@ namespace owds {
   class Agent
   {
   public:
-    Agent(const std::string& id, const AgentType_e type) : id_(id), type_(type)
-    {
-      head_ = nullptr;
-      left_hand_ = nullptr;
-      right_hand_ = nullptr;
-      base_ = nullptr;
-      torso_ = nullptr;
-    }
+    Agent(const std::string& id, const AgentType_e type) : id_(id),
+                                                           type_(type),
+                                                           head_(nullptr),
+                                                           left_hand_(nullptr),
+                                                           right_hand_(nullptr),
+                                                           base_(nullptr),
+                                                           torso_(nullptr)
+    {}
 
     const std::string& getId() const { return id_; }
-    const AgentType_e getType() const { return type_; }
+    AgentType_e getType() const { return type_; }
 
     void setHead(BodyPart* head) { head_ = head; }
     void setLeftHand(Hand* hand) { left_hand_ = hand; }

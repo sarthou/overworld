@@ -7,22 +7,26 @@
   <link href="../../images/favicon.ico" rel="shortcut icon">
   <link href="../../images/favicon-32x32.png" rel="icon" type="image/png">
   <link href="../../images/favicon-16x16.png" rel="icon" type="image/png">
-  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css"
+    integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
 </head>
 
 <body>
   <div class="header" id="header">
     <header class="fixed" id="navbar">
       <div class="container">
-          <div class="navbar-header">
-            <div id="header-buttons">
-                <ul id="header-ul" data-event="hover_intent" data-effect="fade" data-effect-speed="500">
-                    <li class="header-item"><a class="header-link" href="https://github.com/sarthou/overworld" tabindex="0"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Octicons-mark-github.svg/1200px-Octicons-mark-github.svg.png" alt="github" width="40px" height="40px"/></a></li>
-                </ul>
-            </div>
-            <a class="navbar-icon" href="../../index.html">
-              <img src="../../images/overworld.png " alt="overworld" width="53px" height="65px"/>
-            </a>
+        <div class="navbar-header">
+          <div id="header-buttons">
+            <ul id="header-ul" data-event="hover_intent" data-effect="fade" data-effect-speed="500">
+              <li class="header-item"><a class="header-link" href="https://github.com/sarthou/overworld"
+                  tabindex="0"><img
+                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Octicons-mark-github.svg/1200px-Octicons-mark-github.svg.png"
+                    alt="github" width="40px" height="40px" /></a></li>
+            </ul>
+          </div>
+          <a class="navbar-icon" href="../../index.html">
+            <img src="../../images/overworld_light.png" alt="overworld" height="65px" />
+          </a>
         </div>
       </div>
     </header>
@@ -32,9 +36,12 @@
 
     <div class="navigationbar">
       <ul class="sub-navigation">
-        <li><a href="https://www.youtube.com/watch?v=LUkjts8UacI" target="_blank" rel="noopener noreferrer">Demo video</a></li>
-        <li><a href="https://sarthou.github.io/ontologenius/index.html" target="_blank" rel="noopener noreferrer">Ontologenius</a></li>
-        <li><a href="https://github.com/sarthou/overworld/actions" target="_blank" rel="noopener noreferrer">Pipelines</a></li>
+        <li><a href="https://www.youtube.com/watch?v=LUkjts8UacI" target="_blank" rel="noopener noreferrer">Demo
+            video</a></li>
+        <li><a href="https://sarthou.github.io/ontologenius/index.html" target="_blank"
+            rel="noopener noreferrer">Ontologenius</a></li>
+        <li><a href="https://github.com/sarthou/overworld/actions" target="_blank"
+            rel="noopener noreferrer">Pipelines</a></li>
       </ul>
       <h1>Overworld Cpp Documentation</h1>
     </div>
@@ -90,94 +97,137 @@
 
         <h1 class="title">Launch Overworld</h1>
 
-        <p>Now that we have fully described our robot, we will be able to launch Overworld. 
-           Nevertheless, we have to make our previous descriptions available to Overworld. 
-           To do so, we will launch Ontologenius to expose the semantic description and we will configure Overworld.
+        <p>Now that we have fully described our robot, we will be able to launch Overworld.
+          Nevertheless, we have to make our previous descriptions available to Overworld.
+          To do so, we will launch Ontologenius to expose the semantic description and we will configure Overworld.
         </p>
 
         <h2>Ontologenius launch file</h2>
 
-        <p>The first to do is to launch Ontologenius. Let's create a new launch file called "ontologenius.launch" in our launch folder. Then fill it with the following:</p>
+        <p>The first to do is to launch Ontologenius. Let's create a new launch file called "ontologenius.launch" in our
+          launch folder. Then fill it with the following:</p>
 
         <div class="code_block xml_code" style="counter-reset:code_line 0;">
           <div class="code_line">&lt;<span class="xml_tag">launch</span>&gt;</div>
-          <div class="code_line">  &lt;<span class="xml_tag">arg</span> <span class="xml_param">name</span>=<span class="xml_string">&quot;files&quot;</span> <span class="xml_param">default</span>=<span class="xml_string">&quot;</span></div>
-          <div class="code_line">    <span class="xml_string">$(find overworld_tutorials)/ontologies/agents.owl</span></div>
-          <div class="code_line">    <span class="xml_string">$(find common_ground_ontology)/CG_root.owl</span></div>
-          <div class="code_line">  <span class="xml_string">&quot;</span>/&gt;</div>
-          <div class="code_line">  &lt;<span class="xml_tag">node</span> <span class="xml_param">name</span>=<span class="xml_string">&quot;ontologenius_core&quot;</span> <span class="xml_param">pkg</span>=<span class="xml_string">&quot;ontologenius&quot;</span> <span class="xml_param">type</span>=<span class="xml_string">&quot;ontologenius_multi&quot;</span> <span class="xml_param">output</span>=<span class="xml_string">&quot;screen&quot;</span> <span class="xml_param">args</span>=<span class="xml_string">&quot;-d false $(arg files)&quot;</span>/&gt;</div>
-          <div class="code_line">  &lt;<span class="xml_tag">node</span> <span class="xml_param">name</span>=<span class="xml_string">&quot;ontologenius_gui&quot;</span> <span class="xml_param">pkg</span>=<span class="xml_string">&quot;ontologenius&quot;</span> <span class="xml_param">type</span>=<span class="xml_string">&quot;ontoloGUI&quot;</span> <span class="xml_param">output</span>=<span class="xml_string">&quot;screen&quot;</span>/&gt;</div>
+          <div class="code_line"> &lt;<span class="xml_tag">arg</span> <span class="xml_param">name</span>=<span
+              class="xml_string">&quot;files&quot;</span> <span class="xml_param">default</span>=<span
+              class="xml_string">&quot;</span></div>
+          <div class="code_line"> <span class="xml_string">$(find overworld_tutorials)/ontologies/agents.owl</span>
+          </div>
+          <div class="code_line"> <span class="xml_string">$(find common_ground_ontology)/CG_root.owl</span></div>
+          <div class="code_line"> <span class="xml_string">&quot;</span>/&gt;</div>
+          <div class="code_line"> &lt;<span class="xml_tag">node</span> <span class="xml_param">name</span>=<span
+              class="xml_string">&quot;ontologenius_core&quot;</span> <span class="xml_param">pkg</span>=<span
+              class="xml_string">&quot;ontologenius&quot;</span> <span class="xml_param">type</span>=<span
+              class="xml_string">&quot;ontologenius_multi&quot;</span> <span class="xml_param">output</span>=<span
+              class="xml_string">&quot;screen&quot;</span> <span class="xml_param">args</span>=<span
+              class="xml_string">&quot;-d false $(arg files)&quot;</span>/&gt;</div>
+          <div class="code_line"> &lt;<span class="xml_tag">node</span> <span class="xml_param">name</span>=<span
+              class="xml_string">&quot;ontologenius_gui&quot;</span> <span class="xml_param">pkg</span>=<span
+              class="xml_string">&quot;ontologenius&quot;</span> <span class="xml_param">type</span>=<span
+              class="xml_string">&quot;ontoloGUI&quot;</span> <span class="xml_param">output</span>=<span
+              class="xml_string">&quot;screen&quot;</span>/&gt;</div>
           <div class="code_line">&lt;/<span class="xml_tag">launch</span>&gt;</div>
         </div>
 
-        <p>Here we have the simplest Ontologenius launch file. For more detail, you can refer to <a href="https://sarthou.github.io/ontologenius/overview/launchers.html" target="_blank" rel="noopener noreferrer"><b>Ontologenius documentation</b></a>.</p>
+        <p>Here we have the simplest Ontologenius launch file. For more detail, you can refer to <a
+            href="https://sarthou.github.io/ontologenius/overview/launchers.html" target="_blank"
+            rel="noopener noreferrer"><b>Ontologenius documentation</b></a>.</p>
 
-        <p>With the previous launch file, we register the ontologies to be loaded. 
-           We ask for loading our "agents" ontology as well as the entire common ground ontology. 
-           Note that Ontologenius automatically resolve the ontologies imports.
+        <p>With the previous launch file, we register the ontologies to be loaded.
+          We ask for loading our "agents" ontology as well as the entire common ground ontology.
+          Note that Ontologenius automatically resolve the ontologies imports.
         </p>
 
         <p>When we will need to add more ontologies, we will always add them there.</p>
 
-        <p>Our launch file launch two nodes. While the first is Ontologenius itself, the second is a GUI which can be useful to debug your application.</p>
+        <p>Our launch file launch two nodes. While the first is Ontologenius itself, the second is a GUI which can be
+          useful to debug your application.</p>
 
         <h2>Overworld configuration</h2>
 
-        <p>Before launching Overworld, we need to configure it. 
-           Overworld is based on plugins called perception modules. 
-           Each module is in charge of a perception modality and thanks to the plugin mechanism, you can easily add your own. 
-           However, Overworld comes with default ones for basic purposes.
-           At this step, we will use one allowing the robot to listen to its joint state.
+        <p>Before launching Overworld, we need to configure it.
+          Overworld is based on plugins called perception modules.
+          Each module is in charge of a perception modality and thanks to the plugin mechanism, you can easily add your
+          own.
+          However, Overworld comes with default ones for basic purposes.
+          At this step, we will use one allowing the robot to listen to its joint state.
         </p>
 
-        <p>For the list of the available modules as well as external ones, you can refer to <a href="../../AvailableModules.html" target="_blank" rel="noopener noreferrer"><b>this page</b></a>.</p>
+        <p>For the list of the available modules as well as external ones, you can refer to <a
+            href="../../AvailableModules.html" target="_blank" rel="noopener noreferrer"><b>this page</b></a>.</p>
 
         <p>Let's now create a "configurations" folder and in it an "overworld.yaml" file with the following content.</p>
 
         <div class="code_block xml_code" style="counter-reset:code_line 0;">
           <div class="code_line"><span class="yaml_key">modules</span>:</div>
-          <div class="code_line">  <span class="yaml_key">robot</span>:</div>
-          <div class="code_line">    <span class="yaml_key">JointStatePerceptionModule</span>: <span class="yaml_string">robot_joints</span></div>
+          <div class="code_line"> <span class="yaml_key">robot</span>:</div>
+          <div class="code_line"> <span class="yaml_key">JointStatePerceptionModule</span>: <span
+              class="yaml_string">robot_joints</span></div>
           <div class="code_line"></div>
           <div class="code_line"><span class="yaml_key">robot_joints</span>:</div>
-          <div class="code_line">  <span class="yaml_key">robot_name</span> : <span class="yaml_string">eve</span></div>
+          <div class="code_line"> <span class="yaml_key">robot_name</span> : <span class="yaml_string">eve</span></div>
         </div>
 
-        <p>An Overworld configuration file always has at its root a "modules" key. In there, we can have three keys: robot, humans, and objects. 
-           Each of them will contain the modules to be loaded for each entity type. For now, we will only use the robot one.
+        <p>An Overworld configuration file always has at its root a "modules" key. In there, we can have three keys:
+          robot, humans, and objects.
+          Each of them will contain the modules to be loaded for each entity type. For now, we will only use the robot
+          one.
         </p>
 
-        <p>Under the robot key, we have a key-value pair where the key is the module type and the value is the name of the module instance. 
-           Here we want to load a JointStatePerceptionModule that we call robot_joints.
+        <p>Under the robot key, we have a key-value pair where the key is the module type and the value is the name of
+          the module instance.
+          Here we want to load a JointStatePerceptionModule that we call robot_joints.
         </p>
 
-        <p>At the root of the file, we can then add specific configurations for each module instance. 
-           To do so, we put the instance name as a root key then below we can add several key-value pairs where the keys are the parameters names and the values, the parameters' values (obvious).
-           Here we set a value to the robot_name parameter of the robot_joints instance. This parameter is mandatory for this module.
+        <p>At the root of the file, we can then add specific configurations for each module instance.
+          To do so, we put the instance name as a root key then below we can add several key-value pairs where the keys
+          are the parameters names and the values, the parameters' values (obvious).
+          Here we set a value to the robot_name parameter of the robot_joints instance. This parameter is mandatory for
+          this module.
         </p>
 
-        <p>To get information about the modules and their parameters, you can use <a href="../../overview/Plugins.html" target="_blank" rel="noopener noreferrer"><b>this page</b></a> and to get additional details about Overworld configuration file, you can refer to <a href="../../overview/Configuration.html" target="_blank" rel="noopener noreferrer"><b>this other page</b></a>.</p>
+        <p>To get information about the modules and their parameters, you can use <a href="../../overview/Plugins.html"
+            target="_blank" rel="noopener noreferrer"><b>this page</b></a> and to get additional details about Overworld
+          configuration file, you can refer to <a href="../../overview/Configuration.html" target="_blank"
+            rel="noopener noreferrer"><b>this other page</b></a>.</p>
 
         <h2>Overworld launch file</h2>
 
-        <p>A last file and we are done! Create an "overworld.launch" file in the launch folder with the following content.</p>
-        
+        <p>A last file and we are done! Create an "overworld.launch" file in the launch folder with the following
+          content.</p>
+
         <div class="code_block xml_code" style="counter-reset:code_line 0;">
           <div class="code_line">&lt;<span class="xml_tag">launch</span>&gt;</div>
-          <div class="code_line">  &lt;<span class="xml_tag">arg</span> <span class="xml_param">name</span>=<span class="xml_string">&quot;configuration_file&quot;</span> <span class="xml_param">default</span>=<span class="xml_string">&quot;$(find overworld_tutorials)/configurations/overworld.yaml&quot;</span>/&gt;</div>
-          <div class="code_line">  &lt;<span class="xml_tag">arg</span> <span class="xml_param">name</span>=<span class="xml_string">&quot;robot_name&quot;</span> <span class="xml_param">default</span>=<span class="xml_string">&quot;eve&quot;</span>/&gt;</div>
-          <div class="code_line">  &lt;<span class="xml_tag">arg</span> <span class="xml_param">name</span>=<span class="xml_string">&quot;simulate&quot;</span> <span class="xml_param">default</span>=<span class="xml_string">&quot;false&quot;</span>/&gt;</div>
+          <div class="code_line"> &lt;<span class="xml_tag">arg</span> <span class="xml_param">name</span>=<span
+              class="xml_string">&quot;configuration_file&quot;</span> <span class="xml_param">default</span>=<span
+              class="xml_string">&quot;$(find overworld_tutorials)/configurations/overworld.yaml&quot;</span>/&gt;</div>
+          <div class="code_line"> &lt;<span class="xml_tag">arg</span> <span class="xml_param">name</span>=<span
+              class="xml_string">&quot;robot_name&quot;</span> <span class="xml_param">default</span>=<span
+              class="xml_string">&quot;eve&quot;</span>/&gt;</div>
+          <div class="code_line"> &lt;<span class="xml_tag">arg</span> <span class="xml_param">name</span>=<span
+              class="xml_string">&quot;simulate&quot;</span> <span class="xml_param">default</span>=<span
+              class="xml_string">&quot;false&quot;</span>/&gt;</div>
           <div class="code_line"></div>
-          <div class="code_line">  &lt;<span class="xml_tag">node</span> <span class="xml_param">name</span>=<span class="xml_string">&quot;overworld&quot;</span> <span class="xml_param">pkg</span>=<span class="xml_string">&quot;overworld&quot;</span> <span class="xml_param">type</span>=<span class="xml_string">&quot;overworld_node&quot;</span> <span class="xml_param">output</span>=<span class="xml_string">&quot;screen&quot;</span> <span class="xml_param">args</span>=<span class="xml_string">&quot;-c $(arg configuration_file) -n $(arg robot_name) -s $(arg simulate)&quot;</span>/&gt;</div>
+          <div class="code_line"> &lt;<span class="xml_tag">node</span> <span class="xml_param">name</span>=<span
+              class="xml_string">&quot;overworld&quot;</span> <span class="xml_param">pkg</span>=<span
+              class="xml_string">&quot;overworld&quot;</span> <span class="xml_param">type</span>=<span
+              class="xml_string">&quot;overworld_node&quot;</span> <span class="xml_param">output</span>=<span
+              class="xml_string">&quot;screen&quot;</span> <span class="xml_param">args</span>=<span
+              class="xml_string">&quot;-c $(arg configuration_file) -n $(arg robot_name) -s $(arg
+              simulate)&quot;</span>/&gt;</div>
           <div class="code_line">&lt;/<span class="xml_tag">launch</span>&gt;</div>
         </div>
 
-        <p>Here we have two important and mandatory arguments, the configuration file and the robot name. 
-           We thus register our previously created configuration file and we set the robot name to eve, as we have defined it in the ontology. 
-           The third argument is to deactivate the physics simulation for the moment.
+        <p>Here we have two important and mandatory arguments, the configuration file and the robot name.
+          We thus register our previously created configuration file and we set the robot name to eve, as we have
+          defined it in the ontology.
+          The third argument is to deactivate the physics simulation for the moment.
         </p>
 
-        <p>Arguments are then filled to Overworld node using keys (-n, -c). To get the list and the effects of all keys, you can refer to the <a href="../../overview/launchers.html" target="_blank" rel="noopener noreferrer"><b>launch page</b></a>.</p>
+        <p>Arguments are then filled to Overworld node using keys (-n, -c). To get the list and the effects of all keys,
+          you can refer to the <a href="../../overview/launchers.html" target="_blank"
+            rel="noopener noreferrer"><b>launch page</b></a>.</p>
 
         <h2>Launch Overworld</h2>
 
@@ -191,12 +241,13 @@
           <div class="terminal_line">roslaunch overworld_tutorials overworld.launch</div>
         </div>
 
-        <p>A blue window should appear within it, our robot! 
-           Using the sliders of the joint state publisher gui you can move the robot's head and arms. 
-           Putting the focus on the terminal containing the teleop node, you should be able to move it.
+        <p>A blue window should appear within it, our robot!
+          Using the sliders of the joint state publisher gui you can move the robot's head and arms.
+          Putting the focus on the terminal containing the teleop node, you should be able to move it.
         </p>
 
-        <p>To know how to move in the GUI, you can take a look at the <a href="../../overview/bulletGUI.html" target="_blank" rel="noopener noreferrer"><b>GUI page</b></a>.</p>
+        <p>To know how to move in the GUI, you can take a look at the <a href="../../overview/bulletGUI.html"
+            target="_blank" rel="noopener noreferrer"><b>GUI page</b></a>.</p>
 
         <p>You have loaded your first robot in Overworld! However, we can go further in the robot description...</p>
 
@@ -223,7 +274,7 @@
     <p>
       Brought to you by:
       <a class="laas_logo" href="https://www.laas.fr/public/">
-        <img src="../../images/LogoLAAS-2016_BW.png " alt="LAAS-CNRS" height="60px"/>
+        <img src="../../images/LogoLAAS-2016_BW.png " alt="LAAS-CNRS" height="60px" />
       </a>
     </p>
   </div>

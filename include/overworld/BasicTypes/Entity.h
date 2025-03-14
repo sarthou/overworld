@@ -6,11 +6,12 @@
 #include <ros/ros.h>
 #include <string>
 #include <visualization_msgs/Marker.h>
+#include <unordered_set>
 
 #include "overworld/BasicTypes/Shape.h"
-#include "overworld/Bullet/BulletClient.h"
 #include "overworld/Geometry/Pose.h"
-#include "overworld/Utility/CircularBuffer.h"
+#include "overworld/Utils/CircularBuffer.h"
+#include "overworld/Engine/Common/WorldTypes.h"
 
 namespace owds {
 
@@ -40,6 +41,9 @@ namespace owds {
     bool hasMoved() const;
     bool hasMoved(const ros::Time& stamp) const;
 
+    void setStatic(bool is_static = true) { is_static_ = is_static; }
+    bool isStatic() const { return is_static_; }
+
     std::array<double, 3> computeTranslationSpeed() const;
     virtual std::array<double, 3> direction() const;
     double speed() const;
@@ -51,16 +55,16 @@ namespace owds {
     void addFalseId(const std::string& false_id) { false_ids_.insert(false_id); }
     std::unordered_set<std::string> getFalseIds() const { return false_ids_; }
 
-    void setBulletId(int bullet_id) { bullet_id_ = bullet_id; }
-    void setBulletLinkId(int bullet_link_id) { bullet_link_id_ = bullet_link_id; }
-    int bulletId() const { return bullet_id_; }
-    int bulletLinkId() const { return bullet_link_id_; }
-    bool isBulletLink() { return (bullet_link_id_ != -1); }
+    void setWorldId(int engine_id) { engine_id_ = engine_id; }
+    void setBulletLinkId(int engine_link_id) { engine_link_id_ = engine_link_id; }
+    int worldId() const { return engine_id_; }
+    int engineLinkId() const { return engine_link_id_; }
+    bool isEngineLink() { return (engine_link_id_ != -1); }
 
-    void setAabb(const struct aabb_t& aabb) { aabb_ = aabb; }
-    struct aabb_t getAabb() const { return aabb_; }
+    void setAabb(const struct AABB_t& aabb) { aabb_ = aabb; }
+    struct AABB_t getAabb() const { return aabb_; }
     double getAabbVolume() const;
-    bool isAabbValid() const { return aabb_.is_valid; }
+    bool isAabbValid() const { return aabb_.isValid(); }
 
     void setShape(const Shape_t& shape)
     {
@@ -83,6 +87,7 @@ namespace owds {
     void merge(const Entity* other, bool update_pose = true);
 
     geometry_msgs::TransformStamped toTfTransform() const;
+    const visualization_msgs::Marker& toMarker(const geometry_msgs::TransformStamped& transform, int id, double lifetime, const std::string& ns);
     const visualization_msgs::Marker& toMarker(int id, double lifetime, const std::string& ns);
 
     void computeFeature();
@@ -92,13 +97,14 @@ namespace owds {
     bool is_true_id_;
     std::unordered_set<std::string> false_ids_;
 
+    bool is_static_;
     CircularBuffer<PoseStamped_s, 30> last_poses_;
     bool is_located_;
-    int bullet_id_;
-    int bullet_link_id_;
+    int engine_id_;
+    int engine_link_id_;
     Shape_t shape_;
     size_t nb_frame_unseen_;
-    struct aabb_t aabb_;
+    struct AABB_t aabb_;
 
     visualization_msgs::Marker marker_;
 

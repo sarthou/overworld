@@ -8,7 +8,8 @@ namespace owds {
   class HumansPerceptionManager : public AgentPerceptionManager
   {
   public:
-    explicit HumansPerceptionManager(ros::NodeHandle* nh) : AgentPerceptionManager(nh) {}
+    HumansPerceptionManager() = default;
+    virtual ~HumansPerceptionManager() = default;
 
     Agent* getAgent(const std::string& agent_name) { return AgentPerceptionManager::getAgent(agent_name, AgentType_e::HUMAN); }
 

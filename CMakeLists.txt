@@ -1,360 +1,105 @@
 cmake_minimum_required(VERSION 3.8)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 project(overworld)
 
-add_compile_options(-std=c++14)
+# Why not use cmake_policy? See: https://gitlab.kitware.com/cmake/cmake/-/issues/20312.
+set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
+set(CMAKE_POLICY_DEFAULT_CMP0153 OLD)
 
-if(DEFINED ENV{BULLET_INSTALL_PATH})
-  set(BULLET_ROOT $ENV{BULLET_INSTALL_PATH})
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED on)
+
+
+if(NOT DEFINED ENV{ROS_VERSION})
+    message(FATAL_ERROR "Please source your ROS1 / ROS2 environment before running cmake")
 endif()
 
-find_package(catkin REQUIRED COMPONENTS
-  roscpp
-  std_msgs
-  genmsg
-  message_generation
-  tf
-  tf2
-  tf2_ros
-  tf2_eigen
-  tf2_geometry_msgs
-  roslib
-  message_filters
-  sensor_msgs
-  visualization_msgs
-  geometry_msgs
-  cv_bridge
-  pluginlib
-)
-find_package(ontologenius 0.4.1 REQUIRED)
+# Some dependencies won't compile (cough cough PhysX..) unless if a "valid" value for CMAKE_BUILD_TYPE is set
+if(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
+    message("Colcon does not specify the value of CMAKE_BUILD_TYPE by default, defaulting to 'Debug'")
+    set(CMAKE_BUILD_TYPE Debug)
+endif()
+
+# ####################################################################
+# # Import packaged libraries:                                      ##
+# # - OpenCV: For computer vision related tasks                     ##
+# # - Assimp: For loading 3D models                                 ##
+# # - Bullet3: Primary physics engine                               ##
+# # - Eigen3: For hardcore math nerds                               ##
+# # - glm: Also for math nerds, but only used in the graphics &     ##
+# #        physics engine glue                                      ##
+# ####################################################################
+find_package(PkgConfig REQUIRED)
+find_package(OpenCV REQUIRED)
+find_package(assimp REQUIRED)
+find_package(Eigen3 3.3 REQUIRED NO_MODULE)
+find_package(glm CONFIG REQUIRED)
+find_package(Freetype REQUIRED)
+find_package(ontologenius 0.4.3 REQUIRED)
 find_package(Eigen3 REQUIRED NO_MODULE)
 find_package(Threads REQUIRED)
 find_package(CURL REQUIRED)
+find_package(cmake_modules REQUIRED)
 find_package(pluginlib REQUIRED)
+find_package(TinyXML REQUIRED)
 
-list(APPEND BULLET_LIB_NAMES BulletRoboticsGUI
-                             BulletExampleBrowserLib
-                             BulletRobotics
-                             BulletFileLoader
-                             BulletWorldImporter
-                             BulletSoftBody
-                             BulletDynamics
-                             BulletCollision
-                             BulletInverseDynamicsUtils
-                             BulletInverseDynamics
-                             LinearMath
-                             OpenGLWindow
-                             gwen
-                             BussIK
-                             Bullet3Common)
+include(FetchContent)
+include(CheckLanguage)
 
+# ####################################################################
+# # PhysX may be used as an alternative engine for better simulation ##
+# # performance and GPU hardware acceleration if cuda is available.  ##
+# #####################################################################
 
-find_package(Bullet MODULE REQUIRED)
-
-foreach(lib_name ${BULLET_LIB_NAMES})
-  find_library(LIB_PATH ${lib_name} ${BULLET_ROOT}/lib NO_DEFAULT_PATH)
-  list(APPEND BULLET_LIBS ${LIB_PATH})
-  unset(LIB_PATH CACHE)
-endforeach()
-
-################################################
-## Declare ROS messages, services and actions ##
-################################################
-
-add_message_files(
-  FILES
-  Triplet.msg
-  EntityPose.msg
-  EntitiesPoses.msg
-  AgentPose.msg
-  AgentsPose.msg
-  Pose.msg
+FetchContent_Declare(
+    PhysX
+    GIT_REPOSITORY "https://github.com/NVIDIA-Omniverse/PhysX.git"
+    GIT_TAG "106.4-physx-5.5.0"
 )
+FetchContent_GetProperties(PhysX)
 
-add_service_files(
-  FILES
-  StartStopModules.srv
-  BoundingBox.srv
-  GetAgents.srv
-  GetApproachPoint.srv
-  GetPose.srv
-  GetRelations.srv
-)
+if(NOT physx_POPULATED)
+    FetchContent_Populate(PhysX)
+    message(WARNING "PhysX source dir: ${physx_SOURCE_DIR}")
+    message(WARNING "PhysX binary dir: ${physx_BINARY_DIR}")
 
-generate_messages(
-  DEPENDENCIES
-  std_msgs
-  geometry_msgs
-)
+    # todo: figure out this doesn't work
+    # We need to call this script so that packman can download NVidia's proprietary PhysXgpu shared binary
+    execute_process(
+        WORKING_DIRECTORY "${physx_SOURCE_DIR}/physx/"
+        COMMAND "yes 1 | generate_projects.sh"
+        COMMAND_ECHO STDOUT)
 
-###################################
-## catkin specific configuration ##
-###################################
-## The catkin_package macro generates cmake config files for your package
-## Declare things to be passed to dependent projects
-## INCLUDE_DIRS: uncomment this if your package contains header files
-## LIBRARIES: libraries you create in this project that dependent projects also need
-## CATKIN_DEPENDS: catkin_packages dependent projects also need
-## DEPENDS: system dependencies of this project that dependent projects also need
-catkin_package(
-  INCLUDE_DIRS include ${BULLET_INCLUDE_DIRS}
-  LIBRARIES ${PROJECT_NAME}_bullet_lib ${PROJECT_NAME}_types_lib ${PROJECT_NAME}_utility_lib
-  CATKIN_DEPENDS ontologenius roscpp std_msgs tf2 tf2_ros roslib
-#  DEPENDS system_lib
-)
+    # Hardcoded for now..
+    set(PHYSX_ROOT_DIR ${physx_SOURCE_DIR}/physx/)
+    set(TARGET_BUILD_PLATFORM "linux")
 
-###########
-## Build ##
-###########
+    # Dirty hack, please look away just for this one
+    macro(physx_workaround VAR access value current_list_file stack)
+        if("${access}" STREQUAL "MODIFIED_ACCESS")
+            set(${VAR} 0)
+        endif()
+    endmacro()
 
-include_directories(
-  include
-  ${ontologenius_INCLUDE_DIRS}
-  ${EIGEN3_INCLUDE_DIRS}
-  ${catkin_INCLUDE_DIRS}
-  ${CURL_INCLUDE_DIRS}
-)
-add_definitions( ${EIGEN3_DEFINITIONS} )
+    variable_watch(PUBLIC_RELEASE physx_workaround)
 
-#################
-#   Libraries   #
-#################
+    set(PX_GENERATE_SOURCE_DISTRO 1)
+    set(PX_GENERATE_STATIC_LIBRARIES 1)
+    set(PX_BUILDPVDRUNTIME 1)
+    set(PX_BUILDSNIPPETS 0) # No we don't want any fancy demos :c
+    set(PX_SUPPORT_GPU_PHYSX ON)
 
-add_library(Bullet3 INTERFACE)
-target_include_directories(Bullet3 INTERFACE ${BULLET_INCLUDE_DIRS})
-target_link_libraries(Bullet3 INTERFACE
-                      ${BULLET_LIBS}
-                      ${CMAKE_DL_LIBS}
-                      ${catkin_LIBRARIES}
-                      Threads::Threads)
+    set(PX_OUTPUT_LIB_DIR ${CMAKE_CURRENT_BINARY_DIR})
+    set(PX_OUTPUT_BIN_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
-add_library(${PROJECT_NAME}_utility_lib STATIC
-  src/Utility/YamlReader.cpp
-  src/Utility/Ontology.cpp
-  src/Utility/RosFiles.cpp
-  src/Utility/Wavefront.cpp
-)
-target_link_libraries(${PROJECT_NAME}_utility_lib PUBLIC
-                      ${catkin_LIBRARIES}
-                      ${ontologenius_LIBRARIES})
-set_target_properties(${PROJECT_NAME}_utility_lib PROPERTIES POSITION_INDEPENDENT_CODE ON)
+    add_subdirectory(${physx_SOURCE_DIR}/physx/compiler/public/ ${physx_BINARY_DIR}/physx/)
+endif()
 
-add_library(${PROJECT_NAME}_bullet_lib STATIC
-  src/Bullet/PhysicsServers.cpp
-  src/Bullet/BulletClient.cpp
-)
-target_link_libraries(${PROJECT_NAME}_bullet_lib PUBLIC 
-                      Bullet3
-                      ${PROJECT_NAME}_utility_lib)
-set_target_properties(${PROJECT_NAME}_bullet_lib PROPERTIES POSITION_INDEPENDENT_CODE ON)
-
-add_library(${PROJECT_NAME}_types_lib STATIC
-  src/Geometry/Pose.cpp
-  src/Geometry/Polygon.cpp
-  src/BasicTypes/Area.cpp
-  src/BasicTypes/Entity.cpp
-  src/BasicTypes/BodyPart.cpp
-  src/BasicTypes/Object.cpp
-  src/BasicTypes/Hand.cpp
-  src/BasicTypes/Sensors/SensorBase.cpp
-)
-target_link_libraries(${PROJECT_NAME}_types_lib PUBLIC
-                      ${catkin_LIBRARIES}
-                      ${PROJECT_NAME}_bullet_lib)
-set_target_properties(${PROJECT_NAME}_types_lib PROPERTIES POSITION_INDEPENDENT_CODE ON)
-
-add_library(${PROJECT_NAME}_perception_lib STATIC
-  src/Perception/Managers/AgentPerceptionManager.cpp
-  src/Perception/Managers/AreasPerceptionManager.cpp
-  src/Perception/Managers/ObjectsPerceptionManager.cpp
-  src/Perception/Managers/RobotsPerceptionManager.cpp
-  src/Perception/Managers/HumansPerceptionManager.cpp
-  src/Perception/Modules/ObjectsModules/ObjectsEmulatedPerceptionModule.cpp
-  src/Perception/Modules/HumansModules/HumansEmulatedPerceptionModule.cpp
-  src/Perception/Modules/AreasModules/AreasEmulatedPerceptionModule.cpp
-  src/Perception/PerceptionManagers.cpp
-  src/Perception/DataFusion/DataFusionBase.cpp
-)
-target_link_libraries(${PROJECT_NAME}_perception_lib PUBLIC
-                      ${catkin_LIBRARIES}
-                      ${PROJECT_NAME}_bullet_lib
-                      ${PROJECT_NAME}_types_lib
-                      ${PROJECT_NAME}_utility_lib)
-
-add_library(${PROJECT_NAME}_facts_lib STATIC
-  src/Facts/Publisher/FactsPublisher.cpp
-  src/Facts/Publisher/OntologeniusFactsPublisher.cpp
-  src/Facts/FactsCalculator.cpp
-)
-target_link_libraries(${PROJECT_NAME}_facts_lib PUBLIC
-                      ${catkin_LIBRARIES}
-                      ${PROJECT_NAME}_bullet_lib
-                      ${PROJECT_NAME}_types_lib)
-           
-add_library(${PROJECT_NAME}_sender_lib STATIC
-  src/Senders/ApproachSender.cpp
-  src/Senders/ROSSender.cpp
-  src/Senders/PoseSender.cpp
-  src/Senders/Bernie.cpp
-  src/Senders/RelationsSender.cpp
-)
-target_link_libraries(${PROJECT_NAME}_sender_lib PUBLIC
-                      ${catkin_LIBRARIES}
-                      Bullet3 # For b3CameraImage
-                      ${CURL_LIBRARIES}
-                      ${PROJECT_NAME}_types_lib
-                      ${PROJECT_NAME}_perception_lib)
-
-#################
-#    Plugins    #
-#################
-
-add_library(overworld_modules_plugin MODULE
-  src/Perception/Modules/ObjectsModules/StaticObjectsPerceptionModule.cpp
-  src/Perception/Modules/ObjectsModules/FakeObjectPerceptionModule.cpp
-  src/Perception/Modules/RobotsModules/JointStatePerceptionModule.cpp
-  src/Perception/Modules/HumansModules/StampedPosePerceptionModule.cpp
-  src/Perception/Modules/HumansModules/FakeHumanPerceptionModule.cpp
-  src/Perception/Modules/HumansModules/FakeHumansPerceptionModule.cpp
-  src/Perception/Modules/AreasModules/ObjAreasPerceptionModule.cpp
-)
-target_link_libraries(overworld_modules_plugin PUBLIC
-                      ${catkin_LIBRARIES}
-                      ${PROJECT_NAME}_bullet_lib
-                      ${PROJECT_NAME}_types_lib
-                      ${PROJECT_NAME}_utility_lib)
-
-add_library(overworld_reasoner_plugin
-  src/OntologeniusPlugins/ReasonerEgocentric.cpp
-)
-add_dependencies(overworld_reasoner_plugin overworld_gencpp ${catkin_EXPORTED_TARGETS})
-target_link_libraries(overworld_reasoner_plugin PUBLIC
-                      ${catkin_LIBRARIES}
-                      ${ontologenius_LIBRARIES})
-                                          
-#################
-#     Nodes     #
-#################
-
-add_executable(${PROJECT_NAME}_node src/Nodes/overworld.cpp src/SituationAssessor.cpp)
-target_link_libraries(${PROJECT_NAME}_node PRIVATE
-                      ${PROJECT_NAME}_perception_lib
-                      ${PROJECT_NAME}_sender_lib
-                      ${PROJECT_NAME}_facts_lib
-                      ${catkin_LIBRARIES}
-                      ${ontologenius_LIBRARIES})
-add_dependencies(${PROJECT_NAME}_node overworld_gencpp)
-
-add_executable(plugins src/Nodes/plugins.cpp)
-target_link_libraries(plugins ${catkin_LIBRARIES}
-                      ${PROJECT_NAME}_bullet_lib)
-
-add_executable(teleop src/Nodes/teleop.cpp)
-target_link_libraries(teleop ${catkin_LIBRARIES})
-add_dependencies(teleop overworld_gencpp)
-
-#################
-#  Test files   #
-#################
-
-add_executable(${PROJECT_NAME}_bullet_test src/TestFiles/bullet_test.cpp )
-target_link_libraries(${PROJECT_NAME}_bullet_test PRIVATE
-                      ${PROJECT_NAME}_bullet_lib
-                      ${PROJECT_NAME}_types_lib
-                      ${PROJECT_NAME}_perception_lib
-                      ${PROJECT_NAME}_utility_lib
-                      ${catkin_LIBRARIES})
-
-add_executable(${PROJECT_NAME}_fov_test src/TestFiles/fov.cpp )
-target_link_libraries(${PROJECT_NAME}_fov_test PRIVATE
-                    ${PROJECT_NAME}_bullet_lib
-                    ${PROJECT_NAME}_types_lib
-                    ${PROJECT_NAME}_perception_lib
-                    ${PROJECT_NAME}_utility_lib
-                    ${PROJECT_NAME}_sender_lib
-                    ${catkin_LIBRARIES})
-
-add_executable(${PROJECT_NAME}_multi_server_test src/TestFiles/multi_server_test.cpp )
-target_link_libraries(${PROJECT_NAME}_multi_server_test PRIVATE
-                      ${PROJECT_NAME}_bullet_lib
-                      ${catkin_LIBRARIES})
-
-add_executable(${PROJECT_NAME}_config_test src/TestFiles/config_test.cpp )
-target_link_libraries(${PROJECT_NAME}_config_test PRIVATE
-                      ${PROJECT_NAME}_types_lib
-                      ${PROJECT_NAME}_perception_lib
-                      ${catkin_LIBRARIES})
-add_dependencies(${PROJECT_NAME}_config_test overworld_gencpp)
-
-add_executable(${PROJECT_NAME}_gravity_test src/TestFiles/gravity.cpp )
-target_link_libraries(${PROJECT_NAME}_gravity_test PRIVATE
-                      ${PROJECT_NAME}_types_lib
-                      ${PROJECT_NAME}_bullet_lib
-                      ${catkin_LIBRARIES})
-add_dependencies(${PROJECT_NAME}_gravity_test overworld_gencpp)
-
-add_executable(${PROJECT_NAME}_area_test src/TestFiles/area.cpp )
-target_link_libraries(${PROJECT_NAME}_area_test PRIVATE
-                      ${PROJECT_NAME}_types_lib)
-
-add_executable(${PROJECT_NAME}_approach_test src/TestFiles/approach_sender.cpp )
-target_link_libraries(${PROJECT_NAME}_approach_test PRIVATE
-                      ${PROJECT_NAME}_sender_lib)
+link_directories(${physx_SOURCE_DIR}/physx/bin/linux.x86_64/release)
 
 
-add_executable(${PROJECT_NAME}_object_spawn src/TestFiles/object_spawn.cpp )
-target_link_libraries(${PROJECT_NAME}_object_spawn PRIVATE
-                      ${PROJECT_NAME}_sender_lib
-                      ${catkin_LIBRARIES}
-                      ${ontologenius_LIBRARIES})
-
-# ##################################
-# #            Install            ##
-# ##################################
-install(TARGETS
-  ${PROJECT_NAME}_bullet_lib
-  ${PROJECT_NAME}_types_lib
-  ${PROJECT_NAME}_utility_lib
-  overworld_reasoner_plugin
-  overworld_modules_plugin
-  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-  PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-)
-
-install(TARGETS
-  ${PROJECT_NAME}_node
-  plugins
-  teleop
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
-
-install(DIRECTORY include/${PROJECT_NAME}/
-  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-  FILES_MATCHING PATTERN "*.h"
-  PATTERN ".svn" EXCLUDE
-)
-
-install(DIRECTORY launch/
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
-)
-
-install(DIRECTORY config/
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/config
-)
-
-install(DIRECTORY models/
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/models
-)
-
-install(DIRECTORY ontologies/
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/ontologies
-)
-
-install(FILES
-  modules_plugins.xml
-  reasoners_plugins.xml
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-)
+if($ENV{ROS_VERSION} STREQUAL "1")
+    include(cmake/BuildROS1.cmake)
+elseif($ENV{ROS_VERSION} STREQUAL "2")
+    include(cmake/BuildROS2.cmake)
+endif()

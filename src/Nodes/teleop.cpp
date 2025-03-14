@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <termios.h>
 #include <tf/transform_broadcaster.h>
+#include <string>
 
 #include "overworld/Pose.h"
 
@@ -27,7 +28,11 @@
 class TeleopKeyboard
 {
 public:
-  TeleopKeyboard(double x = 0.0, double y = 0.0, double z = 0.0, double theta = 0.0)
+  TeleopKeyboard(const std::string& frame,
+                 double x = 0.0,
+                 double y = 0.0,
+                 double z = 0.0,
+                 double theta = 0.0) : frame_(frame)
   {
     cmd_.linear.x = cmd_.linear.y = cmd_.angular.z = 0;
     pose_.theta = theta;
@@ -51,6 +56,7 @@ private:
   double yaw_rate_run_;
   geometry_msgs::Twist cmd_;
   overworld::Pose pose_;
+  std::string frame_;
   double z_;
 
   ros::NodeHandle n_;
@@ -164,26 +170,29 @@ void TeleopKeyboard::publishTransform()
   tf::Quaternion q;
   q.setRPY(0, 0, pose_.theta);
   transform.setRotation(q);
-  br_.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "map", "base_link"));
+  br_.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "map", frame_));
 }
 
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "overworld_teleop");
 
+  std::string frame = "base_link";
   double x = 0.0;
   double y = 0.0;
   double z = 0.0;
   double theta = 0.0;
   if(argc > 1)
-    x = std::stod(argv[1]);
+    frame = std::string(argv[1]);
   if(argc > 2)
-    y = std::stod(argv[2]);
+    x = std::stod(argv[2]);
   if(argc > 3)
-    z = std::stod(argv[3]);
+    y = std::stod(argv[3]);
   if(argc > 4)
-    theta = std::stod(argv[4]);
-  TeleopKeyboard teleop(x, y, z, theta);
+    z = std::stod(argv[4]);
+  if(argc > 5)
+    theta = std::stod(argv[5]);
+  TeleopKeyboard teleop(frame, x, y, z, theta);
 
   signal(SIGINT, quit);
 

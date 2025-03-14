@@ -53,14 +53,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          mkdir -p ~/dependencies && cd ~/dependencies
-          git clone https://github.com/bulletphysics/bullet3.git
-          cd bullet3
-          mkdir build && mkdir install
-          export BULLET_PATH=$(pwd)
-          cd build
-          cmake .. -DCMAKE_INSTALL_PREFIX=$BULLET_PATH/install -DBUILD_SHARED_LIBS=ON
-          make install
+          sudo apt install -y libglm-dev libglfw3-dev
           cd ~/work
           git clone -b dev https://github.com/sarthou/ontologenius.git
 
@@ -75,6 +68,4 @@ jobs:
           cd ~/catkin_ws/src
           ln -s ~/work
           cd ..
-          export BULLET_INSTALL_PATH=~/dependencies/bullet3/install
-          export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$BULLET_INSTALL_PATH/lib
           catkin_make

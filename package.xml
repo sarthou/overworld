@@ -1,5 +1,7 @@
 <?xml version="1.0"?>
-<package format="2">
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+
+<package format="3">
   <name>overworld</name>
   <version>0.1.5</version>
   <description>The overworld package</description>
@@ -10,64 +12,57 @@
   
   <author email="gsarthou@laas.fr">Guillaume Sarthou</author>
 
-  <buildtool_depend>catkin</buildtool_depend>
 
-  <build_depend>ontologenius</build_depend>
-  <build_depend>roscpp</build_depend>
-  <build_depend>std_msgs</build_depend>
-  <build_depend>tf2</build_depend>
-  <build_depend>tf2_ros</build_depend>
-  <build_depend>tf2_geometry_msgs</build_depend>
-  <build_depend>tf2_eigen</build_depend>
-  <build_depend>bullet</build_depend>
-  <build_depend>roslib</build_depend>
-  <build_depend>eigen</build_depend>
-  <build_depend>message_filters</build_depend>
-  <build_depend>sensor_msgs</build_depend>
-  <build_depend>visualization_msgs</build_depend>
-  <build_depend>geometry_msgs</build_depend>
-  <build_depend>cv_bridge</build_depend>
-  <build_depend>pluginlib</build_depend>
+  <!-- ROS1 -->
+  <buildtool_depend condition="$ROS_VERSION == 1">catkin</buildtool_depend>
+
+  <depend>std_msgs</depend>
+
+  <depend condition="$ROS_VERSION == 1">message_generation</depend>
+  <depend condition="$ROS_VERSION == 1">diagnostic_msgs</depend>
+  <depend condition="$ROS_VERSION == 1">rospy</depend>
+  <depend condition="$ROS_VERSION == 1">roscpp</depend>
+  <depend condition="$ROS_VERSION == 1">tinyxml</depend>
+  <depend condition="$ROS_VERSION == 1">cv_bridge</depend>
+  <depend condition="$ROS_VERSION == 1">cmake_modules</depend>
+  <depend condition="$ROS_VERSION == 1">pluginlib</depend>
+  <depend condition="$ROS_VERSION == 1">rostest</depend>
+  <depend condition="$ROS_VERSION == 1">ontologenius</depend>
+  <depend condition="$ROS_VERSION == 1">tf2</depend>
+  <depend condition="$ROS_VERSION == 1">tf2_ros</depend>
+  <depend condition="$ROS_VERSION == 1">tf2_geometry_msgs</depend>
+  <depend condition="$ROS_VERSION == 1">tf2_eigen</depend>
+  <depend condition="$ROS_VERSION == 1">roslib</depend>
+  <depend condition="$ROS_VERSION == 1">eigen</depend>
+  <depend condition="$ROS_VERSION == 1">message_filters</depend>
+  <depend condition="$ROS_VERSION == 1">sensor_msgs</depend>
+  <depend condition="$ROS_VERSION == 1">visualization_msgs</depend>
+  <depend condition="$ROS_VERSION == 1">geometry_msgs</depend>
+  <depend condition="$ROS_VERSION == 1">optitrack_msgs</depend>
+
+  <exec_depend condition="$ROS_VERSION == 1">message_runtime</exec_depend>
+
+  <!-- ROS2 -->
+  <depend condition="$ROS_VERSION == 2">rclcpp</depend>
+  <depend condition="$ROS_VERSION == 2">builtin_interfaces</depend>
+  <depend condition="$ROS_VERSION == 2">std_msgs</depend>
+  <depend condition="$ROS_VERSION == 2">geometry_msgs</depend>
+  <depend condition="$ROS_VERSION == 2">message_filters</depend>
+  <depend condition="$ROS_VERSION == 2">ontologenius</depend>
+
+  <buildtool_depend condition="$ROS_VERSION == 2">ament_cmake</buildtool_depend>
+  <buildtool_depend condition="$ROS_VERSION == 2">rosidl_default_generators</buildtool_depend>
+
+  <exec_depend condition="$ROS_VERSION == 2">rosidl_default_runtime</exec_depend>
+  <exec_depend condition="$ROS_VERSION == 2">ros2launch</exec_depend>
+
+  <member_of_group condition="$ROS_VERSION == 2">rosidl_interface_packages</member_of_group>
 
 
-  <build_export_depend>ontologenius</build_export_depend>
-  <build_export_depend>roscpp</build_export_depend>
-  <build_export_depend>std_msgs</build_export_depend>
-  <build_export_depend>tf2</build_export_depend>
-  <build_export_depend>tf2_ros</build_export_depend>
-  <build_export_depend>tf2_geometry_msgs</build_export_depend>
-  <build_export_depend>tf2_eigen</build_export_depend>
-  <build_export_depend>bullet</build_export_depend>
-  <build_export_depend>eigen</build_export_depend>
-  <build_export_depend>message_filters</build_export_depend>
-  <build_export_depend>sensor_msgs</build_export_depend>
-  <build_export_depend>visualization_msgs</build_export_depend>
-  <build_export_depend>geometry_msgs</build_export_depend>
-  <build_export_depend>optitrack_mss</build_export_depend>
-  <build_export_depend>cv_bridge</build_export_depend>
-
-
-  <exec_depend>ontologenius</exec_depend>
-  <exec_depend>roscpp</exec_depend>
-  <exec_depend>std_msgs</exec_depend>
-  <exec_depend>tf2</exec_depend>
-  <exec_depend>tf2_ros</exec_depend>
-  <exec_depend>tf2_geometry_msgs</exec_depend>
-  <exec_depend>tf2_eigen</exec_depend>
-  <exec_depend>bullet</exec_depend>
-  <exec_depend>roslib</exec_depend>
-  <exec_depend>eigen</exec_depend>
-  <exec_depend>message_filters</exec_depend>
-  <exec_depend>sensor_msgs</exec_depend>
-  <exec_depend>visualization_msgs</exec_depend>
-  <exec_depend>geometry_msgs</exec_depend>
-  <exec_depend>cv_bridge</exec_depend>
-  <exec_depend>pluginlib</exec_depend>
-
-  <!-- The export tag contains other, unspecified, tags -->
   <export>
-    <!-- Other tools can request additional information be placed here -->
-    <overworld plugin="${prefix}/modules_plugins.xml" />
-    <ontologenius plugin="${prefix}/reasoners_plugins.xml" />
+    <overworld condition="$ROS_VERSION == 1" plugin="${prefix}/modules_plugins.xml" />
+    <ontologenius condition="$ROS_VERSION == 1" plugin="${prefix}/reasoners_plugins.xml" />
+
+    <build_type condition="$ROS_VERSION == 2">ament_cmake</build_type>
   </export>
 </package>

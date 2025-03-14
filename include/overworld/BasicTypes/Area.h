@@ -18,12 +18,16 @@ namespace owds {
 
     const std::string& id() const { return id_; }
 
-    const std::unordered_set<int>& getBulletIds() const { return bullet_ids_; }
-    void setBulletIds(const std::unordered_set<int>& bullet_ids) { bullet_ids_ = bullet_ids; }
+    const std::unordered_set<int>& getWorldLineIds() const { return engine_line_ids_; }
+    const std::unordered_set<int>& getWorldTextIds() const { return engine_text_ids_; }
+    void setWorldLineIds(const std::unordered_set<int>& engine_ids) { engine_line_ids_ = engine_ids; }
+    void setWorldTextIds(const std::unordered_set<int>& engine_ids) { engine_text_ids_ = engine_ids; }
 
     void setHysteresis(double hysteresis);
     void setOwner(Entity* owner) { owner_ = owner; }
     void setOwnerStr(const std::string& owner_str) { owner_str_ = owner_str; }
+
+    void updatePose();
 
     bool isStatic() const { return (owner_str_ == ""); }
     bool isEmpty() const;
@@ -46,6 +50,7 @@ namespace owds {
   private:
     std::string id_;
     Pose center_;
+    Pose pose_;
     Entity* owner_;
     std::string owner_str_;
     bool is_circle_;
@@ -62,7 +67,8 @@ namespace owds {
     std::unordered_set<Entity*> inside_entities_;
     std::unordered_set<Entity*> leaving_entities_;
 
-    std::unordered_set<int> bullet_ids_;
+    std::unordered_set<int> engine_line_ids_;
+    std::unordered_set<int> engine_text_ids_;
 
     bool isInCircle(Entity* entity);
     bool isInPolygon(Entity* entity);

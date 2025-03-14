@@ -10,16 +10,13 @@ namespace owds {
   class ObjectsPerceptionManager : public EntitiesPerceptionManager<Object>
   {
   public:
-    explicit ObjectsPerceptionManager(ros::NodeHandle* nh) : EntitiesPerceptionManager(nh), simulate_(false), myself_agent_(nullptr) {}
+    explicit ObjectsPerceptionManager() : simulate_(false), myself_agent_(nullptr) {}
 
-    std::map<std::string, Object*> getEntities() const { return entities_; };
+    const std::map<std::string, Object*>& getEntities() const { return entities_; };
 
     void setSimulation(bool simulate) { simulate_ = simulate; }
     bool needSimulation() const { return simulated_objects_.size() != 0; }
     void updateSimulatedPoses();
-
-    void initLerp();
-    void stepLerp(double alpha);
 
     void setOwnerAgent(Agent* agent) { myself_agent_ = agent; }
 
@@ -44,7 +41,8 @@ namespace owds {
     void geometricReasoning();
     void reasoningOnUpdate() override;
 
-    std::map<std::string, Object*> simulatePhysics(const std::map<std::string, Object*>& objects, const std::map<std::string, Object*>& to_simulate_objetcs);
+    std::map<std::string, Object*> simulatePhysics(const std::map<std::string, Object*>& objects,
+                                                   const std::map<std::string, Object*>& objects_to_simulate_oclusion);
     void startSimulation(Object* object);
     void stopSimulation(Object* object, bool erase = true);
 
@@ -52,7 +50,6 @@ namespace owds {
     bool isObjectInFovAabb(Object* object, Sensor* sensor);
 
     bool shouldBeSeen(Object* object, Sensor* sensor, const std::vector<PointOfInterest>& pois);
-    bool isObjectInCamera(Object* object, Sensor* sensors);
 
     void mergeFalseIdData();
 

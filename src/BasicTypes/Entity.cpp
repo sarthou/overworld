@@ -2,14 +2,18 @@
 
 #include <functional>
 #include <ros/ros.h>
+#include <string>
+#include <array>
+#include <cstddef>
 
 namespace owds {
 
   Entity::Entity(const std::string& id, bool is_true_id) : id_(id),
                                                            is_true_id_(is_true_id),
+                                                           is_static_(false),
                                                            is_located_(false),
-                                                           bullet_id_(-1),
-                                                           bullet_link_id_(-1)
+                                                           engine_id_(-1),
+                                                           engine_link_id_(-1)
   {}
 
   void Entity::updatePose(const Pose& pose, ros::Time stamp)
@@ -244,6 +248,25 @@ namespace owds {
     transform.child_frame_id = id_;
     transform.transform = last_poses_.back().pose.toTransformMsg();
     return transform;
+  }
+
+  const visualization_msgs::Marker& Entity::toMarker(const geometry_msgs::TransformStamped& transform, int id, double lifetime, const std::string& ns)
+  {
+    if(!isLocated())
+    {
+      throw std::runtime_error("Called toMarker on a non located entity: '" + id_ + "'.");
+    }
+    marker_.lifetime = ros::Duration(lifetime);
+    marker_.header.stamp = last_poses_.back().stamp;
+    marker_.pose.position.x = transform.transform.translation.x;
+    marker_.pose.position.y = transform.transform.translation.y;
+    marker_.pose.position.z = transform.transform.translation.z;
+    marker_.pose.orientation.x = transform.transform.rotation.x;
+    marker_.pose.orientation.y = transform.transform.rotation.y;
+    marker_.pose.orientation.z = transform.transform.rotation.z;
+    marker_.pose.orientation.w = transform.transform.rotation.y;
+    marker_.ns = ns;
+    return marker_;
   }
 
   const visualization_msgs::Marker& Entity::toMarker(int id, double lifetime, const std::string& ns)

@@ -31,7 +31,7 @@
     <owl:Class rdf:about="adream_building#DoorOneHalf">
         <rdfs:subClassOf rdf:resource="cg_building#Door"/>
         <cg_entities:hasMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/adream/door_one_half.obj</cg_entities:hasMesh>
-        <cg_entities:hasTexture rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/textures/door_one_half_texture.png</cg_entities:hasTexture>
+        <cg_entities:hasDiffuseTexture rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/textures/door_one_half_texture.png</cg_entities:hasDiffuseTexture>
     </owl:Class>
 
     
@@ -42,7 +42,7 @@
     <owl:Class rdf:about="adream_building#DoorSingle">
         <rdfs:subClassOf rdf:resource="cg_building#Door"/>
         <cg_entities:hasMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/adream/door_single.obj</cg_entities:hasMesh>
-        <cg_entities:hasTexture rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/textures/door_single_texture.png</cg_entities:hasTexture>
+        <cg_entities:hasDiffuseTexture rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/textures/door_single_texture.png</cg_entities:hasDiffuseTexture>
     </owl:Class>
 
 
@@ -83,19 +83,30 @@
         <rdf:type rdf:resource="cg_building#Wall"/>
         <cg_entities:hasVisualMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/adream/walls.obj</cg_entities:hasVisualMesh>
         <cg_entities:hasCollisionMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/adream/walls_vhacd.obj</cg_entities:hasCollisionMesh>
-        <cg_entities:hasTexture rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/textures/adream_wall_texture.png</cg_entities:hasTexture>
+        <cg_entities:hasDiffuseTexture rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/adream/wall_color.png</cg_entities:hasDiffuseTexture>
         <cg_entities:hasColor rdf:resource="cg_entities#grey"/>
     </owl:NamedIndividual>
 
 
 
-    <!-- adream_building#adream_floor -->
+    <!-- adream_building#adream_hall_floor -->
 
-    <owl:NamedIndividual rdf:about="adream_building#adream_floor">
+    <owl:NamedIndividual rdf:about="adream_building#adream_hall_floor">
         <rdf:type rdf:resource="cg_building#Floor"/>
-        <cg_entities:hasVisualMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/adream/floor.obj</cg_entities:hasVisualMesh>
-        <cg_entities:hasCollisionMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/adream/floor_collisions.obj</cg_entities:hasCollisionMesh>
-        <cg_entities:hasTexture rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/textures/adream_floor_texture.png</cg_entities:hasTexture>
+        <cg_entities:hasVisualMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/adream/floor_hall.obj</cg_entities:hasVisualMesh>
+        <cg_entities:hasCollisionMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/adream/floor_hall_collision.obj</cg_entities:hasCollisionMesh>
+        <cg_entities:hasDiffuseTexture rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/adream/hall_color.png</cg_entities:hasDiffuseTexture>
+        <cg_entities:hasColor rdf:resource="cg_entities#grey"/>
+    </owl:NamedIndividual>
+
+
+
+    <!-- adream_building#adream_expe_floor -->
+
+    <owl:NamedIndividual rdf:about="adream_building#adream_expe_floor">
+        <rdf:type rdf:resource="cg_building#Floor"/>
+        <cg_entities:hasVisualMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/adream/floor_expe.obj</cg_entities:hasVisualMesh>
+        <cg_entities:hasCollisionMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/adream/floor_expe_collision.obj</cg_entities:hasCollisionMesh>
         <cg_entities:hasColor rdf:resource="cg_entities#grey"/>
     </owl:NamedIndividual>
 
@@ -105,7 +116,7 @@
 
     <owl:NamedIndividual rdf:about="adream_building#adream_window_h10_1">
         <rdf:type rdf:resource="cg_building#Window"/>
-        <cg_entities:hasMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/adream/window_h10_1.obj</cg_entities:hasMesh>
+        <cg_entities:hasMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/adream/windows/window_h10_1.obj</cg_entities:hasMesh>
         <cg_entities:hasColor rdf:resource="cg_entities#black"/>
     </owl:NamedIndividual>
 
@@ -115,7 +126,7 @@
 
     <owl:NamedIndividual rdf:about="adream_building#adream_window_h10_2">
         <rdf:type rdf:resource="cg_building#Window"/>
-        <cg_entities:hasMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/adream/window_h10_2.obj</cg_entities:hasMesh>
+        <cg_entities:hasMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/adream/windows/window_h10_2.obj</cg_entities:hasMesh>
         <cg_entities:hasColor rdf:resource="cg_entities#black"/>
     </owl:NamedIndividual>
 
@@ -125,7 +136,7 @@
 
     <owl:NamedIndividual rdf:about="adream_building#adream_window_h20_1">
         <rdf:type rdf:resource="cg_building#Window"/>
-        <cg_entities:hasMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/adream/window_h20_1.obj</cg_entities:hasMesh>
+        <cg_entities:hasMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/adream/windows/window_h20_1.obj</cg_entities:hasMesh>
         <cg_entities:hasColor rdf:resource="cg_entities#black"/>
     </owl:NamedIndividual>
 
@@ -135,7 +146,7 @@
 
     <owl:NamedIndividual rdf:about="adream_building#adream_window_h20_2">
         <rdf:type rdf:resource="cg_building#Window"/>
-        <cg_entities:hasMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/adream/window_h20_2.obj</cg_entities:hasMesh>
+        <cg_entities:hasMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/adream/windows/window_h20_2.obj</cg_entities:hasMesh>
         <cg_entities:hasColor rdf:resource="cg_entities#black"/>
     </owl:NamedIndividual>
 
@@ -145,7 +156,7 @@
 
     <owl:NamedIndividual rdf:about="adream_building#adream_window_h20_3">
         <rdf:type rdf:resource="cg_building#Window"/>
-        <cg_entities:hasMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/adream/window_h20_3.obj</cg_entities:hasMesh>
+        <cg_entities:hasMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/adream/windows/window_h20_3.obj</cg_entities:hasMesh>
         <cg_entities:hasColor rdf:resource="cg_entities#white"/>
     </owl:NamedIndividual>
 
@@ -222,6 +233,46 @@
 
     <owl:NamedIndividual rdf:about="adream_building#adream_door_h11">
         <rdf:type rdf:resource="adream_building#DoorSingle"/>
+    </owl:NamedIndividual>
+
+
+
+    <!-- adream_building#adream_ff_walls -->
+
+    <owl:NamedIndividual rdf:about="adream_building#adream_ff_walls">
+        <rdf:type rdf:resource="cg_building#Wall"/>
+        <cg_entities:hasVisualMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/adream/visual_only/ff_walls.obj</cg_entities:hasVisualMesh>
+        <cg_entities:hasColor rdf:resource="cg_entities#white"/>
+    </owl:NamedIndividual>
+
+
+
+    <!-- adream_building#adream_ff_floor -->
+
+    <owl:NamedIndividual rdf:about="adream_building#adream_ff_floor">
+        <rdf:type rdf:resource="cg_building#Floor"/>
+        <cg_entities:hasVisualMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/adream/visual_only/ff_floor.obj</cg_entities:hasVisualMesh>
+        <cg_entities:hasColor rdf:resource="cg_entities#orange"/>
+    </owl:NamedIndividual>
+
+
+
+    <!-- adream_building#adream_gg_roof -->
+
+    <owl:NamedIndividual rdf:about="adream_building#adream_gg_roof">
+        <rdf:type rdf:resource="cg_building#Roof"/>
+        <cg_entities:hasVisualMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/adream/visual_only/adream_gg_roof.obj</cg_entities:hasVisualMesh>
+        <cg_entities:hasColor rdf:resource="cg_entities#white"/>
+    </owl:NamedIndividual>
+
+
+
+    <!-- adream_building#adream_guard_rail -->
+
+    <owl:NamedIndividual rdf:about="adream_building#adream_guard_rail">
+        <rdf:type rdf:resource="cg_building#BuildingPart"/>
+        <cg_entities:hasVisualMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/adream/visual_only/guard_rail.obj</cg_entities:hasVisualMesh>
+        <cg_entities:hasColor rdf:resource="cg_entities#black"/>
     </owl:NamedIndividual>
 
 

@@ -1,11 +1,19 @@
 #include "overworld/Geometry/Pose.h"
 
+#include <array>
+#include <eigen3/Eigen/Geometry>
+#include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/TransformStamped.h>
+#include <iostream>
+
 namespace owds {
 
   Pose::Pose() : t_(Eigen::Affine3d::Identity())
   {}
 
   Pose::Pose(const Pose& pose) : t_(pose.t_) {}
+
+  Pose::Pose(const Eigen::Affine3d& pose) : t_(pose) {}
 
   Pose::Pose(const std::array<double, 3>& translation, const std::array<double, 4>& rotation) : t_(Eigen::Translation3d(
                                                                                                      translation[0], translation[1], translation[2]) *
@@ -31,6 +39,16 @@ namespace owds {
     t_ = Eigen::Affine3d(tra * qua);
   }
 
+  bool Pose::operator==(const Pose& other) const
+  {
+    return t_.isApprox(other.t_);
+  }
+
+  bool Pose::operator!=(const Pose& other) const
+  {
+    return !t_.isApprox(other.t_);
+  }
+
   double Pose::distanceSqTo(const Pose& pose) const
   {
     return (t_.translation() - pose.t_.translation()).squaredNorm();
@@ -43,8 +61,8 @@ namespace owds {
 
   double Pose::angularDistance(const Pose& pose) const
   {
-    Eigen::Quaternion<double> rot(t_.rotation());
-    return rot.angularDistance(Eigen::Quaternion<double>(pose.t_.rotation()));
+    Eigen::Quaternion<double> rot(t_.linear());
+    return rot.angularDistance(Eigen::Quaternion<double>(pose.t_.linear()));
   }
 
   std::array<double, 3> Pose::subtractTranslations(const Pose& other) const
@@ -55,24 +73,23 @@ namespace owds {
 
   std::pair<std::array<double, 3>, std::array<double, 4>> Pose::arrays() const
   {
-    Eigen::Vector3d translation(t_.translation());
-    Eigen::Quaternion<double> rot(t_.rotation());
-    std::pair<std::array<double, 3>, std::array<double, 4>> p;
-    std::array<double, 3> t();
-    p.first = {translation.x(), translation.y(), translation.z()};
-    p.second = {rot.x(), rot.y(), rot.z(), rot.w()};
-    return p;
+    const Eigen::Vector3d& tra = t_.translation();
+    Eigen::Quaterniond quat(t_.linear());
+    return {
+      {tra.x(), tra.y(), tra.z()},
+      {quat.x(), quat.y(), quat.z(), quat.w()}
+    };
   }
 
   double Pose::getOriginTilt() const
   {
-    Eigen::Vector3d origin = t_.translation();
+    const Eigen::Vector3d& origin = t_.translation();
     return std::acos(origin.z() / std::hypot(origin.y(), origin.z()));
   }
 
   double Pose::getOriginPan() const
   {
-    Eigen::Vector3d origin = t_.translation();
+    const Eigen::Vector3d& origin = t_.translation();
     return std::acos(origin.z() / std::hypot(origin.x(), origin.z()));
   }
 
@@ -93,19 +110,20 @@ namespace owds {
 
   Pose Pose::operator*(const Pose& b) const
   {
-    Pose p;
-    p.t_ = this->t_ * b.t_;
-    return p;
+    return Pose(this->t_ * b.t_);
   }
 
   geometry_msgs::Transform Pose::toTransformMsg() const
   {
     geometry_msgs::Transform transform;
-    Eigen::Quaternion<double> quat(t_.rotation());
-    Eigen::Vector3d tra(t_.translation());
+    const Eigen::Vector3d& tra = t_.translation();
     transform.translation.x = tra.x();
     transform.translation.y = tra.y();
     transform.translation.z = tra.z();
+
+    // Extract rotation matrix and compute quaternion in-place
+    Eigen::Quaterniond quat(t_.linear());  // Use `linear()` instead of `rotation()`
+    
     transform.rotation.x = quat.x();
     transform.rotation.y = quat.y();
     transform.rotation.z = quat.z();
@@ -116,16 +134,24 @@ namespace owds {
   geometry_msgs::Pose Pose::toPoseMsg() const
   {
     geometry_msgs::Pose pose;
-    Eigen::Quaternion<double> quat(t_.rotation());
-    Eigen::Vector3d tra(t_.translation());
+    const Eigen::Vector3d& tra(t_.translation());
     pose.position.x = tra.x();
     pose.position.y = tra.y();
     pose.position.z = tra.z();
+
+    // Extract rotation matrix and compute quaternion in-place
+    Eigen::Quaterniond quat(t_.linear());  // Use `linear()` instead of `rotation()`
+
     pose.orientation.x = quat.x();
     pose.orientation.y = quat.y();
     pose.orientation.z = quat.z();
     pose.orientation.w = quat.w();
     return pose;
+  }
+
+  bool Pose::isTranslationZero() const
+  {
+    return t_.translation().isMuchSmallerThan(0.01);
   }
 
   double Pose::getX() const
@@ -145,17 +171,17 @@ namespace owds {
 
   double Pose::getRoll() const
   {
-    return t_.rotation().eulerAngles(2, 1, 0)[0];
+    return t_.linear().eulerAngles(2, 1, 0)[0];
   }
 
   double Pose::getPitch() const
   {
-    return t_.rotation().eulerAngles(2, 1, 0)[1];
+    return t_.linear().eulerAngles(2, 1, 0)[1];
   }
 
   double Pose::getYaw() const
   {
-    return t_.rotation().eulerAngles(2, 1, 0)[2];
+    return t_.linear().eulerAngles(2, 1, 0)[2];
   }
 
   Pose Pose::lerpTo(const Pose& goal, double alpha) const

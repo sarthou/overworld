@@ -1,7 +1,7 @@
 #include "overworld/Perception/Managers/HumansPerceptionManager.h"
 
 #include "overworld/BasicTypes/Hand.h"
-#include "overworld/Utility/ShellDisplay.h"
+#include "overworld/Utils/ShellDisplay.h"
 
 namespace owds {
 
@@ -14,7 +14,7 @@ namespace owds {
       {
         auto* sensor = getAgent(percept.second.getAgentName())->getSensor(percept.second.getSensorId());
         if(sensor != nullptr)
-          sensor->setPerceptseen(percept.first);
+          sensor->setPerceptSeen(percept.first);
       }
 
       std::string part_id = percept.first;
@@ -42,10 +42,10 @@ namespace owds {
         else
           new_body_part = new BodyPart(*percept.second);
         it = entities_.emplace(std::pair<std::string, BodyPart*>(percept.second->id(), new_body_part)).first;
-        if(addToBullet(it->second) == false)
+        if(addToWorld(it->second) == false)
         {
-          if(it->second->bulletId() != -1)
-            addToBullet(it->second, it->second->bulletId());
+          if(it->second->worldId() != -1)
+            addToWorld(it->second, it->second->worldId());
         }
         updateAgent(it->second, AgentType_e::HUMAN);
       }
@@ -88,10 +88,10 @@ namespace owds {
 
   void HumansPerceptionManager::reasoningOnUpdate()
   {
-    fusioner_.fuseData(fusioned_percepts_, aggregated_);
+    fusioner_.fuseData(fusioned_percepts_, entities_aggregated_percepts_);
     fromfusedToEntities();
 
-    for(auto& percept : aggregated_)
+    for(auto& percept : entities_aggregated_percepts_)
       percept.second.clear();
   }
 

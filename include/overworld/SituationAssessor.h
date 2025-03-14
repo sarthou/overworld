@@ -9,13 +9,15 @@
 #include <ros/ros.h>
 #include <std_srvs/SetBool.h>
 #include <string>
+#include <shared_mutex>
 #include <thread>
 
-#include "overworld/Bullet/PhysicsServers.h"
+#include "overworld/Engine/Engine.h"
+// import first
+
 #include "overworld/Facts/FactsCalculator.h"
 #include "overworld/Facts/Publisher/OntologeniusFactsPublisher.h"
 #include "overworld/Perception/PerceptionManagers.h"
-#include "overworld/Senders/Bernie.h"
 #include "overworld/Senders/PoseSender.h"
 #include "overworld/Senders/ROSSender.h"
 
@@ -32,24 +34,28 @@ namespace owds {
     PerceptionModuleBase<BodyPart, std::vector<BodyPart*>>* robots_module;
     PerceptionModuleBase<Area, std::vector<Area*>>* areas_module;
 
-    HumanAssessor_t()
-    {
-      assessor = nullptr;
-      objects_module = nullptr;
-      humans_module = nullptr;
-      robots_module = nullptr;
-      areas_module = nullptr;
-    }
+    HumanAssessor_t() : assessor(nullptr),
+                        objects_module(nullptr),
+                        humans_module(nullptr),
+                        robots_module(nullptr),
+                        areas_module(nullptr)
+    {}
   };
 
   class SituationAssessor
   {
   public:
     SituationAssessor(const std::string& agent_name, const std::string& config_path,
-                      double assessment_frequency, double simulation_frequency,
-                      bool simulate = true, bool is_robot = false);
+                      double assessment_frequency, size_t simulation_substepping,
+                      bool simulate = true,
+                      bool publish_debug = false,
+                      bool is_robot = false);
     SituationAssessor(const SituationAssessor& other) = delete;
     ~SituationAssessor();
+
+    void initWorld(Window* window);
+    // World should be initialized before the assessor
+    void initAssessor();
 
     void run();
     void stop();
@@ -61,6 +67,9 @@ namespace owds {
     void addRobotPerceptionModule(const std::string& module_name, PerceptionModuleBase_<BodyPart>* module);
     void addAreaPerceptionModule(const std::string& module_name, PerceptionModuleBase_<Area>* module);
 
+    void setCreationCallback(const std::function<void(const std::string&)>& callback) { creation_request_ = callback; }
+    void createHumanAssessor(const std::string& human_name, Window* window);
+
   private:
     std::string agent_name_;
     Agent* myself_agent_;
@@ -68,6 +77,7 @@ namespace owds {
 
     std::string config_path_;
     bool simulate_;
+    bool debug_;
 
     ros::NodeHandle n_;
     ros::CallbackQueue callback_queue_;
@@ -79,9 +89,9 @@ namespace owds {
     ros::Publisher new_assessor_publisher_;
     std::atomic<bool> run_;
     double time_step_; // in second
-    double simu_step_;
+    size_t simulation_substepping_;
 
-    BulletClient* bullet_client_;
+    Engine* engine_;
     PerceptionManagers perception_manager_;
 
     FactsCalculator facts_calculator_;
@@ -89,20 +99,24 @@ namespace owds {
 
     ROSSender* ros_sender_;
     PoseSender* objetcs_pose_sender_;
-    BernieSenders* bernie_sender_;
 
+    mutable std::shared_timed_mutex humans_assessors_mutex_;
     std::map<std::string, HumanAssessor_t> humans_assessors_;
+    std::function<void(const std::string&)> creation_request_;
 
+    std::map<std::string, std::unordered_set<uint32_t>> agents_segmentation_ids_;
+
+    void rosLoop();
     void assessmentLoop();
     void assess();
 
-    void processHumans(std::map<std::string, std::unordered_set<int>>& agents_segmentation_ids);
+    void processHumans();
     void updateHumansPerspective(const std::string& human_name,
                                  const std::map<std::string, Object*>& objects,
                                  const std::map<std::string, BodyPart*>& humans,
                                  const std::map<std::string, Area*>& areas,
-                                 const std::unordered_set<int>& segmented_ids);
-    std::map<std::string, HumanAssessor_t>::iterator createHumanAssessor(const std::string& human_name);
+                                 const std::unordered_set<uint32_t>& segmented_ids);
+    void humanAssessorThread(owds::Window* window);
 
     bool stopModules(overworld::StartStopModules::Request& req, overworld::StartStopModules::Response& res);
     bool startModules(overworld::StartStopModules::Request& req, overworld::StartStopModules::Response& res);

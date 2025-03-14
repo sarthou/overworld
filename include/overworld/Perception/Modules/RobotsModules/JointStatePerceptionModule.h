@@ -6,7 +6,6 @@
 
 #include "ontologenius/OntologiesManipulator.h"
 #include "overworld/BasicTypes/BodyPart.h"
-#include "overworld/Bullet/PhysicsServers.h"
 #include "overworld/Perception/Modules/PerceptionModuleBase.h"
 
 namespace owds {
@@ -21,7 +20,7 @@ namespace owds {
     virtual bool closeInitialization() override;
 
     virtual std::string getAgentName() override { return robot_name_; }
-    virtual int getAgentBulletId() override { return robot_bullet_id_; }
+    virtual int getAgentBulletId() override { return robot_engine_id_; }
 
   protected:
     bool perceptionCallback(const sensor_msgs::JointState& msg) override;
@@ -32,8 +31,6 @@ namespace owds {
     std::string head_link_;
     std::string base_link_;
 
-    std::unordered_map<std::string, int> joint_name_id_;
-    std::unordered_map<std::string, int> links_name_id_;
     std::vector<std::pair<std::string, BodyPartType_e>> links_to_entity_;
 
     double min_period_;

@@ -7,7 +7,7 @@
 #include <vector>
 
 #include "overworld/Perception/Modules/PerceptionModuleBase.h"
-#include "overworld/Utility/ShellDisplay.h"
+#include "overworld/Utils/ShellDisplay.h"
 
 namespace owds {
 
@@ -74,7 +74,7 @@ namespace owds {
     std::string modules_name;
     for(const auto& module : perception_modules_)
     {
-      if(modules_name != "")
+      if(modules_name.empty() == false)
         modules_name += ", ";
       modules_name += module.first;
     }
@@ -89,7 +89,7 @@ namespace owds {
     {
       if(module.second->isActivated())
       {
-        if(modules_name != "")
+        if(modules_name.empty() == false)
           modules_name += ", ";
         modules_name += module.first;
       }

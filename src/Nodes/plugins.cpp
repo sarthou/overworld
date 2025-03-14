@@ -5,7 +5,7 @@
 #include "overworld/BasicTypes/BodyPart.h"
 #include "overworld/BasicTypes/Object.h"
 #include "overworld/Perception/Modules/PerceptionModuleBase.h"
-#include "overworld/Utility/ShellDisplay.h"
+#include "overworld/Utils/ShellDisplay.h"
 
 void displayUsage()
 {

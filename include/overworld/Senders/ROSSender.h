@@ -6,7 +6,6 @@
 #include <unordered_map>
 #include <visualization_msgs/MarkerArray.h>
 
-#include "SharedMemory/PhysicsClientC_API.h"
 #include "overworld/BasicTypes/Entity.h"
 
 namespace owds {
@@ -27,7 +26,7 @@ namespace owds {
     void sendEntitiesToRViz(const std::string& topic_name, const std::map<std::string, T*>& entities);
     template<typename T>
     void sendEntitiesToTFAndRViz(const std::string& rviz_topic_name, const std::map<std::string, T*>& entities);
-    void sendImage(const std::string& topic_name, const b3CameraImageData& image);
+    void sendImage(const std::string& topic_name, uint32_t* image, unsigned int width, unsigned int height);
 
   protected:
     ros::NodeHandle* n_;
@@ -83,8 +82,8 @@ namespace owds {
     {
       if(entity->isLocated())
       {
-        markers.markers.emplace_back(entity->toMarker(id++, 0.2, "marker"));
         transforms.emplace_back(entity->toTfTransform());
+        markers.markers.emplace_back(entity->toMarker(transforms.back(), id++, 0.2, "marker"));
       }
     }
     pub_it->second.publish(markers);
@@ -137,8 +136,8 @@ namespace owds {
     {
       if(entity.second->isLocated())
       {
-        markers.markers.emplace_back(entity.second->toMarker(id++, 0.2, "marker"));
         transforms.emplace_back(entity.second->toTfTransform());
+        markers.markers.emplace_back(entity.second->toMarker(transforms.back(), id++, 0.2, "marker"));
       }
     }
     pub_it->second.publish(markers);

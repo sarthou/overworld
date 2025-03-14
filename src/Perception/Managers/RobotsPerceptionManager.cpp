@@ -1,12 +1,13 @@
 #include "overworld/Perception/Managers/RobotsPerceptionManager.h"
 
 #include "overworld/BasicTypes/Hand.h"
-#include "overworld/Utility/ShellDisplay.h"
+#include "overworld/Utils/ShellDisplay.h"
 
 namespace owds {
 
   void RobotsPerceptionManager::getPercepts(const std::string& module_name, std::map<std::string, Percept<BodyPart>>& percepts)
   {
+    (void)module_name;
     for(auto& percept : percepts)
     {
       if(percept.second.getType() == owds::BODY_PART_SENSOR)
@@ -42,10 +43,10 @@ namespace owds {
           else
             new_body_part = new BodyPart(percept.second);
           it = entities_.insert(std::pair<std::string, BodyPart*>(percept.second.id(), new_body_part)).first;
-          if(addToBullet(it->second) == false)
+          if(addToWorld(it->second) == false)
           {
-            if(it->second->bulletId() != -1)
-              addToBullet(it->second, it->second->bulletId());
+            if(it->second->worldId() != -1)
+              addToWorld(it->second, it->second->worldId());
           }
           updateAgent(it->second, AgentType_e::ROBOT);
         }

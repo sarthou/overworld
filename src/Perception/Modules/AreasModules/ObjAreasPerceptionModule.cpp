@@ -2,10 +2,14 @@
 
 #include <pluginlib/class_list_macros.h>
 #include <ros/package.h>
+#include <string>
+#include <cstddef>
+#include <array>
 
-#include "overworld/Utility/RosFiles.h"
-#include "overworld/Utility/Wavefront.h"
-#include "overworld/Utility/YamlReader.h"
+#include "overworld/Utils/RosPackage.h"
+#include "overworld/Utils/Wavefront.h"
+#include "overworld/Utils/YamlReader.h"
+#include "overworld/Utils/ShellDisplay.h"
 
 namespace owds {
 
@@ -41,6 +45,7 @@ namespace owds {
         for(auto& id : areas_ids)
         {
           double pose_x = 0, pose_y = 0, pose_z = 0;
+          double rot_z = 0;
           double radius = 0, half_height = 0;
           std::string polygon_path;
           double hysteresis = 0;
@@ -48,15 +53,26 @@ namespace owds {
 
           auto area_description = reader[id];
 
-          if(area_description.keyExists("pose"))
+          if(area_description.keyExists("position"))
           {
-            auto position = area_description["pose"];
+            auto position = area_description["position"];
             if(position.keyExists("x"))
               pose_x = std::stod(position["x"].value().front());
             if(position.keyExists("y"))
               pose_y = std::stod(position["y"].value().front());
             if(position.keyExists("z"))
               pose_z = std::stod(position["z"].value().front());
+          }
+
+          if(area_description.keyExists("orientation"))
+          {
+            auto orientation = area_description["orientation"];
+            if(orientation.keyExists("x"))
+              ShellDisplay::warning("[ObjAreasPerceptionModule] " + id + " has a rotation on x. The later will be ignored");
+            if(orientation.keyExists("y"))
+              ShellDisplay::warning("[ObjAreasPerceptionModule] " + id + " has a rotation on y. The later will be ignored");
+            if(orientation.keyExists("z"))
+              rot_z = std::stod(orientation["z"].value().front());
           }
 
           if(area_description.keyExists("radius"))
@@ -70,7 +86,7 @@ namespace owds {
           if(area_description.keyExists("hysteresis"))
             hysteresis = std::stod(area_description["hysteresis"].value().front());
 
-          if((polygon_path != "") && (radius != 0))
+          if((polygon_path.empty() == false) && (radius != 0))
             ShellDisplay::warning("[ObjAreasPerceptionModule] " + id + " is define by a polygon but a radius is defined. The later will be ignored");
           if(half_height == 0)
           {
@@ -81,7 +97,7 @@ namespace owds {
           if(polygon_path == "")
             addCircle(id, {pose_x, pose_y, pose_z}, radius, half_height, hysteresis, owner);
           else
-            addPolygon(id, polygon_path, {pose_x, pose_y, pose_z}, pose_z - half_height, pose_z + half_height, hysteresis, owner);
+            addPolygon(id, polygon_path, {pose_x, pose_y, pose_z}, half_height, rot_z, hysteresis, owner);
         }
       }
       else
@@ -96,7 +112,7 @@ namespace owds {
 
   void ObjAreasPerceptionModule::addCircle(const std::string& id, const std::array<double, 3>& pose, double radius, double half_height, double hysteresis, const std::string& owner)
   {
-    Percept<Area> area(id, Pose({pose[0], pose[1], pose[2]}, {0, 0, 0, 0}), radius, half_height);
+    Percept<Area> area(id, Pose({pose[0], pose[1], pose[2]}, {0., 0., 0., 1.}), radius, half_height);
     area.setHysteresis(hysteresis);
     area.setOwnerStr(owner);
 
@@ -105,15 +121,23 @@ namespace owds {
     percepts_.insert(std::make_pair(area.id(), area));
   }
 
-  void ObjAreasPerceptionModule::addPolygon(const std::string& id, const std::string& polygon_path, const std::array<double, 3>& pose, double z_min, double z_max, double hysteresis, const std::string& owner)
+  void ObjAreasPerceptionModule::addPolygon(const std::string& id, const std::string& polygon_path, const std::array<double, 3>& pose, double half_height, double rot_z, double hysteresis, const std::string& owner)
   {
     std::string full_path = getFullPath(polygon_path);
+
+    double s = sin(rot_z);
+    double c = cos(rot_z);
+
     auto vertexes = wavefront::getVertexes(full_path);
     std::vector<point_t> points;
     for(auto vertex : vertexes)
-      points.emplace_back(vertex[0] + pose[0], vertex[1] + pose[1]);
+    {
+      double x_rot = vertex[0] * c - vertex[1] * s;
+      double y_rot = vertex[0] * s + vertex[1] * c;
+      points.emplace_back(x_rot + pose[0], y_rot + pose[1]);
+    }
     Polygon polygon(points);
-    Percept<Area> area(id, polygon, z_min, z_max - z_min);
+    Percept<Area> area(id, polygon, pose[2] - half_height, 2*half_height);
     area.setHysteresis(hysteresis);
     area.setOwnerStr(owner);
 

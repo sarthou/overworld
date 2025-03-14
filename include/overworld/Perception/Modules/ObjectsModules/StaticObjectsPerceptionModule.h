@@ -12,8 +12,8 @@ namespace owds {
   public:
     StaticObjectsPerceptionModule();
 
-    virtual void setParameter(const std::string& parameter_name, const std::string& parameter_value) override;
-    virtual bool closeInitialization() override;
+    void setParameter(const std::string& parameter_name, const std::string& parameter_value) override;
+    bool closeInitialization() override;
 
   private:
     onto::OntologiesManipulator* ontologies_manipulator_;
@@ -26,13 +26,19 @@ namespace owds {
                    const std::string& colision_mesh,
                    const std::array<double, 3>& translation,
                    const std::array<double, 3>& rotation,
-                   const std::array<double, 3>& color,
+                   const std::array<double, 4>& color,
                    const std::string& texture = "");
 
     void addObject(const std::string& name,
                    const std::array<double, 3>& translation,
                    const std::array<double, 3>& rotation,
-                  const std::array<double,3>& scale);
+                   const std::array<double,3>& scale);
+
+    void addVisual(const std::string& name,
+                   const std::string& mesh,
+                   const std::array<double, 3>& translation,
+                   const std::array<double, 3>& rotation,
+                   const std::array<double,3>& scale);
 
     bool readConfiguration(std::string path);
   };

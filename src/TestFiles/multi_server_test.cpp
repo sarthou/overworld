@@ -5,7 +5,7 @@
 #include <thread>
 
 #include "overworld/Bullet/PhysicsServers.h"
-#include "overworld/Utility/ShellDisplay.h"
+#include "overworld/Utils/ShellDisplay.h"
 
 using namespace std::chrono_literals;
 

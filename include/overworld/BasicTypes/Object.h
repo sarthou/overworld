@@ -4,6 +4,11 @@
 #include "overworld/BasicTypes/Entity.h"
 #include "overworld/BasicTypes/PointOfInterest.h"
 
+#include <unordered_map>
+#include <array>
+#include <string>
+#include <vector>
+
 namespace owds {
 
   class Hand;
@@ -18,15 +23,13 @@ namespace owds {
   {
   public:
     explicit Object(const std::string& id, bool is_true_id = true);
+    virtual ~Object() = default;
 
     void setPointsOfInterest(const std::string& module_name, const std::vector<PointOfInterest>& points_of_interest);
     void addPointOfInterest(const std::string& module_name, const PointOfInterest& point_of_interest);
     void emptyPointsOfInterest(const std::string& module_name);
     const std::vector<PointOfInterest>& getPointsOfInterest(const std::string& module_name) const;
     void setAllPoiUnseen(const std::string& module_name);
-
-    void setStatic(bool is_static = true) { is_static_ = is_static; }
-    bool isStatic() const { return is_static_; }
 
     // setInHand or removeFromHand should be done before the update pose
     void updatePose(const Pose& pose, ros::Time stamp = ros::Time::now());
@@ -67,7 +70,6 @@ namespace owds {
 
   protected:
     std::unordered_map<std::string, std::vector<PointOfInterest>> points_of_interest_;
-    bool is_static_;
     Hand* hand_in_;
     CircularBuffer<HandStamped_t, 30> last_hands_;
 

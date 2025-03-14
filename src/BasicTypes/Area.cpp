@@ -1,5 +1,8 @@
 #include "overworld/BasicTypes/Area.h"
 
+#include <string>
+#include <cstddef>
+
 namespace owds {
 
   Area::Area(const std::string& id, const Pose& center, double radius, double half_height) : id_(id),
@@ -9,6 +12,8 @@ namespace owds {
                                                                                              polygon_({}),
                                                                                              radius_(radius),
                                                                                              half_height_(half_height),
+                                                                                             z_min_(center.getZ() - half_height_),
+                                                                                             z_max_(center.getZ() + half_height_),
                                                                                              hysteresis_distance_(0.0001)
 
   {}
@@ -28,6 +33,19 @@ namespace owds {
     hysteresis_distance_ = hysteresis + 0.0001;
     if(is_circle_ == false)
       polygon_.setHysteresis(hysteresis_distance_);
+  }
+
+  void Area::updatePose()
+  {
+    if(is_circle_ && (owner_ != nullptr))
+    {
+      if(center_.isTranslationZero())
+        pose_ = owner_->pose();
+      else
+        pose_ = owner_->pose() * center_;
+    }
+    else
+      pose_ = center_;
   }
 
   bool Area::isEmpty() const
@@ -88,8 +106,7 @@ namespace owds {
 
   bool Area::isInCircle(Entity* entity)
   {
-    Pose entity_pose = entity->pose();
-    Pose circle_pose = center_;
+    const Pose& entity_pose = entity->pose();
     if(owner_ != nullptr)
     {
       if(owner_->isLocated() == false)
@@ -97,11 +114,10 @@ namespace owds {
         setOut(entity);
         return false;
       }
-      circle_pose = owner_->pose() * center_;
     }
 
-    double up_limit = circle_pose.getZ() + half_height_;
-    double down_limit = circle_pose.getZ() - half_height_;
+    double up_limit = pose_.getZ() + half_height_;
+    double down_limit = pose_.getZ() - half_height_;
 
     if((entity_pose.getZ() > up_limit) ||
        (entity_pose.getZ() < down_limit))
@@ -110,7 +126,7 @@ namespace owds {
       return false;
     }
 
-    double entity_distance = entity_pose.distanceTo(circle_pose);
+    double entity_distance = entity_pose.distanceTo(pose_);
     double leave_radius = radius_ + hysteresis_distance_;
     double enter_radius = radius_ - hysteresis_distance_;
 
@@ -129,7 +145,7 @@ namespace owds {
 
   bool Area::isInPolygon(Entity* entity)
   {
-    Pose entity_pose = entity->pose();
+    const Pose& entity_pose = entity->pose();
     Pose polygon_pose = center_;
     if(owner_ != nullptr)
     {

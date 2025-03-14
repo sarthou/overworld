@@ -1,72 +1,79 @@
 #include "overworld/Perception/DataFusion/DataFusionBase.h"
 
+#include <unordered_map>
+#include <map>
+#include <string>
+
 #include "overworld/BasicTypes/Hand.h"
+#include "overworld/BasicTypes/Object.h"
 
 namespace owds {
 
   void DataFusionBase::fuseData(std::unordered_map<std::string, Percept<Object>*>& fusioned_percepts,
-                                std::map<std::string, std::map<std::string, Percept<Object>>>& aggregated_)
+                                std::map<std::string, std::map<std::string, Percept<Object>>>& entities_aggregated_percepts_)
   {
-    for(auto& it : aggregated_)
+    for(auto& it : entities_aggregated_percepts_)
     {
-      if(it.second.size() == 0)
+      std::map<std::string, Percept<Object>>& entity_percepts = it.second;
+
+      if(entity_percepts.empty())
         continue;
 
       auto fused_percept_it = fusioned_percepts.find(it.first);
       if(fused_percept_it == fusioned_percepts.end())
       {
-        fused_percept_it = fusioned_percepts.emplace(it.first, new Percept<Object>(it.second.begin()->second)).first;
+        fused_percept_it = fusioned_percepts.emplace(it.first, new Percept<Object>(entity_percepts.begin()->second)).first;
         fused_percept_it->second->removeFromHand();
       }
 
       Percept<Object>* percept = fused_percept_it->second;
-      percept->setSensorId(it.second.begin()->second.getSensorId()); // we initialize the sensor_id of the percept created
-      percept->setModuleName(it.second.begin()->second.getModuleName());
-      std::string percept_id = it.first;
+      percept->setSensorId(entity_percepts.begin()->second.getSensorId()); // we initialize the sensor_id of the percept created
+      percept->setModuleName(entity_percepts.begin()->second.getModuleName());
 
       Hand* hand = nullptr;
       Pose pose_in_hand;
       Pose pose_in_map;
       bool located_in_map = false;
-      int nb_frame_unseen = 1000;
+      size_t nb_frame_unseen = 1000;
       float best_confidence = 0.;
       Percept<Object>* percept_to_merge = nullptr;
 
       // We try to find if the percept should be in hand
-      for(auto& inner_it : it.second)
+      for(auto& percept_it : entity_percepts)
       {
-        if(inner_it.second.isInHand())
+        Percept<Object>& percept = percept_it.second;
+        if(percept.isInHand())
         {
-          hand = inner_it.second.getHandIn();
-          if(inner_it.second.poseRaw().similarTo(Pose()) == false)
+          hand = percept.getHandIn();
+          if(percept.poseRaw().similarTo(Pose()) == false)
           {
             // The percept is in a hand with a stated transform
-            pose_in_hand = inner_it.second.poseRaw();
+            pose_in_hand = percept.poseRaw();
             break;
           }
         }
-        else if(inner_it.second.isLocated() && nb_frame_unseen >= inner_it.second.getNbFrameUnseen())
+        else if(percept.isLocated() && nb_frame_unseen >= percept.getNbFrameUnseen())
         {
           // We take the pose of the most recently perceived percept
-          pose_in_map = inner_it.second.pose();
+          pose_in_map = percept.pose();
           located_in_map = true;
 
-          if(nb_frame_unseen > inner_it.second.getNbFrameUnseen())
+          if(nb_frame_unseen > percept.getNbFrameUnseen())
             best_confidence = 0.;
-          nb_frame_unseen = inner_it.second.getNbFrameUnseen();
+          nb_frame_unseen = percept.getNbFrameUnseen();
 
-          if(inner_it.second.getConfidence() >= best_confidence)
+          if(percept.getConfidence() >= best_confidence)
           {
-            best_confidence = inner_it.second.getConfidence();
-            percept_to_merge = &inner_it.second;
+            best_confidence = percept.getConfidence();
+            percept_to_merge = &percept;
           }
         }
       }
 
       if(hand != nullptr)
       {
-        for(auto& inner_it : it.second)
-          percept->merge(&inner_it.second, false); // to update the shape but not the pose
+        for(auto& percept_it : entity_percepts)
+          percept->merge(&percept_it.second, false); // to update the shape but not the pose
         percept->setSeen();
         // If the percept was already in hand we do not have to update the transform
         if(percept->isInHand() == false)
@@ -89,8 +96,9 @@ namespace owds {
       {
         if(percept->isInHand())
         {
+
           Hand* hand = percept->getHandIn();
-          auto pose_tmp = percept->pose();
+          const Pose& pose_tmp = percept->pose();
           hand->removePerceptFromHand(percept->id());
           for(auto& false_id : percept->getFalseIds())
             hand->removePerceptFromHand(false_id);
@@ -105,8 +113,8 @@ namespace owds {
         }
 
         percept->setNbFrameUnseen(nb_frame_unseen);
-        for(auto& inner_it : it.second)
-          percept->merge(&inner_it.second, false);
+        for(auto& percept_it : entity_percepts)
+          percept->merge(&percept_it.second, false);
 
         if(percept_to_merge != nullptr)
           percept->merge(percept_to_merge, true);
