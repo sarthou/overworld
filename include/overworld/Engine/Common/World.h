@@ -60,7 +60,7 @@ namespace owds {
 
     [[nodiscard]] virtual std::string getBackendName() const = 0;
     [[nodiscard]] virtual std::string getFullyQualifiedBackendName() const = 0;
-    virtual void setSubsteping(size_t sub_step) = 0;
+    virtual void setSubstepping(size_t sub_step) = 0;
 
     /* ACTORS */
 

@@ -43,7 +43,7 @@ namespace owds::physx {
            "." + std::to_string(PX_PHYSICS_VERSION_BUGFIX);
   }
 
-  void World::setSubsteping(size_t sub_step)
+  void World::setSubstepping(size_t sub_step)
   {
     ctx_->sub_step_ = sub_step;
   }

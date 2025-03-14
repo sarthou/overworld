@@ -1,6 +1,7 @@
 #include "overworld/Engine/Graphics/OpenGL/OffScreen.h"
 
 #include <cstdint>
+#include <cstring>
 #include <iostream>
 
 #include "glad/glad.h"

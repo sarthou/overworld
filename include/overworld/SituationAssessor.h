@@ -46,7 +46,7 @@ namespace owds {
   {
   public:
     SituationAssessor(const std::string& agent_name, const std::string& config_path,
-                      double assessment_frequency, double simulation_frequency,
+                      double assessment_frequency, size_t simulation_substepping,
                       bool simulate = true, bool is_robot = false);
     SituationAssessor(const SituationAssessor& other) = delete;
     ~SituationAssessor();
@@ -86,7 +86,7 @@ namespace owds {
     ros::Publisher new_assessor_publisher_;
     std::atomic<bool> run_;
     double time_step_; // in second
-    double simu_step_;
+    size_t simulation_substepping_;
 
     Engine* engine_;
     PerceptionManagers perception_manager_;

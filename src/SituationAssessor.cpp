@@ -18,7 +18,7 @@ namespace owds {
   SituationAssessor::SituationAssessor(const std::string& agent_name,
                                        const std::string& config_path,
                                        double assessment_frequency,
-                                       double simulation_frequency,
+                                       size_t simulation_substepping,
                                        bool simulate,
                                        bool is_robot) : agent_name_(agent_name),
                                                         myself_agent_(nullptr),
@@ -26,7 +26,7 @@ namespace owds {
                                                         config_path_(config_path),
                                                         simulate_(simulate),
                                                         time_step_(1.0 / assessment_frequency),
-                                                        simu_step_(1.0 / simulation_frequency),
+                                                        simulation_substepping_(simulation_substepping),
                                                         perception_manager_(&n_),
                                                         facts_publisher_(agent_name)
                                                         
@@ -50,7 +50,7 @@ namespace owds {
                                     {1.0f, 0.976f, 0.898f},
                                     0.25, 0.4, 0.8);
 
-    engine_->world.setSubsteping(3); // TODO make it configurable
+    engine_->world.setSubstepping(simulation_substepping_);
 
     // we could insert this in the world there if needed
     engine_->finalise();
@@ -66,7 +66,7 @@ namespace owds {
     }
 
     engine_->world.setGravity({0, 0, -9.81});
-    engine_->world.setTimeStep(simu_step_);
+    engine_->world.setTimeStep(time_step_);
 
     perception_manager_.setWorldClient(&(engine_->world));
 
@@ -216,7 +216,7 @@ namespace owds {
         if(is_robot_)
         {
           auto delta = next_start_time - std::chrono::high_resolution_clock::now();
-          ShellDisplay::info("sleep for " + std::to_string(delta.count() / 1000000.) + " ms");
+          // ShellDisplay::info("sleep for " + std::to_string(delta.count() / 1000000.) + " ms");
         }
         std::this_thread::sleep_until(next_start_time);
       }
@@ -396,7 +396,7 @@ namespace owds {
     std::lock_guard<std::shared_timed_mutex> lock(humans_assessors_mutex_);
     auto h_assessor = humans_assessors_.insert(std::make_pair(human_name, HumanAssessor_t())).first;
 
-    h_assessor->second.assessor = new SituationAssessor(human_name, config_path_, 1.0 / time_step_, 1.0 / simu_step_, simulate_);;
+    h_assessor->second.assessor = new SituationAssessor(human_name, config_path_, 1.0 / time_step_, simulation_substepping_, simulate_);;
     h_assessor->second.objects_module = new ObjectsEmulatedPerceptionModule();
     h_assessor->second.humans_module = new HumansEmulatedPerceptionModule();
     h_assessor->second.areas_module = new AreasEmulatedPerceptionModule();

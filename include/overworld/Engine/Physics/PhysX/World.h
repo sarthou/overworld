@@ -29,7 +29,7 @@ namespace owds::physx {
 
     [[nodiscard]] std::string getBackendName() const override;
     [[nodiscard]] std::string getFullyQualifiedBackendName() const override;
-    void setSubsteping(size_t sub_step) override;
+    void setSubstepping(size_t sub_step) override;
 
     using owds::World::createActor;
     using owds::World::createStaticActor;
