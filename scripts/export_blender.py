@@ -1,9 +1,12 @@
 import bpy
+import sys 
+import pip
+pip.main(['install','pyaml'])
 import yaml
 import os
 import copy
 #### Argument 
-mesh_root_path = "/path/to/folder" #chemin recepteur des exports
+mesh_root_path = "/path/to/replace" #chemin recepteur des exports
 root = bpy.data.scenes["Adream"].collection
 root_visible = bpy.context.view_layer.layer_collection  
 #### script
@@ -24,8 +27,8 @@ def exportOneObject(obj, export_path_before , export_path_after):
         bpy.ops.anim.keyframe_clear_v3d()
     
     if "STL" in extensions_types:
-        bpy.ops.export_mesh.stl(filepath = export_path_before + "STL" + export_path_after + obj.name + ".stl" ,  check_existing=False, 
-        use_selection = True , axis_forward = 'X' , axis_up = 'Z')
+        bpy.ops.wm.stl_export(filepath = export_path_before + "STL" + export_path_after + obj.name + ".stl" ,  check_existing=False, 
+        export_selected_objects=True , forward_axis = 'X' , up_axis = 'Z')
     if "OBJ" in extensions_types:
         bpy.ops.wm.obj_export(filepath=export_path_before + "OBJ" + export_path_after + obj.name + ".obj" , check_existing=False,
         export_selected_objects=True, forward_axis='X',up_axis='Z')
@@ -53,7 +56,10 @@ def createNewObjectNode(obj , mesh = ''):
            
     scalex=obj.dimensions.x / (bpy.data.objects[mesh].dimensions.x) 
     scaley=obj.dimensions.y / (bpy.data.objects[mesh].dimensions.y) 
-    scalez=obj.dimensions.z / (bpy.data.objects[mesh].dimensions.z)       
+    if (bpy.data.objects[mesh].dimensions.z) > 0:
+        scalez=obj.dimensions.z / (bpy.data.objects[mesh].dimensions.z)
+    else:
+        scalez=1;       
                 
     node_scale={
             'scale':{'x' : scalex ,
@@ -73,9 +79,9 @@ def createNewObjectNode(obj , mesh = ''):
     name = name.replace('.',"_")
     return (node , name)
 
-def createYamlList(collection_dict):
+def createYamlList(collection_dict,name):
     yaml_string = yaml.dump(collection_dict,default_flow_style=False )
-    with open(mesh_root_path+"export1.yaml" , 'w') as outfile :
+    with open(mesh_root_path+name+".yaml" , 'w') as outfile :
         outfile.write(yaml_string)
             
 def exportObjects():
@@ -86,8 +92,9 @@ def exportObjects():
         obj_node , obj_name = createNewObjectNode(obj)
         collection_dict[obj_name] = obj_node
     for child in root.children:
-        exportObjectsInCollection(child , "/" , collection_dict , root_visible.children)      
-    createYamlList(collection_dict)
+        if child.name != "areas":
+            exportObjectsInCollection(child , "/" , collection_dict , root_visible.children)      
+    createYamlList(collection_dict,"export")
     
 def exportObjectsInCollection(collection , collection_path, objects_dict , visible):
     local_collection_path = collection_path + collection.name + "/"
@@ -100,9 +107,19 @@ def exportObjectsInCollection(collection , collection_path, objects_dict , visib
         for child in collection.children:
             objects_dict[child.name] = {}
             exportObjectsInCollection(child , local_collection_path , objects_dict[child.name] , visible[collection.name].children)
+            
+def exportAreas():
+    createFolderForExtensions(mesh_root_path , "/areas/")
+    collection_dict = {}
+    exportObjectsInCollection(root.children["areas"],"/",collection_dict,root_visible.children)
+    createYamlList(collection_dict,"areas")
+    
+    
+    
                 
 if __name__=="__main__":  
     for ob in bpy.context.selected_objects:
         ob.select_set(False)
     exportObjects()
+    exportAreas()
     print('export end well')
