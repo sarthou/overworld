@@ -85,16 +85,16 @@ target_include_directories(overworld_graphics PRIVATE ${FREETYPE_INCLUDE_DIRS})
 target_compile_options(overworld_graphics PRIVATE $<$<CXX_COMPILER_ID:Clang>:-Wno-unused-function>)
 
 # ##################################
-    set(OWDS_PHYSICS_SRC
-        src/Engine/Physics/PhysX/Actors/Actor.cpp
-        src/Engine/Physics/PhysX/Actors/DynamicActor.cpp
-        src/Engine/Physics/PhysX/Actors/LinkActor.cpp
-        src/Engine/Physics/PhysX/Actors/StaticActor.cpp
-        src/Engine/Physics/PhysX/Joint.cpp
-        src/Engine/Physics/PhysX/Urdf.cpp
-        src/Engine/Physics/PhysX/Context.cpp
-        src/Engine/Physics/PhysX/SharedContext.cpp
-        src/Engine/Physics/PhysX/World.cpp)
+set(OWDS_PHYSICS_SRC
+    src/Engine/Physics/PhysX/Actors/Actor.cpp
+    src/Engine/Physics/PhysX/Actors/DynamicActor.cpp
+    src/Engine/Physics/PhysX/Actors/LinkActor.cpp
+    src/Engine/Physics/PhysX/Actors/StaticActor.cpp
+    src/Engine/Physics/PhysX/Joint.cpp
+    src/Engine/Physics/PhysX/Urdf.cpp
+    src/Engine/Physics/PhysX/Context.cpp
+    src/Engine/Physics/PhysX/SharedContext.cpp
+    src/Engine/Physics/PhysX/World.cpp)
 
 owds_add_ros_library(overworld_physics
     ${OWDS_PHYSICS_SRC})
@@ -112,8 +112,8 @@ target_link_libraries(overworld_physics
     PhysXExtensions
     PhysXFoundation
     PhysXPvdSDK)
-    #cuda)
 
+# cuda)
 owds_add_ros_library(overworld_types_lib
     src/Geometry/Pose.cpp
     src/Geometry/Polygon.cpp
@@ -153,14 +153,13 @@ owds_add_ros_library(overworld_sender_lib
     src/Senders/RelationsSender.cpp
 )
 target_link_libraries(overworld_sender_lib PUBLIC
-                      ${CURL_LIBRARIES}
-                      overworld_types_lib
-                      overworld_perception_lib)
+    ${CURL_LIBRARIES}
+    overworld_types_lib
+    overworld_perception_lib)
 
-#################
-#    Plugins    #
-#################
-
+# ################
+# Plugins    #
+# ################
 owds_add_ros_library(overworld_modules_plugin
     src/Perception/Modules/ObjectsModules/StaticObjectsPerceptionModule.cpp
     src/Perception/Modules/ObjectsModules/FakeObjectPerceptionModule.cpp
@@ -171,27 +170,28 @@ owds_add_ros_library(overworld_modules_plugin
     src/Perception/Modules/AreasModules/ObjAreasPerceptionModule.cpp
 )
 target_link_libraries(overworld_modules_plugin PUBLIC
-                      overworld_physics
-                      overworld_types_lib
-                      overworld_utility_lib)
+    overworld_physics
+    overworld_types_lib
+    overworld_utility_lib)
 
 owds_add_ros_library(overworld_reasoner_plugin
-                      src/OntologeniusPlugins/ReasonerEgocentric.cpp
+    src/OntologeniusPlugins/ReasonerEgocentric.cpp
 )
 target_link_libraries(overworld_reasoner_plugin PUBLIC ${ontologenius_LIBRARIES})
 
-#################
-#     Nodes     #
-#################
-
+# ################
+# Nodes     #
+# ################
 owds_add_ros_executable(overworld_node src/Nodes/overworld.cpp src/SituationAssessor.cpp)
 target_link_libraries(overworld_node PRIVATE
-                      overworld_perception_lib
-                      overworld_graphics
-                      overworld_sender_lib
-                      overworld_facts_lib
-                      overworld_physics
-                      #${ontologenius_LIBRARIES}
+    overworld_perception_lib
+    overworld_graphics
+    overworld_sender_lib
+    overworld_facts_lib
+    overworld_physics
+)
+target_link_libraries(overworld_node PRIVATE
+    ${ontologenius_LIBRARIES}
 )
 
 owds_add_ros_executable(plugins src/Nodes/plugins.cpp)

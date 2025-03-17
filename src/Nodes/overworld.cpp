@@ -3,12 +3,13 @@
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <string>
+#include <unistd.h>
 
+#include "ontologenius/OntologiesManipulator.h"
+#include "overworld/Engine/Engine.h"
 #include "overworld/Utils/Parameters.h"
 #include "overworld/Utils/ShellDisplay.h"
-#include "overworld/Engine/Engine.h"
 
 void handler(int sig)
 {
@@ -52,7 +53,7 @@ int main(int argc, char** argv)
 
   owds::Parameters params;
   params.insert(owds::Parameter("config_path", {"-c", "--config"}));
-  params.insert(owds::Parameter("robot_name", {"-n", "--name"}));
+  params.insert(owds::Parameter("robot_name", {"-n", "--name"}, {""}));
   params.insert(owds::Parameter("simulate", {"-s", "--simulate"}, {"true"}));
   params.insert(owds::Parameter("publish debug", {"-s", "--debug"}, {"false"}));
   params.insert(owds::Parameter("assessment frequency", {"-af", "--assessment-frequency"}, {"20"}));
@@ -67,14 +68,27 @@ int main(int argc, char** argv)
   }
 
   std::string robot_name = params.at("robot_name").getFirst();
+  if(robot_name.empty() || (robot_name == "none"))
+  {
+    onto::OntologiesManipulator onto_manip;
+    onto_manip.waitInit();
+    if(onto_manip.hasRoot())
+      robot_name = onto_manip.getRootName();
 
-  robot_assessor = new owds::SituationAssessor (robot_name,
-                                                params.at("config_path").getFirst(),
-                                                std::stod(params.at("assessment frequency").getFirst()),
-                                                std::stoi(params.at("simulation substepping").getFirst()),
-                                                params.at("simulate").getFirst() == "true",
-                                                params.at("publish debug").getFirst() == "true",
-                                                true);
+    if(robot_name.empty() || (robot_name == "none"))
+    {
+      owds::ShellDisplay::error("[Overworld] no robot name defined. Set the Ontologenius root argument or use the overworld robot name argument.");
+      exit(-1);
+    }
+  }
+
+  robot_assessor = new owds::SituationAssessor(robot_name,
+                                               params.at("config_path").getFirst(),
+                                               std::stod(params.at("assessment frequency").getFirst()),
+                                               std::stoi(params.at("simulation substepping").getFirst()),
+                                               params.at("simulate").getFirst() == "true",
+                                               params.at("publish debug").getFirst() == "true",
+                                               true);
 
   windows.emplace(robot_name, new owds::Window(robot_name));
   std::thread tread(&robotAssessorThread, windows.at(robot_name), robot_assessor);
