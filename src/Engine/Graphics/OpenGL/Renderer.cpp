@@ -29,8 +29,8 @@
 #include "overworld/Engine/Graphics/OpenGL/Cubemap.h"
 #include "overworld/Engine/Graphics/OpenGL/MeshHandle.h"
 #include "overworld/Engine/Graphics/OpenGL/Texture2D.h"
-#include "overworld/Utils/RosPackage.h"
 #include "overworld/Utils/GlmMath.h"
+#include "overworld/Utils/RosPackage.h"
 
 // should be after glad
 #include <GLFW/glfw3.h>
@@ -154,11 +154,11 @@ namespace owds {
     shaders_.at("screen").use();
     shaders_.at("screen").setInt("screenTexture", 0);
 
-    render_steps_.emplace_back([this](){ loadWorld(); });
-    render_steps_.emplace_back([this](){ renderPointShadowDepth(); });
-    render_steps_.emplace_back([this](){ loadDebugLines(); });
-    render_steps_.emplace_back([this](){ renderAmbientShadowDepth(); });
-    render_steps_.emplace_back([this](){ renderMainScreen(); });
+    render_steps_.emplace_back([this]() { loadWorld(); });
+    render_steps_.emplace_back([this]() { renderPointShadowDepth(); });
+    render_steps_.emplace_back([this]() { loadDebugLines(); });
+    render_steps_.emplace_back([this]() { renderAmbientShadowDepth(); });
+    render_steps_.emplace_back([this]() { renderMainScreen(); });
 
     return true;
   }
@@ -169,7 +169,7 @@ namespace owds {
     if(last_frame_ <= 0)
       last_frame_ = current_frame;
     delta_time_ = current_frame - last_frame_;
-    
+
     if(world_->has_render_request_)
       return true;
     else
@@ -240,8 +240,8 @@ namespace owds {
           debug_lights_.emplace(i,
                                 DebugLine({glm::vec3(pose.x, pose.y, pose.z),
                                            glm::vec3(pose.x, pose.y, pose.z - dist)},
-                                           {0, 1},
-                                           glm::vec3(color.x, color.y, color.z)));
+                                          {0, 1},
+                                          glm::vec3(color.x, color.y, color.z)));
         }
       }
       else
@@ -251,8 +251,8 @@ namespace owds {
 
   void Renderer::loadActor(Actor* actor, const ShapeBox& shape, bool default_material)
   {
-    const auto size_mat = glm::scale(glm::mat4(1.f), ToV3(shape.half_extents_));
-    const auto model_mat = shape.shape_transform_ * ToM4(actor->getModelMatrix()) * size_mat;
+    const auto size_mat = glm::scale(glm::mat4(1.f), toV3(shape.half_extents_));
+    const auto model_mat = shape.shape_transform_ * toM4(actor->getModelMatrix()) * size_mat;
 
     if(default_material == false)
       loadInstance(shape.box_model_, {"", shape.diffuse_color_, shape.diffuse_color_, 0., "", "", ""}, model_mat, actor->unique_id_);
@@ -270,7 +270,7 @@ namespace owds {
   void Renderer::loadActor(Actor* actor, const ShapeCustomMesh& shape, bool default_material)
   {
     const auto size_mat = glm::scale(glm::mat4(1.f), shape.scale_);
-    const auto model_mat = ToM4(actor->getModelMatrix()) * shape.shape_transform_ * size_mat;
+    const auto model_mat = toM4(actor->getModelMatrix()) * shape.shape_transform_ * size_mat;
 
     if(default_material == false)
       loadInstance(shape.custom_model_, shape.material_, model_mat, actor->unique_id_);
@@ -281,7 +281,7 @@ namespace owds {
   void Renderer::loadActor(Actor* actor, const ShapeCylinder& shape, bool default_material)
   {
     const auto size_mat = glm::scale(glm::mat4(1.f), glm::vec3(shape.radius_, shape.height_, shape.radius_));
-    const auto model_mat = ToM4(actor->getModelMatrix()) * shape.shape_transform_ * size_mat;
+    const auto model_mat = toM4(actor->getModelMatrix()) * shape.shape_transform_ * size_mat;
 
     if(default_material == false)
       loadInstance(shape.cylinder_model_, {"", shape.diffuse_color_, shape.diffuse_color_, 0., "", "", ""}, model_mat, actor->unique_id_);
@@ -530,7 +530,7 @@ namespace owds {
         else
           renderOffscreenSegmented(camera);
 
-        //glFlush();
+        // glFlush();
         off_screens_[i].getImage(virtual_camera.getImageData());
       }
       world_->has_render_request_ = false;
@@ -628,7 +628,7 @@ namespace owds {
           point_shadows_.init(i, world_->point_lights_.getAttenuationDistance(i));
 
         point_shadows_.computeLightTransforms(i, glm::vec3(world_->point_lights_.getPosition(i)));
-        
+
         point_shadows_.setUniforms(i, shadow_point_shader);
 
         renderModels(shadow_point_shader, 2);

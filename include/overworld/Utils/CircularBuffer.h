@@ -8,9 +8,9 @@ namespace owds {
   class CircularBuffer
   {
   public:
-    inline CircularBuffer() : firstIndex_(0), lastIndex_(0), current_index_(0), size_(0) {}
+    CircularBuffer() : firstIndex_(0), lastIndex_(0), current_index_(0), size_(0) {}
 
-    inline const T& at(std::size_t i) const
+    const T& at(std::size_t i) const
     {
       if(i >= size_)
       {
@@ -20,7 +20,7 @@ namespace owds {
       return buffer_[(firstIndex_ + i) % capacity];
     }
 
-    inline const T& back() const
+    const T& back() const
     {
       if(size_ == 0)
       {
@@ -29,7 +29,7 @@ namespace owds {
       return buffer_[(lastIndex_ + capacity - 1) % capacity];
     }
 
-    inline void push_back(const T& element)
+    void push_back(const T& element)
     {
       if(size_ == capacity)
       {
@@ -46,14 +46,14 @@ namespace owds {
       lastIndex_ = (lastIndex_ + 1) % capacity;
     }
 
-    inline void replace_back(const T& element)
+    void replace_back(const T& element)
     {
       buffer_[current_index_] = element;
     }
 
-    inline size_t size() const { return size_; }
+    size_t size() const { return size_; }
 
-    inline void empty()
+    void empty()
     {
       lastIndex_ = firstIndex_ = 0;
       size_ = 0;

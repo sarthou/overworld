@@ -10,6 +10,7 @@ namespace owds {
   {
   public:
     OntologeniusFactsPublisher(const std::string& agent_name);
+    ~OntologeniusFactsPublisher() override = default;
 
   private:
     std::string agent_name_;

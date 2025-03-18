@@ -1,12 +1,12 @@
 #ifndef OWDS_ENTITIESPERCEPTIONMANAGER_H
 #define OWDS_ENTITIESPERCEPTIONMANAGER_H
 
+#include <array>
 #include <map>
 #include <ontologenius/OntologiesManipulator.h>
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include <array>
 
 #include "overworld/BasicTypes/Agent.h"
 #include "overworld/BasicTypes/Entity.h"
@@ -105,7 +105,9 @@ namespace owds {
     {
       auto it = entities_to_sensors_modules_.find(entity_id);
       if(it == entities_to_sensors_modules_.end())
-        entities_to_sensors_modules_.emplace(entity_id, std::map<std::string, std::set<std::string>>{{sensor_id, {module_name}}});
+        entities_to_sensors_modules_.emplace(entity_id, std::map<std::string, std::set<std::string>>{
+                                                          {sensor_id, {module_name}}
+        });
       else
       {
         auto inner_it = it->second.find(sensor_id);
@@ -123,7 +125,9 @@ namespace owds {
     auto it = entities_aggregated_percepts_.find(entity_id);
     if(it == entities_aggregated_percepts_.end())
     {
-      entities_aggregated_percepts_.emplace(entity_id, std::map<std::string, Percept<T>>{{module_name, percept}});
+      entities_aggregated_percepts_.emplace(entity_id, std::map<std::string, Percept<T>>{
+                                                         {module_name, percept}
+      });
     }
     else
     {
@@ -197,7 +201,7 @@ namespace owds {
       return true;
 
     auto fov = sensor->getFieldOfView();
-    int id = world_client_->addCamera(300 * fov.getRatioOpenGl(), 300, fov.getRatioOpenGl(), CameraView_e::segmented_view, fov.getClipNear(), fov.getClipFar());
+    int id = world_client_->addCamera(300 * fov.getRatioOpenGl(), 300, fov.getRatioOpenGl(), CameraView_e::segmented_view, (float)fov.getClipNear(), (float)fov.getClipFar());
     sensor->setWorldSegmentationId(id);
     return id != -1;
   }

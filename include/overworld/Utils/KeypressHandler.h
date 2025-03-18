@@ -5,7 +5,6 @@
 #include "overworld/Geometry/GeometryUtils.h"
 #include "overworld/Perception/PerceptionManagers.h"
 #include "overworld/Utils/ShellDisplay.h"
-#include "overworld/Engine/Engine.h"
 
 namespace owds {
 
@@ -46,20 +45,20 @@ namespace owds {
 
   inline void handleKeypress(Key_e key, bool pressed, Engine* engine, PerceptionManagers& managers)
   {
-      if(pressed)
+    if(pressed)
+    {
+      switch(key)
       {
-        switch(key)
-        {
-        case Key_e::key_enter:
-          onEnterPressed(engine, managers.robots_manager_);
-          break;
-        case key_v:
-          onAPressed(managers.areas_manager_);
-          break;
-        default:
-          break;
-        }
+      case Key_e::key_enter:
+        onEnterPressed(engine, managers.robots_manager_);
+        break;
+      case key_v:
+        onAPressed(managers.areas_manager_);
+        break;
+      default:
+        break;
       }
+    }
   }
 
 } // namespace owds

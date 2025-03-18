@@ -18,10 +18,10 @@ namespace owds {
   public:
     YamlElement operator[](const std::string& name)
     {
-      if(subelem)
+      if(subelem_)
       {
-        if(subelem.value().find(name) != subelem.value().end())
-          return subelem.value()[name];
+        if(subelem_.value().find(name) != subelem_.value().end())
+          return subelem_.value()[name];
         else
           return YamlElement();
       }
@@ -31,8 +31,8 @@ namespace owds {
 
     std::vector<std::string> value()
     {
-      if(data)
-        return data.value();
+      if(data_)
+        return data_.value();
       else
         return {};
     }
@@ -40,8 +40,8 @@ namespace owds {
     std::vector<std::string> getElementsKeys()
     {
       std::vector<std::string> res;
-      if(subelem)
-        std::transform(subelem.value().cbegin(), subelem.value().cend(),
+      if(subelem_)
+        std::transform(subelem_.value().cbegin(), subelem_.value().cend(),
                        std::back_inserter(res),
                        [](const std::pair<std::string, YamlElement>& elem) { return elem.first; });
       return res;
@@ -49,15 +49,15 @@ namespace owds {
 
     bool keyExists(const std::string& key)
     {
-      if(subelem)
-        return (subelem.value().find(key) != subelem.value().end());
+      if(subelem_)
+        return (subelem_.value().find(key) != subelem_.value().end());
       else
         return false;
     }
 
   private:
-    std::experimental::optional<std::vector<std::string>> data;
-    std::experimental::optional<std::map<std::string, YamlElement>> subelem;
+    std::experimental::optional<std::vector<std::string>> data_;
+    std::experimental::optional<std::map<std::string, YamlElement>> subelem_;
   };
 
   class YamlReader

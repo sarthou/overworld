@@ -1,15 +1,15 @@
 #include "overworld/Perception/Modules/ObjectsModules/StaticObjectsPerceptionModule.h"
 
+#include <array>
+#include <cstddef>
 #include <pluginlib/class_list_macros.h>
 #include <ros/package.h>
 #include <string>
-#include <array>
-#include <cstddef>
 
-#include "overworld/Utils/YamlReader.h"
+#include "overworld/Engine/Common/Urdf/UrdfLoader.h"
 #include "overworld/Utils/RosPackage.h"
 #include "overworld/Utils/ShellDisplay.h"
-#include "overworld/Engine/Common/Urdf/UrdfLoader.h"
+#include "overworld/Utils/YamlReader.h"
 
 namespace owds {
 
@@ -128,7 +128,7 @@ namespace owds {
       Pose pose(translation, rotation);
 
       urdf::Geometry_t geom;
-      geom.scale = ToV3(scale);
+      geom.scale = toV3(scale);
       geom.type = urdf::GeometryType_e::geometry_mesh;
       geom.file_name = shape.visual_mesh_resource;
 
@@ -166,7 +166,7 @@ namespace owds {
     YamlReader reader;
     if(reader.read(path))
     {
-      bool success=true;
+      bool success = true;
       auto objects_ids = reader.getKeys();
 
       if(reader.keyExists("include"))
@@ -186,31 +186,40 @@ namespace owds {
 
         double pose_x = 0, pose_y = 0, pose_z = 0;
         double orientation_x = 0, orientation_y = 0, orientation_z = 0;
-        double scale_x=1,scale_y=1,scale_z=1;
+        double scale_x = 1, scale_y = 1, scale_z = 1;
         auto obj_description = reader[id];
 
         if(obj_description.keyExists("position"))
         {
           auto position = obj_description["position"];
-          if(position.keyExists("x")) pose_x = std::stod(position["x"].value().front());
-          if(position.keyExists("y")) pose_y = std::stod(position["y"].value().front());
-          if(position.keyExists("z")) pose_z = std::stod(position["z"].value().front());
+          if(position.keyExists("x"))
+            pose_x = std::stod(position["x"].value().front());
+          if(position.keyExists("y"))
+            pose_y = std::stod(position["y"].value().front());
+          if(position.keyExists("z"))
+            pose_z = std::stod(position["z"].value().front());
         }
 
         if(obj_description.keyExists("orientation"))
         {
           auto orientation = obj_description["orientation"];
-          if(orientation.keyExists("x")) orientation_x = std::stod(orientation["x"].value().front());
-          if(orientation.keyExists("y")) orientation_y = std::stod(orientation["y"].value().front());
-          if(orientation.keyExists("z")) orientation_z = std::stod(orientation["z"].value().front());
+          if(orientation.keyExists("x"))
+            orientation_x = std::stod(orientation["x"].value().front());
+          if(orientation.keyExists("y"))
+            orientation_y = std::stod(orientation["y"].value().front());
+          if(orientation.keyExists("z"))
+            orientation_z = std::stod(orientation["z"].value().front());
         }
 
         if(obj_description.keyExists("scale"))
         {
           auto scale = obj_description["scale"];
-          if(scale.keyExists("x")) scale_x = std::stod(scale["x"].value().front());
-          if(scale.keyExists("y")) scale_y = std::stod(scale["y"].value().front());
-          if(scale.keyExists("z")) scale_z = std::stod(scale["z"].value().front());
+          if(scale.keyExists("x"))
+            scale_x = std::stod(scale["x"].value().front());
+          if(scale.keyExists("y"))
+            scale_y = std::stod(scale["y"].value().front());
+          if(scale.keyExists("z"))
+            scale_z = std::stod(scale["z"].value().front());
         }
 
         bool visual_only = false;
@@ -222,9 +231,9 @@ namespace owds {
           mesh = obj_description["mesh"].value().front();
 
         if(visual_only == false) // we consider it as a percpet
-          addObject(id, {pose_x, pose_y, pose_z}, {orientation_x, orientation_y, orientation_z},{scale_x,scale_y,scale_z});
+          addObject(id, {pose_x, pose_y, pose_z}, {orientation_x, orientation_y, orientation_z}, {scale_x, scale_y, scale_z});
         else // we directly put it into the world and never speak again about it
-          addVisual(id, mesh, {pose_x, pose_y, pose_z}, {orientation_x, orientation_y, orientation_z},{scale_x,scale_y,scale_z});
+          addVisual(id, mesh, {pose_x, pose_y, pose_z}, {orientation_x, orientation_y, orientation_z}, {scale_x, scale_y, scale_z});
       }
       return success;
     }

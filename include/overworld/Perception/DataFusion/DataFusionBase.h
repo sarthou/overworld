@@ -16,7 +16,7 @@ namespace owds {
   class DataFusionBase
   {
   public:
-    explicit DataFusionBase() {}
+    explicit DataFusionBase() = default;
     virtual ~DataFusionBase() = default;
 
     virtual void initialize(const std::string& method_name)

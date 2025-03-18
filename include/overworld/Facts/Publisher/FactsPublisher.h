@@ -13,6 +13,7 @@ namespace owds {
   {
   public:
     FactsPublisher() = default;
+    virtual ~FactsPublisher() = default;
 
     void publish(const std::vector<Fact>& facts);
 
