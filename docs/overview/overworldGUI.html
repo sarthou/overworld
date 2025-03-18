@@ -1,7 +1,7 @@
 <html lang="en_US">
 
 <head>
-  <title>Bullet GUI | Overworld 0.1.5</title>
+  <title>Overworld GUI | Overworld 0.1.5</title>
   <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
   <link href="../style/overworld_api.css" rel="stylesheet" type="text/css">
   <link href="../images/favicon.ico" rel="shortcut icon">
@@ -67,7 +67,7 @@
             <li class="level1"><a href="launchers.html">Launchers</a></li>
             <li class="level1"><a href="Configuration.html">Configuration</a></li>
             <li class="level1"><a href="Plugins.html">Plugins</a></li>
-            <li class="level1"><a href="bulletGUI.html"><b>Bullet GUI</b></a></li>
+            <li class="level1"><a href="overworldGUI.html"><b>Overworld GUI</b></a></li>
           </ul>
         </div>
 
@@ -88,40 +88,47 @@
       </div>
 
       <div class="context">
-        <h1 class="title">Bullet GUI</h1>
+        <h1 class="title">Overworld GUI</h1>
 
-        <p>Overworld uses the Graphical User Interface of the Bullet simulator to render the robot's world. All humans'
-          worlds cannot be rendered. Nevertheless, this interface is really usefull to monitor the robot's world state.
+        <p>Overworld uses its own Graphical User Interface to render both the robot's world and the humans' worlds.
+          This interface is really usefull to monitor the world state of each agent independently.
         </p>
 
-        <p>The interface is automatically launched with Overworld and cannot be desactivated.</p>
+        <p>The interfaces are automatically launched with Overworld and cannot be desactivated.
+          If you close one, the entire software will be killed.</p>
 
         <div align="center">
           <p>
-            <img src="../images/bulletGUI/bulletGUI.png " alt="Default view in the GUI" height="450px" />
+            <img src="../images/overworldGUI/overworldGUI.png " alt="Default view in the GUI" height="450px" />
           </p>
         </div>
 
-        <p>By default the camera points to the world origin. You can move the camera with:</p>
+        <p>By default the camera points to the world origin. The name of each window corresponds to the agent this world is related to.
+           You can move the camera with:</p>
 
         <ul>
           <li><b>Scroll wheel</b>: Zoom and dezoom.</li>
-          <li><b>CTRL + wheel click</b>: Translate the camera.</li>
-          <li><b>CTRL + mouse left</b>: Rotate the camera.</li>
+          <li><b>Wheel click</b>: Translate the camera.</li>
+          <li><b>Mouse right</b>: Rotate the camera.</li>
         </ul>
 
-        <p>Once your robot spawned in the world, you can also use the <b>SPACE</b> bar to automatically place the camera
-          behind the robot.</p>
+        <p>You can also move like most of the video games with AWSD or the arrows to translate side and front, inaddition to SPACE and SHIFT to go up and down.</p>
+
+        <p>Once your robot spawned in the world, you can also use the <b>ENTER</b> bar to automatically place the camera near the robot.</p>
 
         <div align="center">
           <p>
-            <img src="../images/bulletGUI/bulletGUI_back.png " alt="Back view in the GUI" height="450px" />
+            <img src="../images/overworldGUI/overworldGUI_robot.png " alt="Back view in the GUI" height="450px" />
           </p>
         </div>
 
-        <p>If you use areas, you can enable or disable their display pressing <b>A</b>.</p>
-        <p>Shadows can be enabled and disabled pressing <b>S</b>.</p>
+        <p>If you use areas, you can enable or disable their display pressing <b>V</b>.</p>
+        <p><b>F2</b> can be used to display the collision shapes.</p>
+        <p><b>F3</b> can be used to enable or disable the display of the debug lines and texts.</p>
+        <p><b>F4</b> can be used to enable or disable the display of the shadows. Disabling them can help saving GPU.</p>
 
+        <p>As an additional information, a 3D frame is displayed at the bootm right of each world. 
+          This frame is rendered using the perspective.</p>
       </div>
     </div>
 

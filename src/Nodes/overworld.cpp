@@ -55,9 +55,9 @@ int main(int argc, char** argv)
   params.insert(owds::Parameter("config_path", {"-c", "--config"}));
   params.insert(owds::Parameter("robot_name", {"-n", "--name"}, {""}));
   params.insert(owds::Parameter("simulate", {"-s", "--simulate"}, {"true"}));
-  params.insert(owds::Parameter("publish debug", {"-s", "--debug"}, {"false"}));
+  params.insert(owds::Parameter("publish debug", {"-d", "--debug"}, {"false"}));
   params.insert(owds::Parameter("assessment frequency", {"-af", "--assessment-frequency"}, {"20"}));
-  params.insert(owds::Parameter("simulation substepping", {"-sub", "--simulation-substepping_"}, {"3"}));
+  params.insert(owds::Parameter("simulation substepping", {"-sub", "--simulation-substepping"}, {"3"}));
 
   bool valid_parameters = params.set(argc, argv);
   params.display();
