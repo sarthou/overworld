@@ -30,7 +30,7 @@ namespace owds {
 
     bool update();
 
-    bool isDrawn() { return drawn_; }
+    bool isDrawn() const { return drawn_; }
     void drawAreas();
     void undrawAreas();
 

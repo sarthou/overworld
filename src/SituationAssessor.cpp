@@ -90,7 +90,6 @@ namespace owds {
     {
       perception_manager_.applyConfigurationHuman(config_path_);
       myself_agent_ = perception_manager_.humans_manager_.getAgent(agent_name_);
-      perception_manager_.areas_manager_.undrawAreas();
     }
 
     perception_manager_.objects_manager_.setOwnerAgent(myself_agent_);
