@@ -109,19 +109,17 @@
 
         <div class="code_block xml_code" style="counter-reset:code_line 0;">
           <div class="code_line">&lt;<span class="xml_tag">launch</span>&gt;</div>
-          <div class="code_line"> &lt;<span class="xml_tag">arg</span> <span class="xml_param">name</span>=<span
-              class="xml_string">&quot;files&quot;</span> <span class="xml_param">default</span>=<span
-              class="xml_string">&quot;</span></div>
-          <div class="code_line"> <span class="xml_string">$(find overworld_tutorials)/ontologies/agents.owl</span>
-          </div>
-          <div class="code_line"> <span class="xml_string">$(find common_ground_ontology)/CG_root.owl</span></div>
+          <div class="code_line"> &lt;<span class="xml_tag">arg</span> <span class="xml_param">name</span>=<span class="xml_string">&quot;root&quot;</span> <span class="xml_param">default</span>=<span class="xml_string">&quot;eve&quot;</span>/&gt;</div>
+          <div class="code_line"> &lt;<span class="xml_tag">arg</span> <span class="xml_param">name</span>=<span class="xml_string">&quot;files&quot;</span> <span class="xml_param">default</span>=<span class="xml_string">&quot;</span></div>
+          <div class="code_line">   <span class="xml_string">$(find overworld_tutorials)/ontologies/agents.owl</span></div>
+          <div class="code_line">   <span class="xml_string">$(find common_ground_ontology)/CG_root.owl</span></div>
           <div class="code_line"> <span class="xml_string">&quot;</span>/&gt;</div>
           <div class="code_line"> &lt;<span class="xml_tag">node</span> <span class="xml_param">name</span>=<span
               class="xml_string">&quot;ontologenius_core&quot;</span> <span class="xml_param">pkg</span>=<span
               class="xml_string">&quot;ontologenius&quot;</span> <span class="xml_param">type</span>=<span
               class="xml_string">&quot;ontologenius_multi&quot;</span> <span class="xml_param">output</span>=<span
               class="xml_string">&quot;screen&quot;</span> <span class="xml_param">args</span>=<span
-              class="xml_string">&quot;-d false $(arg files)&quot;</span>/&gt;</div>
+              class="xml_string">&quot;--root $(arg root) -d false $(arg files)&quot;</span>/&gt;</div>
           <div class="code_line"> &lt;<span class="xml_tag">node</span> <span class="xml_param">name</span>=<span
               class="xml_string">&quot;ontologenius_gui&quot;</span> <span class="xml_param">pkg</span>=<span
               class="xml_string">&quot;ontologenius&quot;</span> <span class="xml_param">type</span>=<span
@@ -134,7 +132,7 @@
             href="https://sarthou.github.io/ontologenius/overview/launchers.html" target="_blank"
             rel="noopener noreferrer"><b>Ontologenius documentation</b></a>.</p>
 
-        <p>With the previous launch file, we register the ontologies to be loaded.
+        <p>With the previous launch file, we state that the main agent is eve (using the root argument) and we register the ontologies to be loaded.
           We ask for loading our "agents" ontology as well as the entire common ground ontology.
           Note that Ontologenius automatically resolve the ontologies imports.
         </p>
@@ -161,12 +159,11 @@
 
         <div class="code_block xml_code" style="counter-reset:code_line 0;">
           <div class="code_line"><span class="yaml_key">modules</span>:</div>
-          <div class="code_line"> <span class="yaml_key">robot</span>:</div>
-          <div class="code_line"> <span class="yaml_key">JointStatePerceptionModule</span>: <span
-              class="yaml_string">robot_joints</span></div>
+          <div class="code_line">  <span class="yaml_key">robot</span>:</div>
+          <div class="code_line">    <span class="yaml_key">JointStatePerceptionModule</span>: <span class="yaml_string">robot_joints</span></div>
           <div class="code_line"></div>
           <div class="code_line"><span class="yaml_key">robot_joints</span>:</div>
-          <div class="code_line"> <span class="yaml_key">robot_name</span> : <span class="yaml_string">eve</span></div>
+          <div class="code_line">  <span class="yaml_key">min_period</span> : <span class="yaml_value">0.1</span></div>
         </div>
 
         <p>An Overworld configuration file always has at its root a "modules" key. In there, we can have three keys:
@@ -183,8 +180,7 @@
         <p>At the root of the file, we can then add specific configurations for each module instance.
           To do so, we put the instance name as a root key then below we can add several key-value pairs where the keys
           are the parameters names and the values, the parameters' values (obvious).
-          Here we set a value to the robot_name parameter of the robot_joints instance. This parameter is mandatory for
-          this module.
+          Here we set a value to the optional min_period parameter of the robot_joints instance, beeing the the robot state is fetch.
         </p>
 
         <p>To get information about the modules and their parameters, you can use <a href="../../overview/Plugins.html"
@@ -203,9 +199,6 @@
               class="xml_string">&quot;configuration_file&quot;</span> <span class="xml_param">default</span>=<span
               class="xml_string">&quot;$(find overworld_tutorials)/configurations/overworld.yaml&quot;</span>/&gt;</div>
           <div class="code_line"> &lt;<span class="xml_tag">arg</span> <span class="xml_param">name</span>=<span
-              class="xml_string">&quot;robot_name&quot;</span> <span class="xml_param">default</span>=<span
-              class="xml_string">&quot;eve&quot;</span>/&gt;</div>
-          <div class="code_line"> &lt;<span class="xml_tag">arg</span> <span class="xml_param">name</span>=<span
               class="xml_string">&quot;simulate&quot;</span> <span class="xml_param">default</span>=<span
               class="xml_string">&quot;false&quot;</span>/&gt;</div>
           <div class="code_line"></div>
@@ -214,18 +207,16 @@
               class="xml_string">&quot;overworld&quot;</span> <span class="xml_param">type</span>=<span
               class="xml_string">&quot;overworld_node&quot;</span> <span class="xml_param">output</span>=<span
               class="xml_string">&quot;screen&quot;</span> <span class="xml_param">args</span>=<span
-              class="xml_string">&quot;-c $(arg configuration_file) -n $(arg robot_name) -s $(arg
-              simulate)&quot;</span>/&gt;</div>
+              class="xml_string">&quot;-c $(arg configuration_file) -s $(arg simulate)&quot;</span>/&gt;</div>
           <div class="code_line">&lt;/<span class="xml_tag">launch</span>&gt;</div>
         </div>
 
-        <p>Here we have two important and mandatory arguments, the configuration file and the robot name.
-          We thus register our previously created configuration file and we set the robot name to eve, as we have
-          defined it in the ontology.
-          The third argument is to deactivate the physics simulation for the moment.
+        <p>Here we have one important and mandatory argument, the configuration file.
+          We thus register our previously created configuration file.
+          The second argument is to deactivate the physics simulation for the moment.
         </p>
 
-        <p>Arguments are then filled to Overworld node using keys (-n, -c). To get the list and the effects of all keys,
+        <p>Arguments are then filled to Overworld node using keys (-c, -s). To get the list and the effects of all keys,
           you can refer to the <a href="../../overview/launchers.html" target="_blank"
             rel="noopener noreferrer"><b>launch page</b></a>.</p>
 
@@ -241,7 +232,7 @@
           <div class="terminal_line">roslaunch overworld_tutorials overworld.launch</div>
         </div>
 
-        <p>A blue window should appear within it, our robot!
+        <p>A window should appear within it, our robot!
           Using the sliders of the joint state publisher gui you can move the robot's head and arms.
           Putting the focus on the terminal containing the teleop node, you should be able to move it.
         </p>
