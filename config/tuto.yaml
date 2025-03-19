@@ -25,4 +25,4 @@ fake_2:
     - eve_eye
 
 static:
-  file: package://overworld/config/adream.yaml
+  file: package://overworld/config/env/adream.yaml

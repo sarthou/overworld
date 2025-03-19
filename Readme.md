@@ -3,41 +3,25 @@
 [![Release][Release-Image]][Release-Url]
 
 [![Dependency Status][Ontologenius-Dependency-Image]][Ontologenius-Dependency-Url]
-[![Dependency Status][Bullet-Dependency-Image]][Bullet-Dependency-Url]
 
 [![Build Status][Build-Status-Image]][Build-Status-Url]
 
 ## Installation
 
-### Bullet
-
-First of all, we need to install [bullet3](https://github.com/bulletphysics/bullet3) from the sources in order to get all the libraries.
-You can install it where you want on your computer but avoid installing it in your catkin workspace.
-
-```
-git clone https://github.com/bulletphysics/bullet3.git
-cd bullet3
-mkdir build && mkdir install
-export BULLET_PATH=$(pwd)
-cd build
-cmake .. -DCMAKE_INSTALL_PREFIX=$BULLET_PATH/install -DBUILD_SHARED_LIBS=ON
-make install
-```
-
-From there, bullet is installed. To use it, we have to export two variables. You can put them in the bashrc file or in the setup file of your workspace if you use some.
-
-```
-export BULLET_INSTALL_PATH=your/install/path
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$BULLET_INSTALL_PATH/lib
-```
-
 ### Overworld
+
+First of all, if you don't yet have the required dependencies, install them.
+
+```
+sudo apt install -y libglm-dev libglfw3-dev
+```
 
 To install Overworld, you just have to clone it and Ontologenius in the src folder of your ROS workspace and compile it. Enjoy !
 
 ```
 cd src
 git clone https://github.com/sarthou/ontologenius.git
+git clone https://github.com/RIS-WITH/common_ground_ontology.git
 git clone https://github.com/sarthou/overworld.git
 cd ..
 catkin_make # or catkin build
@@ -45,25 +29,21 @@ catkin_make # or catkin build
 
 ## Usage
 
-Overworld has only one executable being `overworld_node` which takes two arguments: a configuration file and a robot name. We thus advise you to use a launch file. You can take the `overworld.launch` example file.
+Overworld has only one executable being `overworld_node` which takes only one required argument: a configuration. A lot of optional arguments are available, take a look to (Overworld's Website)[https://sarthou.github.io/overworld/overview/launchers.html].
 
 The configuration file is used to define the used perception modules and to configure them.
-
-The robot name is the identifier of your robot.
 
 Because Overworld is strongly linked to the semantic knowledge base Ontologenius, you have to launch both:
 
 Terminal 1:
 ```
-roslaunch ontologenius ontologenius_full.launch
+roslaunch overworld tuto_ontologenius.launch
 ```
 
 Terminal 2:
 ```
-roslaunch overworld overworld.launch
+roslaunch overworld tuto_overworld.launch
 ```
-
-> You can also create a launch file starting both if you prefer
 
 ## Ontologenius
 
@@ -76,8 +56,6 @@ More information about this link and tutorials to show its use will come soon.
 
 [Ontologenius-Dependency-Image]: https://img.shields.io/badge/dependencies-ontologenius-yellow
 [Ontologenius-Dependency-Url]: https://github.com/sarthou/ontologenius
-[Bullet-Dependency-Image]: https://img.shields.io/badge/dependencies-bullet3-yellow
-[Bullet-Dependency-Url]: https://github.com/bulletphysics/bullet3
 
 [Build-Status-Image]: https://github.com/sarthou/overworld/actions/workflows/overworld.yml/badge.svg
 [Build-Status-Url]: https://github.com/sarthou/overworld/actions
