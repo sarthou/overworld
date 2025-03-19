@@ -16,12 +16,12 @@ namespace owds {
     friend YamlReader;
 
   public:
-    YamlElement operator[](const std::string& name)
+    YamlElement operator[](const std::string& name) const
     {
       if(subelem_)
       {
         if(subelem_.value().find(name) != subelem_.value().end())
-          return subelem_.value()[name];
+          return subelem_.value().at(name);
         else
           return YamlElement();
       }
@@ -29,7 +29,7 @@ namespace owds {
         return YamlElement();
     }
 
-    std::vector<std::string> value()
+    std::vector<std::string> value() const
     {
       if(data_)
         return data_.value();
@@ -37,7 +37,7 @@ namespace owds {
         return {};
     }
 
-    std::vector<std::string> getElementsKeys()
+    std::vector<std::string> getElementsKeys() const
     {
       std::vector<std::string> res;
       if(subelem_)
@@ -47,7 +47,7 @@ namespace owds {
       return res;
     }
 
-    bool keyExists(const std::string& key)
+    bool keyExists(const std::string& key) const
     {
       if(subelem_)
         return (subelem_.value().find(key) != subelem_.value().end());

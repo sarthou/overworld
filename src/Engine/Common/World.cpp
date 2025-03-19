@@ -375,8 +375,8 @@ namespace owds {
     ambient_light_.setAmbientStrength(ambient_strength);
   }
 
-  std::size_t World::addPointLight(const std::array<float, 3>& position,
-                                   const std::array<float, 3>& color,
+  std::size_t World::addPointLight(const std::array<double, 3>& position,
+                                   const std::array<double, 3>& color,
                                    float ambient_strength,
                                    float diffuse_strength,
                                    float specular_strength,

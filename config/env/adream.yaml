@@ -1,5 +1,6 @@
 include:
-  - package://overworld/config/adream_visual.yaml
+  - package://overworld/config/env/adream_visual.yaml
+  - package://overworld/config/env/adream_lights.yaml
 
 adream_walls:
   orientation:

@@ -126,8 +126,8 @@ namespace owds {
     void setAmbientLightColor(const std::array<float, 3>& color);
     void setAmbientLightAmbientStrength(float ambient_strength);
 
-    std::size_t addPointLight(const std::array<float, 3>& position,
-                              const std::array<float, 3>& color = {1.0, 1.0, 1.0},
+    std::size_t addPointLight(const std::array<double, 3>& position,
+                              const std::array<double, 3>& color = {1.0, 1.0, 1.0},
                               float ambient_strength = 1.0f,
                               float diffuse_strength = 1.0f,
                               float specular_strength = 1.0f,

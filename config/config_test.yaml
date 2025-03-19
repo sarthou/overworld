@@ -25,7 +25,7 @@ fake_2:
     - eve_right_eye
 
 static:
-  file: package://overworld/config/adream.yaml
+  file: package://overworld/config/env/adream.yaml
 
 obj_area:
   file: package://overworld/config/adream_areas.yaml
