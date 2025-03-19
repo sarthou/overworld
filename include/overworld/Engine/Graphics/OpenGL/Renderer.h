@@ -79,7 +79,7 @@ namespace owds {
     void loadInstance(const Model& model, const Material& material, const glm::mat4& model_mat, uint32_t object_id);
     Material combineMaterials(const Material& shape_material, const Material& model_material);
     std::vector<Texture2D> loadTextures(Material& material);
-    void loadModel(const Model& model, const Material& material);
+    void loadModel(const Model& model, const Material& material, uint32_t instance_id);
     void loadDebugLines();
 
     void renderModels(const Shader& shader, unsigned int texture_offset = 0);

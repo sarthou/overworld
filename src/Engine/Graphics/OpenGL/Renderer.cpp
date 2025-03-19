@@ -306,7 +306,7 @@ namespace owds {
 
   void Renderer::loadInstance(const Model& model, const Material& material, const glm::mat4& model_mat, uint32_t object_id)
   {
-    loadModel(model, material);
+    loadModel(model, material, object_id);
 
     for(const auto& mesh : model.meshes_)
       current_mesh_batches_[model.id_][mesh.id_].emplace_back(InstanceData{model_mat, {}, object_id}); // TODO add instance data ?
@@ -395,30 +395,36 @@ namespace owds {
     return textures;
   }
 
-  void Renderer::loadModel(const Model& model, const Material& material)
+  void Renderer::loadModel(const Model& model, const Material& material, uint32_t instance_id)
   {
     if(model.meshes_.empty())
       return;
 
     auto model_it = cached_models_.find(model.id_);
-    if(model_it != cached_models_.end())
-      return;
-
-    model_it = cached_models_.insert({model.id_, {}}).first;
+    if(model_it == cached_models_.end())
+      model_it = cached_models_.insert({model.id_, {}}).first;
 
     for(const auto& mesh : model.meshes_)
     {
+      auto mesh_it = model_it->second.find(mesh.id_);
+      if(mesh_it != model_it->second.end())
+      {
+        if(mesh_it->second.materials.find(instance_id) != mesh_it->second.materials.end())
+          continue;
+      }
+      else
+        mesh_it = model_it->second.insert({mesh.id_, mesh}).first;
+
       auto mesh_material = combineMaterials(mesh.material_, material);
       auto textures = loadTextures(mesh_material);
-      auto mesh_it = model_it->second.insert({
-                                               mesh.id_, {mesh, textures}
-      })
-                       .first;
 
-      mesh_it->second.color = mesh_material.diffuse_color_;
-      mesh_it->second.color.a_ = 1.0;
-      mesh_it->second.shininess = mesh_material.shininess_ <= 0 ? 64.f : mesh_material.shininess_;
-      mesh_it->second.specular = mesh_material.specular_color_.a_ == 0. ? 0.1f : mesh_material.specular_color_.r_;
+      MeshMaterialHandle_t material_handle;
+      material_handle.textures = textures;
+      material_handle.color = mesh_material.diffuse_color_;
+      material_handle.color.a_ = 1.0;
+      material_handle.shininess = mesh_material.shininess_ <= 0 ? 64.f : mesh_material.shininess_;
+      material_handle.specular = mesh_material.specular_color_.a_ == 0. ? 0.1f : mesh_material.specular_color_.r_;
+      mesh_it->second.materials.emplace(instance_id, material_handle);
     }
   }
 
@@ -729,7 +735,7 @@ namespace owds {
         for(const auto& transform : transforms)
         {
           shader.setMat4("model", transform.mvp_);
-          mesh.draw(shader, texture_offset);
+          mesh.draw(shader, transform.object_id_, texture_offset);
         }
       }
     }
