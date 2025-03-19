@@ -57,7 +57,7 @@ namespace owds {
     std::unordered_set<std::string> getFalseIds() const { return false_ids_; }
 
     void setWorldId(int engine_id) { engine_id_ = engine_id; }
-    void setBulletLinkId(int engine_link_id) { engine_link_id_ = engine_link_id; }
+    void setEngineLinkId(int engine_link_id) { engine_link_id_ = engine_link_id; }
     int worldId() const { return engine_id_; }
     int engineLinkId() const { return engine_link_id_; }
     bool isEngineLink() const { return (engine_link_id_ != -1); }

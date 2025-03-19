@@ -47,10 +47,10 @@ namespace owds {
 
     void solvePendingAreas();
 
-    void removeFromBullet(Area* area);
+    void removeFromEngine(Area* area);
     void addToWorld(Area* area);
-    void addPolygonToBullet(Area* area);
-    void addCircleToBullet(Area* area);
+    void addPolygonToEngine(Area* area);
+    void addCircleToEngine(Area* area);
 
     Entity* findAreaOwner(Area* area);
   };

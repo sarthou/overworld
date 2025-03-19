@@ -1,7 +1,7 @@
 #include "overworld/Perception/Managers/AreasPerceptionManager.h"
 
-#include <string>
 #include <array>
+#include <string>
 
 #define CIRCLE_STEPS 10
 
@@ -50,7 +50,7 @@ namespace owds {
     drawn_ = false;
     for(auto& area : areas_)
       if(area.second->getWorldLineIds().size() != 0)
-        removeFromBullet(area.second);
+        removeFromEngine(area.second);
   }
 
   void AreasPerceptionManager::getPercepts(const std::string& module_name, std::map<std::string, Percept<Area>>& percepts)
@@ -92,7 +92,7 @@ namespace owds {
       pending_percepts_.erase(id);
   }
 
-  void AreasPerceptionManager::removeFromBullet(Area* area)
+  void AreasPerceptionManager::removeFromEngine(Area* area)
   {
     for(auto id : area->getWorldLineIds())
       world_client_->removeDebugLine(id);
@@ -108,12 +108,12 @@ namespace owds {
       return;
 
     if(area->isCircle())
-      addCircleToBullet(area);
+      addCircleToEngine(area);
     else
-      addPolygonToBullet(area);
+      addPolygonToEngine(area);
   }
 
-  void AreasPerceptionManager::addPolygonToBullet(Area* area)
+  void AreasPerceptionManager::addPolygonToEngine(Area* area)
   {
     std::array<double, 3> color = {1, 0, 0};
     int owner_id = -1;
@@ -164,14 +164,14 @@ namespace owds {
 
     std::unordered_set<int> engine_text_ids;
     engine_text_ids.insert(world_client_->addDebugText(area->id(),
-                                                      {mean_x, mean_y, z_max + 0.2f}, 0.4,
-                                                      color, true, 0, -1, owner_id, owner_link_id));
+                                                       {mean_x, mean_y, z_max + 0.2f}, 0.4,
+                                                       color, true, 0, -1, owner_id, owner_link_id));
 
     area->setWorldLineIds(engine_ids);
     area->setWorldTextIds(engine_text_ids);
   }
 
-  void AreasPerceptionManager::addCircleToBullet(Area* area)
+  void AreasPerceptionManager::addCircleToEngine(Area* area)
   {
     std::array<double, 3> color = {1, 0, 0};
     int owner_id = -1;
@@ -222,11 +222,12 @@ namespace owds {
 
     std::unordered_set<int> engine_text_ids;
     engine_text_ids.insert(world_client_->addDebugText(area->id(),
-                                                      {x_center, y_center, z_max + 0.2f}, 0.4,
-                                                      color, true, 0, -1, owner_id, owner_link_id));
+                                                       {x_center, y_center, z_max + 0.2f}, 0.4,
+                                                       color, true, 0, -1, owner_id, owner_link_id));
 
     area->setWorldLineIds(engine_ids);
-    area->setWorldTextIds(engine_text_ids);;
+    area->setWorldTextIds(engine_text_ids);
+    ;
   }
 
   Entity* AreasPerceptionManager::findAreaOwner(Area* area)

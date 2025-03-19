@@ -312,7 +312,7 @@ namespace owds {
     if(link_id != -1)
     {
       entity->setWorldId(engine_parent_id);
-      entity->setBulletLinkId(link_id);
+      entity->setEngineLinkId(link_id);
     }
   }
 
