@@ -58,6 +58,7 @@ int main(int argc, char** argv)
   params.insert(owds::Parameter("publish debug", {"-d", "--debug"}, {"false"}));
   params.insert(owds::Parameter("assessment frequency", {"-af", "--assessment-frequency"}, {"20"}));
   params.insert(owds::Parameter("simulation substepping", {"-sub", "--simulation-substepping"}, {"3"}));
+  params.insert(owds::Parameter("display frequency", {"-df", "--display-frequency"}, {"30"}));
 
   bool valid_parameters = params.set(argc, argv);
   params.display();
@@ -88,6 +89,7 @@ int main(int argc, char** argv)
                                                std::stoi(params.at("simulation substepping").getFirst()),
                                                params.at("simulate").getFirst() == "true",
                                                params.at("publish debug").getFirst() == "true",
+                                               std::stod(params.at("display frequency").getFirst()),
                                                true);
 
   windows.emplace(robot_name, new owds::Window(robot_name));

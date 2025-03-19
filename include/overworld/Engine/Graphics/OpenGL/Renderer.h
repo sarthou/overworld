@@ -35,7 +35,7 @@ namespace owds {
     static void init();
     static void release();
 
-    bool initialize(Window& window);
+    bool initialize(Window& window, float max_fps = 30);
     void attachWorld(World* world) { world_ = world; }
 
     bool shouldRender();

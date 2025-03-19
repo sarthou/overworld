@@ -7,6 +7,10 @@
 #include <string>
 #include <thread>
 
+#include "overworld/BasicTypes/Agent.h"
+#include "overworld/BasicTypes/Area.h"
+#include "overworld/BasicTypes/BodyPart.h"
+#include "overworld/BasicTypes/Object.h"
 #include "overworld/Perception/Modules/AreasModules/AreasEmulatedPerceptionModule.h"
 #include "overworld/Perception/Modules/HumansModules/HumansEmulatedPerceptionModule.h"
 #include "overworld/Perception/Modules/ObjectsModules/ObjectsEmulatedPerceptionModule.h"
@@ -21,12 +25,14 @@ namespace owds {
                                        size_t simulation_substepping,
                                        bool simulate,
                                        bool publish_debug,
+                                       double max_fps,
                                        bool is_robot) : agent_name_(agent_name),
                                                         myself_agent_(nullptr),
                                                         is_robot_(is_robot),
                                                         config_path_(config_path),
                                                         simulate_(simulate),
                                                         debug_(publish_debug),
+                                                        max_fps_(max_fps),
                                                         time_step_(1.0 / assessment_frequency),
                                                         simulation_substepping_(simulation_substepping),
                                                         perception_manager_(&n_),
@@ -46,7 +52,7 @@ namespace owds {
   void SituationAssessor::initWorld(Window* window)
   {
     engine_ = new Engine(agent_name_, window);
-    engine_->initView();
+    engine_->initView(max_fps_);
 
     engine_->world.setAmbientLight({43.6f, 1.43f, 115.f},
                                    {1.0f, 0.976f, 0.898f},
@@ -405,7 +411,7 @@ namespace owds {
     std::lock_guard<std::shared_timed_mutex> lock(humans_assessors_mutex_);
     auto h_assessor = humans_assessors_.insert(std::make_pair(human_name, HumanAssessor_t())).first;
 
-    h_assessor->second.assessor = new SituationAssessor(human_name, config_path_, 1.0 / time_step_, simulation_substepping_, simulate_);
+    h_assessor->second.assessor = new SituationAssessor(human_name, config_path_, 1.0 / time_step_, simulation_substepping_, simulate_, false, max_fps_);
     h_assessor->second.objects_module = new ObjectsEmulatedPerceptionModule();
     h_assessor->second.humans_module = new HumansEmulatedPerceptionModule();
     h_assessor->second.areas_module = new AreasEmulatedPerceptionModule();

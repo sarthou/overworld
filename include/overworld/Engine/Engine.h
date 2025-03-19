@@ -12,7 +12,6 @@
 
 // should be after glad
 #include "overworld/Engine/Graphics/GLFW/Window.h"
-
 #include "overworld/Engine/Physics/PhysX/World.h"
 namespace owds {
   using WorldEngine = owds::physx::World;
@@ -34,7 +33,7 @@ namespace owds {
 
     WorldEngine world;
 
-    void initView(float screen_width = 640, float screen_height = 480)
+    void initView(float max_fps = 30, float screen_width = 640, float screen_height = 480)
     {
       auto& cam = window_->getCamera();
       cam.setFieldOfView(60.f);
@@ -44,7 +43,7 @@ namespace owds {
       cam.setPlanes({0.1, 60.});
       cam.finalize();
 
-      renderer_.initialize(*window_);
+      renderer_.initialize(*window_, max_fps);
     }
 
     void setVizualizerCamera(const std::array<double, 3>& position, const std::array<double, 3>& target)

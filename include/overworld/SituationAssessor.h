@@ -7,9 +7,9 @@
 #include <overworld/StartStopModules.h>
 #include <ros/callback_queue.h>
 #include <ros/ros.h>
+#include <shared_mutex>
 #include <std_srvs/SetBool.h>
 #include <string>
-#include <shared_mutex>
 #include <thread>
 
 #include "overworld/Engine/Engine.h"
@@ -49,6 +49,7 @@ namespace owds {
                       double assessment_frequency, size_t simulation_substepping,
                       bool simulate = true,
                       bool publish_debug = false,
+                      double max_fps = 30,
                       bool is_robot = false);
     SituationAssessor(const SituationAssessor& other) = delete;
     ~SituationAssessor();
@@ -78,6 +79,7 @@ namespace owds {
     std::string config_path_;
     bool simulate_;
     bool debug_;
+    double max_fps_;
 
     ros::NodeHandle n_;
     ros::CallbackQueue callback_queue_;
