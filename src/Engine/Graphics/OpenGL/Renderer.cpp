@@ -332,12 +332,28 @@ namespace owds {
       material.normal_texture_ = model_material.normal_texture_;
 
     if(model_material.diffuse_color_.a_ == 0.f)
-      material.diffuse_color_ = shape_material.diffuse_color_;
+    {
+      if(shape_material.diffuse_color_.a_ > 0.001f)
+        material.diffuse_color_ = shape_material.diffuse_color_;
+      else
+      {
+        material.diffuse_color_ = model_material.diffuse_color_;
+        material.diffuse_color_.a_ = 1.0;
+      }
+    }
     else
       material.diffuse_color_ = model_material.diffuse_color_;
 
     if(model_material.specular_color_.a_ <= 0.001f)
-      material.specular_color_ = shape_material.specular_color_;
+    {
+      if(shape_material.specular_color_.a_ > 0.001f)
+        material.specular_color_ = shape_material.specular_color_;
+      else
+      {
+        material.specular_color_ = model_material.specular_color_;
+        material.specular_color_.a_ = 1.0;
+      }
+    }
     else
       material.specular_color_ = model_material.specular_color_;
 
