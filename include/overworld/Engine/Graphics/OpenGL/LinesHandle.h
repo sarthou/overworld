@@ -57,7 +57,7 @@ namespace owds {
       enabled_ = false;
     }
 
-    bool isEnabled() { return enabled_; }
+    bool isEnabled() const { return enabled_; }
 
     void draw(const Shader& shader) const
     {

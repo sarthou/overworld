@@ -15,9 +15,9 @@ namespace owds {
   class ShapeCapsule
   {
   public:
-    float radius_{};
-    float height_{};
-    owds::Color diffuse_color_{};
+    float radius_ = 0.;
+    float height_ = 0.;
+    owds::Color diffuse_color_;
     std::reference_wrapper<owds::Model> cylinder_model_;
     std::reference_wrapper<owds::Model> sphere_model_;
     glm::mat4 shape_transform_{1.};

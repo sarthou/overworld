@@ -78,7 +78,7 @@
             <li class="level1"><a href="../../overview/launchers.html">Launchers</a></li>
             <li class="level1"><a href="../../overview/Configuration.html">Configuration</a></li>
             <li class="level1"><a href="../../overview/Plugins.html">Plugins</a></li>
-            <li class="level1"><a href="../../overview/bulletGUI.html">Bullet GUI</a></li>
+            <li class="level1"><a href="../../overview/overworldGUI.html">Overworld GUI</a></li>
           </ul>
         </div>
 
@@ -115,26 +115,26 @@
 
         <div class="code_block xml_code" style="counter-reset:code_line 0;">
           <div class="code_line"><span class="yaml_key">frame_obj</span>:</div>
-          <div class="code_line"> <span class="yaml_key">position</span>:</div>
-          <div class="code_line"> <span class="yaml_key">x</span>: <span class="yaml_value">0.0</span></div>
-          <div class="code_line"> <span class="yaml_key">y</span>: <span class="yaml_value">0.0</span></div>
-          <div class="code_line"> <span class="yaml_key">z</span>: <span class="yaml_value">0.0</span></div>
-          <div class="code_line"> <span class="yaml_key">orientation</span>:</div>
-          <div class="code_line"> <span class="yaml_key">x</span>: <span class="yaml_value">0.0</span></div>
-          <div class="code_line"> <span class="yaml_key">y</span>: <span class="yaml_value">0.0</span></div>
-          <div class="code_line"> <span class="yaml_key">z</span>: <span class="yaml_value">0.0</span></div>
-          <div class="code_line"> </div>
+          <div class="code_line">  <span class="yaml_key">position</span>:</div>
+          <div class="code_line">    <span class="yaml_key">x</span>: <span class="yaml_value">0.0</span></div>
+          <div class="code_line">    <span class="yaml_key">y</span>: <span class="yaml_value">0.0</span></div>
+          <div class="code_line">    <span class="yaml_key">z</span>: <span class="yaml_value">0.0</span></div>
+          <div class="code_line">  <span class="yaml_key">orientation</span>:</div>
+          <div class="code_line">    <span class="yaml_key">x</span>: <span class="yaml_value">0.0</span></div>
+          <div class="code_line">    <span class="yaml_key">y</span>: <span class="yaml_value">0.0</span></div>
+          <div class="code_line">    <span class="yaml_key">z</span>: <span class="yaml_value">0.0</span></div>
+          <div class="code_line"></div>
           <div class="code_line"><span class="yaml_key">frame_stl</span>:</div>
-          <div class="code_line"> <span class="yaml_key">position</span>:</div>
-          <div class="code_line"> <span class="yaml_key">z</span>: <span class="yaml_value">2.0</span></div>
-          <div class="code_line"> </div>
+          <div class="code_line">  <span class="yaml_key">position</span>:</div>
+          <div class="code_line">    <span class="yaml_key">z</span>: <span class="yaml_value">2.0</span></div>
+          <div class="code_line"></div>
           <div class="code_line"><span class="yaml_key">frame_green</span>:</div>
-          <div class="code_line"> <span class="yaml_key">position</span>:</div>
-          <div class="code_line"> <span class="yaml_key">y</span>: <span class="yaml_value">2.0</span></div>
-          <div class="code_line"> </div>
+          <div class="code_line">  <span class="yaml_key">position</span>:</div>
+          <div class="code_line">    <span class="yaml_key">y</span>: <span class="yaml_value">2.0</span></div>
+          <div class="code_line"></div>
           <div class="code_line"><span class="yaml_key">frame_red</span>:</div>
-          <div class="code_line"> <span class="yaml_key">position</span>:</div>
-          <div class="code_line"> <span class="yaml_key">x</span>: <span class="yaml_value">2.0</span></div>
+          <div class="code_line">  <span class="yaml_key">position</span>:</div>
+          <div class="code_line">    <span class="yaml_key">x</span>: <span class="yaml_value">2.0</span></div>
         </div>
 
         <p>The content and the structure of this file are really simple.
@@ -168,19 +168,16 @@
 
         <div class="code_block xml_code" style="counter-reset:code_line 0;">
           <div class="code_line"><span class="yaml_key">modules</span>:</div>
-          <div class="code_line"> <span class="yaml_key">robot</span>:</div>
-          <div class="code_line"> <span class="yaml_key">JointStatePerceptionModule</span>: <span
-              class="yaml_string">robot_joints</span></div>
-          <div class="code_line"> <span class="yaml_key">objects</span>:</div>
-          <div class="code_line"> <span class="yaml_key">StaticObjectsPerceptionModule</span>: <span
-              class="yaml_string">static</span></div>
+          <div class="code_line">  <span class="yaml_key">robot</span>:</div>
+          <div class="code_line">    <span class="yaml_key">JointStatePerceptionModule</span>: <span class="yaml_string">robot_joints</span></div>
+          <div class="code_line">  <span class="yaml_key">objects</span>:</div>
+          <div class="code_line">    <span class="yaml_key">StaticObjectsPerceptionModule</span>: <span class="yaml_string">static</span></div>
           <div class="code_line"></div>
           <div class="code_line"><span class="yaml_key">robot_joints</span>:</div>
-          <div class="code_line"> <span class="yaml_key">robot_name</span> : <span class="yaml_string">eve</span></div>
+          <div class="code_line">  <span class="yaml_key">robot_name</span> : <span class="yaml_string">eve</span></div>
           <div class="code_line"></div>
           <div class="code_line"><span class="yaml_key">static</span>:</div>
-          <div class="code_line"> <span class="yaml_key">file</span>: <span
-              class="yaml_string">package://overworld_tutorials/configurations/static_env.yaml</span></div>
+          <div class="code_line">  <span class="yaml_key">file</span>: <span class="yaml_string">package://overworld_tutorials/configurations/static_env.yaml</span></div>
         </div>
 
         <p>Where previously we only used a "robot" module, you can see that we now have an "objects" field with a
@@ -195,8 +192,7 @@
         <p>As a reminder, if you want to:</p>
         <ul>
           <li>Change an object's visual features you have to modify the ontology.</li>
-          <li>Change the objects to be spawned or their location, you have to modify the static_env configuration file.
-          </li>
+          <li>Change the objects to be spawned or their location, you have to modify the static_env configuration file.</li>
           <li>Load a completely new environment, you have to modify the file parameter of the
             StaticObjectsPerceptionModule in the module configuration file.</li>
         </ul>
@@ -221,9 +217,9 @@
           <div class="terminal_line">roslaunch overworld_tutorials overworld.launch</div>
         </div>
 
-        <p>Moving a bit the robot aside, you should get the following in the Bullet window.</p>
+        <p>Moving a bit the robot aside, you should get the following in the GUI.</p>
 
-        <img src="../../images/Tutorials/tutorial2/bullet_with_frames.png" alt="tutorial 2 Bullet GUI with frames"
+        <img src="../../images/Tutorials/tutorial2/gui_with_frames.png" alt="tutorial 2 Overworld GUI with frames"
           width="50%" class="center" />
 
         <p>Both the OBJ and STL meshes have been loaded correctly and the colors applied to two of the frames have been

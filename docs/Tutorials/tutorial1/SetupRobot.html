@@ -76,7 +76,7 @@
             <li class="level1"><a href="../../overview/launchers.html">Launchers</a></li>
             <li class="level1"><a href="../../overview/Configuration.html">Configuration</a></li>
             <li class="level1"><a href="../../overview/Plugins.html">Plugins</a></li>
-            <li class="level1"><a href="../../overview/bulletGUI.html">Bullet GUI</a></li>
+            <li class="level1"><a href="../../overview/overworldGUI.html">Overworld GUI</a></li>
           </ul>
         </div>
 
@@ -125,25 +125,16 @@
         <p>We can quickly clean the package.xml and CMakeLists files with their minimal content as follow:</p>
 
         <div class="code_block xml_code" style="counter-reset:code_line 0;">
-          <div class="code_line">&lt;?<span class="xml_tag">xml</span> <span class="xml_param">version</span>=<span
-              class="xml_string">&quot;1.0&quot;</span>?&gt;</div>
-          <div class="code_line">&lt;<span class="xml_tag">package</span> <span class="xml_param">format</span>=<span
-              class="xml_string">&quot;2&quot;</span>&gt;</div>
-          <div class="code_line"> &lt;<span class="xml_tag">name</span>&gt;overworld_tutorials&lt;/<span
-              class="xml_tag">name</span>&gt;</div>
-          <div class="code_line"> &lt;<span class="xml_tag">version</span>&gt;0.0.0&lt;/<span
-              class="xml_tag">version</span>&gt;</div>
-          <div class="code_line"> &lt;<span class="xml_tag">description</span>&gt;The overworld_tutorials
-            package&lt;/<span class="xml_tag">description</span>&gt;</div>
-          <div class="code_line"> </div>
-          <div class="code_line"> &lt;<span class="xml_tag">maintainer</span> <span class="xml_param">email</span>=<span
-              class="xml_string">&quot;plop@plop.com&quot;</span>&gt;Plop&lt;/<span
-              class="xml_tag">maintainer</span>&gt;</div>
-          <div class="code_line"> &lt;<span class="xml_tag">license</span>&gt;MIT&lt;/<span
-              class="xml_tag">license</span>&gt;</div>
-          <div class="code_line"> </div>
-          <div class="code_line"> &lt;<span class="xml_tag">buildtool_depend</span>&gt;catkin&lt;/<span
-              class="xml_tag">buildtool_depend</span>&gt;</div>
+          <div class="code_line">&lt;?<span class="xml_tag">xml</span> <span class="xml_param">version</span>=<span class="xml_string">&quot;1.0&quot;</span>?&gt;</div>
+          <div class="code_line">&lt;<span class="xml_tag">package</span> <span class="xml_param">format</span>=<span class="xml_string">&quot;2&quot;</span>&gt;</div>
+          <div class="code_line">  &lt;<span class="xml_tag">name</span>&gt;overworld_tutorials&lt;/<span class="xml_tag">name</span>&gt;</div>
+          <div class="code_line">  &lt;<span class="xml_tag">version</span>&gt;0.0.0&lt;/<span class="xml_tag">version</span>&gt;</div>
+          <div class="code_line">  &lt;<span class="xml_tag">description</span>&gt;The overworld_tutorials package&lt;/<span class="xml_tag">description</span>&gt;</div>
+          <div class="code_line">  </div>
+          <div class="code_line">  &lt;<span class="xml_tag">maintainer</span> <span class="xml_param">email</span>=<span class="xml_string">&quot;plop@plop.com&quot;</span>&gt;Plop&lt;/<span class="xml_tag">maintainer</span>&gt;</div>
+          <div class="code_line">  &lt;<span class="xml_tag">license</span>&gt;MIT&lt;/<span class="xml_tag">license</span>&gt;</div>
+          <div class="code_line">  </div>
+          <div class="code_line">  &lt;<span class="xml_tag">buildtool_depend</span>&gt;catkin&lt;/<span class="xml_tag">buildtool_depend</span>&gt;</div>
           <div class="code_line">&lt;/<span class="xml_tag">package</span>&gt;</div>
         </div>
 
@@ -175,18 +166,10 @@
 
         <div class="code_block xml_code" style="counter-reset:code_line 0;">
           <div class="code_line">&lt;<span class="xml_tag">launch</span>&gt;</div>
-          <div class="code_line"> &lt;<span class="xml_tag">param</span> <span class="xml_param">name</span>=<span
-              class="xml_string">&quot;robot_description&quot;</span> <span class="xml_param">textfile</span>=<span
-              class="xml_string">&quot;$(find overworld)/models/eve.urdf&quot;</span>/&gt;</div>
+          <div class="code_line">  &lt;<span class="xml_tag">param</span> <span class="xml_param">name</span>=<span class="xml_string">&quot;robot_description&quot;</span> <span class="xml_param">textfile</span>=<span class="xml_string">&quot;$(find overworld)/models/eve.urdf&quot;</span>/&gt;</div>
           <div class="code_line"> </div>
-          <div class="code_line"> &lt;<span class="xml_tag">node</span> <span class="xml_param">name</span>=<span
-              class="xml_string">&quot;joint_state_publisher&quot;</span> <span class="xml_param">pkg</span>=<span
-              class="xml_string">&quot;joint_state_publisher_gui&quot;</span> <span class="xml_param">type</span>=<span
-              class="xml_string">&quot;joint_state_publisher_gui&quot;</span>/&gt;</div>
-          <div class="code_line"> &lt;<span class="xml_tag">node</span> <span class="xml_param">name</span>=<span
-              class="xml_string">&quot;robot_state_publisher&quot;</span> <span class="xml_param">pkg</span>=<span
-              class="xml_string">&quot;robot_state_publisher&quot;</span> <span class="xml_param">type</span>=<span
-              class="xml_string">&quot;robot_state_publisher&quot;</span>/&gt;</div>
+          <div class="code_line">  &lt;<span class="xml_tag">node</span> <span class="xml_param">name</span>=<span class="xml_string">&quot;joint_state_publisher&quot;</span> <span class="xml_param">pkg</span>=<span class="xml_string">&quot;joint_state_publisher_gui&quot;</span> <span class="xml_param">type</span>=<span class="xml_string">&quot;joint_state_publisher_gui&quot;</span>/&gt;</div>
+          <div class="code_line">  &lt;<span class="xml_tag">node</span> <span class="xml_param">name</span>=<span class="xml_string">&quot;robot_state_publisher&quot;</span> <span class="xml_param">pkg</span>=<span class="xml_string">&quot;robot_state_publisher&quot;</span> <span class="xml_param">type</span>=<span class="xml_string">&quot;robot_state_publisher&quot;</span>/&gt;</div>
           <div class="code_line">&lt;/<span class="xml_tag">launch</span>&gt;</div>
         </div>
 
@@ -313,20 +296,11 @@
         <p>The following is the description of the individuals of our ontology. It's there that we describe our robot.
           Here we start with the simplest description.</p>
 
-<<<<<<< HEAD
-        <p>The three first individuals are our robot's body parts.
-          We declare a base, a head and two hands. The names of these parts are in fact the robot's frames that we want
-          to consider as specific body parts.
-          For example, we state that the frame head_camera_frame has to be considered as a head of an agent.
-          Nevertheless, for each body part, we do not say to which agent they correspond.
-          We do it in the agent description.
-=======
         <p>The three first individuals are our robot's body parts. 
            We declare a base, a head and two hands. The names of these parts are in fact the robot's frames that we want to consider as specific body parts. 
            For example, we state that the frame eve_head has to be considered as a head of an agent. 
            Nevertheless, for each body part, we do not say to which agent they correspond. 
            We do it in the agent description.
->>>>>>> origin/dev
         </p>
 
         <p>Our agent is the fith individual.
@@ -334,13 +308,7 @@
           base, a head and two hands.
         </p>
 
-<<<<<<< HEAD
-        <p>To describe a robot, only a head and a base are required. Note that the head corresponds in fact to the robot
-          camera whose forward axe is Z.
-          For the hands, you can define, one, two, or none if you want.
-=======
         <p>To describe a robot, only a head and a base are required. For the hands, you can define, one, two, or none if you want.
->>>>>>> origin/dev
         </p>
 
         <p>Now that we have fully described our robot, we will be able to launch Overworld!</p>

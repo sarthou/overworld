@@ -15,29 +15,33 @@
 
 namespace owds {
 
+  struct MeshMaterialHandle_t
+  {
+    std::vector<Texture2D> textures;
+    float shininess;
+    float specular;
+    Color color;
+  };
+
   class MeshHandle
   {
   public:
     uint32_t id;
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
-    std::vector<Texture2D> textures;
-    float shininess;
-    float specular;
-    Color color;
+    std::unordered_map<uint32_t, MeshMaterialHandle_t> materials;
 
-    MeshHandle(const Mesh& mesh, const std::vector<Texture2D>& textures)
+    MeshHandle(const Mesh& mesh)
     {
       this->vertices = mesh.vertices_;
       this->indices = mesh.indices_;
-      this->textures = textures;
 
       setupMesh();
     }
 
     void drawId(const Shader& shader, uint32_t model_id) const
     {
-      //model_id *= 4'000'000;
+      // model_id *= 4'000'000;
       shader.setVec4("color", glm::vec4((uint8_t)(model_id >> 24) / 255.,
                                         (uint8_t)(model_id >> 16) / 255.,
                                         (uint8_t)(model_id >> 8) / 255.,
@@ -48,42 +52,46 @@ namespace owds {
       glBindVertexArray(0);
     }
 
-    void draw(const Shader& shader, unsigned int texture_pose_offset = 0) const
+    void draw(const Shader& shader, uint32_t model_id, unsigned int texture_pose_offset = 0) const
     {
+      auto material_it = materials.find(model_id);
+      if(material_it == materials.end())
+        return;
+
       unsigned int diffuse_nr = 1;
       unsigned int specular_nr = 1;
       unsigned int normal_nr = 1;
       unsigned int height_nr = 1;
       unsigned int nb_used = 0;
-      for(unsigned int i = 0; i < textures.size(); i++)
+      for(unsigned int i = 0; i < material_it->second.textures.size(); i++)
       {
         glActiveTexture(GL_TEXTURE0 + texture_pose_offset + i); // active proper texture unit before binding
         std::string number;
         std::string name;
-        if(textures[i].type_ == texture_diffuse)
+        if(material_it->second.textures[i].type_ == texture_diffuse)
         {
           name = "material.texture_diffuse";
           number = std::to_string(diffuse_nr++);
         }
-        else if(textures[i].type_ == texture_specular)
+        else if(material_it->second.textures[i].type_ == texture_specular)
         {
           name = "material.texture_specular";
           number = std::to_string(specular_nr++);
         }
-        else if(textures[i].type_ == texture_normal)
+        else if(material_it->second.textures[i].type_ == texture_normal)
         {
           name = "material.texture_normal";
           number = std::to_string(normal_nr++);
           shader.setFloat("material.use_normal", 1.);
         }
-        else if(textures[i].type_ == texture_height)
+        else if(material_it->second.textures[i].type_ == texture_height)
         {
           name = "material.texture_height";
           number = std::to_string(height_nr++);
         }
 
         // now bind the texture
-        glBindTexture(GL_TEXTURE_2D, textures[i].id_);
+        glBindTexture(GL_TEXTURE_2D, material_it->second.textures[i].id_);
         // and finally set the sampler to the correct texture unit
         shader.setInt(name + number, texture_pose_offset + i);
         nb_used++;
@@ -122,9 +130,12 @@ namespace owds {
         nb_used++;
       }
 
-      shader.setFloat("material.shininess", shininess);
-      shader.setFloat("material.specular", (specular_nr == 1) ? specular : -1);
-      shader.setVec4("material.color", glm::vec4(color.r_, color.g_, color.b_, (diffuse_nr == 1) ? color.a_ : 0));
+      shader.setFloat("material.shininess", material_it->second.shininess);
+      shader.setFloat("material.specular", (specular_nr == 1) ? material_it->second.specular : -1);
+      shader.setVec4("material.color", glm::vec4(material_it->second.color.r_,
+                                                 material_it->second.color.g_,
+                                                 material_it->second.color.b_,
+                                                 (diffuse_nr == 1) ? material_it->second.color.a_ : 0));
 
       glBindVertexArray(vao_);
       glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, 0);

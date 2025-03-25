@@ -2,8 +2,8 @@
 
 #include <pluginlib/class_loader.h>
 
-#include "overworld/Utils/ShellDisplay.h"
 #include "overworld/Engine/Engine.h"
+#include "overworld/Utils/ShellDisplay.h"
 
 namespace owds {
 
@@ -180,7 +180,7 @@ namespace owds {
       return false;
 
     robot_name_ = robot_perception_module->getAgentName();
-    robot_engine_id_ = robot_perception_module->getAgentBulletId();
+    robot_engine_id_ = robot_perception_module->getAgentEngineId();
 
     robots_manager_.addPerceptionModule(module_name, robot_perception_module);
 

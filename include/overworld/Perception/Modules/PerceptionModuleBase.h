@@ -61,7 +61,7 @@ namespace owds {
     }
 
     virtual std::string getAgentName() { return ""; }
-    virtual int getAgentBulletId() { return -1; }
+    virtual int getAgentEngineId() { return -1; }
 
     void activate(bool is_activated) { is_activated_ = is_activated; }
     bool isActivated() { return is_activated_; }

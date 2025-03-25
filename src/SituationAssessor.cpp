@@ -7,6 +7,10 @@
 #include <string>
 #include <thread>
 
+#include "overworld/BasicTypes/Agent.h"
+#include "overworld/BasicTypes/Area.h"
+#include "overworld/BasicTypes/BodyPart.h"
+#include "overworld/BasicTypes/Object.h"
 #include "overworld/Perception/Modules/AreasModules/AreasEmulatedPerceptionModule.h"
 #include "overworld/Perception/Modules/HumansModules/HumansEmulatedPerceptionModule.h"
 #include "overworld/Perception/Modules/ObjectsModules/ObjectsEmulatedPerceptionModule.h"
@@ -21,17 +25,19 @@ namespace owds {
                                        size_t simulation_substepping,
                                        bool simulate,
                                        bool publish_debug,
+                                       double max_fps,
                                        bool is_robot) : agent_name_(agent_name),
                                                         myself_agent_(nullptr),
                                                         is_robot_(is_robot),
                                                         config_path_(config_path),
                                                         simulate_(simulate),
                                                         debug_(publish_debug),
+                                                        max_fps_(max_fps),
                                                         time_step_(1.0 / assessment_frequency),
                                                         simulation_substepping_(simulation_substepping),
                                                         perception_manager_(&n_),
                                                         facts_publisher_(agent_name)
-                                                        
+
   {
     n_.setCallbackQueue(&callback_queue_);
   }
@@ -46,11 +52,11 @@ namespace owds {
   void SituationAssessor::initWorld(Window* window)
   {
     engine_ = new Engine(agent_name_, window);
-    engine_->initView();
+    engine_->initView(max_fps_);
 
     engine_->world.setAmbientLight({43.6f, 1.43f, 115.f},
-                                    {1.0f, 0.976f, 0.898f},
-                                    0.25, 0.4, 0.8);
+                                   {1.0f, 0.976f, 0.898f},
+                                   0.25, 0.4, 0.8);
 
     engine_->world.setSubstepping(simulation_substepping_);
 
@@ -90,7 +96,6 @@ namespace owds {
     {
       perception_manager_.applyConfigurationHuman(config_path_);
       myself_agent_ = perception_manager_.humans_manager_.getAgent(agent_name_);
-      perception_manager_.areas_manager_.undrawAreas();
     }
 
     perception_manager_.objects_manager_.setOwnerAgent(myself_agent_);
@@ -115,7 +120,7 @@ namespace owds {
       new_assessor_publisher_.publish(msg);
     }
 
-    engine_->setKeyCallback([this](Key_e key, bool pressed){ handleKeypress(key, pressed, this->engine_, this->perception_manager_); });
+    engine_->setKeyCallback([this](Key_e key, bool pressed) { handleKeypress(key, pressed, this->engine_, this->perception_manager_); });
   }
 
   void SituationAssessor::stop()
@@ -155,7 +160,7 @@ namespace owds {
       delete human_assessor.second.assessor;
     }
 
-    //assessment_thread.join();
+    // assessment_thread.join();
   }
 
   void SituationAssessor::addObjectPerceptionModule(const std::string& module_name, PerceptionModuleBase_<Object>* module)
@@ -207,9 +212,9 @@ namespace owds {
         auto delta = std::chrono::high_resolution_clock::now() - (start_time + interval);
         if(delta > interval)
         {
-          int mod = (delta.count()/ 1000000) % interval.count();
+          int mod = (delta.count() / 1000000) % interval.count();
           start_time += interval * mod;
-          next_start_time  += interval * mod;
+          next_start_time += interval * mod;
         }
         ShellDisplay::warning("[SituationAssessor] [" + agent_name_ + "] The main loop is late of " + std::to_string(delta.count() / 1000000.) + " ms");
       }
@@ -227,7 +232,7 @@ namespace owds {
 
   void SituationAssessor::assess()
   {
-    //perception_manager_.update();
+    // perception_manager_.update();
     auto objects = perception_manager_.objects_manager_.getEntities();
     auto robots = perception_manager_.robots_manager_.getAgents();
     auto robot_parts = perception_manager_.robots_manager_.getEntities();
@@ -311,7 +316,7 @@ namespace owds {
         int cam_id = sensor.second->getWorldSegmentationId();
         cameras.push_back(cam_id);
         agent_to_segmentation.emplace(human.second, cam_id);
-        
+
         engine_->world.setCameraPositionAndOrientation(cam_id, head_pose_array.first, head_pose_array.second);
 
         if(sensor.second->getWorldRgbaId() == -1)
@@ -406,7 +411,7 @@ namespace owds {
     std::lock_guard<std::shared_timed_mutex> lock(humans_assessors_mutex_);
     auto h_assessor = humans_assessors_.insert(std::make_pair(human_name, HumanAssessor_t())).first;
 
-    h_assessor->second.assessor = new SituationAssessor(human_name, config_path_, 1.0 / time_step_, simulation_substepping_, simulate_);;
+    h_assessor->second.assessor = new SituationAssessor(human_name, config_path_, 1.0 / time_step_, simulation_substepping_, simulate_, false, max_fps_);
     h_assessor->second.objects_module = new ObjectsEmulatedPerceptionModule();
     h_assessor->second.humans_module = new HumansEmulatedPerceptionModule();
     h_assessor->second.areas_module = new AreasEmulatedPerceptionModule();

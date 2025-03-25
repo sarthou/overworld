@@ -47,7 +47,7 @@ namespace owds {
     {
       double el = 0., az = 0.;
       solarAzEl(time(0), latitude_, longitude_, altitude_, &az, &el);
-      setElevationAndAzimuth(glm::radians(el), glm::radians(az));
+      setElevationAndAzimuth((float)glm::radians(el), (float)glm::radians(az));
       computeAmbient();
       computeDiffuse();
       computeSpecular();
@@ -74,7 +74,7 @@ namespace owds {
       }
       else if(z < 0.)
       {
-        z = z+1;
+        z = z + 1;
         color_ = z * color_ + night_color * (1.f - z);
         diffuse_strength_ = z;
         specular_strength_ = z;

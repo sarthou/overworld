@@ -5,17 +5,17 @@
 #include <geometry_msgs/TransformStamped.h>
 #include <ros/ros.h>
 #include <string>
-#include <visualization_msgs/Marker.h>
 #include <unordered_set>
+#include <visualization_msgs/Marker.h>
 
 #include "overworld/BasicTypes/Shape.h"
+#include "overworld/Engine/Common/WorldTypes.h"
 #include "overworld/Geometry/Pose.h"
 #include "overworld/Utils/CircularBuffer.h"
-#include "overworld/Engine/Common/WorldTypes.h"
 
 namespace owds {
 
-  struct PoseStamped_s
+  struct PoseStamped_t
   {
     Pose pose;
     ros::Time stamp;
@@ -25,6 +25,7 @@ namespace owds {
   {
   public:
     explicit Entity(const std::string& id, bool is_true_id = true);
+    virtual ~Entity() = default;
 
     virtual void updatePose(const Pose& pose, ros::Time stamp = ros::Time::now());
     virtual void updatePose(const std::array<double, 3>& translation, const std::array<double, 4>& rotation);
@@ -56,10 +57,10 @@ namespace owds {
     std::unordered_set<std::string> getFalseIds() const { return false_ids_; }
 
     void setWorldId(int engine_id) { engine_id_ = engine_id; }
-    void setBulletLinkId(int engine_link_id) { engine_link_id_ = engine_link_id; }
+    void setEngineLinkId(int engine_link_id) { engine_link_id_ = engine_link_id; }
     int worldId() const { return engine_id_; }
     int engineLinkId() const { return engine_link_id_; }
-    bool isEngineLink() { return (engine_link_id_ != -1); }
+    bool isEngineLink() const { return (engine_link_id_ != -1); }
 
     void setAabb(const struct AABB_t& aabb) { aabb_ = aabb; }
     struct AABB_t getAabb() const { return aabb_; }
@@ -98,7 +99,7 @@ namespace owds {
     std::unordered_set<std::string> false_ids_;
 
     bool is_static_;
-    CircularBuffer<PoseStamped_s, 30> last_poses_;
+    CircularBuffer<PoseStamped_t, 30> last_poses_;
     bool is_located_;
     int engine_id_;
     int engine_link_id_;

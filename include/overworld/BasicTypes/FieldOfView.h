@@ -16,10 +16,9 @@ namespace owds {
                 double clip_far) : height_(height),
                                    width_(width),
                                    clip_near_(clip_near),
-                                   clip_far_(clip_far)
-    {
-      opengl_ratio_ = std::tan(width_ * TO_HALF_RAD) / std::tan(height_ * TO_HALF_RAD);
-    }
+                                   clip_far_(clip_far),
+                                   opengl_ratio_(std::tan(width_ * TO_HALF_RAD) / std::tan(height_ * TO_HALF_RAD))
+    {}
 
     double getHeight() const { return height_; }
     double getWidth() const { return width_; }
@@ -36,7 +35,7 @@ namespace owds {
      * @return true
      * @return false
      */
-    inline bool hasIn(const Pose& pose, double margin = 0.) const
+    bool hasIn(const Pose& pose, double margin = 0.) const
     {
       return pose.getZ() <= clip_far_ && std::abs(pose.getOriginTilt()) <= (height_ - margin * 2) * TO_HALF_RAD &&
              std::abs(pose.getOriginPan()) <= (width_ - margin * 2) * TO_HALF_RAD;

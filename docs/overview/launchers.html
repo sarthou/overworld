@@ -1,7 +1,7 @@
 <html lang="en_US">
 
 <head>
-  <title>Launchers | Overworld 0.1.5</title>
+  <title>Launchers | Overworld 0.2.0</title>
   <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
   <link href="../style/overworld_api.css" rel="stylesheet" type="text/css">
   <link href="../images/favicon.ico" rel="shortcut icon">
@@ -67,7 +67,7 @@
             <li class="level1"><a href="launchers.html"><b>Launchers</b></a></li>
             <li class="level1"><a href="Configuration.html">Configuration</a></li>
             <li class="level1"><a href="Plugins.html">Plugins</a></li>
-            <li class="level1"><a href="bulletGUI.html">Bullet GUI</a></li>
+            <li class="level1"><a href="overworldGUI.html">Overworld GUI</a></li>
           </ul>
         </div>
 
@@ -91,7 +91,7 @@
 
         <h1 class="title">Launchers</h1>
 
-        <p>Overworld is quite easy to launch as it consists of only one executable and only has two mandotory arguments.
+        <p>Overworld is quite easy to launch as it consists of only one executable and only has one mandotory argument.
           However, Overworld uses the Ontologenius knowledge base. Here we explain the minimal setup to launch both
           software.</p>
 
@@ -101,18 +101,13 @@
 
         <div class="code_block">
           <div class="terminal_line"> &lt;<span class="xml_tag">launch</span>&gt;</div>
-          <div class="terminal_line"> &lt;<span class="xml_tag">arg</span> <span class="xml_param">name</span>=<span
-              class="xml_string">&quot;configuration_file&quot;</span> <span class="xml_param">default</span>=<span
-              class="xml_string">&quot;$(find overworld)/config/config_example.yaml&quot;</span>/&gt;</div>
-          <div class="terminal_line"> &lt;<span class="xml_tag">arg</span> <span class="xml_param">name</span>=<span
-              class="xml_string">&quot;robot_name&quot;</span> <span class="xml_param">default</span>=<span
-              class="xml_string">&quot;pr2&quot;</span>/&gt;</div>
-          <div class="terminal_line"> &lt;<span class="xml_tag">node</span> <span class="xml_param">name</span>=<span
+          <div class="terminal_line">   &lt;<span class="xml_tag">arg</span> <span class="xml_param">name</span>=<span class="xml_string">&quot;configuration_file&quot;</span> <span class="xml_param">default</span>=<span class="xml_string">&quot;$(find overworld)/config/config_example.yaml&quot;</span>/&gt;</div>
+          <div class="terminal_line">   &lt;<span class="xml_tag">node</span> <span class="xml_param">name</span>=<span
               class="xml_string">&quot;overworld&quot;</span> <span class="xml_param">pkg</span>=<span
               class="xml_string">&quot;overworld&quot;</span> <span class="xml_param">type</span>=<span
               class="xml_string">&quot;overworld_node&quot;</span> <span class="xml_param">output</span>=<span
               class="xml_string">&quot;screen&quot;</span> <span class="xml_param">args</span>=<span
-              class="xml_string">&quot;-c $(arg configuration_file) -n $(arg robot_name)&quot;</span>&gt; &lt;/<span
+              class="xml_string">&quot;-c $(arg configuration_file)&quot;</span>&gt; &lt;/<span
               class="xml_tag">node</span>&gt;</div>
           <div class="terminal_line"> &lt;/<span class="xml_tag">launch</span>&gt;</div>
         </div>
@@ -121,49 +116,56 @@
           loaded and to parametrized them. See the <a href="Configuration.html">configuration page</a> to setup your
           file.</p>
 
-        <p>The <b>robot_name</b> (-n or --name) parameter is (quite logically) the identifier of your robot. This
-          parameter should be the same as the one defined in the configuration file.</p>
+        <p>The <b>robot_name</b> (-n or --name) optional parameter is (quite logically) the identifier of your robot. This
+          parameter is not mandatory if the root parameter of Ontologenius has been defined.</p>
 
         <p>The <b>simulate</b> (-s or --simulate) is an optional boolean ("true" or "false") parameter. It can be set to
           activate or deactivate the physics simulation in the reasoning process. By default, this parameter is set to
           true.</p>
 
         <p>The <b>assessment frequency</b> (-af or --assessment-frequency) is an optional double parameter. It can be
-          set to change the assessment loop frequency. By default, this parameter is set to 17hz.</p>
+          set to change the assessment loop frequency. By default, this parameter is set to 20hz.</p>
 
-        <p>The <b>simulation frequency</b> (-sf or --simulation-frequency) is an optional double parameter. It can be
-          set to change the physical simulation frequency. By default, this parameter is set to 70hz.</p>
+        <p>The <b>simulation substepping</b> (-sub or --simulation-substepping) is an optional integer parameter. It can be
+          set to change the physical simulation frequency by substepping the assessment frequency. By default, this parameter is set to 3, 
+          meaning a frequency of 20Hz for the default assessment frequency.</p>
+
+        <p>The <b>display frequency</b> (-df or --display-frequency) is an optional double parameter. It can be
+          set to change the rendering frequency. By default, this parameter is set to 30hz.
+          Changing this parameter has an impact both on the CPU and GPU usage.</p>
+
+        <p>The <b>publish debug</b> (-d or --debug) is an optional boolean parameter to publish debug marker on Rviz.
+        By default, this parameter is set to false.</p>
 
         <h2><i class="fas fa-angle-right"></i> Ontologenius launcher</h2>
 
         <p>Here we propose the simplest launch file to use Ontologenius with Overworld. Advanced use can is explain on
-          <a href="https://sarthou.github.io/ontologenius/index.html" target="_blank"
+          <a href="https://sarthou.github.io/ontologenius/overview/launchers.html" target="_blank"
             rel="noopener noreferrer">Ontologenius website</a>.</p>
 
-        <p>Ontologenius has to be used in its multi-mode. The only mandatory parameter is the ontologies to be loaded.
-        </p>
+        <p>Ontologenius has to be used in its multi-mode. The only mandatory parameters are the ontologies to be loaded and the root name representing the robot to be considered.</p>
 
         <div class="code_block">
           <div class="terminal_line"> &lt;<span class="xml_tag">launch</span>&gt;</div>
-          <div class="terminal_line"> &lt;<span class="xml_tag">arg</span> <span class="xml_param">name</span>=<span
+          <div class="terminal_line">   &lt;<span class="xml_tag">arg</span> <span class="xml_param">name</span>=<span
+              class="xml_string">&quot;root&quot;</span> <span class="xml_param">default</span>=<span class="xml_string">&quot;my_robot_name&quot;</span>/&gt;</div>
+          <div class="terminal_line">   &lt;<span class="xml_tag">arg</span> <span class="xml_param">name</span>=<span
               class="xml_string">&quot;files&quot;</span> <span class="xml_param">default</span>=<span
               class="xml_string">&quot;</div>
-          <div class="terminal_line"> <span class="xml_string">$(find
-              overworld)/ontologies/common_ground_example.owl</span></div>
-          <div class="terminal_line"> <span class="xml_string">$(find overworld)/ontologies/adream_building.owl</span>
-          </div>
-          <div class="terminal_line"> <span class="xml_string">&quot;</span>/&gt;</div>
-          <div class="terminal_line"> &lt;<span class="xml_tag">node</span> <span class="xml_param">name</span>=<span
+          <div class="terminal_line">     <span class="xml_string">$(find common_ground_ontology)/CG_root.owl</span></div>
+          <div class="terminal_line">     <span class="xml_string">$(find overworld)/ontologies/adream_building.owl</span></div>
+          <div class="terminal_line">   <span class="xml_string">&quot;</span>/&gt;</div>
+          <div class="terminal_line">   &lt;<span class="xml_tag">node</span> <span class="xml_param">name</span>=<span
               class="xml_string">&quot;ontologenius_core&quot;</span> <span class="xml_param">pkg</span>=<span
               class="xml_string">&quot;ontologenius&quot;</span> <span class="xml_param">type</span>=<span
               class="xml_string">&quot;ontologenius_multi&quot;</span> <span class="xml_param">output</span>=<span
               class="xml_string">&quot;screen&quot;</span> <span class="xml_param">args</span>=<span
-              class="xml_string">&quot;-d false $(arg files)&quot;</span>&gt; &lt;/<span class="xml_tag">node</span>&gt;
+              class="xml_string">&quot;--root $(arg root) -d false $(arg files)&quot;</span>&gt; &lt;/<span class="xml_tag">node</span>&gt;
           </div>
-          <div class="terminal_line"> &lt;<span class="xml_tag">node</span> <span class="xml_param">name</span>=<span
+          <div class="terminal_line">   &lt;<span class="xml_tag">node</span> <span class="xml_param">name</span>=<span
               class="xml_string">&quot;ontologenius_gui&quot;</span> <span class="xml_param">pkg</span>=<span
               class="xml_string">&quot;ontologenius&quot;</span> <span class="xml_param">type</span>=<span
-              class="xml_string">&quot;bulletGUI&quot;</span> <span class="xml_param">output</span>=<span
+              class="xml_string">&quot;overworldGUI&quot;</span> <span class="xml_param">output</span>=<span
               class="xml_string">&quot;screen&quot;</span> &gt; &lt;/<span class="xml_tag">node</span>&gt;</div>
           <div class="terminal_line"> &lt;/<span class="xml_tag">launch</span>&gt;</div>
         </div>

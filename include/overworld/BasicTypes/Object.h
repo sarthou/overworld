@@ -1,13 +1,13 @@
 #ifndef OWDS_OBJECT_H
 #define OWDS_OBJECT_H
 
-#include "overworld/BasicTypes/Entity.h"
-#include "overworld/BasicTypes/PointOfInterest.h"
-
-#include <unordered_map>
 #include <array>
 #include <string>
+#include <unordered_map>
 #include <vector>
+
+#include "overworld/BasicTypes/Entity.h"
+#include "overworld/BasicTypes/PointOfInterest.h"
 
 namespace owds {
 
@@ -32,15 +32,15 @@ namespace owds {
     void setAllPoiUnseen(const std::string& module_name);
 
     // setInHand or removeFromHand should be done before the update pose
-    void updatePose(const Pose& pose, ros::Time stamp = ros::Time::now());
-    void updatePose(const std::array<double, 3>& translation, const std::array<double, 4>& rotation);
-    void updatePose(const std::array<double, 3>& translation, const std::array<double, 4>& rotation, ros::Time stamp);
-    void updatePose(const geometry_msgs::PoseStamped& pose);
+    void updatePose(const Pose& pose, ros::Time stamp = ros::Time::now()) override;
+    void updatePose(const std::array<double, 3>& translation, const std::array<double, 4>& rotation) override;
+    void updatePose(const std::array<double, 3>& translation, const std::array<double, 4>& rotation, ros::Time stamp) override;
+    void updatePose(const geometry_msgs::PoseStamped& pose) override;
 
     Pose poseRaw() const;
-    Pose pose() const;
-    Pose pose(unsigned int id) const;
-    Pose pose(const ros::Time& stamp) const;
+    Pose pose() const override;
+    Pose pose(unsigned int id) const override;
+    Pose pose(const ros::Time& stamp) const override;
 
     std::array<double, 3> direction() const override;
 

@@ -9,7 +9,7 @@ namespace owds {
   {
   public:
     RobotsPerceptionManager() = default;
-    virtual ~RobotsPerceptionManager() {}
+    virtual ~RobotsPerceptionManager() = default;
 
     Agent* getAgent(const std::string& agent_name) { return AgentPerceptionManager::getAgent(agent_name, AgentType_e::ROBOT); }
 

@@ -2,6 +2,9 @@
 
 #include <pluginlib/class_list_macros.h>
 #include <ros/package.h>
+#include <string>
+
+#include "ontologenius/OntologiesManipulator.h"
 
 namespace owds {
 
@@ -26,14 +29,20 @@ namespace owds {
 
   bool JointStatePerceptionModule::closeInitialization()
   {
-    if(robot_name_ == "")
-    {
-      ShellDisplay::error("[JointStatePerceptionModule] No robot name has been defined");
-      return false;
-    }
-
     ontologies_manipulator_ = new onto::OntologiesManipulator();
     ontologies_manipulator_->waitInit();
+    if(robot_name_.empty())
+    {
+      if(ontologies_manipulator_->hasRoot())
+        robot_name_ = ontologies_manipulator_->getRootName();
+
+      if(robot_name_.empty())
+      {
+        ShellDisplay::error("[JointStatePerceptionModule] No robot name has been defined. Use the module argument robot_name or Ontologenius root argument.");
+        return false;
+      }
+    }
+
     ontologies_manipulator_->add(robot_name_);
     onto_ = ontologies_manipulator_->get(robot_name_);
     onto_->close();
@@ -107,7 +116,7 @@ namespace owds {
       ShellDisplay::warning("[JointStatePerceptionModule] Pr2 base has no position in tf");
     else
       updated_ = true;
-    
+
     return true;
   }
 
@@ -121,7 +130,7 @@ namespace owds {
 
     for(size_t i = 0; i < msg.name.size(); i++)
       world_client_->setJointState(robot_engine_id_, msg.name[i], msg.position[i]);
-    
+
     for(const auto& link_pair : links_to_entity_)
     {
       int link_id = world_client_->getLinkId(robot_engine_id_, link_pair.first);

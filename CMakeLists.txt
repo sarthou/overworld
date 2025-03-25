@@ -9,7 +9,6 @@ set(CMAKE_POLICY_DEFAULT_CMP0153 OLD)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED on)
 
-
 if(NOT DEFINED ENV{ROS_VERSION})
     message(FATAL_ERROR "Please source your ROS1 / ROS2 environment before running cmake")
 endif()
@@ -24,7 +23,6 @@ endif()
 # # Import packaged libraries:                                      ##
 # # - OpenCV: For computer vision related tasks                     ##
 # # - Assimp: For loading 3D models                                 ##
-# # - Bullet3: Primary physics engine                               ##
 # # - Eigen3: For hardcore math nerds                               ##
 # # - glm: Also for math nerds, but only used in the graphics &     ##
 # #        physics engine glue                                      ##
@@ -36,7 +34,6 @@ find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 find_package(glm CONFIG REQUIRED)
 find_package(Freetype REQUIRED)
 find_package(ontologenius 0.4.3 REQUIRED)
-find_package(Eigen3 REQUIRED NO_MODULE)
 find_package(Threads REQUIRED)
 find_package(CURL REQUIRED)
 find_package(cmake_modules REQUIRED)
@@ -50,7 +47,6 @@ include(CheckLanguage)
 # # PhysX may be used as an alternative engine for better simulation ##
 # # performance and GPU hardware acceleration if cuda is available.  ##
 # #####################################################################
-
 FetchContent_Declare(
     PhysX
     GIT_REPOSITORY "https://github.com/NVIDIA-Omniverse/PhysX.git"
@@ -96,7 +92,6 @@ if(NOT physx_POPULATED)
 endif()
 
 link_directories(${physx_SOURCE_DIR}/physx/bin/linux.x86_64/release)
-
 
 if($ENV{ROS_VERSION} STREQUAL "1")
     include(cmake/BuildROS1.cmake)

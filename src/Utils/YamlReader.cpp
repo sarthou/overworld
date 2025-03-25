@@ -53,7 +53,7 @@ namespace owds {
 
       if(std::regex_match(lines[current_line], match, element_regex))
       {
-        if(match[2].str() == "")
+        if(match[2].str().empty())
         {
           config_name = match[1].str();
           res[config_name] = YamlElement();
@@ -62,18 +62,18 @@ namespace owds {
           {
             if(std::regex_match(lines[current_line + 1], match, list_regex))
             {
-              res[config_name].data = std::vector<std::string>();
+              res[config_name].data_ = std::vector<std::string>();
 
               do
               {
                 current_line++;
-                res[config_name].data->push_back(match[1].str());
+                res[config_name].data_->push_back(match[1].str());
               } while((current_line + 1 < lines.size()) && (std::regex_match(lines[current_line + 1], match, list_regex)));
             }
             else
             {
               current_line++;
-              res[config_name].subelem = read(lines, current_line);
+              res[config_name].subelem_ = read(lines, current_line);
               current_line--;
             }
           }
@@ -82,8 +82,8 @@ namespace owds {
         {
           config_name = match[1].str();
           res[config_name] = YamlElement();
-          res[config_name].data = std::vector<std::string>();
-          res[config_name].data->push_back(match[2].str());
+          res[config_name].data_ = std::vector<std::string>();
+          res[config_name].data_->push_back(match[2].str());
         }
       }
 
@@ -116,24 +116,24 @@ namespace owds {
   {
     displayTab(nb);
     std::cout << "\e[1m" << it.first << "\e[0m : ";
-    if(it.second.data)
+    if(it.second.data_)
     {
-      if(it.second.data.value().size() > 1)
+      if(it.second.data_.value().size() > 1)
       {
         std::cout << std::endl;
-        for(const auto& d : it.second.data.value())
+        for(const auto& d : it.second.data_.value())
         {
           displayTab(nb + 1);
           std::cout << "- " << d << std::endl;
         }
       }
       else
-        std::cout << it.second.data.value().front() << std::endl;
+        std::cout << it.second.data_.value().front() << std::endl;
     }
-    else if(it.second.subelem)
+    else if(it.second.subelem_)
     {
       std::cout << std::endl;
-      display(it.second.subelem.value(), nb + 1);
+      display(it.second.subelem_.value(), nb + 1);
     }
   }
 

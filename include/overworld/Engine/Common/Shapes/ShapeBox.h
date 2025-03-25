@@ -14,7 +14,7 @@ namespace owds {
   {
   public:
     std::array<float, 3> half_extents_{};
-    owds::Color diffuse_color_{};
+    owds::Color diffuse_color_;
     std::reference_wrapper<owds::Model> box_model_;
     glm::mat4 shape_transform_{1.};
   };

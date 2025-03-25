@@ -1,0 +1,48 @@
+adream_ff_walls:
+  visual_only: true
+
+adream_ff_floor:
+  visual_only: true
+
+adream_gg_roof:
+  visual_only: true
+
+adream_guard_rail:
+  visual_only: true
+
+window_h100_1:
+  visual_only: true
+  mesh: package://overworld/models/adream/windows/window_h100_1.obj
+
+window_h100_2:
+  visual_only: true
+  mesh: package://overworld/models/adream/windows/window_h100_2.obj
+
+window_h100_3:
+  visual_only: true
+  mesh: package://overworld/models/adream/windows/window_h100_3.obj
+
+desk_01:
+  visual_only: true
+  mesh: package://common_ground_ontology/meshes/furnitures/adream_desk_90.dae
+  position:
+    x: 9.0846
+    y: 6.597
+
+desk_02:
+  visual_only: true
+  mesh: package://common_ground_ontology/meshes/furnitures/adream_desk_90.dae
+  position:
+    x: 9.0846
+    y: 8.2
+
+adream_tree:
+  visual_only: true
+  mesh: package://overworld/models/trees/Tree1_.obj
+  scale:
+    x: 0.4
+    y: 0.4
+    z: 0.3
+  position:
+    x: -3
+    y: 4

@@ -1,17 +1,17 @@
 #include "overworld/Perception/Managers/ObjectsPerceptionManager.h"
 
 #include <array>
+#include <cstddef>
+#include <map>
 #include <string>
 #include <vector>
-#include <map>
-#include <cstddef>
 
-#include "overworld/Utils/ShellDisplay.h"
 #include "overworld/BasicTypes/Hand.h"
+#include "overworld/Utils/ShellDisplay.h"
 
 #define TO_HALF_RAD M_PI / 180. / 2.
 
-#define MAX_UNSEEN 2
+#define MAX_UNSEEN 10 // TODO Adjust in time
 #define MAX_SIMULATED 10
 #define IN_HAND_DISTANCE 0.30 // meters
 
@@ -241,8 +241,8 @@ namespace owds {
               else
                 occlusion_detected = true;
             }
-            //else
-              // If Pois are not in Fov we do not care, it is normal to not perceive
+            // else
+            //  If Pois are not in Fov we do not care, it is normal to not perceive
           }
           else
             no_poi_sensors.insert(myself_agent_->getSensor(sensor_name));
@@ -293,7 +293,7 @@ namespace owds {
           sensor_world_ids.push_back(sensor->getWorldSegmentationId());
           auto sensor_pose = sensor->pose().arrays();
           world_client_->setCameraPositionAndOrientation(sensor->getWorldSegmentationId(),
-                                                        sensor_pose.first, sensor_pose.second);
+                                                         sensor_pose.first, sensor_pose.second);
         }
         world_client_->requestCameraRender(sensor_world_ids);
         std::unordered_map<Sensor*, std::unordered_set<uint32_t>> segmentations;
@@ -312,7 +312,7 @@ namespace owds {
           for(auto sensor : sensor_set)
           {
             if(segmentations[sensor].find(object.first->worldId()) != segmentations[sensor].end()) // Other conditions have already been tested
-            { // This object should have been seen by this sensor
+            {                                                                                      // This object should have been seen by this sensor
               auto it_unseen = lost_objects_nb_frames_.find(object.first->id());
               if(it_unseen == lost_objects_nb_frames_.end())
                 it_unseen = lost_objects_nb_frames_.insert({object.first->id(), 0}).first;
@@ -489,8 +489,8 @@ namespace owds {
     {
       std::vector<std::array<double, 3>> from_poses(poi.getPoints().size(), sensor->pose().arrays().first);
       std::vector<std::array<double, 3>> to_poses;
-      //std::vector<std::array<double, 3>> debug_vertices;
-      //std::vector<unsigned int> debug_index_;
+      // std::vector<std::array<double, 3>> debug_vertices;
+      // std::vector<unsigned int> debug_index_;
       double max_dist = 0;
 
       for(const auto& point : poi.getPoints())
@@ -501,12 +501,12 @@ namespace owds {
           max_dist = poi_dist;
 
         to_poses.push_back(map_to_point.arrays().first);
-        //debug_vertices.push_back(map_to_point.arrays().first);
-        //debug_vertices.push_back(sensor->pose().arrays().first);
-        //debug_index_.push_back(debug_index_.size());
-        //debug_index_.push_back(debug_index_.size());
+        // debug_vertices.push_back(map_to_point.arrays().first);
+        // debug_vertices.push_back(sensor->pose().arrays().first);
+        // debug_index_.push_back(debug_index_.size());
+        // debug_index_.push_back(debug_index_.size());
       }
-      //world_client_->addDebugLine(debug_vertices, debug_index_, {0., 1., 0.}, 0.5);
+      // world_client_->addDebugLine(debug_vertices, debug_index_, {0., 1., 0.}, 0.5);
       if(max_dist > sensor->getFieldOfView().getClipFar())
         max_dist = sensor->getFieldOfView().getClipFar();
       auto ray_cast_info = world_client_->raycasts(from_poses, to_poses, max_dist);
@@ -519,7 +519,7 @@ namespace owds {
         {
           if(info.actor_id != object->worldId())
           {
-            //world_client_->addDebugLine(sensor->pose().arrays().first, info.position, {1., 0., 0.}, 0.5);
+            // world_client_->addDebugLine(sensor->pose().arrays().first, info.position, {1., 0., 0.}, 0.5);
             return false;
           }
         }

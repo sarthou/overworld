@@ -219,7 +219,7 @@ namespace owds {
   {
     assert(camera_ && "CameraUpdater work on null pointer");
     // to verify
-    camera_->world_eye_position_ = ToV3(position);
+    camera_->world_eye_position_ = toV3(position);
     camera_->view_angles_.x = orientation[2]; // yaw
     camera_->view_angles_.y = orientation[1]; // pitch
     camera_->recomputeDirectionVector();
@@ -228,8 +228,8 @@ namespace owds {
   void CameraUpdater::setPositionAndLookAt(const std::array<double, 3>& eye_position, const std::array<double, 3>& dst_position)
   {
     assert(camera_ && "CameraUpdater work on null pointer");
-    camera_->world_eye_position_ = ToV3(eye_position);
-    camera_->world_eye_front_ = ToV3(dst_position) - camera_->world_eye_position_;
+    camera_->world_eye_position_ = toV3(eye_position);
+    camera_->world_eye_front_ = toV3(dst_position) - camera_->world_eye_position_;
 
     const auto xy = glm::sqrt(glm::pow(camera_->world_eye_front_.x, 2) + glm::pow(camera_->world_eye_front_.y, 2));
 
@@ -243,8 +243,8 @@ namespace owds {
   void CameraUpdater::setPositionAndDirection(const std::array<double, 3>& eye_position, const std::array<double, 3>& eye_direction)
   {
     assert(camera_ && "CameraUpdater work on null pointer");
-    camera_->world_eye_position_ = ToV3(eye_position);
-    camera_->world_eye_front_ = ToV3(eye_direction);
+    camera_->world_eye_position_ = toV3(eye_position);
+    camera_->world_eye_front_ = toV3(eye_direction);
 
     const auto xy = glm::sqrt(glm::pow(camera_->world_eye_front_.x, 2) + glm::pow(camera_->world_eye_front_.y, 2));
 
@@ -258,8 +258,8 @@ namespace owds {
   void CameraUpdater::setDirectionAndLookAt(const std::array<double, 3>& eye_direction, const std::array<double, 3>& dst_position)
   {
     assert(camera_ && "CameraUpdater work on null pointer");
-    camera_->world_eye_front_ = ToV3(eye_direction);
-    camera_->world_eye_position_ = ToV3(dst_position) - camera_->world_eye_front_;
+    camera_->world_eye_front_ = toV3(eye_direction);
+    camera_->world_eye_position_ = toV3(dst_position) - camera_->world_eye_front_;
 
     const auto xy = glm::sqrt(glm::pow(camera_->world_eye_front_.x, 2) + glm::pow(camera_->world_eye_front_.y, 2));
 
@@ -270,18 +270,18 @@ namespace owds {
     camera_->updateViewMatrix();
   }
 
-  void CameraUpdater::setPositionAndOrientation(const std::array<double, 3>& eye_position, 
+  void CameraUpdater::setPositionAndOrientation(const std::array<double, 3>& eye_position,
                                                 const std::array<double, 4>& orientation)
   {
     assert(camera_ && "CameraUpdater works on null pointer");
-    
-    camera_->world_eye_position_ = ToV3(eye_position);
 
-    glm::quat quat = ToQT(orientation);
-    glm::vec3 world_up(0.0f, 0.0f, 1.0f); // Fixed world up vector
+    camera_->world_eye_position_ = toV3(eye_position);
+
+    glm::quat quat = toQt(orientation);
+    glm::vec3 world_up(0.0f, 0.0f, 1.0f);                                 // Fixed world up vector
     glm::vec3 front = glm::normalize(quat * glm::vec3(0.0f, 0.0f, 1.0f)); // Forward direction
-    glm::vec3 right = glm::normalize(glm::cross(front, world_up)); // Right direction
-    glm::vec3 up = glm::cross(right, front); // Actual up direction based on orientation
+    glm::vec3 right = glm::normalize(glm::cross(front, world_up));        // Right direction
+    glm::vec3 up = glm::cross(right, front);                              // Actual up direction based on orientation
 
     camera_->world_eye_front_ = front;
     camera_->world_eye_up_ = up;
@@ -289,7 +289,7 @@ namespace owds {
 
     // Do not call recomputeDirectionVector, they are computed here considering more degrees of freedom
     camera_->updateViewMatrix();
-   }
+  }
 
   void CameraUpdater::finalize()
   {

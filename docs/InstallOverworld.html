@@ -1,7 +1,7 @@
 <html lang="en_US">
 
 <head>
-  <title>Install | Overworld 0.1.5</title>
+  <title>Install | Overworld 0.2.0</title>
   <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
   <link href="style/overworld_api.css" rel="stylesheet" type="text/css">
   <link href="images/favicon.ico" rel="shortcut icon">
@@ -77,7 +77,7 @@
             <li class="level1"><a href="overview/launchers.html">Launchers</a></li>
             <li class="level1"><a href="overview/Configuration.html">Configuration</a></li>
             <li class="level1"><a href="overview/Plugins.html">Plugins</a></li>
-            <li class="level1"><a href="overview/bulletGUI.html">Bullet GUI</a></li>
+            <li class="level1"><a href="overview/overworldGUI.html">Overworld GUI</a></li>
           </ul>
         </div>
 
@@ -104,52 +104,25 @@
             Morenia</a>, and <a class="type" href="http://wiki.ros.org/noetic/Installation">ROS Noetic Ninjemys</a>.
           Desktop ROS configuration is not required for use of overworld.</p>
 
-        <p>We first need to install a third-party library (bullet) from the source. This library should not be installed
-          in the catkin workspace.</p>
-
-        <p class="tip">You can for example install it in ~/software</p>
-
+        <p>First, install Overworld dependencies:</p>
         <div class="code_block">
-          <p>git clone https://github.com/bulletphysics/bullet3.git</p>
-          <p>cd bullet3</p>
-          <p>mkdir build && mkdir install</p>
-          <p>export BULLET_PATH=$(pwd)</p>
-          <p>cd build</p>
-          <p>cmake .. -DCMAKE_INSTALL_PREFIX=$BULLET_PATH/install -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Release</p>
-          <p>make install</p>
-        </div>
-
-        <p>Before continuing, you will need to export the follwong environment variable and changing the path to
-          correspond to your bullet installation path.</p>
-
-        <p class="tip">These exports are mandatory for each compilation of your ROS workspace. Put them in your .bashrc
-          file or in a setup.sh file.</p>
-
-        <div class="code_block">
-          <p>export BULLET_INSTALL_PATH=your/path/bullet3/install</p>
-          <p>export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$BULLET_INSTALL_PATH/lib</p>
+          <p>sudo apt install -y libglm-dev libglfw3-dev</p>
         </div>
 
         <p>Overworld uses the software <a class="type"
-            href="https://sarthou.github.io/ontologenius/index.html">Ontologenius</a> as a knowledge base. Clone both
+            href="https://sarthou.github.io/ontologenius/index.html">Ontologenius</a> as a knowledge base and the <a class="type"
+            href="https://github.com/RIS-WITH/common_ground_ontology#">common_ground_ontology</a> as a vocabulary. Clone all
           packages in your catkin workspace and compile it:</p>
         <div class="code_block">
           <p>cd ~/catkin_ws/src/</p>
           <p>git clone https://github.com/sarthou/overworld.git</p>
+          <p>git clone https://github.com/RIS-WITH/common_ground_ontology.git</p>
           <p>git clone https://github.com/sarthou/ontologenius.git</p>
           <p>cd ..</p>
           <p>catkin_make</p>
         </div>
 
         <h2>Troubles</h2>
-
-        <p> - If the compilation fails due to some Bullet header not find or some Bullet symbols not being linked,
-          check if the two environment variables are correctly exported. Then, remove the build and devel folder
-          of your ROS workspace and compile it again from scratch.</p>
-
-        <p class="tip">Some cmake variables use cache. If you have already tried to compile Overworld while the
-          environment variables were not exported, recompiling the workspace without cleaning it will have no effect.
-        </p>
 
         <p> - If you have the following error :</p>
         <div class="code_block">

@@ -1,10 +1,10 @@
 #include "overworld/BasicTypes/Entity.h"
 
+#include <array>
+#include <cstddef>
 #include <functional>
 #include <ros/ros.h>
 #include <string>
-#include <array>
-#include <cstddef>
 
 namespace owds {
 
@@ -29,14 +29,14 @@ namespace owds {
 
   void Entity::updatePose(const std::array<double, 3>& translation, const std::array<double, 4>& rotation, ros::Time stamp)
   {
-    PoseStamped_s pose_stamped = {Pose(translation, rotation), stamp};
+    PoseStamped_t pose_stamped = {Pose(translation, rotation), stamp};
     is_located_ = true;
     last_poses_.push_back(pose_stamped);
   }
 
   void Entity::updatePose(const geometry_msgs::PoseStamped& pose)
   {
-    PoseStamped_s pose_stamped = {Pose(pose), pose.header.stamp};
+    PoseStamped_t pose_stamped = {Pose(pose), pose.header.stamp};
     is_located_ = true;
     last_poses_.push_back(pose_stamped);
   }
@@ -147,7 +147,7 @@ namespace owds {
       return {0.0, 0.0, 0.0};
     }
 
-    PoseStamped_s oldest_pose;
+    PoseStamped_t oldest_pose;
     size_t oldest_i = 0;
     for(size_t i = 0; i < last_poses_.size() - 1; i++)
     {
@@ -163,7 +163,7 @@ namespace owds {
       // We have less than 2 poses more recent than 2 seconds, we cannot compute a speed
       return {0.0, 0.0, 0.0};
     }
-    const PoseStamped_s& last_pose = last_poses_.back();
+    const PoseStamped_t& last_pose = last_poses_.back();
     auto pose_diff = last_pose.pose.subtractTranslations(oldest_pose.pose);
     double dt = (last_pose.stamp - oldest_pose.stamp).toSec();
     return {pose_diff[0] / dt, pose_diff[1] / dt, pose_diff[2] / dt};

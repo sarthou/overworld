@@ -12,7 +12,6 @@
 
 namespace owds::physx {
   class Context;
-  class Actor;
 
   class World final : public owds::World
   {

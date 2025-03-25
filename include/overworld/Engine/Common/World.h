@@ -90,6 +90,7 @@ namespace owds {
     std::pair<std::array<double, 3>, std::array<double, 4>> getBasePositionAndOrientation(int body_id) const;
     void setBasePositionAndOrientation(int body_id);
     void setBasePositionAndOrientation(int body_id, const std::array<double, 3>& position, const std::array<double, 4>& orientation);
+    void resetSubsteping(int body_id);
     void setBaseVelocity(int body_id, const std::array<double, 3>& linear_velocity, const std::array<double, 3>& angular_velocity);
     bool setJointState(int body_id, const std::string& joint_name, double position, double velocity = 0);
     int getLinkId(int body_id, const std::string& link_name);
@@ -126,8 +127,8 @@ namespace owds {
     void setAmbientLightColor(const std::array<float, 3>& color);
     void setAmbientLightAmbientStrength(float ambient_strength);
 
-    std::size_t addPointLight(const std::array<float, 3>& position,
-                              const std::array<float, 3>& color = {1.0, 1.0, 1.0},
+    std::size_t addPointLight(const std::array<double, 3>& position,
+                              const std::array<double, 3>& color = {1.0, 1.0, 1.0},
                               float ambient_strength = 1.0f,
                               float diffuse_strength = 1.0f,
                               float specular_strength = 1.0f,

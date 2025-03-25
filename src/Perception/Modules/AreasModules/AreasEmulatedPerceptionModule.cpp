@@ -22,6 +22,8 @@ namespace owds {
     percept.setWorldLineIds({});
     percept.setWorldTextIds({});
 
+    updated_ = true;
+
     return percepts_.insert(std::make_pair(percept.id(), percept)).first;
   }
 

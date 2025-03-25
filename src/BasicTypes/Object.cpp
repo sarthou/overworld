@@ -1,11 +1,12 @@
 #include "overworld/BasicTypes/Object.h"
 
+#include <array>
 #include <limits>
 #include <string>
-#include <array>
 
+#include "overworld/BasicTypes/Entity.h"
 #include "overworld/BasicTypes/Hand.h"
-#include "overworld/Utils/ShellDisplay.h"
+#include "overworld/Geometry/Pose.h"
 
 namespace owds {
 

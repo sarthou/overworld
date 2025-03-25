@@ -20,7 +20,7 @@ namespace owds {
     virtual bool closeInitialization() override;
 
     virtual std::string getAgentName() override { return robot_name_; }
-    virtual int getAgentBulletId() override { return robot_engine_id_; }
+    virtual int getAgentEngineId() override { return robot_engine_id_; }
 
   protected:
     bool perceptionCallback(const sensor_msgs::JointState& msg) override;

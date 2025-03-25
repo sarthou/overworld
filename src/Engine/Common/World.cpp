@@ -185,6 +185,13 @@ namespace owds {
     }
   }
 
+  void World::resetSubsteping(int body_id)
+  {
+    auto actor_it = actors_.find(body_id);
+    if(actor_it != actors_.end())
+      actor_it->second->resetSubsteping();
+  }
+
   void World::setBaseVelocity(int body_id, const std::array<double, 3>& linear_velocity, const std::array<double, 3>& angular_velocity)
   {
     auto urdf_it = urdfs_.find(body_id);
@@ -375,8 +382,8 @@ namespace owds {
     ambient_light_.setAmbientStrength(ambient_strength);
   }
 
-  std::size_t World::addPointLight(const std::array<float, 3>& position,
-                                   const std::array<float, 3>& color,
+  std::size_t World::addPointLight(const std::array<double, 3>& position,
+                                   const std::array<double, 3>& color,
                                    float ambient_strength,
                                    float diffuse_strength,
                                    float specular_strength,
@@ -425,8 +432,8 @@ namespace owds {
     DebugText_t debug{
       text,
       centered,
-      ToV3(position),
-      ToV3(color),
+      toV3(position),
+      toV3(color),
       height,
       life_time,
       getActor(body_id, link_index)};
@@ -495,12 +502,12 @@ namespace owds {
     std::vector<glm::vec3> glm_vertices;
     glm_vertices.reserve(vertices.size());
     for(const auto& vertex : vertices)
-      glm_vertices.emplace_back(ToV3(vertex));
+      glm_vertices.emplace_back(toV3(vertex));
 
     DebugLine debug{
       glm_vertices,
       indices,
-      ToV3(color),
+      toV3(color),
       life_time,
       getActor(body_id, link_index)};
 
@@ -619,7 +626,7 @@ namespace owds {
   {
     if(ids.empty())
       return;
-      
+
     for(auto id : ids)
     {
       if(id < (int)cameras_.size())
@@ -691,7 +698,8 @@ namespace owds {
   urdf::Urdf_t World::getUrdfRaw(const std::string& content)
   {
     UrdfLoader loader;
-    return loader.readRaw(content);;
+    return loader.readRaw(content);
+    ;
   }
 
   void World::loadUrdfLink(owds::Urdf* urdf, const urdf::Urdf_t& model,
@@ -710,7 +718,7 @@ namespace owds {
       collision_shapes.emplace_back(ShapeDummy());
 
     if(parent.empty())
-      urdf->addLink(parent, link_name, ToV3(position), ToV3(orientation), collision_shapes.front(), {visual_shape});
+      urdf->addLink(parent, link_name, toV3(position), toV3(orientation), collision_shapes.front(), {visual_shape});
     else
     {
       std::string joint_name = model.link_to_parent_joint.at(link_name);

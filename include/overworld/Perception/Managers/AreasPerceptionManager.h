@@ -30,7 +30,7 @@ namespace owds {
 
     bool update();
 
-    bool isDrawn() { return drawn_; }
+    bool isDrawn() const { return drawn_; }
     void drawAreas();
     void undrawAreas();
 
@@ -47,10 +47,10 @@ namespace owds {
 
     void solvePendingAreas();
 
-    void removeFromBullet(Area* area);
+    void removeFromEngine(Area* area);
     void addToWorld(Area* area);
-    void addPolygonToBullet(Area* area);
-    void addCircleToBullet(Area* area);
+    void addPolygonToEngine(Area* area);
+    void addCircleToEngine(Area* area);
 
     Entity* findAreaOwner(Area* area);
   };
