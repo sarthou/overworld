@@ -179,7 +179,10 @@ namespace owds {
   template<typename T>
   void EntitiesPerceptionManager<T>::updateEntityPose(T* entity, const Pose& pose, const ros::Time& stamp)
   {
+    bool previously_located = entity->isLocated();
     entity->updatePose(pose, stamp);
+    if(previously_located == false)
+      world_client_->resetSubsteping(entity->worldId());
     updateToEngine(entity);
     entity->setSeen();
   }
