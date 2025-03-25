@@ -38,6 +38,7 @@ namespace owds::physx {
     void setPositionAndOrientation() override;
     void setPositionAndOrientation(const std::array<double, 3>& position, const std::array<double, 4>& orientation) override;
     void stepPose() override;
+    void resetSubsteping() override;
     void setVelocity(const std::array<double, 3>& linear_velocity, const std::array<double, 3>& angular_velocity) override;
 
   private:

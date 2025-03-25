@@ -185,6 +185,13 @@ namespace owds {
     }
   }
 
+  void World::resetSubsteping(int body_id)
+  {
+    auto actor_it = actors_.find(body_id);
+    if(actor_it != actors_.end())
+      actor_it->second->resetSubsteping();
+  }
+
   void World::setBaseVelocity(int body_id, const std::array<double, 3>& linear_velocity, const std::array<double, 3>& angular_velocity)
   {
     auto urdf_it = urdfs_.find(body_id);

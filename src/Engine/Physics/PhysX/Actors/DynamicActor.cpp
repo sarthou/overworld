@@ -45,12 +45,12 @@ namespace owds::physx {
         false,
         ::physx::PxShapeFlag::eSCENE_QUERY_SHAPE | ::physx::PxShapeFlag::eSIMULATION_SHAPE));
       px_shapes_.back()->setContactOffset(0.05); // default is 0.02
-      px_shapes_.back()->setRestOffset(0.0);    // default is 0.0
+      px_shapes_.back()->setRestOffset(0.0);     // default is 0.0
       px_actor_->attachShape(*px_shapes_.back());
     }
 
     px_actor_->setRigidBodyFlag(::physx::PxRigidBodyFlag::eENABLE_GYROSCOPIC_FORCES, true);
-    //px_actor_->setRigidBodyFlag(::physx::PxRigidBodyFlag::eENABLE_CCD, true);
+    // px_actor_->setRigidBodyFlag(::physx::PxRigidBodyFlag::eENABLE_CCD, true);
     px_actor_->setSolverIterationCounts(8, 4);
 
     ActorData_t* data = new ActorData_t();
@@ -100,10 +100,11 @@ namespace owds::physx {
   }
 
   // Interpolation function for PxTransform
-  ::physx::PxTransform interpolateTransform(const ::physx::PxTransform& start, const ::physx::PxTransform& end, float t) {
+  ::physx::PxTransform interpolateTransform(const ::physx::PxTransform& start, const ::physx::PxTransform& end, float t)
+  {
     return ::physx::PxTransform(
       start.p * (1.0f - t) + end.p * t,   // Interpolate position
-      ::physx::PxSlerp(t, start.q, end.q)// Interpolate rotation
+      ::physx::PxSlerp(t, start.q, end.q) // Interpolate rotation
     );
   }
 
@@ -172,11 +173,16 @@ namespace owds::physx {
     }
   }
 
+  void DynamicActor::resetSubsteping()
+  {
+    has_first_pose_ = false;
+  }
+
   void DynamicActor::setVelocity(const std::array<double, 3>& linear_velocity, const std::array<double, 3>& angular_velocity)
   {
     if(is_kinematic_)
       return;
-    
+
     ctx_.physx_mutex_.lock();
     px_actor_->setLinearVelocity(::physx::PxVec3(
       static_cast<::physx::PxReal>(linear_velocity[0]),
