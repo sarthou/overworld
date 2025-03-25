@@ -4,52 +4,56 @@
 
 namespace owds {
 
-Hand::Hand(const std::string& id, bool is_true_id) : BodyPart(id, is_true_id)
-{}
+  Hand::Hand(const std::string& id, bool is_true_id) : BodyPart(id, is_true_id)
+  {}
 
-Hand::Hand(const BodyPart& body_part) : BodyPart(body_part)
-{}
+  Hand::Hand(const BodyPart& body_part) : BodyPart(body_part)
+  {}
 
-void Hand::putInHand(Object* object)
-{
-  if(has_in_.find(object->id()) == has_in_.end())
+  void Hand::putInHand(Object* object)
   {
-    has_in_.insert(std::make_pair(object->id(), object));
-    object->setInHand(this);
+    putInHand(object, has_in_);
   }
-}
 
-void Hand::removeFromHand(const std::string& object_name)
-{
-  if(has_in_.erase(object_name) == 0)
+  void Hand::putPerceptInHand(Percept<Object>* percept)
   {
-    Object* obj_true = nullptr;
-    for(auto& obj : has_in_)
-    {
-      auto false_ids = obj.second->getFalseIds();
-      if(false_ids.find(object_name) != false_ids.end())
-      {
-        obj_true = obj.second;
-        break;
-      }
-    }
-
-    if(obj_true != nullptr)
-      obj_true->removeFromHand();
+    putInHand(percept, has_percept_in_);
   }
-}
 
-bool Hand::isInHand(const std::string& object_name) const
-{
-  return (has_in_.find(object_name) != has_in_.end());
-}
+  void Hand::removeFromHand(const std::string& object_name)
+  {
+    removeFromHand(object_name, has_in_);
+  }
 
-std::vector<std::string> Hand::getInHand() const
-{
-  std::vector<std::string> res;
-  for(auto object : has_in_)
-    res.push_back(object.first);
-  return res;
-}
+  void Hand::removePerceptFromHand(const std::string& object_name)
+  {
+    removeFromHand(object_name, has_percept_in_);
+  }
+
+  bool Hand::isInHand(const std::string& object_name) const
+  {
+    return (has_in_.find(object_name) != has_in_.end());
+  }
+
+  bool Hand::isPerceptInHand(const std::string& object_name) const
+  {
+    return (has_percept_in_.find(object_name) != has_percept_in_.end());
+  }
+
+  std::vector<std::string> Hand::getInHand() const
+  {
+    std::vector<std::string> res;
+    for(auto object : has_in_)
+      res.push_back(object.first);
+    return res;
+  }
+
+  std::vector<std::string> Hand::getPerceptsInHand() const
+  {
+    std::vector<std::string> res;
+    for(auto percept : has_percept_in_)
+      res.push_back(percept.first);
+    return res;
+  }
 
 } // namespace owds

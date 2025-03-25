@@ -10,18 +10,6 @@
   - apt-get update -qq && apt-get install -y libcppunit-1.15-0 libcppunit-dev libtinyxml-dev git-all python3-rosdep python3-pip
   - pip3 install requests --user
 
-.install_bullet_template : &install_bullet |
-  mkdir -p ~/dependencies && cd ~/dependencies
-  git clone https://github.com/bulletphysics/bullet3.git
-  cd bullet3
-  mkdir build && mkdir install
-  export BULLET_PATH=$(pwd)
-  cd build
-  cmake .. -DCMAKE_INSTALL_PREFIX=$BULLET_PATH/install -DBUILD_SHARED_LIBS=ON
-  make install
-  export BULLET_INSTALL_PATH=~/dependencies/bullet3/install
-  export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$BULLET_INSTALL_PATH/lib
-
 .create_ws_template : &create_ws |
   mkdir -p ~/ros_ws/src
   cd ~/ros_ws
@@ -60,7 +48,6 @@ run-build-melodic:
   stage: build
   <<: *melodic_before_definition
   script:
-    - *install_bullet
     - *create_ws
     - *build_script_definition
 
@@ -69,7 +56,6 @@ run-build-noetic:
   stage: build
   <<: *noetic_before_definition
   script:
-    - *install_bullet
     - *create_ws
     - *build_script_definition
 
@@ -82,7 +68,6 @@ run-build-modules-melodic:
     - when: never
   <<: *melodic_before_definition
   script:
-    - *install_bullet
     - *create_ws
     - *clone_modules
     - *clone_deps_melodic
@@ -97,7 +82,6 @@ run-build-modules-noetic:
     - when: never
   <<: *noetic_before_definition
   script:
-    - *install_bullet
     - *create_ws
     - *clone_modules
     - *clone_deps_noetic

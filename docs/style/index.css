@@ -25,23 +25,24 @@ body {
   width: 100%;
 }
 
-.banner h1, .banner h2, .banner img{
+.banner h1,
+.banner h2,
+.banner img {
   padding: 0;
   margin: 0px 20px;
   vertical-align: middle;
   text-align: center;
 }
 
-.banner h1{
+.banner h1 {
   font-size: 300%;
 }
 
-.banner h2{
+.banner h2 {
   font-size: 150%;
 }
 
-.onto_container
-{
+.onto_container {
   margin-right: auto;
   margin-left: auto;
   padding-left: 20px;
@@ -66,24 +67,24 @@ body {
   min-height: 50px;
   margin-bottom: 20px;
   border: 1px solid transparent;
-      border-top-color: transparent;
-      border-right-color: transparent;
-      border-bottom-color: transparent;
-      border-left-color: transparent;
+  border-top-color: transparent;
+  border-right-color: transparent;
+  border-bottom-color: transparent;
+  border-left-color: transparent;
 }
 
 .navbar-default {
-  background-color: #324a5e;
-  border-color: #324a5e;
+  background-color: #3d5a72;
+  border-color: #3d5a72;
 }
 
 .navbar-default .navbar-brand,
-.navbar-default .navbar-nav > li > a  {
+.navbar-default .navbar-nav>li>a {
   color: #fff;
 }
 
 .navbar-default .navbar-brand:hover,
-.navbar-default .navbar-nav > li > a:hover  {
+.navbar-default .navbar-nav>li>a:hover {
   color: #ccc;
 }
 
@@ -91,15 +92,15 @@ body {
   width: auto;
   height: 20px;
   -webkit-filter: invert(1);
-   filter: invert(1);
+  filter: invert(1);
 }
 
-.navbar-brand > img {
+.navbar-brand>img {
   display: inline;
   margin-right: 10px;
 }
 
-.nav > li > a {
+.nav>li>a {
   position: relative;
   display: block;
   padding: 10px 15px;
@@ -112,7 +113,7 @@ body {
 
 .jumbotron {
   background: url(../images/background.png) no-repeat center center;
-      background-size: auto;
+  background-size: auto;
   background-size: cover;
   padding-bottom: 5px;
   padding: 0;
@@ -142,7 +143,7 @@ body {
   width: 18px;
   height: 20px;
   -webkit-filter: invert(1);
-   filter: invert(1);
+  filter: invert(1);
 }
 
 .btn {
@@ -175,15 +176,15 @@ body {
 }
 
 .onto-content {
-  max-width:1280px;
-  width:95%;
-  margin:auto;
-  margin-top:10px;
+  max-width: 1280px;
+  width: 95%;
+  margin: auto;
+  margin-top: 10px;
 }
 
 .onto-content h1 {
-  border-left: 5px solid #324a5e;
-  border-bottom: 2px solid #324a5e;
+  border-left: 5px solid #3d5a72;
+  border-bottom: 2px solid #3d5a72;
   padding-left: 10px;
 }
 
@@ -199,18 +200,18 @@ body {
 }
 
 .onto-grid-item:hover .onto-grid-item-title {
-    right: -190px;
+  right: -190px;
 }
 
 .onto-grid-item:hover .onto-grid-item-menu {
-    left: 0px;
+  left: 0px;
 }
 
 .onto-grid-item-content {
-    width: 100%;
-    background-color: rgba(150, 150, 150, 0.3);
-    height: 100%;
-    transition: all 0.5s ease;
+  width: 100%;
+  background-color: rgba(150, 150, 150, 0.3);
+  height: 100%;
+  transition: all 0.5s ease;
 }
 
 .onto-grid-print-img {
@@ -218,7 +219,7 @@ body {
 }
 
 .onto-grid-item-title {
-  background-color: #324a5e;
+  background-color: #3d5a72;
   max-width: 80%;
   padding: 5px 20px;
   top: 0px;
@@ -278,13 +279,13 @@ body {
 }
 
 footer {
-  line-height:1;
-  font-family:Arial, Helvetica, sans-serif;
-  font-weight:400;
-  transition-duration:1s;
+  line-height: 1;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: 400;
+  transition-duration: 1s;
   font-size: 16px;
-  background-color:#324a5e;
-  color:#ffffff;
+  background-color: #3d5a72;
+  color: #ffffff;
   height: 80px;
   padding: 10px;
 
@@ -294,9 +295,9 @@ footer {
 }
 
 a.laas_logo {
-  color:#ffffff;
+  color: #ffffff;
   margin: auto auto auto auto;
-  position:relative;
+  position: relative;
 }
 
 @media (min-width: 768px) {
@@ -314,7 +315,7 @@ a.laas_logo {
     border-radius: 0;
   }
 
-  .navbar-nav > li > a {
+  .navbar-nav>li>a {
     padding-top: 15px;
     padding-bottom: 15px;
   }

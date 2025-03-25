@@ -4,73 +4,79 @@
 #include <string>
 #include <unordered_set>
 
-#include "overworld/Geometry/Pose.h"
-#include "overworld/Geometry/Polygon.h"
 #include "overworld/BasicTypes/Entity.h"
+#include "overworld/Geometry/Polygon.h"
+#include "overworld/Geometry/Pose.h"
 
 namespace owds {
 
-class Area
-{
-public:
-  Area(const std::string& id, const Pose& center, double radius, double half_height);
-  Area(const std::string& id, const Polygon& polygon, double z_min, double height);
+  class Area
+  {
+  public:
+    Area(const std::string& id, const Pose& center, double radius, double half_height);
+    Area(const std::string& id, const Polygon& polygon, double z_min, double height);
 
-  const std::string& id() const { return id_; }
+    const std::string& id() const { return id_; }
 
-  const std::unordered_set<int>& getBulletIds() const { return bullet_ids_; }
-  void setBulletIds(const std::unordered_set<int>& bullet_ids) { bullet_ids_ = bullet_ids; }
+    const std::unordered_set<int>& getWorldLineIds() const { return engine_line_ids_; }
+    const std::unordered_set<int>& getWorldTextIds() const { return engine_text_ids_; }
+    void setWorldLineIds(const std::unordered_set<int>& engine_ids) { engine_line_ids_ = engine_ids; }
+    void setWorldTextIds(const std::unordered_set<int>& engine_ids) { engine_text_ids_ = engine_ids; }
 
-  void setHysteresis(double hysteresis);
-  void setOwner(Entity* owner) { owner_ = owner; }
-  void setOwnerStr(const std::string& owner_str) { owner_str_ = owner_str; }
+    void setHysteresis(double hysteresis);
+    void setOwner(Entity* owner) { owner_ = owner; }
+    void setOwnerStr(const std::string& owner_str) { owner_str_ = owner_str; }
 
-  bool isStatic() const { return (owner_str_ == ""); }
-  bool isEmpty() const;
-  bool isCircle() const { return is_circle_; }
+    void updatePose();
 
-  Entity* getOwner() const { return owner_; }
-  const std::string& getOwnerStr() const { return owner_str_; }
-  const Polygon& getPolygon() const { return polygon_; }
-  double getZmin() const { return z_min_; }
-  double getZmax() const { return z_max_; }
-  double getRadius() const { return radius_; }
-  double getHalfHeight() const { return half_height_; }
-  const Pose& getCenterPose() const { return center_; }
+    bool isStatic() const { return (owner_str_ == ""); }
+    bool isEmpty() const;
+    bool isCircle() const { return is_circle_; }
 
-  bool isInside(const Pose& pose, bool hysteresis = true);
-  bool isInside(Entity* entity);
-  bool setOut(Entity* entity);
-  void clearInsideEntities();
+    Entity* getOwner() const { return owner_; }
+    const std::string& getOwnerStr() const { return owner_str_; }
+    const Polygon& getPolygon() const { return polygon_; }
+    double getZmin() const { return z_min_; }
+    double getZmax() const { return z_max_; }
+    double getRadius() const { return radius_; }
+    double getHalfHeight() const { return half_height_; }
+    const Pose& getCenterPose() const { return center_; }
 
-private:
-  std::string id_;
-  Pose center_;
-  Entity* owner_;
-  std::string owner_str_;
-  bool is_circle_;
+    bool isInside(const Pose& pose, bool hysteresis = true);
+    bool isInside(Entity* entity);
+    bool setOut(Entity* entity);
+    void clearInsideEntities();
 
-  double radius_;
-  double half_height_;
+  private:
+    std::string id_;
+    Pose center_;
+    Pose pose_;
+    Entity* owner_;
+    std::string owner_str_;
+    bool is_circle_;
 
-  double z_min_;
-  double z_max_;
-  Polygon polygon_;
+    double radius_;
+    double half_height_;
 
-  double hysteresis_distance_;
-  std::unordered_set<Entity*> upcoming_entities_;
-  std::unordered_set<Entity*> inside_entities_;
-  std::unordered_set<Entity*> leaving_entities_;
+    double z_min_;
+    double z_max_;
+    Polygon polygon_;
 
-  std::unordered_set<int> bullet_ids_;
+    double hysteresis_distance_;
+    std::unordered_set<Entity*> upcoming_entities_;
+    std::unordered_set<Entity*> inside_entities_;
+    std::unordered_set<Entity*> leaving_entities_;
 
-  bool isInCircle(Entity* entity);
-  bool isInPolygon(Entity* entity);
+    std::unordered_set<int> engine_line_ids_;
+    std::unordered_set<int> engine_text_ids_;
 
-  bool entityInLeaving(Entity* entity);
-  bool entityInUpcoming(Entity* entity);
-  bool entityInArea(Entity* entity);
-};
+    bool isInCircle(Entity* entity);
+    bool isInPolygon(Entity* entity);
+
+    bool entityInLeaving(Entity* entity);
+    bool entityInUpcoming(Entity* entity);
+    bool entityInArea(Entity* entity);
+  };
 
 } // namespace owds
 

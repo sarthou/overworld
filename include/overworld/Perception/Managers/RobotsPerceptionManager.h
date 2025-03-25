@@ -5,17 +5,17 @@
 
 namespace owds {
 
-class RobotsPerceptionManager : public AgentPerceptionManager
-{
-public:
-  explicit RobotsPerceptionManager(ros::NodeHandle* nh): AgentPerceptionManager(nh){}
-  ~RobotsPerceptionManager() {}
+  class RobotsPerceptionManager : public AgentPerceptionManager
+  {
+  public:
+    RobotsPerceptionManager() = default;
+    virtual ~RobotsPerceptionManager() = default;
 
-  Agent* getAgent(const std::string& agent_name) { return AgentPerceptionManager::getAgent(agent_name, AgentType_e::ROBOT); }
+    Agent* getAgent(const std::string& agent_name) { return AgentPerceptionManager::getAgent(agent_name, AgentType_e::ROBOT); }
 
-private:
-  void getPercepts( std::map<std::string, BodyPart>& percepts) override;
-};
+  private:
+    void getPercepts(const std::string& module_name, std::map<std::string, Percept<BodyPart>>& percepts) override;
+  };
 
 } // namespace owds
 

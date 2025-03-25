@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="https://gitlab.laas.fr/discuter/overworld_tutorials/-/blob/master/ontologies/agents#"
+     xmlns:agents="https://gitlab.laas.fr/discuter/overworld_tutorials/-/blob/master/ontologies/agents#"
+     xmlns:cg_agents="https://github.com/RIS-WITH/common_ground_ontology/blob/master/CG_agents#"
+     xmlns:cg_entities="https://github.com/RIS-WITH/common_ground_ontology/blob/master/CG_entities#"
+     xmlns:cg_sensors="https://github.com/RIS-WITH/common_ground_ontology/blob/master/CG_sensors#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+    <owl:Ontology rdf:about="https://gitlab.laas.fr/discuter/overworld_tutorials/-/blob/master/ontologies/agents">
+      <owl:imports rdf:resource="https://github.com/RIS-WITH/common_ground_ontology/blob/master/CG_agents"/>
+      <owl:imports rdf:resource="https://github.com/RIS-WITH/common_ground_ontology/blob/master/CG_sensors"/>
+    </owl:Ontology>
+    
+
+
+    <!-- 
+    /////////////////////////////////////////////////////////////////////////////////////// 
+    // 
+    // Individuals 
+    // 
+    /////////////////////////////////////////////////////////////////////////////////////// 
+     -->
+
+
+
+    <!-- agents#steve_fov -->
+
+    <owl:NamedIndividual rdf:about="agents#steve_fov">
+        <rdf:type rdf:resource="cg_sensors#FieldOfView"/>
+        <cg_sensors:fovHasClipNear rdf:datatype="http://www.w3.org/2002/07/owl#real">0.1</cg_sensors:fovHasClipNear>
+        <cg_sensors:fovHasClipFar rdf:datatype="http://www.w3.org/2002/07/owl#real">12</cg_sensors:fovHasClipFar>
+        <cg_sensors:fovHasHeight rdf:datatype="http://www.w3.org/2002/07/owl#real">70</cg_sensors:fovHasHeight>
+        <cg_sensors:fovHasWidth rdf:datatype="http://www.w3.org/2002/07/owl#real">102.4</cg_sensors:fovHasWidth>
+    </owl:NamedIndividual>
+
+
+
+    <!-- agents#steve_eye_frame -->
+
+    <owl:NamedIndividual rdf:about="agents#steve_eye_frame">
+        <rdf:type rdf:resource="cg_sensors#FrameId"/>
+    </owl:NamedIndividual>
+
+
+
+    <!-- agents#steve_eye -->
+    
+    <owl:NamedIndividual rdf:about="agents#steve_eye">
+        <rdf:type rdf:resource="cg_sensors#Sensor"/>
+        <cg_sensors:hasFieldOfView rdf:resource="agents#steve_fov"/>
+        <cg_sensors:hasFrameId rdf:resource="agents#steve_eye_frame"/>
+        <cg_sensors:isStatic rdf:datatype="http://www.w3.org/2002/07/owl#bool">false</cg_sensors:isStatic>
+    </owl:NamedIndividual>
+
+
+
+    <!-- agents#steve_base -->
+    
+    <owl:NamedIndividual rdf:about="agents#steve_base">
+        <rdf:type rdf:resource="cg_agents#Base"/>
+        <cg_entities:hasMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/tutorials/Steve/steve_body.obj</cg_entities:hasMesh>
+        <cg_entities:hasDiffuseTexture rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/tutorials/Steve/steve.png</cg_entities:hasDiffuseTexture>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- agents#steve_head -->
+    
+    <owl:NamedIndividual rdf:about="agents#steve_head">
+        <rdf:type rdf:resource="cg_agents#Head"/>
+        <cg_sensors:hasSensor rdf:resource="agents#steve_eye"/>
+        <cg_entities:hasMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/tutorials/Steve/steve_head.obj</cg_entities:hasMesh>
+        <cg_entities:hasDiffuseTexture rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://overworld/models/tutorials/Steve/steve.png</cg_entities:hasDiffuseTexture>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- agents#steve -->
+    
+    <owl:NamedIndividual rdf:about="agents#steve">
+        <rdf:type rdf:resource="cg_agents#Human"/>
+        <cg_agents:hasBase rdf:resource="agents#steve_base"/>
+        <cg_agents:hasHead rdf:resource="agents#steve_head"/>
+    </owl:NamedIndividual>
+
+</rdf:RDF>

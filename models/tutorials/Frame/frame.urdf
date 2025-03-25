@@ -1,0 +1,55 @@
+<?xml version="0.0" ?>
+<robot name="frame">
+
+  <material name="farme_material">
+    <texture filename="package://overworld/models/tutorials/Frame/frame.png"/>
+  </material>
+
+  <link concave="yes" name="frame_y">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value=".0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://overworld/models/tutorials/Frame/frame.obj" scale="1 1 1"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://overworld/models/tutorials/Frame/frame.obj" scale="1 1 1"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <link concave="yes" name="frame_z">
+    <inertial>
+      <origin rpy="0 0 0" xyz="1 1 0"/>
+      <mass value=".0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="1 1 0"/>
+      <geometry>
+        <mesh filename="package://overworld/models/tutorials/Frame/frame_z.dae" scale="1 1 1"/>
+      </geometry>
+      <material name="farme_material"/>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://overworld/models/tutorials/Frame/frame.obj" scale="1 1 1"/>
+      </geometry>
+    </collision>
+  </link>
+
+    <joint name="frame_link" type="fixed">
+      <origin rpy="0 0 0" xyz="-1 1 0"/>
+      <parent link="frame_y"/>
+      <child link="frame_z"/>
+    </joint>
+
+</robot>

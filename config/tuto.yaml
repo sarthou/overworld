@@ -1,0 +1,28 @@
+modules:
+  robot:
+    JointStatePerceptionModule: robot_joints
+  humans:
+    FakeHumanPerceptionModule: steve_module
+  objects:
+    FakeObjectPerceptionModule:
+      - fake_1
+      - fake_2
+    StaticObjectsPerceptionModule: static
+
+robot_joints:
+  min_period : 0.09
+  robot_name: eve
+
+fake_1:
+  topic: /overworld/fake_objects_poses
+  sensor_id: 
+    - eve_eye
+
+fake_2:
+  true_id: false
+  topic: /overworld/fake_false_objects_poses
+  sensor_id:
+    - eve_eye
+
+static:
+  file: package://overworld/config/env/adream.yaml

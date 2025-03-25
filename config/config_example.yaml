@@ -29,4 +29,4 @@ optitrack:
   offset_y: 2.8506
 
 static:
-  file: package://overworld/config/adream.yaml
+  file: package://overworld/config/env/adream.yaml

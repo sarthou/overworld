@@ -1,28 +1,32 @@
 <html lang="en_US">
 
 <head>
-  <title>Install | Overworld 0.1.5</title>
+  <title>Install | Overworld 0.2.0</title>
   <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
   <link href="style/overworld_api.css" rel="stylesheet" type="text/css">
   <link href="images/favicon.ico" rel="shortcut icon">
   <link href="images/favicon-32x32.png" rel="icon" type="image/png">
   <link href="images/favicon-16x16.png" rel="icon" type="image/png">
-  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css"
+    integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
 </head>
 
 <body>
   <div class="header" id="header">
     <header class="fixed" id="navbar">
       <div class="container">
-          <div class="navbar-header">
-            <div id="header-buttons">
-                <ul id="header-ul" data-event="hover_intent" data-effect="fade" data-effect-speed="500">
-                    <li class="header-item"><a class="header-link" href="https://github.com/sarthou/overworld" tabindex="0"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Octicons-mark-github.svg/1200px-Octicons-mark-github.svg.png" alt="github" width="40px" height="40px"/></a></li>
-                </ul>
-            </div>
-            <a class="navbar-icon" href="index.html">
-              <img src="images/overworld.png " alt="overworld" width="53px" height="65px"/>
-            </a>
+        <div class="navbar-header">
+          <div id="header-buttons">
+            <ul id="header-ul" data-event="hover_intent" data-effect="fade" data-effect-speed="500">
+              <li class="header-item"><a class="header-link" href="https://github.com/sarthou/overworld"
+                  tabindex="0"><img
+                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Octicons-mark-github.svg/1200px-Octicons-mark-github.svg.png"
+                    alt="github" width="40px" height="40px" /></a></li>
+            </ul>
+          </div>
+          <a class="navbar-icon" href="index.html">
+            <img src="images/overworld_light.png" alt="overworld" height="65px" />
+          </a>
         </div>
       </div>
     </header>
@@ -32,9 +36,12 @@
 
     <div class="navigationbar">
       <ul class="sub-navigation">
-        <li><a href="https://www.youtube.com/watch?v=LUkjts8UacI" target="_blank" rel="noopener noreferrer">Demo video</a></li>
-        <li><a href="https://sarthou.github.io/ontologenius/index.html" target="_blank" rel="noopener noreferrer">Ontologenius</a></li>
-        <li><a href="https://github.com/sarthou/overworld/actions" target="_blank" rel="noopener noreferrer">Pipelines</a></li>
+        <li><a href="https://www.youtube.com/watch?v=LUkjts8UacI" target="_blank" rel="noopener noreferrer">Demo
+            video</a></li>
+        <li><a href="https://sarthou.github.io/ontologenius/index.html" target="_blank"
+            rel="noopener noreferrer">Ontologenius</a></li>
+        <li><a href="https://github.com/sarthou/overworld/actions" target="_blank"
+            rel="noopener noreferrer">Pipelines</a></li>
       </ul>
       <h1>Overworld Documentation</h1>
     </div>
@@ -70,7 +77,7 @@
             <li class="level1"><a href="overview/launchers.html">Launchers</a></li>
             <li class="level1"><a href="overview/Configuration.html">Configuration</a></li>
             <li class="level1"><a href="overview/Plugins.html">Plugins</a></li>
-            <li class="level1"><a href="overview/bulletGUI.html">Bullet GUI</a></li>
+            <li class="level1"><a href="overview/overworldGUI.html">Overworld GUI</a></li>
           </ul>
         </div>
 
@@ -92,35 +99,24 @@
 
       <div class="context">
         <h1 class="title">Install Overworld</h1>
-        <p>Since Overworld is a ROS package, make sure that ROS is installed on your platform. Overworld is fully supported and maintained by <a class="type" href="http://wiki.ros.org/melodic/Installation">ROS Melodic Morenia</a>, and <a class="type" href="http://wiki.ros.org/noetic/Installation">ROS Noetic Ninjemys</a>. Desktop ROS configuration is not required for use of overworld.</p>
+        <p>Since Overworld is a ROS package, make sure that ROS is installed on your platform. Overworld is fully
+          supported and maintained by <a class="type" href="http://wiki.ros.org/melodic/Installation">ROS Melodic
+            Morenia</a>, and <a class="type" href="http://wiki.ros.org/noetic/Installation">ROS Noetic Ninjemys</a>.
+          Desktop ROS configuration is not required for use of overworld.</p>
 
-        <p>We first need to install a third-party library (bullet) from the source. This library should not be installed in the catkin workspace.</p>
-
-        <p class="tip">You can for example install it in ~/software</p>
-
+        <p>First, install Overworld dependencies:</p>
         <div class="code_block">
-          <p>git clone git@github.com:bulletphysics/bullet3.git</p>
-          <p>cd bullet3</p>
-          <p>mkdir build && mkdir install</p>
-          <p>export BULLET_PATH=$(pwd)</p>
-          <p>cd build</p>
-          <p>cmake .. -DCMAKE_INSTALL_PREFIX=$BULLET_PATH/install -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Release</p>
-          <p>make install</p>
+          <p>sudo apt install -y libglm-dev libglfw3-dev</p>
         </div>
 
-        <p>Before continuing, you will need to export the follwong environment variable and changing the path to correspond to your bullet installation path.</p>
-
-        <p class="tip">These exports are mandatory for each compilation of your ROS workspace. Put them in your .bashrc file or in a setup.sh file.</p>
-
-        <div class="code_block">
-          <p>export BULLET_INSTALL_PATH=your/path/bullet3/install</p>
-          <p>export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$BULLET_INSTALL_PATH/lib</p>
-        </div>
-
-        <p>Overworld uses the software <a class="type" href="https://sarthou.github.io/ontologenius/index.html">Ontologenius</a> as a knowledge base. Clone both packages in your catkin workspace and compile it:</p>
+        <p>Overworld uses the software <a class="type"
+            href="https://sarthou.github.io/ontologenius/index.html">Ontologenius</a> as a knowledge base and the <a class="type"
+            href="https://github.com/RIS-WITH/common_ground_ontology#">common_ground_ontology</a> as a vocabulary. Clone all
+          packages in your catkin workspace and compile it:</p>
         <div class="code_block">
           <p>cd ~/catkin_ws/src/</p>
           <p>git clone https://github.com/sarthou/overworld.git</p>
+          <p>git clone https://github.com/RIS-WITH/common_ground_ontology.git</p>
           <p>git clone https://github.com/sarthou/ontologenius.git</p>
           <p>cd ..</p>
           <p>catkin_make</p>
@@ -128,16 +124,10 @@
 
         <h2>Troubles</h2>
 
-        <p> - If the compilation fails due to some Bullet header not find or some Bullet symbols not being linked,
-           check if the two environment variables are correctly exported. Then, remove the build and devel folder
-           of your ROS workspace and compile it again from scratch.</p>
-
-        <p class="tip">Some cmake variables use cache. If you have already tried to compile Overworld while the
-          environment variables were not exported, recompiling the workspace without cleaning it will have no effect.</p>
-
         <p> - If you have the following error :</p>
         <div class="code_block">
-          <p>Could not find a package configuration file provided by "qt_build" with any of the following names:<br><br>    qt_buildConfig.cmake<br>    qt_build-config.cmake</p>
+          <p>Could not find a package configuration file provided by "qt_build" with any of the following names:<br><br>
+            qt_buildConfig.cmake<br> qt_build-config.cmake</p>
         </div>
         <p>You just have to install qt-build:</p>
         <div class="code_block">
@@ -169,7 +159,7 @@
     <p>
       Brought to you by:
       <a class="laas_logo" href="https://www.laas.fr/public/">
-        <img src="images/LogoLAAS-2016_BW.png " alt="LAAS-CNRS" height="60px"/>
+        <img src="images/LogoLAAS-2016_BW.png " alt="LAAS-CNRS" height="60px" />
       </a>
     </p>
   </div>

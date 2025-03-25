@@ -1,0 +1,13 @@
+# Blender MTL File: 'None'
+# Material Count: 1
+
+newmtl floor_hall
+Ns 214.728932
+Ka 1.000000 1.000000 1.000000
+Kd 0.650006 0.650006 0.650006
+Ks 0.867692 0.867692 0.867692
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd hall_color.png

@@ -1,20 +1,20 @@
-#include <termios.h>
-#include <signal.h>
+#include <fcntl.h>
+#include <geometry_msgs/Twist.h>
 #include <math.h>
+#include <ros/ros.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <fcntl.h>
-
-#include <ros/ros.h>
-#include <geometry_msgs/Twist.h>
+#include <termios.h>
 #include <tf/transform_broadcaster.h>
+#include <string>
 
 #include "overworld/Pose.h"
 
 #define KEYCODE_A 0x61
 #define KEYCODE_D 0x64
 #define KEYCODE_S 0x73
-#define KEYCODE_W 0x77 
+#define KEYCODE_W 0x77
 #define KEYCODE_Q 0x71
 #define KEYCODE_E 0x65
 
@@ -28,8 +28,12 @@
 class TeleopKeyboard
 {
 public:
-  TeleopKeyboard(double x = 0.0, double y = 0.0, double z = 0.0, double theta = 0.0)
-  { 
+  TeleopKeyboard(const std::string& frame,
+                 double x = 0.0,
+                 double y = 0.0,
+                 double z = 0.0,
+                 double theta = 0.0) : frame_(frame)
+  {
     cmd_.linear.x = cmd_.linear.y = cmd_.angular.z = 0;
     pose_.theta = theta;
     pose_.x = x;
@@ -42,7 +46,7 @@ public:
     n_private.param("yaw_rate_", yaw_rate_, 0.0174533 / 2.);
     n_private.param("yaw_run_rate", yaw_rate_run_, 0.0174533);
   }
-  
+
   void keyboardLoop();
 
 private:
@@ -52,6 +56,7 @@ private:
   double yaw_rate_run_;
   geometry_msgs::Twist cmd_;
   overworld::Pose pose_;
+  std::string frame_;
   double z_;
 
   ros::NodeHandle n_;
@@ -77,7 +82,7 @@ void TeleopKeyboard::keyboardLoop()
   // get the console in raw mode
   tcgetattr(kfd, &cooked);
   memcpy(&raw, &cooked, sizeof(struct termios));
-  raw.c_lflag &=~ (ICANON | ECHO);
+  raw.c_lflag &= ~(ICANON | ECHO);
   // Setting a new line, then end of file
   raw.c_cc[VEOL] = 1;
   raw.c_cc[VEOF] = 2;
@@ -106,39 +111,39 @@ void TeleopKeyboard::keyboardLoop()
         cmd_.linear.x = walk_vel_;
         break;
       case KEYCODE_S:
-        cmd_.linear.x = - walk_vel_;
+        cmd_.linear.x = -walk_vel_;
         break;
       case KEYCODE_A:
         cmd_.linear.y = walk_vel_;
         break;
       case KEYCODE_D:
-        cmd_.linear.y = - walk_vel_;
+        cmd_.linear.y = -walk_vel_;
         break;
       case KEYCODE_Q:
         cmd_.angular.z = yaw_rate_;
         break;
       case KEYCODE_E:
-        cmd_.angular.z = - yaw_rate_;
+        cmd_.angular.z = -yaw_rate_;
         break;
 
-        // Running 
+        // Running
       case KEYCODE_W_CAP:
         cmd_.linear.x = run_vel_;
         break;
       case KEYCODE_S_CAP:
-        cmd_.linear.x = - run_vel_;
+        cmd_.linear.x = -run_vel_;
         break;
       case KEYCODE_A_CAP:
         cmd_.linear.y = run_vel_;
         break;
       case KEYCODE_D_CAP:
-        cmd_.linear.y = - run_vel_;
+        cmd_.linear.y = -run_vel_;
         break;
       case KEYCODE_Q_CAP:
         cmd_.angular.z = yaw_rate_run_;
         break;
       case KEYCODE_E_CAP:
-        cmd_.angular.z = - yaw_rate_run_;
+        cmd_.angular.z = -yaw_rate_run_;
         break;
       }
 
@@ -146,7 +151,7 @@ void TeleopKeyboard::keyboardLoop()
     }
     else
       usleep(10000);
-    
+
     publishTransform();
   }
 }
@@ -161,32 +166,35 @@ void TeleopKeyboard::updatePose()
 void TeleopKeyboard::publishTransform()
 {
   tf::Transform transform;
-  transform.setOrigin( tf::Vector3(pose_.x, pose_.y, z_) );
+  transform.setOrigin(tf::Vector3(pose_.x, pose_.y, z_));
   tf::Quaternion q;
   q.setRPY(0, 0, pose_.theta);
   transform.setRotation(q);
-  br_.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "map", "base_link"));
+  br_.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "map", frame_));
 }
 
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "overworld_teleop");
 
+  std::string frame = "base_link";
   double x = 0.0;
   double y = 0.0;
   double z = 0.0;
   double theta = 0.0;
   if(argc > 1)
-    x = std::stod(argv[1]);
+    frame = std::string(argv[1]);
   if(argc > 2)
-    y  = std::stod(argv[2]);
+    x = std::stod(argv[2]);
   if(argc > 3)
-    z  = std::stod(argv[3]);
+    y = std::stod(argv[3]);
   if(argc > 4)
-    theta  = std::stod(argv[4]);
-  TeleopKeyboard teleop(x, y, z, theta);
+    z = std::stod(argv[4]);
+  if(argc > 5)
+    theta = std::stod(argv[5]);
+  TeleopKeyboard teleop(frame, x, y, z, theta);
 
-  signal(SIGINT,quit);
+  signal(SIGINT, quit);
 
   teleop.keyboardLoop();
 

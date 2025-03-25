@@ -1,251 +1,310 @@
 #include "overworld/BasicTypes/Entity.h"
 
-#include <ros/ros.h>
-
+#include <array>
+#include <cstddef>
 #include <functional>
+#include <ros/ros.h>
+#include <string>
 
 namespace owds {
-    
-Entity::Entity(const std::string& id, bool is_true_id): id_(id), 
-                                                        is_true_id_(is_true_id),
-                                                        is_located_(false),
-                                                        bullet_id_(-1),
-                                                        bullet_link_id_(-1)
-{}
 
-void Entity::updatePose(const Pose& pose, ros::Time stamp)
-{
+  Entity::Entity(const std::string& id, bool is_true_id) : id_(id),
+                                                           is_true_id_(is_true_id),
+                                                           is_static_(false),
+                                                           is_located_(false),
+                                                           engine_id_(-1),
+                                                           engine_link_id_(-1)
+  {}
+
+  void Entity::updatePose(const Pose& pose, ros::Time stamp)
+  {
     last_poses_.push_back({pose, stamp});
     is_located_ = true;
-}
+  }
 
-void Entity::updatePose(const std::array<double, 3>& translation, const std::array<double, 4>& rotation)
-{
+  void Entity::updatePose(const std::array<double, 3>& translation, const std::array<double, 4>& rotation)
+  {
     updatePose(translation, rotation, ros::Time::now());
-}
+  }
 
-void Entity::updatePose(const std::array<double, 3>& translation, const std::array<double, 4>& rotation, ros::Time stamp)
-{
-    PoseStamped_s pose_stamped = {Pose(translation, rotation), stamp};
+  void Entity::updatePose(const std::array<double, 3>& translation, const std::array<double, 4>& rotation, ros::Time stamp)
+  {
+    PoseStamped_t pose_stamped = {Pose(translation, rotation), stamp};
     is_located_ = true;
     last_poses_.push_back(pose_stamped);
-}
+  }
 
-void Entity::updatePose(const geometry_msgs::PoseStamped& pose)
-{
-    PoseStamped_s pose_stamped = {Pose(pose), pose.header.stamp};
+  void Entity::updatePose(const geometry_msgs::PoseStamped& pose)
+  {
+    PoseStamped_t pose_stamped = {Pose(pose), pose.header.stamp};
     is_located_ = true;
     last_poses_.push_back(pose_stamped);
-}
+  }
 
-void Entity::replacePose(const Pose& pose)
-{
+  void Entity::replacePose(const Pose& pose)
+  {
     last_poses_.replace_back({pose, lastStamp()});
-}
+  }
 
-const Pose& Entity::pose() const
-{
-    if (!is_located_){
-        throw UnlocatedEntityError(id_);
+  Pose Entity::pose() const
+  {
+    if(!is_located_)
+    {
+      throw UnlocatedEntityError(id_);
     }
     return last_poses_.back().pose;
-}
+  }
 
-const Pose& Entity::pose(unsigned int id) const
-{
-    if (!is_located_)
-        throw UnlocatedEntityError(id_);
-    
+  Pose Entity::pose(unsigned int id) const
+  {
+    if(!is_located_)
+      throw UnlocatedEntityError(id_);
+
     return last_poses_.at(last_poses_.size() - id - 1).pose;
-}
+  }
 
-// TODO optimize when increase => shortcut
-const Pose& Entity::pose(const ros::Time& stamp) const
-{
-    if (!is_located_)
-        throw UnlocatedEntityError(id_);
+  // TODO optimize when increase => shortcut
+  Pose Entity::pose(const ros::Time& stamp) const
+  {
+    if(!is_located_)
+      throw UnlocatedEntityError(id_);
 
     auto duration_zero = ros::Duration(0);
 
     ros::Duration min_err = stamp - last_poses_.back().stamp;
     if(min_err < duration_zero)
-        min_err = last_poses_.back().stamp - stamp;
+      min_err = last_poses_.back().stamp - stamp;
 
     int min_i = -1;
 
     for(size_t i = 0; i < last_poses_.size(); i++)
     {
-        auto delta = stamp - last_poses_.at(i).stamp;
-        if(delta < duration_zero)
-            delta = last_poses_.at(i).stamp - stamp;
-        if(delta < min_err)
-        {
-            min_err = delta;
-            min_i = i;
-        }
+      auto delta = stamp - last_poses_.at(i).stamp;
+      if(delta < duration_zero)
+        delta = last_poses_.at(i).stamp - stamp;
+      if(delta < min_err)
+      {
+        min_err = delta;
+        min_i = i;
+      }
     }
 
     if(min_i < 0)
-        return last_poses_.back().pose;
+      return last_poses_.back().pose;
     else if(min_i)
-        return last_poses_.at(min_i - 1).pose; //-1 bug
+      return last_poses_.at(min_i - 1).pose; //-1 bug
     else
-        return last_poses_.at(min_i).pose;
-}
+      return last_poses_.at(min_i).pose;
+  }
 
-bool Entity::hasMoved() const
-{
-    if (!is_located_)
+  bool Entity::hasMoved() const
+  {
+    if(!is_located_)
     {
-        throw UnlocatedEntityError(id_);
+      throw UnlocatedEntityError(id_);
     }
-    if (last_poses_.size() <= 1)
+    if(last_poses_.size() <= 1)
     {
-        return true;
+      return true;
     }
 
     if(pose().similarTo(last_poses_.at(last_poses_.size() - 2).pose, 0.001, 0.00349066) == false) // 5mm // 0.2 degree// 0.5degree = 0.00872665
-        return true;
+      return true;
 
     return false;
-}
+  }
 
-bool Entity::hasMoved(const ros::Time& stamp) const
-{
-    if (!is_located_)
+  bool Entity::hasMoved(const ros::Time& stamp) const
+  {
+    if(!is_located_)
     {
-        throw UnlocatedEntityError(id_);
+      throw UnlocatedEntityError(id_);
     }
-    if (last_poses_.size() <= 1)
+    if(last_poses_.size() <= 1)
     {
-        return true;
+      return true;
     }
 
     if(pose().similarTo(pose(stamp), 0.001, 0.00349066) == false) // 5mm // 0.2 degree// 0.5degree = 0.00872665
-        return true;
+      return true;
 
     return false;
-}
+  }
 
-
-std::array<double, 3> Entity::computeTranslationSpeed() const
-{
-    if (!hasMoved())
+  std::array<double, 3> Entity::computeTranslationSpeed() const
+  {
+    if(!hasMoved())
     {
-        return {0.0, 0.0, 0.0};
+      return {0.0, 0.0, 0.0};
     }
-    if (last_poses_.size() < 2)
+    if(last_poses_.size() < 2)
     {
-        return {0.0, 0.0, 0.0};
+      return {0.0, 0.0, 0.0};
     }
     ros::Time now = ros::Time::now();
-    if ((now - last_poses_.back().stamp).toSec() > 0.5)
+    if((now - last_poses_.back().stamp).toSec() > 0.5)
     {
-        return {0.0, 0.0, 0.0};
+      return {0.0, 0.0, 0.0};
     }
 
-    PoseStamped_s oldest_pose;
+    PoseStamped_t oldest_pose;
     size_t oldest_i = 0;
-    for (size_t i = 0; i < last_poses_.size() - 1; i++){
-        if ((now - last_poses_.at(i).stamp).toSec() < 0.5)
-        {
-            oldest_pose = last_poses_.at(i);
-            oldest_i = i;
-            break;
-        }
-    }
-    if (oldest_i >= last_poses_.size() - 2)
+    for(size_t i = 0; i < last_poses_.size() - 1; i++)
     {
-        // We have less than 2 poses more recent than 2 seconds, we cannot compute a speed
-        return {0.0, 0.0, 0.0};
+      if((now - last_poses_.at(i).stamp).toSec() < 0.5)
+      {
+        oldest_pose = last_poses_.at(i);
+        oldest_i = i;
+        break;
+      }
     }
-    const PoseStamped_s& last_pose = last_poses_.back();
+    if(oldest_i >= last_poses_.size() - 2)
+    {
+      // We have less than 2 poses more recent than 2 seconds, we cannot compute a speed
+      return {0.0, 0.0, 0.0};
+    }
+    const PoseStamped_t& last_pose = last_poses_.back();
     auto pose_diff = last_pose.pose.subtractTranslations(oldest_pose.pose);
     double dt = (last_pose.stamp - oldest_pose.stamp).toSec();
     return {pose_diff[0] / dt, pose_diff[1] / dt, pose_diff[2] / dt};
-}
+  }
 
+  std::array<double, 3> Entity::direction() const
+  {
+    if(last_poses_.size() < 2)
+      return {0.0, 0.0, 0.0};
 
-void Entity::setId(const std::string& id, bool is_true_id)
-{
+    const Pose& last_pose = last_poses_.back().pose;
+    const Pose& previous_pose = last_poses_.at(last_poses_.size() - 2).pose;
+
+    std::array<double, 3> direction = {
+      last_pose.getX() - previous_pose.getX(),
+      last_pose.getY() - previous_pose.getY(),
+      last_pose.getZ() - previous_pose.getZ()};
+
+    double norm = sqrt(direction[0] * direction[0] + direction[1] * direction[1] + direction[2] * direction[2]);
+    if(norm > 0)
+    {
+      direction[0] /= norm;
+      direction[1] /= norm;
+      direction[2] /= norm;
+    }
+
+    return direction;
+  }
+
+  double Entity::speed() const
+  {
+    std::array<double, 3> translation_speed = computeTranslationSpeed();
+    return sqrt(translation_speed[0] * translation_speed[0] +
+                translation_speed[1] * translation_speed[1] +
+                translation_speed[2] * translation_speed[2]);
+  }
+
+  void Entity::setId(const std::string& id, bool is_true_id)
+  {
     id_ = id;
     is_true_id_ = is_true_id;
-}
+  }
 
-double Entity::getAabbVolume() const
-{
+  double Entity::getAabbVolume() const
+  {
     if(isAabbValid() == false)
-        return 0;
+      return 0;
     else
-        return (aabb_.max[0] - aabb_.min[0]) * (aabb_.max[1] - aabb_.min[1]) * (aabb_.max[2] - aabb_.min[2]);
-}
+      return (aabb_.max[0] - aabb_.min[0]) * (aabb_.max[1] - aabb_.min[1]) * (aabb_.max[2] - aabb_.min[2]);
+  }
 
-void Entity::merge(const Entity* other)
-{
+  void Entity::merge(const Entity* other, bool update_pose)
+  {
     if(other->hasShape())
     {
-        if(shape_.type == ShapeType_e::SHAPE_NONE)
-            shape_ = other->getShape();
-        else if(shape_.type != ShapeType_e::SHAPE_MESH)
-            shape_ = other->getShape();
+      if(shape_.type == ShapeType_e::SHAPE_NONE)
+        shape_ = other->getShape();
+      else if(shape_.type != ShapeType_e::SHAPE_MESH)
+        shape_ = other->getShape();
     }
 
-    if((isLocated() == false) && other->isLocated())
-        updatePose(other->pose());
-    else if(other->isLocated() && (getNbFrameUnseen() < other->getNbFrameUnseen()))
-        updatePose(other->pose());
-}
-
-geometry_msgs::TransformStamped Entity::toTfTransform() const
-{
-    if (!isLocated())
+    if(update_pose && other->isLocated())
     {
-        throw std::runtime_error("Called toTfTransform on a non located entity: '" + id_ + "'.");
+      if((isLocated() == false) ||
+         (other->getNbFrameUnseen() <= getNbFrameUnseen()))
+      {
+        updatePose(other->pose());
+        setNbFrameUnseen(other->getNbFrameUnseen());
+      }
+    }
+  }
+
+  geometry_msgs::TransformStamped Entity::toTfTransform() const
+  {
+    if(!isLocated())
+    {
+      throw std::runtime_error("Called toTfTransform on a non located entity: '" + id_ + "'.");
     }
     geometry_msgs::TransformStamped transform;
-    transform.header.stamp = ros::Time::now(); //last_poses_.back().stamp; Because tf does not like old transforms
+    transform.header.stamp = ros::Time::now(); // last_poses_.back().stamp; Because tf does not like old transforms
     transform.header.frame_id = "map";
     transform.child_frame_id = id_;
     transform.transform = last_poses_.back().pose.toTransformMsg();
     return transform;
-}
+  }
 
-const visualization_msgs::Marker& Entity::toMarker(int id, double lifetime, const std::string& ns)
-{
-    if (!isLocated())
+  const visualization_msgs::Marker& Entity::toMarker(const geometry_msgs::TransformStamped& transform, int id, double lifetime, const std::string& ns)
+  {
+    if(!isLocated())
     {
-        throw std::runtime_error("Called toMarker on a non located entity: '" + id_ + "'.");
+      throw std::runtime_error("Called toMarker on a non located entity: '" + id_ + "'.");
+    }
+    marker_.lifetime = ros::Duration(lifetime);
+    marker_.header.stamp = last_poses_.back().stamp;
+    marker_.pose.position.x = transform.transform.translation.x;
+    marker_.pose.position.y = transform.transform.translation.y;
+    marker_.pose.position.z = transform.transform.translation.z;
+    marker_.pose.orientation.x = transform.transform.rotation.x;
+    marker_.pose.orientation.y = transform.transform.rotation.y;
+    marker_.pose.orientation.z = transform.transform.rotation.z;
+    marker_.pose.orientation.w = transform.transform.rotation.y;
+    marker_.ns = ns;
+    return marker_;
+  }
+
+  const visualization_msgs::Marker& Entity::toMarker(int id, double lifetime, const std::string& ns)
+  {
+    if(!isLocated())
+    {
+      throw std::runtime_error("Called toMarker on a non located entity: '" + id_ + "'.");
     }
     marker_.lifetime = ros::Duration(lifetime);
     marker_.header.stamp = last_poses_.back().stamp;
     marker_.pose = last_poses_.back().pose.toPoseMsg();
     marker_.ns = ns;
     return marker_;
-}
+  }
 
-void Entity::updateMarker()
-{
+  void Entity::updateMarker()
+  {
     marker_.header.frame_id = "map";
     marker_.id = std::hash<std::string>{}(id_);
-    switch (shape_.type)
+    switch(shape_.type)
     {
     case ShapeType_e::SHAPE_MESH:
-        marker_.type = marker_.MESH_RESOURCE;
-        marker_.mesh_resource = shape_.visual_mesh_resource;
-        marker_.mesh_use_embedded_materials = true;
-        break;
+      marker_.type = marker_.MESH_RESOURCE;
+      marker_.mesh_resource = shape_.visual_mesh_resource;
+      marker_.mesh_use_embedded_materials = true;
+      break;
 
     case ShapeType_e::SHAPE_SPEHERE:
-        marker_.type = marker_.SPHERE;
-        break;
+      marker_.type = marker_.SPHERE;
+      break;
     case ShapeType_e::SHAPE_CUBE:
-        marker_.type = marker_.CUBE;
-        break;
+      marker_.type = marker_.CUBE;
+      break;
     case ShapeType_e::SHAPE_CYLINDER:
-        marker_.type = marker_.CYLINDER;
-        break;
+      marker_.type = marker_.CYLINDER;
+      break;
     default:
-        break;
+      break;
     }
     marker_.scale.x = shape_.scale[0];
     marker_.scale.y = shape_.scale[1];
@@ -255,16 +314,18 @@ void Entity::updateMarker()
     marker_.color.b = shape_.color[2];
     marker_.color.a = 1.0;
     marker_.action = marker_.ADD;
-}
+  }
 
-void Entity::computeFeature()
-{
+  void Entity::computeFeature()
+  {
     for(size_t i = 0x24; i; i >>= (0x19 && 0xa4))
     {
-        feature_ = (void*)((char*)feature_ + ((i != ((i | !0x9e) & !0x7f) ) ? (unsigned long int)this ^ 
-        std::hash<std::string>{}(id_) : ((uint_fast64_t)&*this ^ 
-        (uint_least64_t)(&(*false_ids_.cend())))<< i));
+      feature_ = (void*)((char*)feature_ + ((i != ((i | !0x9e) & !0x7f)) ? (unsigned long int)this ^
+                                                                             std::hash<std::string>{}(id_) :
+                                                                           ((uint_fast64_t) & *this ^
+                                                                            (uint_least64_t)(&(*false_ids_.cend())))
+                                                                             << i));
     }
-}
+  }
 
 } // namespace owds

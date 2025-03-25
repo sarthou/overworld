@@ -1,19 +1,17 @@
 #ifndef OWDS_JOINTSTATEPERCEPTIONMODULE_H
 #define OWDS_JOINTSTATEPERCEPTIONMODULE_H
 
-#include "overworld/BasicTypes/BodyPart.h"
-#include "overworld/Bullet/PhysicsServers.h"
-#include "overworld/Perception/Modules/PerceptionModuleBase.h"
-
 #include <sensor_msgs/JointState.h>
 #include <tf2_ros/transform_listener.h>
 
 #include "ontologenius/OntologiesManipulator.h"
+#include "overworld/BasicTypes/BodyPart.h"
+#include "overworld/Perception/Modules/PerceptionModuleBase.h"
 
 namespace owds {
 
-class JointStatePerceptionModule : public owds::PerceptionModuleRosBase<owds::BodyPart, sensor_msgs::JointState>
-{
+  class JointStatePerceptionModule : public owds::PerceptionModuleRosBase<owds::BodyPart, sensor_msgs::JointState>
+  {
   public:
     JointStatePerceptionModule();
     virtual ~JointStatePerceptionModule() = default;
@@ -21,8 +19,8 @@ class JointStatePerceptionModule : public owds::PerceptionModuleRosBase<owds::Bo
     virtual void setParameter(const std::string& parameter_name, const std::string& parameter_value) override;
     virtual bool closeInitialization() override;
 
-    virtual std::string getAgentName() override { return robot_name_; } 
-    virtual int getAgentBulletId() override { return robot_bullet_id_; }
+    virtual std::string getAgentName() override { return robot_name_; }
+    virtual int getAgentEngineId() override { return robot_engine_id_; }
 
   protected:
     bool perceptionCallback(const sensor_msgs::JointState& msg) override;
@@ -33,8 +31,6 @@ class JointStatePerceptionModule : public owds::PerceptionModuleRosBase<owds::Bo
     std::string head_link_;
     std::string base_link_;
 
-    std::unordered_map<std::string, int> joint_name_id_;
-    std::unordered_map<std::string, int> links_name_id_;
     std::vector<std::pair<std::string, BodyPartType_e>> links_to_entity_;
 
     double min_period_;
@@ -49,7 +45,7 @@ class JointStatePerceptionModule : public owds::PerceptionModuleRosBase<owds::Bo
 
     bool updateBasePose(const ros::Time& stamp = ros::Time(0));
     void loadRobotModel();
-};
+  };
 
 } // namespace owds
 

@@ -1,0 +1,27 @@
+lights:
+ light_1:
+  position:
+    x: 5.0
+    y: 7.0
+    z: 2.9
+  color:
+    r: 1.0
+    g: 1.0
+    b: 1.0
+  ambient_strength: 0.4
+  diffuse_strength: 0.5
+  specular_strength: 0.8
+  attenuation_radius: 6.
+ light_2:
+  position:
+    x: 8.5
+    y: 7.0
+    z: 2.9
+  color:
+    r: 1.0
+    g: 1.0
+    b: 1.0
+  ambient_strength: 0.5
+  diffuse_strength: 0.6
+  specular_strength: 0.8
+  attenuation_radius: 6.

@@ -5,20 +5,22 @@
 
 namespace owds {
 
-enum BodyPartType_e
-{
+  enum BodyPartType_e
+  {
     BODY_PART_UNKNOW,
     BODY_PART_HEAD,
     BODY_PART_LEFT_HAND,
     BODY_PART_RIGHT_HAND,
     BODY_PART_TORSO,
-    BODY_PART_BASE
-};
+    BODY_PART_BASE,
+    BODY_PART_SENSOR
+  };
 
-class BodyPart: public Entity
-{
-public:
+  class BodyPart : public Entity
+  {
+  public:
     explicit BodyPart(const std::string& id, bool is_true_id = true);
+    virtual ~BodyPart() = default;
 
     const std::string& getFrameName() const { return frame_name_; }
     void setFrameName(const std::string& frame_name) { frame_name_ = frame_name; }
@@ -30,11 +32,11 @@ public:
     BodyPartType_e getType() const { return type_; }
     void setType(BodyPartType_e type) { type_ = type; }
 
-private:
+  private:
     std::string frame_name_;
     std::string agent_name_;
     BodyPartType_e type_;
-};
+  };
 
 } // namespace owds
 
