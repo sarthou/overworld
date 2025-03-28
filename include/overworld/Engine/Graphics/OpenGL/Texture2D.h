@@ -5,7 +5,7 @@
 #include <iostream>
 #include <string>
 
-#include "glad/glad.h"
+typedef unsigned int GLenum;
 
 namespace owds {
 
@@ -32,11 +32,7 @@ namespace owds {
     Texture2D(const std::string& path, TextureType_e type, bool gamma_correction = false, bool flip = false);
     Texture2D(const std::array<uint8_t, 4>& color, TextureType_e type);
 
-    void bind(GLenum unit = GL_TEXTURE0) const
-    {
-      glActiveTexture(unit);
-      glBindTexture(GL_TEXTURE_2D, id_);
-    }
+    void bind(GLenum unit) const;
 
   private:
     void loadGreyAsRgb(unsigned char* data);

@@ -79,6 +79,12 @@ namespace owds {
     std::cout << "color texture ceated " << id_ << std::endl;
   }
 
+  void Texture2D::bind(GLenum unit) const
+  {
+    glActiveTexture(unit);
+    glBindTexture(GL_TEXTURE_2D, id_);
+  }
+
   void Texture2D::loadGreyAsRgb(unsigned char* data)
   {
     unsigned char* image = new unsigned char[width * height * 3];

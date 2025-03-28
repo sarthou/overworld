@@ -72,6 +72,8 @@ owds_add_library(overworld_glad External/src/glad.c)
 owds_add_library(overworld_graphics
     src/Engine/Graphics/GLFW/Window.cpp
     src/Engine/Graphics/OpenGL/Cubemap.cpp
+    src/Engine/Graphics/OpenGL/LinesHandle.cpp
+    src/Engine/Graphics/OpenGL/MeshHandle.cpp
     src/Engine/Graphics/OpenGL/OffScreen.cpp
     src/Engine/Graphics/OpenGL/PointShadow.cpp
     src/Engine/Graphics/OpenGL/Renderer.cpp
