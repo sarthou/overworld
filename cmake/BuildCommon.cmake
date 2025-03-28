@@ -199,12 +199,6 @@ target_link_libraries(plugins PUBLIC overworld_perception_lib)
 
 owds_add_ros_executable(teleop src/Nodes/teleop.cpp)
 
-# owds_install_executables(
-# mementar_single
-# mementar_multi
-# mementar_timeline
-# mementarGUI)
-
 # ##################################
 
 # ##################################
@@ -221,6 +215,13 @@ target_link_libraries(overworld_opengl
 owds_install_libs(overworld_graphics
     overworld_glad
     overworld_engine_common
-    overworld_utility_lib)
+    overworld_utility_lib
+    overworld_sender_lib
+    overworld_facts_lib
+    overworld_perception_lib
+    overworld_physics
+    overworld_types_lib)
 
-owds_install_executables(overworld_opengl)
+owds_install_executables(overworld_node
+    plugins
+    teleop)
