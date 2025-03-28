@@ -158,6 +158,30 @@ install(DIRECTORY include/${PROJECT_NAME}/
     FILES_MATCHING PATTERN "*.h"
     PATTERN ".svn" EXCLUDE)
 
+install(DIRECTORY launch/
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
+)
+
+install(DIRECTORY config/
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/config
+)
+
+install(DIRECTORY docs/
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/docs
+)
+
+install(DIRECTORY shaders/
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/shaders
+)
+
+install(DIRECTORY ontologies/
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/ontologies
+)
+
+install(DIRECTORY models/
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/models
+)
+
 # #############################
 # # Tests
 # #############################

@@ -222,7 +222,8 @@ owds_install_libs(overworld_graphics
     overworld_facts_lib
     overworld_perception_lib
     overworld_physics
-    overworld_types_lib)
+    overworld_types_lib
+    overworld_modules_plugin)
 
 owds_install_executables(overworld_node
     plugins
