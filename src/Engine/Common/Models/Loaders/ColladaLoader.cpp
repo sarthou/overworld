@@ -266,6 +266,25 @@ namespace owds {
               effects.emplace(effect_id, material);
               continue;
             }
+
+            auto* phong = technique->FirstChildElement("phong");
+            if(phong != nullptr)
+            {
+              auto* diffuse = phong->FirstChildElement("diffuse");
+              if(diffuse != nullptr)
+                getColorAndTexture(diffuse, params, images, material.diffuse_color_, material.diffuse_texture_);
+
+              auto* specular = phong->FirstChildElement("specular");
+              if(specular != nullptr)
+                getColorAndTexture(specular, params, images, material.specular_color_, material.specular_texture_);
+
+              auto* shininess = phong->FirstChildElement("shininess");
+              if(shininess != nullptr)
+                material.shininess_ = atof(shininess->FirstChildElement("float")->GetText());
+
+              effects.emplace(effect_id, material);
+              continue;
+            }
           }
         }
         else
