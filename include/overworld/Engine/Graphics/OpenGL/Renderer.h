@@ -21,6 +21,7 @@
 #include "overworld/Engine/Graphics/OpenGL/Screen.h"
 #include "overworld/Engine/Graphics/OpenGL/Shader.h"
 #include "overworld/Engine/Graphics/OpenGL/TextRenderer.h"
+#include "overworld/Engine/Graphics/OpenGL/Texture2D.h"
 
 namespace owds {
   class Window;

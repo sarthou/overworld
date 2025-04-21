@@ -16,6 +16,32 @@
 
 namespace owds {
 
+  void checkCompileErrors(GLuint shader, std::string type)
+  {
+    GLint success = 0;
+    GLchar info_log[1024];
+    if(type != "PROGRAM")
+    {
+      glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+      if(success == 0)
+      {
+        glGetShaderInfoLog(shader, 1024, nullptr, info_log);
+        std::cout << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << "\n"
+                  << info_log << "\n -- --------------------------------------------------- -- " << std::endl;
+      }
+    }
+    else
+    {
+      glGetProgramiv(shader, GL_LINK_STATUS, &success);
+      if(success == 0)
+      {
+        glGetProgramInfoLog(shader, 1024, nullptr, info_log);
+        std::cout << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << "\n"
+                  << info_log << "\n -- --------------------------------------------------- -- " << std::endl;
+      }
+    }
+  }
+
   std::string Shader::shaders_directory;
 
   Shader::Shader(const std::string& vertex_path, const std::string& fragment_path, const std::string& geometry_path)
@@ -140,32 +166,6 @@ namespace owds {
   void Shader::setVec4(const std::string& name, const glm::vec4& value) const
   {
     glUniform4fv(glGetUniformLocation(id_, name.c_str()), 1, &value[0]);
-  }
-
-  void Shader::checkCompileErrors(GLuint shader, std::string type)
-  {
-    GLint success = 0;
-    GLchar info_log[1024];
-    if(type != "PROGRAM")
-    {
-      glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-      if(success == 0)
-      {
-        glGetShaderInfoLog(shader, 1024, nullptr, info_log);
-        std::cout << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << "\n"
-                  << info_log << "\n -- --------------------------------------------------- -- " << std::endl;
-      }
-    }
-    else
-    {
-      glGetProgramiv(shader, GL_LINK_STATUS, &success);
-      if(success == 0)
-      {
-        glGetProgramInfoLog(shader, 1024, nullptr, info_log);
-        std::cout << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << "\n"
-                  << info_log << "\n -- --------------------------------------------------- -- " << std::endl;
-      }
-    }
   }
 
 } // namespace owds
