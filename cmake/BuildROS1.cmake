@@ -182,6 +182,12 @@ install(DIRECTORY models/
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/models
 )
 
+install(FILES
+    reasoners_plugins.xml
+    modules_plugins.xml
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+  )
+
 # #############################
 # # Tests
 # #############################
