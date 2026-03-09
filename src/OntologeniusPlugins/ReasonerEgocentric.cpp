@@ -15,7 +15,7 @@ namespace overworld {
     std::vector<std::string> computable_properties = {"egocentricGeometricalProperty"};
     for(auto& property : computable_properties)
     {
-      auto property_ptr = ontology_->object_property_graph_.findBranch(property);
+      auto property_ptr = ontology_->object_properties_.findBranch(property);
       if(property_ptr != nullptr)
         computable_properties_.insert(property_ptr);
       else
@@ -93,12 +93,12 @@ namespace overworld {
 
   ObjectPropertyBranch* ReasonerEgocentric::isComputableProperty(const std::string& property)
   {
-    auto property_ptr = ontology_->object_property_graph_.findBranch(property);
+    auto property_ptr = ontology_->object_properties_.findBranch(property);
     if(property_ptr != nullptr)
     {
       for(auto computable_property : computable_properties_)
       {
-        auto down_properties = ontology_->object_property_graph_.getDownPtrSafe(computable_property);
+        auto down_properties = ontology_->object_properties_.getDownPtrSafe(computable_property);
         if(down_properties.find(property_ptr) != down_properties.end())
           return property_ptr;
       }
@@ -108,12 +108,12 @@ namespace overworld {
 
   std::set<ObjectPropertyBranch*> ReasonerEgocentric::isInRange(const std::string& indiv, ObjectPropertyBranch* property)
   {
-    auto indiv_ptr = ontology_->individual_graph_.findBranch(indiv);
+    auto indiv_ptr = ontology_->individuals_.findBranch(indiv);
     if(indiv_ptr == nullptr)
       return {};
 
     std::unordered_set<ClassBranch*> types;
-    ontology_->individual_graph_.getUpPtr(indiv_ptr, types);
+    ontology_->individuals_.getUpPtr(indiv_ptr, types);
     if(property != nullptr)
     {
       if(property->ranges_.size() == 0)
@@ -147,12 +147,12 @@ namespace overworld {
 
   std::set<ObjectPropertyBranch*> ReasonerEgocentric::isInDomain(const std::string& indiv, ObjectPropertyBranch* property)
   {
-    auto indiv_ptr = ontology_->individual_graph_.findBranch(indiv);
+    auto indiv_ptr = ontology_->individuals_.findBranch(indiv);
     if(indiv_ptr == nullptr)
       return {};
 
     std::unordered_set<ClassBranch*> types;
-    ontology_->individual_graph_.getUpPtr(indiv_ptr, types);
+    ontology_->individuals_.getUpPtr(indiv_ptr, types);
     if(property != nullptr)
     {
       if(property->domains_.size() == 0)
@@ -219,16 +219,16 @@ namespace overworld {
   {
     for(auto& triplet : to_delete)
     {
-      ontology_->individual_graph_.removeRelation(triplet.subject, triplet.predicate, triplet.object);
+      ontology_->individuals_.removeRelation(triplet.subject, triplet.predicate, triplet.object);
       nb_update++;
     }
 
     for(auto& triplet : to_add)
     {
-      auto branch = ontology_->individual_graph_.findBranch(triplet.subject);
+      auto branch = ontology_->individuals_.findBranch(triplet.subject);
       if(branch != nullptr)
       {
-        ontology_->individual_graph_.addRelation(branch, triplet.predicate, triplet.object);
+        ontology_->individuals_.addRelation(branch, triplet.predicate, triplet.object);
         nb_update++;
       }
     }
