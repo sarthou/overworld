@@ -4,9 +4,10 @@
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <tf2_ros/transform_listener.h>
 
+#include "overworld/Perception/Modules/PerceptionModuleBase.h"
+// PerceptionModuleBase should be included first
 #include "overworld/BasicTypes/Object.h"
 #include "overworld/EntitiesPoses.h"
-#include "overworld/Perception/Modules/PerceptionModuleBase.h"
 
 namespace owds {
 

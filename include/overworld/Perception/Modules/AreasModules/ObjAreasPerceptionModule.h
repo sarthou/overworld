@@ -1,8 +1,9 @@
 #ifndef OWDS_OBJAREASPERCEPTIONMODULE_H
 #define OWDS_OBJAREASPERCEPTIONMODULE_H
 
-#include "overworld/BasicTypes/Area.h"
 #include "overworld/Perception/Modules/PerceptionModuleBase.h"
+// PerceptionModuleBase should be included first
+#include "overworld/BasicTypes/Area.h"
 
 namespace owds {
 

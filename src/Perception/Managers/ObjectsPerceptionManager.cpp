@@ -117,8 +117,7 @@ namespace owds {
     {
       auto* hand = percept->getHandIn();
       hand->putInHand(entity);
-      world_client_->setPhysics(entity->worldId(), false);
-      world_client_->setSimulation(entity->worldId(), false);
+      world_client_->setActorMode(entity->worldId(), hws::ActorMode_e::ghost_mode);
       updateEntityPose(entity, percept->poseRaw(), percept->lastStamp());
       stopSimulation(entity);
 
@@ -130,16 +129,14 @@ namespace owds {
       if(percept->hasBeenSeen() && hand->pose().distanceTo(percept->pose()) >= IN_HAND_DISTANCE)
       {
         hand->removeFromHand(entity->id());
-        world_client_->setPhysics(entity->worldId(), true);
-        world_client_->setSimulation(entity->worldId(), false);
+        world_client_->setActorMode(entity->worldId(), hws::ActorMode_e::kinematic_mode);
         updateEntityPose(entity, percept->pose(), percept->lastStamp());
       }
       else if((percept->isLocated() == false) || (percept->isInHand() == false))
       {
         const Pose& obj_in_map = entity->pose();
         hand->removeFromHand(entity->id());
-        world_client_->setPhysics(entity->worldId(), true);
-        world_client_->setSimulation(entity->worldId(), false);
+        world_client_->setActorMode(entity->worldId(), hws::ActorMode_e::kinematic_mode);
         updateEntityPose(entity, obj_in_map, ros::Time::now());
       }
       else
@@ -397,8 +394,7 @@ namespace owds {
   void ObjectsPerceptionManager::startSimulation(Object* object)
   {
     world_client_->setMass(object->worldId(), -1, object->getMass());
-    world_client_->setPhysics(object->worldId(), false);
-    world_client_->setSimulation(object->worldId(), true);
+    world_client_->setActorMode(object->worldId(), hws::ActorMode_e::simulated_mode);
     world_client_->setBaseVelocity(object->worldId(), {0, 0, 0}, {0, 0, 0});
 
     simulated_objects_.insert({object->id(), 0});
@@ -410,8 +406,7 @@ namespace owds {
     if(it != simulated_objects_.end())
     {
       world_client_->setMass(object->worldId(), -1, 0);
-      world_client_->setPhysics(object->worldId(), true);
-      world_client_->setSimulation(object->worldId(), false);
+      world_client_->setActorMode(object->worldId(), hws::ActorMode_e::kinematic_mode);
       if(erase)
         simulated_objects_.erase(object->id());
     }
@@ -517,7 +512,7 @@ namespace owds {
       {
         for(auto& info : ray_cast_info)
         {
-          if(info.actor_id != object->worldId())
+          if(info.actor_id != (size_t)object->worldId())
           {
             // world_client_->addDebugLine(sensor->pose().arrays().first, info.position, {1., 0., 0.}, 0.5);
             return false;

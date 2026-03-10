@@ -5,11 +5,11 @@
 #include <string>
 #include <unordered_set>
 
+#include "hello_worlds/Common/WorldTypes.h"
 #include "overworld/BasicTypes/Agent.h"
 #include "overworld/BasicTypes/Area.h"
 #include "overworld/BasicTypes/Object.h"
 #include "overworld/Facts/Fact.h"
-#include "overworld/Engine/Common/WorldTypes.h"
 
 namespace owds {
 
@@ -30,12 +30,13 @@ namespace owds {
                                         bool clear = true);
 
     void initAreas(const std::map<std::string, Area*>& areas);
+
   private:
     std::vector<Fact> facts_;
 
     bool isOnTopfOf(Object* object_under, Object* object_on);
     bool isInContainer(Object* object_around, Object* object_in);
-    bool overlapXY(const struct AABB_t& aabb_1, const struct AABB_t& aabb_2);
+    bool overlapXY(const struct hws::AABB_t& aabb_1, const struct hws::AABB_t& aabb_2);
 
     bool isPerceiving(Agent* agent_perceiving, Agent* agent_perceived);
 

@@ -8,8 +8,8 @@
 #include <unordered_set>
 #include <visualization_msgs/Marker.h>
 
+#include "hello_worlds/Common/WorldTypes.h"
 #include "overworld/BasicTypes/Shape.h"
-#include "overworld/Engine/Common/WorldTypes.h"
 #include "overworld/Geometry/Pose.h"
 #include "overworld/Utils/CircularBuffer.h"
 
@@ -62,8 +62,8 @@ namespace owds {
     int engineLinkId() const { return engine_link_id_; }
     bool isEngineLink() const { return (engine_link_id_ != -1); }
 
-    void setAabb(const struct AABB_t& aabb) { aabb_ = aabb; }
-    struct AABB_t getAabb() const { return aabb_; }
+    void setAabb(const struct hws::AABB_t& aabb) { aabb_ = aabb; }
+    struct hws::AABB_t getAabb() const { return aabb_; }
     double getAabbVolume() const;
     bool isAabbValid() const { return aabb_.isValid(); }
 
@@ -105,7 +105,7 @@ namespace owds {
     int engine_link_id_;
     Shape_t shape_;
     size_t nb_frame_unseen_;
-    struct AABB_t aabb_;
+    struct hws::AABB_t aabb_;
 
     visualization_msgs::Marker marker_;
 

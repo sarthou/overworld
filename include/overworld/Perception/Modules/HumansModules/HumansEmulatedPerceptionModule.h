@@ -3,8 +3,9 @@
 
 #include <vector>
 
-#include "overworld/BasicTypes/BodyPart.h"
 #include "overworld/Perception/Modules/PerceptionModuleBase.h"
+// PerceptionModuleBase should be included first
+#include "overworld/BasicTypes/BodyPart.h"
 
 namespace owds {
 

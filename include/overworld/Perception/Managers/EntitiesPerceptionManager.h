@@ -8,11 +8,11 @@
 #include <unordered_map>
 #include <vector>
 
+#include "hello_worlds/Engine.h"
 #include "overworld/BasicTypes/Agent.h"
 #include "overworld/BasicTypes/Entity.h"
 #include "overworld/BasicTypes/Percept.h"
 #include "overworld/BasicTypes/Sensors/SensorBase.h"
-#include "overworld/Engine/Engine.h"
 #include "overworld/Perception/DataFusion/DataFusionBase.h"
 #include "overworld/Perception/Managers/BasePerceptionManager.h"
 #include "overworld/Utils/RosPackage.h"
@@ -31,7 +31,7 @@ namespace owds {
     virtual ~EntitiesPerceptionManager();
 
     void setOwnerAgentName(const std::string& agent_name);
-    void setWorldClient(WorldEngine* world_client) { world_client_ = world_client; }
+    void setWorldClient(hws::WorldEngine* world_client) { world_client_ = world_client; }
 
     const std::map<std::string, T*>& getEntities() const { return entities_; }
     T* getEntity(const std::string& entity_id) const;
@@ -44,7 +44,7 @@ namespace owds {
     std::map<std::string, std::map<std::string, std::set<std::string>>> entities_to_sensors_modules_;
     std::unordered_map<std::string, Percept<T>*> fusioned_percepts_;
     std::unordered_set<std::string> black_listed_entities_;
-    WorldEngine* world_client_;
+    hws::WorldEngine* world_client_;
 
     std::string myself_agent_name_;
     onto::OntologiesManipulator ontos_;
@@ -204,7 +204,7 @@ namespace owds {
       return true;
 
     auto fov = sensor->getFieldOfView();
-    int id = world_client_->addCamera(300 * fov.getRatioOpenGl(), 300, fov.getRatioOpenGl(), CameraView_e::segmented_view, (float)fov.getClipNear(), (float)fov.getClipFar());
+    int id = world_client_->addCamera(300 * fov.getRatioOpenGl(), 300, fov.getRatioOpenGl(), hws::CameraView_e::segmented_view, (float)fov.getClipNear(), (float)fov.getClipFar());
     sensor->setWorldSegmentationId(id);
     return id != -1;
   }
@@ -215,14 +215,14 @@ namespace owds {
     if(black_listed_entities_.find(entity->id()) != black_listed_entities_.end())
       return true;
 
-    urdf::Geometry_t collision_geom;
-    urdf::Geometry_t visual_geom;
+    hws::urdf::Geometry_t collision_geom;
+    hws::urdf::Geometry_t visual_geom;
 
     switch(entity->getShape().type)
     {
     case SHAPE_CUBE:
     {
-      collision_geom.type = urdf::geometry_box;
+      collision_geom.type = hws::urdf::geometry_box;
       collision_geom.scale = {entity->getShape().scale[0] / 2.,
                               entity->getShape().scale[1] / 2.,
                               entity->getShape().scale[2] / 2.};
@@ -233,7 +233,7 @@ namespace owds {
     }
     case SHAPE_SPEHERE:
     {
-      collision_geom.type = urdf::geometry_sphere;
+      collision_geom.type = hws::urdf::geometry_sphere;
       collision_geom.scale = {entity->getShape().scale[0],
                               0.f, 0.f};
 
@@ -243,7 +243,7 @@ namespace owds {
     }
     case SHAPE_CYLINDER:
     {
-      collision_geom.type = urdf::geometry_cylinder;
+      collision_geom.type = hws::urdf::geometry_cylinder;
       collision_geom.scale = {std::min(entity->getShape().scale[0], entity->getShape().scale[1]) / 2.,
                               entity->getShape().scale[2],
                               0.f};
@@ -254,7 +254,7 @@ namespace owds {
     }
     case SHAPE_MESH:
     {
-      visual_geom.type = urdf::geometry_mesh;
+      visual_geom.type = hws::urdf::geometry_mesh;
 
       visual_geom.file_name = entity->getShape().visual_mesh_resource;
       visual_geom.scale = {entity->getShape().scale[0],
@@ -272,7 +272,7 @@ namespace owds {
       return false;
     }
 
-    if(visual_geom.type != urdf::geometry_none)
+    if(visual_geom.type != hws::urdf::geometry_none)
     {
       auto shape_color = entity->getShape().color;
       std::array<float, 4> color{(float)shape_color[0], (float)shape_color[1], (float)shape_color[2], (float)shape_color[3]};

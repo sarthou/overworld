@@ -9,8 +9,8 @@
 namespace owds {
 
   JointStatePerceptionModule::JointStatePerceptionModule() : PerceptionModuleRosBase("/joint_states"),
-                                                             tf2_listener_(tf_buffer_),
                                                              base_link_("base_footprint"),
+                                                             tf2_listener_(tf_buffer_),
                                                              ontologies_manipulator_(nullptr),
                                                              onto_(nullptr)
   {
@@ -178,7 +178,7 @@ namespace owds {
 
     std::string urdf = n_->param<std::string>("/robot_description", "");
     if(urdf.empty())
-      robot_engine_id_ = world_client_->loadUrdf(path_overworld + robot_name_ + ".urdf", {0., 0., 0.}, {0., 0., 0.}, false);
+      robot_engine_id_ = world_client_->loadUrdf(path_overworld + robot_name_ + ".urdf", {0., 0., 0.}, {0., 0., 0.});
     else
       robot_engine_id_ = world_client_->loadUrdfRaw(urdf, {0., 0., 0.}, {0., 0., 0.});
   }

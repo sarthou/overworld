@@ -1,12 +1,13 @@
 #ifndef OWDS_OBJECTSEMULATEDPERCEPTIONMODULE_H
 #define OWDS_OBJECTSEMULATEDPERCEPTIONMODULE_H
 
-#include <vector>
 #include <map>
+#include <vector>
 
+#include "overworld/Perception/Modules/PerceptionModuleBase.h"
+// PerceptionModuleBase should be included first
 #include "overworld/BasicTypes/Object.h"
 #include "overworld/BasicTypes/Percept.h"
-#include "overworld/Perception/Modules/PerceptionModuleBase.h"
 
 namespace owds {
 

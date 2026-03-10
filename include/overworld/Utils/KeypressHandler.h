@@ -1,14 +1,14 @@
 #ifndef OWDS_KEYPRESSHANDLER_H
 #define OWDS_KEYPRESSHANDLER_H
 
-#include "overworld/Engine/Engine.h"
+#include "hello_worlds/Engine.h"
 #include "overworld/Geometry/GeometryUtils.h"
 #include "overworld/Perception/PerceptionManagers.h"
 #include "overworld/Utils/ShellDisplay.h"
 
 namespace owds {
 
-  inline void onEnterPressed(Engine* engine, const RobotsPerceptionManager& robots_manager)
+  inline void onEnterPressed(hws::Engine* engine, const RobotsPerceptionManager& robots_manager)
   {
     auto agents = robots_manager.getAgents();
     if(agents.size() != 1)
@@ -43,16 +43,16 @@ namespace owds {
     }
   }
 
-  inline void handleKeypress(Key_e key, bool pressed, Engine* engine, PerceptionManagers& managers)
+  inline void handleKeypress(hws::Key_e key, bool pressed, hws::Engine* engine, PerceptionManagers& managers)
   {
     if(pressed)
     {
       switch(key)
       {
-      case Key_e::key_enter:
+      case hws::Key_e::key_enter:
         onEnterPressed(engine, managers.robots_manager_);
         break;
-      case key_v:
+      case hws::Key_e::key_v:
         onAPressed(managers.areas_manager_);
         break;
       default:

@@ -1,8 +1,8 @@
 #include "overworld/Facts/FactsCalculator.h"
 
-#include "overworld/Engine/Common/WorldTypes.h"
-
 #include <array>
+
+#include "hello_worlds/Common/WorldTypes.h"
 
 #define IN_HAND_DIST 0.08
 
@@ -184,7 +184,7 @@ namespace owds {
     }
   }
 
-  bool FactsCalculator::overlapXY(const struct AABB_t& aabb_1, const struct AABB_t& aabb_2)
+  bool FactsCalculator::overlapXY(const struct hws::AABB_t& aabb_1, const struct hws::AABB_t& aabb_2)
   {
     if((aabb_1.min[0] == aabb_1.max[0]) || (aabb_1.min[1] == aabb_1.max[1]) ||
        (aabb_2.min[0] == aabb_2.max[0]) || (aabb_2.min[1] == aabb_2.max[1]))
@@ -199,7 +199,7 @@ namespace owds {
 
   bool FactsCalculator::isPerceiving(Agent* agent_perceiving, Agent* agent_perceived) // TODO CHECK
   {
-        auto agent_perceiving_sensors = agent_perceiving->getSensors();
+    auto agent_perceiving_sensors = agent_perceiving->getSensors();
     if(agent_perceiving_sensors.empty() || agent_perceiving->getHead()->isLocated() == false) // TODO: LOCATED
       return false;
 

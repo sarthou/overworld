@@ -10,9 +10,9 @@
 #include <mutex>
 #include <ros/ros.h>
 
+#include "hello_worlds/Engine.h"
 #include "overworld/BasicTypes/Agent.h"
 #include "overworld/BasicTypes/Percept.h"
-#include "overworld/Engine/Engine.h"
 #include "overworld/Utils/Ontology.h"
 #include "overworld/Utils/ShellDisplay.h"
 
@@ -35,7 +35,7 @@ namespace owds {
 
     virtual void initialize(const std::string& module_name,
                             ros::NodeHandle* n,
-                            WorldEngine* world_client,
+                            hws::WorldEngine* world_client,
                             int robot_engine_id,
                             Agent* robot_agent)
     {
@@ -90,7 +90,7 @@ namespace owds {
     bool need_access_to_external_entities_;
 
     ros::NodeHandle* n_;
-    WorldEngine* world_client_;
+    hws::WorldEngine* world_client_;
     int robot_engine_id_;
     Agent* robot_agent_;
 
@@ -152,7 +152,7 @@ namespace owds {
 
     virtual void initialize(const std::string& module_name,
                             ros::NodeHandle* n,
-                            WorldEngine* world_client,
+                            hws::WorldEngine* world_client,
                             int robot_engine_id,
                             Agent* robot_agent) override
     {
@@ -232,7 +232,7 @@ namespace owds {
 
     virtual void initialize(const std::string& module_name,
                             ros::NodeHandle* n,
-                            WorldEngine* world_client,
+                            hws::WorldEngine* world_client,
                             int robot_engine_id,
                             Agent* robot_agent) override
     {

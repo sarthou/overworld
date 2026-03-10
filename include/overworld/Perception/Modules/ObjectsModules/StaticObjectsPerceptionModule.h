@@ -1,9 +1,10 @@
 #ifndef OWDS_STATICOBJECTSPERCEPTIONMODULE_H
 #define OWDS_STATICOBJECTSPERCEPTIONMODULE_H
 
+#include "overworld/Perception/Modules/PerceptionModuleBase.h"
+// PerceptionModuleBase should be included first
 #include "ontologenius/OntologiesManipulator.h"
 #include "overworld/BasicTypes/Object.h"
-#include "overworld/Perception/Modules/PerceptionModuleBase.h"
 #include "overworld/Utils/YamlReader.h"
 
 namespace owds {
@@ -46,7 +47,9 @@ namespace owds {
     bool readConfiguration(std::string path);
 
     std::array<double, 3> extractDouble(YamlElement& element, const std::string& main_key, const std::array<std::string, 3>& keys, std::array<double, 3> default_values);
+    std::array<float, 3> extractFloat(YamlElement& element, const std::string& main_key, const std::array<std::string, 3>& keys, std::array<float, 3> default_values);
     double extractDouble(YamlElement& element, const std::string& main_key, double default_value);
+    float extractFloat(YamlElement& element, const std::string& main_key, float default_value);
   };
 
 } // namespace owds

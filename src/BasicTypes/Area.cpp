@@ -1,7 +1,7 @@
 #include "overworld/BasicTypes/Area.h"
 
-#include <string>
 #include <cstddef>
+#include <string>
 
 namespace owds {
 
@@ -9,11 +9,11 @@ namespace owds {
                                                                                              center_(center),
                                                                                              owner_(nullptr),
                                                                                              is_circle_(true),
-                                                                                             polygon_({}),
                                                                                              radius_(radius),
                                                                                              half_height_(half_height),
                                                                                              z_min_(center.getZ() - half_height_),
                                                                                              z_max_(center.getZ() + half_height_),
+                                                                                             polygon_({}),
                                                                                              hysteresis_distance_(0.0001)
 
   {}
@@ -22,9 +22,9 @@ namespace owds {
              double z_min, double height) : id_(id),
                                             owner_(nullptr),
                                             is_circle_(false),
-                                            polygon_(polygon),
                                             z_min_(z_min),
                                             z_max_(z_min + height),
+                                            polygon_(polygon),
                                             hysteresis_distance_(0.0001)
   {}
 

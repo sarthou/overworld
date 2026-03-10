@@ -12,7 +12,7 @@
 #include <string>
 #include <thread>
 
-#include "overworld/Engine/Engine.h"
+#include "hello_worlds/Engine.h"
 // import first
 
 #include "overworld/Facts/FactsCalculator.h"
@@ -54,7 +54,7 @@ namespace owds {
     SituationAssessor(const SituationAssessor& other) = delete;
     ~SituationAssessor();
 
-    void initWorld(Window* window);
+    void initWorld(hws::Window* window);
     // World should be initialized before the assessor
     void initAssessor();
 
@@ -69,7 +69,7 @@ namespace owds {
     void addAreaPerceptionModule(const std::string& module_name, PerceptionModuleBase_<Area>* module);
 
     void setCreationCallback(const std::function<void(const std::string&)>& callback) { creation_request_ = callback; }
-    void createHumanAssessor(const std::string& human_name, Window* window);
+    void createHumanAssessor(const std::string& human_name, hws::Window* window);
 
   private:
     std::string agent_name_;
@@ -93,7 +93,7 @@ namespace owds {
     double time_step_; // in second
     size_t simulation_substepping_;
 
-    Engine* engine_;
+    hws::Engine* engine_;
     PerceptionManagers perception_manager_;
 
     FactsCalculator facts_calculator_;
@@ -118,7 +118,7 @@ namespace owds {
                                  const std::map<std::string, BodyPart*>& humans,
                                  const std::map<std::string, Area*>& areas,
                                  const std::unordered_set<uint32_t>& segmented_ids);
-    void humanAssessorThread(owds::Window* window);
+    void humanAssessorThread(hws::Window* window);
 
     bool stopModules(overworld::StartStopModules::Request& req, overworld::StartStopModules::Response& res);
     bool startModules(overworld::StartStopModules::Request& req, overworld::StartStopModules::Response& res);

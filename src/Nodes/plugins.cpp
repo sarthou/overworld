@@ -1,10 +1,11 @@
 #include <pluginlib/class_loader.h>
 #include <ros/ros.h>
 
+#include "overworld/Perception/Modules/PerceptionModuleBase.h"
+// PerceptionModuleBase should be included first
 #include "overworld/BasicTypes/Area.h"
 #include "overworld/BasicTypes/BodyPart.h"
 #include "overworld/BasicTypes/Object.h"
-#include "overworld/Perception/Modules/PerceptionModuleBase.h"
 #include "overworld/Utils/ShellDisplay.h"
 
 void displayUsage()

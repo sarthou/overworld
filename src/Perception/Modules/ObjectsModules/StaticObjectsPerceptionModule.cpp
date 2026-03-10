@@ -6,7 +6,7 @@
 #include <ros/package.h>
 #include <string>
 
-#include "overworld/Engine/Common/Urdf/UrdfLoader.h"
+#include "hello_worlds/Common/Urdf/UrdfLoader.h"
 #include "overworld/Utils/RosPackage.h"
 #include "overworld/Utils/ShellDisplay.h"
 #include "overworld/Utils/YamlReader.h"
@@ -127,9 +127,9 @@ namespace owds {
     {
       Pose pose(translation, rotation);
 
-      urdf::Geometry_t geom;
-      geom.scale = toV3(scale);
-      geom.type = urdf::GeometryType_e::geometry_mesh;
+      hws::urdf::Geometry_t geom;
+      geom.scale = hws::toGlmV3(scale);
+      geom.type = hws::urdf::GeometryType_e::geometry_mesh;
       geom.file_name = shape.visual_mesh_resource;
 
       auto shape_color = shape.color;
@@ -152,12 +152,12 @@ namespace owds {
 
   void StaticObjectsPerceptionModule::addPointLight(YamlElement light)
   {
-    auto pose = extractDouble(light, "position", {"x", "y", "z"}, {0., 0., 0.});
-    auto color = extractDouble(light, "color", {"r", "g", "b"}, {0.9, 0.9, 0.9});
-    double ambient_strength = extractDouble(light, "ambient_strength", 0.4);
-    double diffuse_strength = extractDouble(light, "diffuse_strength", 0.5);
-    double specular_strength = extractDouble(light, "specular_strength", 1.0);
-    double attenuation_radius = extractDouble(light, "attenuation_radius", 0.4);
+    auto pose = extractFloat(light, "position", {"x", "y", "z"}, {0., 0., 0.});
+    auto color = extractFloat(light, "color", {"r", "g", "b"}, {0.9, 0.9, 0.9});
+    float ambient_strength = extractFloat(light, "ambient_strength", 0.4);
+    float diffuse_strength = extractFloat(light, "diffuse_strength", 0.5);
+    float specular_strength = extractFloat(light, "specular_strength", 1.0);
+    float attenuation_radius = extractFloat(light, "attenuation_radius", 0.4);
 
     world_client_->addPointLight(pose, color, ambient_strength, diffuse_strength, specular_strength, attenuation_radius);
   }
@@ -244,10 +244,31 @@ namespace owds {
     return default_values;
   }
 
+  std::array<float, 3> StaticObjectsPerceptionModule::extractFloat(YamlElement& element, const std::string& main_key, const std::array<std::string, 3>& keys, std::array<float, 3> default_values)
+  {
+    if(element.keyExists(main_key))
+    {
+      auto position = element[main_key];
+      for(size_t i = 0; i < 3; i++)
+        if(position.keyExists(keys[i]))
+          default_values[i] = (float)std::stod(position[keys[i]].value().front());
+    }
+
+    return default_values;
+  }
+
   double StaticObjectsPerceptionModule::extractDouble(YamlElement& element, const std::string& main_key, double default_value)
   {
     if(element.keyExists(main_key))
       default_value = std::stod(element[main_key].value().front());
+
+    return default_value;
+  }
+
+  float StaticObjectsPerceptionModule::extractFloat(YamlElement& element, const std::string& main_key, float default_value)
+  {
+    if(element.keyExists(main_key))
+      default_value = (float)std::stod(element[main_key].value().front());
 
     return default_value;
   }

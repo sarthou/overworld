@@ -49,19 +49,18 @@ namespace owds {
     delete engine_;
   }
 
-  void SituationAssessor::initWorld(Window* window)
+  void SituationAssessor::initWorld(hws::Window* window)
   {
-    engine_ = new Engine(agent_name_, window);
-    engine_->initView(max_fps_);
+    engine_ = new hws::Engine(window, false);
 
-    engine_->world.setAmbientLight({43.6f, 1.43f, 115.f},
-                                   {1.0f, 0.976f, 0.898f},
-                                   0.25, 0.4, 0.8);
+    engine_->world.setBackgroundColor(135. / 255., 206. / 255., 235. / 255.);
+    engine_->world.addSkyBox(findPackage("hello_worlds") + "/assets/SkyBox/");
+
+    engine_->world.setAmbientLight({43.6, 1.43, 115.},
+                                   {1.0, 0.976, 0.898},
+                                   1.5);
 
     engine_->world.setSubstepping(simulation_substepping_);
-
-    // we could insert this in the world there if needed
-    engine_->finalise();
   }
 
   void SituationAssessor::initAssessor()
@@ -120,7 +119,7 @@ namespace owds {
       new_assessor_publisher_.publish(msg);
     }
 
-    engine_->setKeyCallback([this](Key_e key, bool pressed) { handleKeypress(key, pressed, this->engine_, this->perception_manager_); });
+    engine_->setKeyCallback([this](hws::Key_e key, bool pressed) { handleKeypress(key, pressed, this->engine_, this->perception_manager_); });
   }
 
   void SituationAssessor::stop()
@@ -151,7 +150,7 @@ namespace owds {
     std::thread render_thread(&SituationAssessor::rosLoop, this);
     std::thread assessment_thread(&SituationAssessor::assessmentLoop, this);
 
-    engine_->run();
+    engine_->run(max_fps_);
 
     for(auto& human_assessor : humans_assessors_)
     {
@@ -310,7 +309,7 @@ namespace owds {
         if(sensor.second->getWorldSegmentationId() == -1)
         {
           auto fov = sensor.second->getFieldOfView();
-          int id = engine_->world.addCamera(300 * fov.getRatioOpenGl(), 300, fov.getRatio(), CameraView_e::segmented_view, fov.getClipNear(), fov.getClipFar());
+          int id = engine_->world.addCamera(300 * fov.getRatioOpenGl(), 300, fov.getRatio(), hws::CameraView_e::segmented_view, fov.getClipNear(), fov.getClipFar());
           sensor.second->setWorldSegmentationId(id);
         }
         int cam_id = sensor.second->getWorldSegmentationId();
@@ -322,7 +321,7 @@ namespace owds {
         if(sensor.second->getWorldRgbaId() == -1)
         {
           auto fov = sensor.second->getFieldOfView();
-          int id = engine_->world.addCamera(300 * fov.getRatioOpenGl(), 300, fov.getRatio(), CameraView_e::regular_view, fov.getClipNear(), fov.getClipFar());
+          int id = engine_->world.addCamera(300 * fov.getRatioOpenGl(), 300, fov.getRatio(), hws::CameraView_e::regular_view, fov.getClipNear(), fov.getClipFar());
           sensor.second->setWorldRgbaId(id);
         }
         cam_id = sensor.second->getWorldRgbaId();
@@ -398,7 +397,7 @@ namespace owds {
     assessor_it->second.areas_module->sendPerception(seen_areas);
   }
 
-  void SituationAssessor::humanAssessorThread(owds::Window* window)
+  void SituationAssessor::humanAssessorThread(hws::Window* window)
   {
     initWorld(window);
     initAssessor();
@@ -406,7 +405,7 @@ namespace owds {
     run();
   }
 
-  void SituationAssessor::createHumanAssessor(const std::string& human_name, Window* window)
+  void SituationAssessor::createHumanAssessor(const std::string& human_name, hws::Window* window)
   {
     std::lock_guard<std::shared_timed_mutex> lock(humans_assessors_mutex_);
     auto h_assessor = humans_assessors_.insert(std::make_pair(human_name, HumanAssessor_t())).first;

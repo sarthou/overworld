@@ -1,19 +1,19 @@
 #ifndef OWDS_PERCEPTIONMANAGER_H
 #define OWDS_PERCEPTIONMANAGER_H
 
+#include "hello_worlds/Engine.h"
 #include "overworld/Perception/Managers/AreasPerceptionManager.h"
 #include "overworld/Perception/Managers/HumansPerceptionManager.h"
 #include "overworld/Perception/Managers/ObjectsPerceptionManager.h"
 #include "overworld/Perception/Managers/RobotsPerceptionManager.h"
 #include "overworld/Utils/YamlReader.h"
-#include "overworld/Engine/Engine.h"
 
 namespace owds {
 
   class PerceptionManagers
   {
   public:
-    explicit PerceptionManagers(ros::NodeHandle* n, WorldEngine* world_client = nullptr);
+    explicit PerceptionManagers(ros::NodeHandle* n, hws::WorldEngine* world_client = nullptr);
     ~PerceptionManagers();
 
     AreasPerceptionManager areas_manager_;
@@ -21,7 +21,7 @@ namespace owds {
     ObjectsPerceptionManager objects_manager_;
     HumansPerceptionManager humans_manager_;
 
-    void setWorldClient(WorldEngine* world_client)
+    void setWorldClient(hws::WorldEngine* world_client)
     {
       world_client_ = world_client;
       areas_manager_.setWorldClient(world_client_);
@@ -46,7 +46,7 @@ namespace owds {
 
   private:
     ros::NodeHandle* n_;
-    WorldEngine* world_client_;
+    hws::WorldEngine* world_client_;
     std::string robot_name_;
     int robot_engine_id_;
     Agent* robot_agent_;

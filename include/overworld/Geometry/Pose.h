@@ -3,7 +3,7 @@
 
 #include <array>
 #ifdef Success
-  #undef Success
+#undef Success
 #endif
 #include <eigen3/Eigen/Geometry>
 #include <geometry_msgs/PoseStamped.h>
@@ -18,6 +18,7 @@ namespace owds {
     Pose();
     Pose(const Pose& pose);
     explicit Pose(const Eigen::Affine3d& pose);
+    Pose& operator=(const Pose&) = default;
 
     /**
      * @brief Construct a new Pose object

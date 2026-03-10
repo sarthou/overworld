@@ -122,8 +122,8 @@ namespace owds {
     transform.translation.z = tra.z();
 
     // Extract rotation matrix and compute quaternion in-place
-    Eigen::Quaterniond quat(t_.linear());  // Use `linear()` instead of `rotation()`
-    
+    Eigen::Quaterniond quat(t_.linear()); // Use `linear()` instead of `rotation()`
+
     transform.rotation.x = quat.x();
     transform.rotation.y = quat.y();
     transform.rotation.z = quat.z();
@@ -140,7 +140,7 @@ namespace owds {
     pose.position.z = tra.z();
 
     // Extract rotation matrix and compute quaternion in-place
-    Eigen::Quaterniond quat(t_.linear());  // Use `linear()` instead of `rotation()`
+    Eigen::Quaterniond quat(t_.linear()); // Use `linear()` instead of `rotation()`
 
     pose.orientation.x = quat.x();
     pose.orientation.y = quat.y();

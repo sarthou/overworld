@@ -4,9 +4,10 @@
 #include <sensor_msgs/JointState.h>
 #include <tf2_ros/transform_listener.h>
 
+#include "overworld/Perception/Modules/PerceptionModuleBase.h"
+// PerceptionModuleBase should be included first
 #include "ontologenius/OntologiesManipulator.h"
 #include "overworld/BasicTypes/BodyPart.h"
-#include "overworld/Perception/Modules/PerceptionModuleBase.h"
 
 namespace owds {
 

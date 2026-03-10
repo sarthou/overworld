@@ -6,8 +6,8 @@
 #include <string>
 #include <unistd.h>
 
+#include "hello_worlds/Engine.h"
 #include "ontologenius/OntologiesManipulator.h"
-#include "overworld/Engine/Engine.h"
 #include "overworld/Utils/Parameters.h"
 #include "overworld/Utils/ShellDisplay.h"
 
@@ -23,7 +23,7 @@ void handler(int sig)
   exit(1);
 }
 
-std::unordered_map<std::string, owds::Window*> windows;
+std::unordered_map<std::string, hws::Window*> windows;
 std::unordered_map<std::string, owds::SituationAssessor*> human_assessors;
 owds::SituationAssessor* robot_assessor;
 
@@ -34,7 +34,7 @@ void requestAssessorCreation(const std::string& human_name)
   requests.insert(human_name);
 }
 
-void robotAssessorThread(owds::Window* window, owds::SituationAssessor* assessor)
+void robotAssessorThread(hws::Window* window, owds::SituationAssessor* assessor)
 {
   assessor->initWorld(window);
   assessor->initAssessor();
@@ -49,7 +49,7 @@ int main(int argc, char** argv)
   signal(SIGABRT, handler);
   ros::init(argc, argv, "overworld");
 
-  owds::Renderer::init();
+  hws::Renderer::init();
 
   owds::Parameters params;
   params.insert(owds::Parameter("config_path", {"-c", "--config"}));
@@ -67,6 +67,8 @@ int main(int argc, char** argv)
     owds::ShellDisplay::error("Some parameters have not been setted. Overworld will shutdown.");
     return -1;
   }
+
+  std::string icon_path(owds::findPackage("overworld") + "/docs/images/overworld_light.png");
 
   std::string robot_name = params.at("robot_name").getFirst();
   if(robot_name.empty() || (robot_name == "none"))
@@ -92,12 +94,12 @@ int main(int argc, char** argv)
                                                std::stod(params.at("display frequency").getFirst()),
                                                true);
 
-  windows.emplace(robot_name, new owds::Window(robot_name));
+  windows.emplace(robot_name, new hws::Window(robot_name));
   std::thread tread(&robotAssessorThread, windows.at(robot_name), robot_assessor);
 
   while(ros::ok())
   {
-    owds::Window::pollEvent();
+    hws::Window::pollEvent();
     usleep(1000);
 
     if(requests.empty() == false)
@@ -110,7 +112,7 @@ int main(int argc, char** argv)
         if(windows.find(human_name) != windows.end())
           continue;
 
-        windows.emplace(human_name, new owds::Window(human_name));
+        windows.emplace(human_name, new hws::Window(human_name, 960, 720, icon_path));
         robot_assessor->createHumanAssessor(human_name, windows.at(human_name));
       }
     }
@@ -118,7 +120,7 @@ int main(int argc, char** argv)
 
   tread.join();
 
-  owds::Renderer::release();
+  hws::Renderer::release();
 
   return 0;
 }

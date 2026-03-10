@@ -3,9 +3,10 @@
 
 #include <geometry_msgs/PoseStamped.h>
 
+#include "overworld/Perception/Modules/PerceptionModuleBase.h"
+// PerceptionModuleBase should be included first
 #include "ontologenius/OntologiesManipulator.h"
 #include "overworld/BasicTypes/BodyPart.h"
-#include "overworld/Perception/Modules/PerceptionModuleBase.h"
 
 namespace owds {
 

@@ -4,10 +4,10 @@
 #include <map>
 #include <string>
 
+#include "hello_worlds/Engine.h"
 #include "overworld/BasicTypes/Area.h"
 #include "overworld/BasicTypes/BodyPart.h"
 #include "overworld/BasicTypes/Object.h"
-#include "overworld/Engine/Engine.h"
 #include "overworld/Perception/Managers/BasePerceptionManager.h"
 #include "overworld/Perception/Managers/EntitiesPerceptionManager.h"
 #include "overworld/Utils/ShellDisplay.h"
@@ -20,7 +20,7 @@ namespace owds {
     AreasPerceptionManager() : world_client_(nullptr), drawn_(true) {}
     ~AreasPerceptionManager();
 
-    void setWorldClient(WorldEngine* client) { world_client_ = client; }
+    void setWorldClient(hws::WorldEngine* client) { world_client_ = client; }
 
     void registerObjectsManager(EntitiesPerceptionManager<Object>* manager) { objects_managers_.insert(manager); }
     void registerBodyPartsManager(EntitiesPerceptionManager<BodyPart>* manager) { bodyparts_managers_.insert(manager); }
@@ -37,7 +37,7 @@ namespace owds {
   private:
     std::map<std::string, Area*> areas_;
     std::map<std::string, Area*> pending_percepts_;
-    WorldEngine* world_client_;
+    hws::WorldEngine* world_client_;
     bool drawn_;
 
     std::set<EntitiesPerceptionManager<Object>*> objects_managers_;
