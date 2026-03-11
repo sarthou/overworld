@@ -58,7 +58,7 @@ namespace owds {
 
     engine_->world.setAmbientLight({43.6, 1.43, 115.},
                                    {1.0, 0.976, 0.898},
-                                   1.5);
+                                   1.);
 
     engine_->world.setAmbientLightTime(time(nullptr));
 

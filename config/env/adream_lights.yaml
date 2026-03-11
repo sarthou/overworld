@@ -5,23 +5,24 @@ lights:
     y: 7.0
     z: 2.9
   color:
-    r: 1.0
-    g: 1.0
-    b: 1.0
+    r: 0.988
+    g: 0.980
+    b: 0.964
   ambient_strength: 0.4
-  diffuse_strength: 0.5
-  specular_strength: 0.8
-  attenuation_radius: 6.
+  diffuse_strength: 0.8
+  specular_strength: 1.
+  attenuation_radius: 10.
+
  light_2:
   position:
     x: 8.5
     y: 7.0
     z: 2.9
   color:
-    r: 1.0
-    g: 1.0
-    b: 1.0
-  ambient_strength: 0.5
-  diffuse_strength: 0.6
-  specular_strength: 0.8
-  attenuation_radius: 6.
+    r: 0.988
+    g: 0.980
+    b: 0.964
+  ambient_strength: 0.4
+  diffuse_strength: 0.8
+  specular_strength: 1.
+  attenuation_radius: 10.

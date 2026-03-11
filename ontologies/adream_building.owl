@@ -354,7 +354,7 @@
         <rdf:type rdf:resource="cg_building#Wall"/>
         <cg_entities:hasVisualMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://hello_worlds/assets/Adream/appartment.obj</cg_entities:hasVisualMesh>
         <cg_entities:hasCollisionMesh rdf:datatype="http://www.w3.org/2001/XMLSchema#string">package://hello_worlds/assets/Adream/appartment_vhacd.obj</cg_entities:hasCollisionMesh>
-        <cg_entities:hasColor rdf:resource="cg_entities#white"/>
+        <!--cg_entities:hasColor rdf:resource="cg_entities#white"/-->
     </owl:NamedIndividual>
 
 
