@@ -21,23 +21,161 @@ adream_window_h10_1:
 
 adream_window_h10_2:
   visual_only: true
-  orientation:
-    z: 1.57
+  scale:
+    y: 1.022
+  position:
+    x: -2.8639
+    y: 8.2988
+    z: 1.4249
 
-adream_window_h20_1:
+adream_window_door_outside_3x3_1:
   visual_only: true
   orientation:
     z: 1.57
+  position:
+    x: 11.573
+    y: 15.98
+    z: 1.5938
 
-adream_window_h20_2:
+adream_window_door_outside_3x3_2:
   visual_only: true
   orientation:
     z: 1.57
+  position:
+    x: 11.573
+    y: 6.0135
+    z: 1.5938
+
+adream_window_door_outside_3x3_3:
+  visual_only: true
+  orientation:
+    z: 1.57
+  position:
+    x: 11.573
+    y: -3.9512
+    z: 1.5938
+    
+adream_window_outside_3x3_1:
+  visual_only: true
+  orientation:
+    z: 1.57
+  position:
+    x: 11.571
+    y: 1.0355
+    z: 1.5932
+
+adream_window_outside_3x3_2:
+  visual_only: true
+  orientation:
+    z: 1.57
+  position:
+    x: 11.571
+    y: 11.001
+    z: 1.5929
+
+adream_window_h22_1:
+  visual_only: true
+  position:
+    x: 5.0627
+    y: -1.0579
+    z: 1.7611
+
+adream_window_h22_2:
+  visual_only: true
+  position:
+    x: 5.0627
+    y: -5.3393
+    z: 1.7611
+
+adream_window_h22_3:
+  visual_only: true
+  orientation:
+    z: 1.57
+  scale:
+    y: 1.12
+  position:
+    x: 3.95
+    y: -0.04475
+    z: 1.7611
 
 adream_window_h20_3:
   visual_only: true
+  position:
+    x: 10.06
+    y: 18.805
+    z: 1.5531
+
+adream_window_h20_4:
+  visual_only: true
+  position:
+    x: 8.8243
+    y: 18.508
+    z: 1.5531
+
+adream_window_h20_5:
+  visual_only: true
+  position:
+    x: 7.584
+    y: 18.508
+    z: 1.5531
+
+adream_window_h20_6:
+  visual_only: true
+  position:
+    x: 6.3587
+    y: 18.505
+    z: 1.5531
+
+adream_window_h20_7:
+  visual_only: true
   orientation:
     z: 1.57
+
+adream_window_h20_8:
+  visual_only: true
+  position:
+    x: -0.060667
+    y: 1.2035
+    z: 1.8868
+
+adream_window_h20_9:
+  visual_only: true
+  position:
+    x: -0.060667
+    y: 3.6972
+    z: 1.8868
+
+adream_window_door_1:
+  visual_only: true
+  orientation:
+    z: 3.1415
+  position:
+    x: -0.060667
+    y: 6.0788
+    z: 1.4258
+
+adream_window_door_2:
+  visual_only: true
+  orientation:
+    z: -1.57
+  position:
+    x: -5.2078
+    y: 8.2955
+    z: 1.4258
+
+adream_window_h20_8:
+  visual_only: true
+  position:
+    x: -0.060667
+    y: 1.2035
+    z: 1.8868
+
+adream_window_h20_9:
+  visual_only: true
+  position:
+    x: -0.060667
+    y: 3.6972
+    z: 1.8868
 
 adream_appartment:
   orientation:

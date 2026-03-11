@@ -12,15 +12,15 @@ adream_guard_rail:
 
 window_h100_1:
   visual_only: true
-  mesh: package://overworld/models/adream/windows/window_h100_1.obj
+  mesh: package://hello_worlds/assets/Adream/windows/window_h100_1.obj
 
 window_h100_2:
   visual_only: true
-  mesh: package://overworld/models/adream/windows/window_h100_2.obj
+  mesh: package://hello_worlds/assets/Adream/windows/window_h100_2.obj
 
 window_h100_3:
   visual_only: true
-  mesh: package://overworld/models/adream/windows/window_h100_3.obj
+  mesh: package://hello_worlds/assets/Adream/windows/window_h100_3.obj
 
 desk_01:
   visual_only: true
