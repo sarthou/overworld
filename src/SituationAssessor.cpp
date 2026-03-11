@@ -60,6 +60,8 @@ namespace owds {
                                    {1.0, 0.976, 0.898},
                                    1.5);
 
+    engine_->world.setAmbientLightTime(time(nullptr));
+
     engine_->world.setSubstepping(simulation_substepping_);
   }
 
@@ -225,6 +227,7 @@ namespace owds {
           // ShellDisplay::info("sleep for " + std::to_string(delta.count() / 1000000.) + " ms");
         }
         std::this_thread::sleep_until(next_start_time);
+        engine_->world.setAmbientLightTime(time(nullptr));
       }
     }
   }
